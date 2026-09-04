@@ -138,7 +138,7 @@ export default function DossierRoom({ author }: { author: Author }) {
 
             {/* portrait plate — in flow after the handle on mobile, overlapping
                 the sheet's left edge on desktop */}
-            <div className="relative z-[3] mt-8 lg:absolute lg:left-[-6rem] lg:top-[40%] lg:mt-0 lg:w-[216px] lg:-translate-y-1/2">
+            <div className="relative z-[3] mt-8 lg:absolute lg:left-[-9rem] lg:top-[40%] lg:mt-0 lg:w-[200px] lg:-translate-y-1/2">
               <div className="relative w-[150px] border border-[#7C6338]/70 bg-[#F8F6F2] lg:w-full">
                 {/* brass registration frame */}
                 <div aria-hidden="true" className="pointer-events-none absolute inset-2 border border-[#D9B978]/80" />
@@ -158,13 +158,10 @@ export default function DossierRoom({ author }: { author: Author }) {
                   )}
                 </div>
               </div>
-              <p className="mt-3 w-[150px] font-mono text-[8px] uppercase tracking-[0.12em] text-[#7C6338] lg:w-full">
-                Plate 01 — Portrait · {portrait ? portrait.split('/').pop() : 'the monogram'}
-              </p>
             </div>
 
             {/* biography + archival metadata */}
-            <div className="relative mt-10 grid grid-cols-1 gap-8 lg:mt-12 lg:grid-cols-[1.3fr_0.7fr] lg:gap-12">
+            <div className="relative mt-10 grid grid-cols-1 gap-8 lg:mt-12 lg:grid-cols-[1.3fr_0.7fr] lg:gap-12 lg:pl-[8rem] lg:pr-[12rem]">
               <div>
                 <p className="font-mono text-[10px] font-semibold uppercase tracking-[0.2em] text-[#7C6338]">
                   Biography — Contributor record
@@ -210,7 +207,7 @@ export default function DossierRoom({ author }: { author: Author }) {
             {/* featured folio plate — in flow after the metadata on mobile,
                 overlapping the sheet's right edge on desktop */}
             {featured && (
-              <div className="relative z-[3] mt-8 lg:absolute lg:right-[-4.5rem] lg:top-[46%] lg:mt-0 lg:w-[224px] lg:-translate-y-1/2">
+              <div className="relative z-[3] mt-8 lg:absolute lg:right-[-11rem] lg:top-[46%] lg:mt-0 lg:w-[224px] lg:-translate-y-1/2">
                 <div aria-hidden="true" className="absolute -bottom-1 -right-1 h-full w-full border border-[#E7DCC8] bg-[#EFE8DD] lg:hidden" />
                 <div className="relative border border-[#7C6338]/70 bg-[#EFE8DD] px-5 py-5 text-[#241D18]">
                   <div aria-hidden="true" className="pointer-events-none absolute inset-1.5 border border-[#D9B978]/50" />
@@ -242,7 +239,7 @@ export default function DossierRoom({ author }: { author: Author }) {
             )}
 
             {/* the other folios — the rest of the archive behind this name */}
-            <div className="relative mt-10 lg:mt-12">
+            <div className="relative mt-10 lg:mt-12 lg:pl-[8rem]">
               <p className="font-mono text-[9px] uppercase tracking-[0.15em] text-[#7C6338]">
                 {also.length > 0
                   ? `Also in the archive — ${also.map((w) => `№ ${folioOf(w.id)} · ${w.title} · ${w.category} · ${w.readingTime}`).join('   ·   ')}`
