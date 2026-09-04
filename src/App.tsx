@@ -131,6 +131,7 @@ export default function App() {
           <Route path="/articles" element={<PageTransition label={threshold}><Articles /></PageTransition>} />
           <Route path="/article/:id" element={<PageTransition label={threshold}><ReadingRoom><ArticleDetail /></ReadingRoom></PageTransition>} />
           <Route path="/categories" element={<PageTransition label={threshold}><Categories /></PageTransition>} />
+          <Route path="/categories/:slug" element={<PageTransition label={threshold}><Categories /></PageTransition>} />
           <Route path="/community" element={<PageTransition label={threshold}><Community /></PageTransition>} />
           <Route path="/submit" element={<PageTransition label={threshold}><Submit /></PageTransition>} />
           <Route path="/ambassadors" element={<PageTransition label={threshold}><Ambassadors /></PageTransition>} />
