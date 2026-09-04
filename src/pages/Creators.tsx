@@ -143,7 +143,7 @@ export default function Creators() {
                   <div className="img-frame relative flex aspect-[3/4] w-full max-w-[190px] items-center justify-center overflow-hidden bg-[#F2EADA] p-3">
                     {selected.portrait || selected.profilePhoto ? (
                       <img
-                        src={authorPhoto(selected.id)}
+                        src={selected.profilePhoto ?? selected.portrait ?? authorPhoto(selected.id)}
                         alt={`${selected.name} — photograph`}
                         loading="lazy"
                         decoding="async"
