@@ -64,7 +64,7 @@ export default function Plate({
         <article
           ref={presentingRef}
           aria-label={`Folio ${folio.folio}: ${folio.title} by ${folio.author}`}
-          className="relative flex h-[452px] w-[300px] flex-col overflow-hidden rounded-[3px] border border-[#7C6338] bg-[#F8F6F2] p-7 text-left shadow-[0_40px_90px_rgba(0,0,0,0.6)] md:h-[560px] md:w-[452px] md:p-12"
+          className="relative flex h-[min(452px,calc(100svh-5rem))] w-[min(300px,calc(100vw-2rem))] flex-col overflow-hidden rounded-[3px] border border-[#7C6338] bg-[#F8F6F2] p-5 text-left shadow-[0_40px_90px_rgba(0,0,0,0.6)] md:h-[560px] md:w-[452px] md:p-12"
         >
           <span
             aria-hidden
@@ -77,13 +77,13 @@ export default function Plate({
             Folio №{folio.folio}
           </p>
 
-          <h2 className="mt-5 font-serif text-[30px] font-semibold leading-[1.04] text-[#241D18] md:mt-7 md:text-[46px]">
+          <h2 className="mt-4 font-serif text-[clamp(1.8rem,8vw,2.2rem)] font-semibold leading-[1.04] text-[#241D18] md:mt-7 md:text-[46px]">
             {folio.title}
           </h2>
 
           <span className="mt-6 block h-px w-full bg-[#B89146] md:mt-8" aria-hidden />
 
-          <p className="mt-5 font-serif text-[15px] italic leading-snug text-[#463F38] md:mt-7 md:text-[19px] md:leading-relaxed">
+          <p className="mt-4 font-serif text-[14px] italic leading-snug text-[#463F38] md:mt-7 md:text-[19px] md:leading-relaxed">
             {folio.excerpt}
           </p>
 
