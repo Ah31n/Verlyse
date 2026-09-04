@@ -86,9 +86,14 @@ export default function Room() {
 
   useEffect(() => {
     const onResize = () => setLayout(layoutForWidth(window.innerWidth))
+    const previousOverflowX = document.body.style.overflowX
+    document.body.style.overflowX = 'hidden'
     window.addEventListener('resize', onResize)
     onResize()
-    return () => window.removeEventListener('resize', onResize)
+    return () => {
+      document.body.style.overflowX = previousOverflowX
+      window.removeEventListener('resize', onResize)
+    }
   }, [])
 
   useEffect(() => {
@@ -183,7 +188,7 @@ export default function Room() {
       if (e.key === 'Enter') {
         if (state === 'arrival') { setState('discovery'); return }
         if (state === 'discovery') { setState('focus'); return }
-        if (state === 'focus') { setState('settle'); return }
+        if (state === 'focus') { enter(focus); return }
         if (state === 'settle') { enter(focus); return }
         if (state === 'ending') { goNext(); return }
         if (state === 'next') { enter(focus); return }
@@ -227,7 +232,7 @@ export default function Room() {
 
   return (
     <main
-      className="room relative h-screen w-full overflow-hidden bg-charcoal text-ivory"
+      className="room relative min-h-[100svh] w-full touch-pan-y overflow-x-clip overflow-y-auto bg-charcoal text-ivory lg:h-screen lg:overflow-hidden"
       style={{ perspective: reduced ? undefined : '1600px' }}
       aria-label="The Keeping Room — a Verlyse Media spatial archive"
     >
@@ -244,8 +249,10 @@ export default function Room() {
       <BrassThread state={state} reduced={reduced} mobile={layout === 'mobile'} />
 
       {/* 3D stage */}
+      {/* Mobile gets real document height instead of a clipped desktop stage. */}
+      <div aria-hidden="true" className="h-[32svh] md:hidden" />
       <div
-        className="absolute inset-0"
+        className="absolute inset-0 min-h-[132svh] md:min-h-0"
         style={{ transformStyle: 'preserve-3d', perspective: reduced ? undefined : '1600px' }}
       >
         {FOLIOS.map((f, i) => (
@@ -293,7 +300,7 @@ export default function Room() {
             <p className="font-mono text-[12px] font-medium uppercase tracking-[0.32em] text-gold">
               A spatial archive of {count} voices
             </p>
-            <h1 className="mt-4 font-serif text-[clamp(3rem,9vw,7.5rem)] font-semibold leading-[0.98]">
+            <h1 className="mt-4 max-w-[10ch] font-serif text-[clamp(2.7rem,13vw,7.5rem)] font-semibold leading-[0.94] md:max-w-none">
               The Keeping<br />Room
             </h1>
             <p className="mt-6 max-w-xl font-serif text-[clamp(1.1rem,2vw,1.5rem)] italic leading-snug text-cream/90">
@@ -413,7 +420,7 @@ export default function Room() {
           animate={{ opacity: 1, x: 0 }}
           exit={{ opacity: 0, x: -24 }}
           transition={{ duration: reduced ? 0 : 0.5 }}
-          className="absolute left-0 top-0 z-[450] flex h-full w-[min(420px,86vw)] flex-col bg-[#2A0F18] p-8 shadow-[40px_0_80px_rgba(0,0,0,0.5)] md:p-12"
+          className="absolute left-0 top-0 z-[450] flex h-full max-h-[100svh] w-[min(420px,86vw)] flex-col overflow-y-auto bg-[#2A0F18] p-8 shadow-[40px_0_80px_rgba(0,0,0,0.5)] md:p-12"
           aria-label={`Creator dossier: ${dossierAuthorRecord.name}`}
         >
           <p className="font-mono text-[11px] uppercase tracking-[0.28em] text-gold">Contributor</p>
@@ -464,7 +471,7 @@ export default function Room() {
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             transition={{ duration: reduced ? 0 : 0.35 }}
-            className="absolute inset-0 z-[600] flex items-start justify-center bg-[#2A0F18]/90 px-6 pt-[18vh]"
+            className="absolute inset-0 z-[600] flex items-start justify-center overflow-y-auto bg-[#2A0F18]/90 px-6 pt-[18vh] pb-12"
             role="dialog"
             aria-modal="true"
             aria-label="Search the archive"
