@@ -26,6 +26,11 @@ export function useSeo({ title, description, path = '/', image = '/img/poster-3-
     setMeta('meta[property="og:description"]', 'content', description)
     setMeta('meta[property="og:url"]', 'content', url)
     setMeta('meta[property="og:image"]', 'content', `${window.location.origin}${image}`)
+    setMeta('meta[property="og:type"]', 'content', 'website')
+    setMeta('meta[name="twitter:card"]', 'content', 'summary_large_image')
+    setMeta('meta[name="twitter:title"]', 'content', `${title} — Verlyse Media`)
+    setMeta('meta[name="twitter:description"]', 'content', description)
+    setMeta('meta[name="twitter:image"]', 'content', `${window.location.origin}${image}`)
 
     // canonical link
     let canon = document.head.querySelector<HTMLLinkElement>('link[rel="canonical"]')
@@ -82,6 +87,11 @@ export function useArticleSeo(article: { title: string; excerpt: string; date: s
     setMeta('meta[property="og:title"]', 'content', `${article.title} — Verlyse Media`)
     setMeta('meta[property="og:description"]', 'content', desc)
     setMeta('meta[property="og:image"]', 'content', `${window.location.origin}/${article.cover}`)
+    setMeta('meta[property="og:type"]', 'content', 'article')
+    setMeta('meta[name="twitter:card"]', 'content', 'summary_large_image')
+    setMeta('meta[name="twitter:title"]', 'content', `${article.title} — Verlyse Media`)
+    setMeta('meta[name="twitter:description"]', 'content', desc)
+    setMeta('meta[name="twitter:image"]', 'content', `${window.location.origin}/${article.cover}`)
 
     let canon = document.head.querySelector<HTMLLinkElement>('link[rel="canonical"]')
     if (!canon) {
