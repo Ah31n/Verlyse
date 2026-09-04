@@ -119,7 +119,7 @@ function Cover({ selectedId, state }: { selectedId: string | null; state: Spatia
       {/* ——— MID · issue line + tagline — the editorial threshold, centred.
           Pinned by an explicit top so the threshold sits in the upper-middle
           of the hall (board ghost zone), independent of the flex stack. ——— */}
-      <motion.div style={{ y: pFolio }} className="absolute inset-x-0 top-[clamp(8.5rem,20vh,12rem)] z-[2] px-6 text-center">
+      <motion.div style={{ y: pFolio }} className="absolute inset-x-0 top-[clamp(6.5rem,12vh,8.5rem)] z-[2] px-6 text-center">
         <motion.p
           initial={reduce ? false : { opacity: 0, y: 14 }}
           animate={{ opacity: 1, y: 0 }}
