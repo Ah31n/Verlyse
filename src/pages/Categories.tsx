@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
-import { Link } from 'react-router-dom'
+import { Link, useParams } from 'react-router-dom'
 import { motion } from 'framer-motion'
 import { useSeo } from '../hooks/useSeo'
 import { getAuthor, ARTICLES, CATEGORIES } from '../data/content'
@@ -18,14 +18,21 @@ import { getAuthor, ARTICLES, CATEGORIES } from '../data/content'
  * doors · Esc returns to REST (all seven doors).
  */
 export default function Categories() {
+  const { slug } = useParams<{ slug?: string }>()
+  const selectedCategory = slug ? CATEGORIES.find((category) => category.slug === slug) : undefined
   useSeo({
-    path: '/categories',
-    title: 'Categories',
-    description: 'The departments of Verlyse Media — seven wings, one publication.',
+    path: slug && selectedCategory ? `/categories/${selectedCategory.slug}` : '/categories',
+    title: selectedCategory?.name ?? 'Categories',
+    description: selectedCategory?.blurb ?? 'The departments of Verlyse Media — seven wings, one publication.',
   })
 
-  const [active, setActive] = useState<string | null>(null)
-  const [focusIdx, setFocusIdx] = useState(0)
+  const [active, setActive] = useState<string | null>(selectedCategory?.name ?? null)
+  const [focusIdx, setFocusIdx] = useState(() => Math.max(0, selectedCategory ? CATEGORIES.findIndex((category) => category.slug === selectedCategory.slug) : 0))
+
+  useEffect(() => {
+    setActive(selectedCategory?.name ?? null)
+    setFocusIdx(Math.max(0, selectedCategory ? CATEGORIES.findIndex((category) => category.slug === selectedCategory.slug) : 0))
+  }, [selectedCategory?.name, selectedCategory?.slug])
   const hallRef = useRef<HTMLDivElement>(null)
 
   /* every wing's folios — registry order, real data (the selected wing's
