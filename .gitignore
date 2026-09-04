@@ -1,11 +1,70 @@
-node_modules
-dist
+# Dependencies and generated output
+node_modules/
+dist/
 *.tsbuildinfo
+.vercel/
+coverage/
+.playwright/
+.cache/
+.tmp/
 .DS_Store
-.vercel
 
-# Local MCP configs (contain the OriginKit live API key) — keep .example in git
-.mcp.json
-.cursor/mcp.json
-.vscode/mcp.json
+# Environment and secrets
 .env
+.env.*
+!.env.example
+*.local
+*.secret
+*.secrets
+
+# Credentials, tokens, keys, and certificates
+*.pem
+*.key
+*.p12
+*.pfx
+*.crt
+*.cer
+credentials.json
+credentials.*
+secrets.json
+secrets.*
+*token*
+*oauth*
+*credential*
+
+# Browser profiles and session data
+.cookies/
+.cookies
+**/Cookies
+**/Cookies-journal
+**/Login Data
+**/Login Data For Account
+**/Local Storage/
+**/Session Storage/
+**/Sessions/
+**/User Data/
+**/browser-profile/
+**/chrome-profile/
+**/chromium-profile/
+
+# PKI / browser databases
+**/*.db
+**/*.sqlite
+**/*.sqlite3
+**/Certificate Revocation Lists/
+**/PKI/
+
+# MCP and agent configuration
+.mcp.json
+.mcp.*
+!.mcp.example.json
+**/.cursor/mcp.json
+**/.vscode/mcp.json
+**/mcp-config.json
+
+# Workspace and local agent state
+.arena/
+.cursor/
+.vscode/
+.workspace/
+.agent/
