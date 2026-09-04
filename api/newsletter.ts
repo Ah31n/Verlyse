@@ -9,7 +9,9 @@
  * (Vercel production, the InfinityFree mirror, local previews).
  *
  * A simple in-memory rate limit (per IP) protects the endpoint from
- * brute-force/abuse, with the standard X-RateLimit-* headers.
+ * brute-force/abuse, with the standard X-RateLimit-* headers. This is
+ * instance-local only and is not distributed protection across serverless
+ * instances; a shared rate-limit store is the follow-up hardening step.
  */
 
 /** Simple sliding-window limiter: 10 requests per minute per IP. */
@@ -55,10 +57,32 @@ function rateLimit(req: HandlerRequest, res: HandlerResponse): boolean {
   return entry.count > RATE_LIMIT
 }
 
-export default async function handler(req: HandlerRequest, res: HandlerResponse) {
-  res.setHeader('Access-Control-Allow-Origin', '*')
+const DEFAULT_ALLOWED_ORIGINS = [
+  'https://verlyse-react.vercel.app',
+  'http://localhost:5173',
+  'http://localhost:4173',
+]
+
+function allowedOrigins(): Set<string> {
+  const configured = process.env.ALLOWED_ORIGINS
+    ?.split(',')
+    .map((origin) => origin.trim())
+    .filter(Boolean)
+  return new Set(configured?.length ? configured : DEFAULT_ALLOWED_ORIGINS)
+}
+
+function applyCors(req: HandlerRequest, res: HandlerResponse) {
+  const origin = req.headers.origin
+  if (typeof origin === 'string' && allowedOrigins().has(origin)) {
+    res.setHeader('Access-Control-Allow-Origin', origin)
+    res.setHeader('Vary', 'Origin')
+  }
   res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS')
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type')
+}
+
+export default async function handler(req: HandlerRequest, res: HandlerResponse) {
+  applyCors(req, res)
   // Hardening headers
   res.setHeader('X-Content-Type-Options', 'nosniff')
   res.setHeader('X-Frame-Options', 'SAMEORIGIN')
