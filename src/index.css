@@ -1,0 +1,531 @@
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ============================================================
+   VERLYSE MEDIA — design system
+   Dark academia · luxury magazine · editorial
+   ============================================================ */
+
+@layer base {
+  :root {
+    --wine: #5C1224;
+    --wine-deep: #3B0D17;
+    --ivory: #F8F6F2;
+    --cream: #EFE8DD;
+    --gold: #B89146;
+    --charcoal: #1C1C1C;
+    --rule: rgba(248, 246, 242, 0.13);
+    --faint: rgba(248, 246, 242, 0.52);
+    --muted: rgba(248, 246, 242, 0.68);
+  }
+
+  html {
+    scroll-behavior: smooth;
+    -webkit-text-size-adjust: 100%;
+    overflow-x: clip;
+  }
+
+  body {
+    @apply bg-wine-deep text-ivory font-sans antialiased;
+    font-size: 17px;
+    line-height: 1.7;
+    text-rendering: optimizeLegibility;
+    overflow-x: clip;
+  }
+
+  /* ——— typographic foundations ——— */
+  h1, h2, h3, h4 {
+    text-wrap: balance;
+    font-feature-settings: "liga" 1, "dlig" 1, "lnum" 1;
+  }
+  p {
+    text-wrap: pretty;
+  }
+  blockquote {
+    font-feature-settings: "liga" 1, "dlig" 1;
+  }
+
+  ::selection {
+    background: var(--gold);
+    color: #1C1C1C;
+  }
+
+  ::-webkit-scrollbar { width: 10px; }
+  ::-webkit-scrollbar-track { background: #23070E; }
+  ::-webkit-scrollbar-thumb { background: rgba(248, 246, 242, 0.22); border: 2px solid #23070E; }
+  ::-webkit-scrollbar-thumb:hover { background: rgba(184, 145, 70, 0.55); }
+  html { position: relative; scrollbar-width: thin; scrollbar-color: rgba(248, 246, 242, 0.28) transparent; }
+
+  :focus-visible {
+    outline: 1px solid var(--gold);
+    outline-offset: 3px;
+  }
+
+  img { display: block; max-width: 100%; }
+  a { color: inherit; }
+
+  @media (prefers-reduced-motion: reduce) {
+    html { scroll-behavior: auto; }
+    *, *::before, *::after {
+      animation-duration: 0.001s !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.001s !important;
+    }
+  }
+}
+
+@layer components {
+  /* ---------- Editorial type ---------- */
+  .display {
+    @apply font-serif font-light leading-[1.02] tracking-[-0.02em] text-balance;
+    font-feature-settings: "liga" 1, "dlig" 1;
+  }
+  .eyebrow {
+    @apply inline-flex items-center gap-4 text-[11px] font-semibold uppercase text-gold;
+    letter-spacing: 0.36em;
+  }
+  .eyebrow::before {
+    content: "";
+    @apply block h-px w-12 bg-gold;
+  }
+  .kicker {
+    @apply font-mono text-[11px] uppercase text-gold;
+    letter-spacing: 0.28em;
+  }
+
+  /* ——— the decorative drop cap: oversized, italic, seated on the measure ——— */
+  .drop-cap::first-letter {
+    font-family: "Cormorant Garamond", Georgia, serif;
+    font-style: italic;
+    font-weight: 300;
+    float: left;
+    font-size: 4.5em;
+    line-height: 0.7;
+    padding: 0.1em 0.18em 0 0;
+    margin-top: 0.04em;
+    color: var(--gold);
+    text-shadow: 0 1px 0 rgba(184, 145, 70, 0.25);
+  }
+
+  /* ——— the house pull quote: one voice for every quotation ——— */
+  .pull-quote {
+    @apply font-serif font-light italic leading-[1.45];
+    font-feature-settings: "liga" 1, "dlig" 1;
+  }
+
+  /* ——— magazine caption: small, tracked, quiet ——— */
+  .fig-cap {
+    @apply font-mono text-[9px] uppercase tracking-[0.30em];
+  }
+
+  /* ——— tabular numerals for ledgers and counts ——— */
+  .tnum {
+    font-variant-numeric: tabular-nums lining-nums;
+  }
+
+  /* ---------- Hairlines & frames ---------- */
+  .hairline-t { border-top: 1px solid var(--rule); }
+  .hairline-b { border-bottom: 1px solid var(--rule); }
+  .frame-gold {
+    position: relative;
+  }
+  .frame-gold::after {
+    content: "";
+    position: absolute;
+    inset: 16px;
+    border: 1px solid rgba(184, 145, 70, 0.5);
+    pointer-events: none;
+    z-index: 1;
+  }
+
+  /* ---------- Ghost numerals ---------- */
+  .ghost-num {
+    -webkit-text-stroke: 1px rgba(248, 246, 242, 0.07);
+    color: transparent;
+    user-select: none;
+    pointer-events: none;
+  }
+
+  /* ---------- Buttons ---------- */
+  .btn {
+    @apply relative inline-flex items-center justify-center gap-3 overflow-hidden px-9 py-4 font-sans text-[11px] font-semibold uppercase tracking-[0.24em];
+    transition: color 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+  .btn::before {
+    content: "";
+    @apply absolute inset-0 -z-10 origin-bottom;
+    background: var(--gold);
+    transform: scaleY(0);
+    transition: transform 0.7s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+  .btn:hover::before { transform: scaleY(1); }
+  .btn-gold {
+    @apply bg-gold text-[#171212] border border-gold;
+  }
+  .btn-gold:hover { @apply text-ivory; }
+  .btn-gold::before { background: var(--wine-deep); }
+  .btn-ghost {
+    @apply border border-gold/60 text-ivory;
+  }
+  .btn-ghost:hover { @apply text-ivory; }
+  .btn-ghost::before { background: var(--gold); }
+
+  /* the seal — a wine seal set on the letter, inked on hover */
+  .btn-seal {
+    @apply border border-wine text-wine;
+  }
+  .btn-seal:hover { @apply text-[#F2EADA]; }
+  .btn-seal::before { background: var(--wine-deep); }
+
+  /* buttons press like a seal — a held breath, then release */
+  .btn:active::before { transform: scaleY(1); transition-duration: 0.2s; }
+  .btn:active { transform: translateY(1px); }
+  .btn { transition: color 0.6s cubic-bezier(0.16, 1, 0.3, 1), transform 0.2s cubic-bezier(0.16, 1, 0.3, 1); }
+
+  /* focus — a gold rule, not a blue outline */
+  .btn:focus-visible {
+    outline: none;
+    box-shadow: 0 0 0 1px var(--gold), 0 0 0 4px rgba(184, 145, 70, 0.2);
+  }
+
+  /* ---------- Forms ---------- */
+  .field {
+    @apply flex flex-col gap-2;
+  }
+  .field-label {
+    @apply font-mono text-[10px] uppercase tracking-[0.3em] text-gold;
+  }
+  .field-input {
+    @apply bg-transparent border-0 border-b border-gold/40 px-0 py-2.5 font-serif text-xl text-ivory outline-none;
+    transition: border-color 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+  .field-input::placeholder { @apply text-ivory/35 italic; }
+  .field-input:focus {
+    border-color: var(--gold);
+    box-shadow: 0 1px 0 var(--gold);
+  }
+  .field-input.is-invalid { border-bottom-color: #E8A2A2; }
+  .field-area { @apply resize-y min-h-24 leading-relaxed; }
+
+  /* ---------- The letter to the desk ---------- */
+  .letter-input {
+    @apply w-full border-0 border-b border-wine/25 bg-transparent pb-2.5 font-serif text-lg italic text-wine outline-none;
+    transition:
+      border-color 0.6s cubic-bezier(0.16, 1, 0.3, 1),
+      box-shadow 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+  .letter-input::placeholder { color: rgba(59, 13, 23, 0.35); }
+  .letter-input:focus {
+    border-color: var(--gold);
+    box-shadow: 0 1px 0 var(--gold);
+  }
+  .letter-input.is-invalid { border-bottom-color: #B33A3A; }
+  .letter-input:-webkit-autofill {
+    -webkit-box-shadow: 0 0 0 1000px #F2EADA inset;
+    -webkit-text-fill-color: #3B0D17;
+    caret-color: #3B0D17;
+  }
+
+  /* ---------- The film strip — a reel you can hold ---------- */
+  .vm-film-scroll {
+    cursor: grab;
+    scrollbar-width: thin;
+    scrollbar-color: rgba(184, 145, 70, 0.35) transparent;
+  }
+  .vm-film-scroll:active { cursor: grabbing; }
+  .vm-film-scroll.is-dragging { cursor: grabbing; user-select: none; }
+  .vm-film-scroll::-webkit-scrollbar { height: 6px; }
+  .vm-film-scroll::-webkit-scrollbar-thumb { background: rgba(184, 145, 70, 0.35); }
+  .vm-film-scroll::-webkit-scrollbar-track { background: transparent; }
+
+
+  /* ---------- Cards ---------- */
+  .card-article {
+    @apply flex flex-col border-t border-white/10 pt-6 text-ivory no-underline;
+  }
+
+  /* ---------- Reveal states (JS via framer-motion) ---------- */
+  .img-frame {
+    position: relative;
+    overflow: hidden;
+  }
+  /* the frame holds the photograph with a tasteful inner shadow — nothing else */
+  .img-frame::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    box-shadow: inset 0 0 110px rgba(16, 4, 8, 0.32);
+    pointer-events: none;
+    z-index: 2;
+  }
+
+
+  /* ---------- Skip link ---------- */
+  .skip-link {
+    @apply fixed -top-24 left-4 z-[2000] bg-gold px-5 py-3 font-mono text-[11px] uppercase tracking-[0.18em] text-charcoal no-underline transition-all;
+  }
+  .skip-link:focus { top: 1rem; }
+
+  .no-scroll { overflow: hidden; }
+}
+
+@layer utilities {
+  .text-balance { text-wrap: balance; }
+  .text-pretty { text-wrap: pretty; }
+  .writing-vertical {
+    writing-mode: vertical-rl;
+  }
+}
+
+  /* ================================================================== */
+  /* ARTICLE SIGNATURES — the final shot of every publication.          */
+  /* One original symbolic scene per story, drawn in the house language */
+  /* (wine, ivory, gold). Only the symbolic element moves; everything   */
+  /* else stays still. Under .sig-anim only; static resting frames      */
+  /* otherwise (reduced motion / before paint).                         */
+  /* ================================================================== */
+
+  /* — 1 · Their Voices Matter — the timeline:
+       0-1s nothing · 1-2s the hand rises · 2-6s almost still (the elbow
+       sways ~1° left, ~1° right, back — the wrist absorbs it all; the
+       sign never bends) · 6-8s fade to FIN. The sway runs once. — */
+  @keyframes sig-tvm-elbow {
+    0%   { transform: rotate(0deg); }
+    20%  { transform: rotate(-1deg); }
+    40%  { transform: rotate(-1deg); }
+    50%  { transform: rotate(0deg); }
+    60%  { transform: rotate(1deg); }
+    80%  { transform: rotate(1deg); }
+    100% { transform: rotate(0deg); }
+  }
+  .sig-tvm-elbow { transform-origin: 22% 93%; will-change: transform; }
+  .sig-anim .vm-live .sig-tvm-elbow { animation: sig-tvm-elbow 4s ease-in-out 2s both; }
+  @keyframes sig-tvm-wrist {
+    0%   { transform: rotate(0deg); }
+    20%  { transform: rotate(-0.4deg); }
+    40%  { transform: rotate(-0.4deg); }
+    50%  { transform: rotate(0deg); }
+    60%  { transform: rotate(0.4deg); }
+    80%  { transform: rotate(0.4deg); }
+    100% { transform: rotate(0deg); }
+  }
+  .sig-tvm-wrist { transform-origin: 49% 57%; will-change: transform; }
+  .sig-anim .vm-live .sig-tvm-wrist { animation: sig-tvm-wrist 4s ease-in-out 2.3s both; }
+
+  /* the hero's sway — the whole cutout, pivoting at the bottom where the
+     arm leaves the frame. Less than 1° each side, very slow. */
+  @keyframes sig-tvm-sway {
+    0%, 100% { transform: rotate(0deg); }
+    25%      { transform: rotate(-0.6deg); }
+    55%      { transform: rotate(0.6deg); }
+    80%      { transform: rotate(0deg); }
+  }
+  .sig-tvm-sway {
+    transform-origin: 50% 100%;
+    will-change: transform;
+  }
+  .sig-anim .vm-live .sig-tvm-sway {
+    animation: sig-tvm-sway 14s ease-in-out 3s infinite;
+  }
+
+  /* the comic ink accents — separate floating strokes that appear briefly
+     while the hand rises, then fade away. Not outlines, not persistent. */
+  @keyframes sig-ink-pop {
+    0%   { opacity: 0; transform: translate(0, 0); }
+    18%  { opacity: 0.85; }
+    45%  { opacity: 0.55; }
+    62%  { opacity: 0.7; transform: translate(3px, -3px); }
+    100% { opacity: 0; transform: translate(5px, -5px); }
+  }
+  .sig-ink-a1, .sig-ink-a2, .sig-ink-a3, .sig-ink-a4 { opacity: 0; will-change: transform; }
+  .sig-anim .vm-live .sig-ink-a1 { animation: sig-ink-pop 2.4s ease-out 1.2s both; }
+  .sig-anim .vm-live .sig-ink-a2 { animation: sig-ink-pop 2.4s ease-out 1.5s both; }
+  .sig-anim .vm-live .sig-ink-a3 { animation: sig-ink-pop 2.4s ease-out 1.8s both; }
+  .sig-anim .vm-live .sig-ink-a4 { animation: sig-ink-pop 2.4s ease-out 2.1s both; }
+
+  /* — 2 · 3:13 — the second hand, sweeping through the wait — */
+  @keyframes sig-tick { to { transform: rotate(360deg); } }
+  .sig-clock-hand { transform-origin: 60px 60px; }
+  .sig-anim .sig-clock-hand { animation: sig-tick 60s linear infinite; }
+
+  /* — 4 · The Arts Deserve Respect — the candle flame, breathing — */
+  @keyframes sig-flame2 {
+    0%, 100% { transform: scaleY(1) skewX(0deg); }
+    25%      { transform: scaleY(1.07) skewX(-1.2deg); }
+    55%      { transform: scaleY(0.95) skewX(1deg); }
+    78%      { transform: scaleY(1.04) skewX(-0.6deg); }
+  }
+  .sig-flame2 { transform-origin: 50% 100%; }
+  .sig-anim .sig-flame2 { animation: sig-flame2 7s ease-in-out infinite; }
+
+  /* — 5 · Hope Becomes Mythology — the far light across the water — */
+  @keyframes sig-farlight { 0%, 100% { opacity: 0.5; } 45% { opacity: 0.95; } 62% { opacity: 0.62; } }
+  .sig-farlight { opacity: 0.8; }
+  .sig-anim .sig-farlight { animation: sig-farlight 8s ease-in-out infinite; }
+
+  /* — 7 · Tasbih-e-Fatima — one bead travels the string — */
+  @keyframes sig-bead2 { 0% { offset-distance: 0%; } 78% { offset-distance: 100%; } 100% { offset-distance: 100%; } }
+  .sig-bead2 { offset-rotate: 0deg; }
+  .sig-anim .sig-bead2 { animation: sig-bead2 21s cubic-bezier(0.45, 0.05, 0.55, 0.95) infinite; }
+
+  /* — 8 · Intellect Lost to Code — the caret waits (sig-caret below) — */
+
+  /* — 10 · Water Cat — the cat blinks once, and flicks an ear — */
+  @keyframes sig-blink { 0%, 86%, 100% { transform: scaleY(1); } 90%, 95% { transform: scaleY(0.06); } }
+  .sig-cat-eye { transform-box: fill-box; transform-origin: center; }
+  .sig-anim .sig-cat-eye { animation: sig-blink 12s ease-in-out infinite; }
+  @keyframes sig-earflick { 0%, 78%, 100% { transform: rotate(0deg); } 84% { transform: rotate(-12deg); } 91% { transform: rotate(0deg); } }
+  .sig-cat-ear { transform-box: fill-box; transform-origin: 50% 12%; }
+  .sig-anim .sig-cat-ear { animation: sig-earflick 19s ease-in-out infinite; }
+
+  /* — 11 · If Hope Were a Feather — the feather drifts and rests — */
+  @keyframes sig-feather {
+    0%   { transform: translate(-120px, -150px) rotate(-16deg); opacity: 0; }
+    10%  { opacity: 0.9; }
+    38%  { transform: translate(30px, -40px) rotate(6deg); }
+    62%  { transform: translate(-24px, 60px) rotate(-10deg); }
+    76%  { transform: translate(6px, 118px) rotate(0deg); opacity: 0.9; }
+    84%  { transform: translate(0, 122px) rotate(2deg); opacity: 0.8; }
+    96%  { transform: translate(-44px, 54px) rotate(-8deg); opacity: 0; }
+    100% { transform: translate(-86px, -46px) rotate(-14deg); opacity: 0; }
+  }
+  .sig-feather { opacity: 0.85; }
+  .sig-anim .sig-feather { animation: sig-feather 16s cubic-bezier(0.45, 0.05, 0.55, 0.95) infinite; }
+
+  /* — 12 · The Horrors of CSA — the protected light, breathing — */
+  @keyframes sig-protect { 0%, 100% { opacity: 0.6; } 50% { opacity: 1; } }
+  .sig-protect { opacity: 0.9; }
+  .sig-anim .sig-protect { animation: sig-protect 7s ease-in-out infinite; }
+
+  /* — 13 · Khageena — the steam of the pause, rising — */
+  @keyframes sig-steam2 {
+    0%   { transform: translate(0, 14px) scaleY(0.85); opacity: 0; }
+    20%  { opacity: 0.5; }
+    60%  { opacity: 0.3; }
+    100% { transform: translate(10px, -78px) scaleY(1.15); opacity: 0; }
+  }
+  .sig-steam2 { opacity: 0.25; }
+  .sig-anim .sig-steam2 { animation: sig-steam2 10s ease-in-out infinite; }
+  .sig-anim .sig-steam2:nth-of-type(2) { animation-delay: 3.3s; }
+  .sig-anim .sig-steam2:nth-of-type(3) { animation-delay: 6.6s; }
+
+  /* — 15 · Jaldi — the window light, staying on — */
+  @keyframes sig-window2 { 0%, 100% { opacity: 0.55; } 50% { opacity: 1; } }
+  .sig-window2 { opacity: 0.9; }
+  .sig-anim .sig-window2 { animation: sig-window2 9s ease-in-out infinite; }
+
+  /* — 16 · Failure — the light climbs the steps, and waits — */
+  @keyframes sig-climb2 {
+    0%   { transform: translateY(0); opacity: 0; }
+    5%   { opacity: 1; }
+    18%  { transform: translateY(0); }
+    30%  { transform: translateY(-52px); }
+    43%  { transform: translateY(-52px); }
+    55%  { transform: translateY(-104px); }
+    68%  { transform: translateY(-104px); }
+    80%  { transform: translateY(-156px); }
+    88%  { transform: translateY(-156px); opacity: 1; }
+    92%  { transform: translateY(-156px); opacity: 0; }
+    100% { transform: translateY(0); opacity: 0; }
+  }
+  .sig-climber2 { transform: translateY(-156px); opacity: 0.95; }
+  .sig-anim .sig-climber2 { animation: sig-climb2 20s cubic-bezier(0.45, 0.05, 0.55, 0.95) infinite; }
+
+  /* — 17 · My Last Breath — the bud opens; the bird crosses — */
+  @keyframes sig-cycle-bud {
+    0%, 5%  { opacity: 0; transform: scale(0.3); }
+    14%     { opacity: 0.9; transform: scale(1); }
+    24%     { transform: scale(1.07); }
+    32%, 100% { opacity: 0; transform: scale(1.04); }
+  }
+  @keyframes sig-cycle-bird {
+    0%, 30% { transform: translateX(90px); opacity: 0; }
+    38%     { opacity: 0.9; }
+    58%     { transform: translateX(-110px); opacity: 0.8; }
+    68%, 100% { transform: translateX(-130px); opacity: 0; }
+  }
+  .sig-cycle-bud { opacity: 0; }
+  .sig-cycle-bird { transform: translateX(0); opacity: 0.5; }
+  .sig-anim .sig-cycle-bud { animation: sig-cycle-bud 26s ease-in-out infinite; }
+  .sig-anim .sig-cycle-bird { animation: sig-cycle-bird 26s ease-in-out infinite; }
+
+  /* — 18 · The Garden Beyond My Tower — petals past the window — */
+  @keyframes sig-petal2 {
+    0%   { transform: translate(0, -10px) rotate(0deg); opacity: 0; }
+    10%  { opacity: 0.65; }
+    100% { transform: translate(30px, 260px) rotate(300deg); opacity: 0; }
+  }
+  .sig-petal2 { opacity: 0; }
+  .sig-anim .sig-petal2 { animation: sig-petal2 13s ease-in-out infinite; }
+  .sig-anim .sig-petal2:nth-of-type(2) { animation-delay: 4.3s; }
+  .sig-anim .sig-petal2:nth-of-type(3) { animation-delay: 8.6s; }
+
+
+  /* the caret — the only life left on the page */
+  @keyframes sig-caret { 0%, 49% { opacity: 1; } 50%, 100% { opacity: 0; } }
+  .sig-caret { opacity: 1; }
+  .sig-anim .sig-caret { animation: sig-caret 1.5s steps(1) infinite; }
+
+  @media print {
+    .sig-anim, .sig-anim * { animation: none !important; }
+  }
+
+  /* ---------- Print — the magazine, on paper ---------- */
+  @media print {
+    .skip-link,
+    header,
+    footer,
+    nav,
+    [role="dialog"],
+    [aria-label="Quick navigation"],
+    [aria-label="Saved stories"] {
+      display: none !important;
+    }
+    body {
+      background: #fff !important;
+      color: #1f1f1f !important;
+    }
+    main, section, article {
+      background: #fff !important;
+    }
+    h1, h2, h3, h4 {
+      color: #111 !important;
+      break-after: avoid;
+    }
+    p, li, blockquote, figcaption {
+      color: #222 !important;
+    }
+    [class*="text-ivory"], [class*="text-white"], .pull-quote {
+      color: #222 !important;
+    }
+    [class*="text-gold"], .kicker, .eyebrow {
+      color: #6b5220 !important;
+    }
+    [class*="font-mono"], .fig-cap {
+      color: #555 !important;
+    }
+    .drop-cap::first-letter {
+      color: #6b5220 !important;
+    }
+    a {
+      color: inherit !important;
+    }
+    a[href^="http"]::after {
+      content: " (" attr(href) ")";
+      font-size: 0.75em;
+      color: #666;
+    }
+    img {
+      max-width: 100% !important;
+      break-inside: avoid;
+    }
+    .img-frame, figure {
+      break-inside: avoid;
+    }
+    [class*="animate-"] {
+      animation: none !important;
+      transition: none !important;
+    }
+  }
