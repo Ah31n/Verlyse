@@ -1,0 +1,11 @@
+node_modules
+dist
+*.tsbuildinfo
+.DS_Store
+.vercel
+
+# Local MCP configs (contain the OriginKit live API key) — keep .example in git
+.mcp.json
+.cursor/mcp.json
+.vscode/mcp.json
+.env
