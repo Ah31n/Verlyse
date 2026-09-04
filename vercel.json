@@ -13,6 +13,11 @@
   ],
   "rewrites": [
     { "source": "/api/(.*)", "destination": "/api/$1" },
+    { "source": "/articles", "destination": "/articles/index.html" },
+    { "source": "/categories", "destination": "/categories/index.html" },
+    { "source": "/article/:id", "destination": "/article/:id/index.html" },
+    { "source": "/creator/:id", "destination": "/creator/:id/index.html" },
+    { "source": "/categories/:slug", "destination": "/categories/:slug/index.html" },
     { "source": "/(.*)", "destination": "/index.html" }
   ]
 }
