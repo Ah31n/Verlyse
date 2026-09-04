@@ -103,7 +103,7 @@ const INDEX = [
 
 export default function Footer() {
   return (
-    <footer className="border-t border-white/10 bg-charcoal" aria-label="Footer">
+    <footer className="relative z-10 border-t border-white/10 bg-charcoal" aria-label="Footer">
       {/* the closing invitation */}
       <div className="border-b border-white/10">
         <div className="mx-auto max-w-page px-[clamp(1.75rem,5.5vw,4.75rem)] py-[clamp(4.5rem,9vh,7rem)]">
@@ -122,11 +122,14 @@ export default function Footer() {
 
       {/* the letter — its own full-width band so the CTA keeps a wide,
           horizontal composition on desktop */}
-      <div className="border-b border-white/10">
+      <div className="border-b border-white/10 bg-charcoal">
         <div className="mx-auto max-w-page px-[clamp(1.75rem,5.5vw,4.75rem)] py-14">
-          <Reveal>
+          {/* Keep the letter band in normal flow. The previous reveal wrapper could
+              leave this whole section visually empty in embedded previews and in
+              fast screenshot captures while the CTA remained visible. */}
+          <div className="relative z-10">
             <Newsletter />
-          </Reveal>
+          </div>
         </div>
       </div>
 
