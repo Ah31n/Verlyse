@@ -36,15 +36,19 @@ export default function Header() {
     document.body.classList.toggle('no-scroll', menuOpen)
   }, [menuOpen])
 
-  // Focus management: move focus into the menu when it opens, restore on close,
-  // and allow Escape to dismiss it — keyboard-first navigation.
+  // Focus management: move focus into the menu when it opens, restore only to
+  // the control that opened it, and allow Escape to dismiss it.
   const burgerRef = useRef<HTMLButtonElement>(null)
+  const menuOpenerRef = useRef<HTMLElement | null>(null)
   useEffect(() => {
     if (menuOpen) {
       const first = document.querySelector<HTMLAnchorElement>('#site-menu a')
       first?.focus()
-    } else {
-      burgerRef.current?.focus()
+    } else if (menuOpenerRef.current) {
+      const opener = menuOpenerRef.current
+      menuOpenerRef.current = null
+      const t = window.setTimeout(() => opener.focus(), 0)
+      return () => window.clearTimeout(t)
     }
   }, [menuOpen])
 
@@ -155,7 +159,10 @@ export default function Header() {
             <button
               ref={burgerRef}
               type="button"
-              onClick={() => setMenuOpen((v) => !v)}
+              onClick={() => {
+                if (!menuOpen) menuOpenerRef.current = document.activeElement as HTMLElement
+                setMenuOpen((v) => !v)
+              }}
               aria-expanded={menuOpen}
               aria-controls="site-menu"
               aria-label={menuOpen ? 'Close menu' : 'Open menu'}
