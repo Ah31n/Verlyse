@@ -33,6 +33,7 @@ export function isSaved(id: string): boolean {
 export default function SavedDrawer() {
   const [open, setOpen] = useState(false)
   const [saved, setSaved] = useState<SavedItem[]>([])
+  const closeRef = useRef<HTMLButtonElement | null>(null)
 
   useEffect(() => {
     const load = () => {
@@ -67,6 +68,21 @@ export default function SavedDrawer() {
     }
   }, [open])
 
+  useEffect(() => {
+    const onKey = (event: KeyboardEvent) => {
+      if (open && event.key === 'Escape') setOpen(false)
+    }
+    window.addEventListener('keydown', onKey)
+    if (open) {
+      const t = window.setTimeout(() => closeRef.current?.focus(), 0)
+      return () => {
+        window.clearTimeout(t)
+        window.removeEventListener('keydown', onKey)
+      }
+    }
+    return () => window.removeEventListener('keydown', onKey)
+  }, [open])
+
   const remove = (id: string) => {
     const next = saved.filter((s) => s.id !== id)
     try { localStorage.setItem(KEY, JSON.stringify(next)) } catch {}
@@ -99,6 +115,7 @@ export default function SavedDrawer() {
                 The bookmarks
               </h3>
               <button
+                ref={closeRef}
                 type="button"
                 onClick={() => setOpen(false)}
                 aria-label="Close saved stories"
