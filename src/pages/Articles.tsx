@@ -116,7 +116,7 @@ function Archive() {
         {/* ——— MID · header block — ghost folio range, title, search ———
             The ghost № 01–19 floats at the shelf's top-right, out of flow, so
             the first folio row starts high — as the board's shelf does. ——— */}
-        <div className="relative flex flex-wrap items-start justify-between gap-6">
+        <div className="relative flex flex-wrap items-end justify-between gap-6">
           <div aria-hidden="true" className="pointer-events-none absolute right-0 top-0 z-0 hidden select-none md:block">
             <span className="whitespace-nowrap font-serif text-[clamp(4rem,10vw,8rem)] font-semibold leading-[0.8] text-transparent [-webkit-text-stroke:1px_rgba(184,145,70,0.18)]">
               № 01–19
@@ -130,21 +130,22 @@ function Archive() {
               The <em className="italic text-gold">folio shelf</em>
             </h1>
           </div>
-        </div>
-
-        {/* search — SEARCH THE ARCHIVE… */}
-        <div className="relative z-10 mt-5 max-w-md md:mt-6" onKeyDown={onKeyDown}>
-          <label htmlFor="art-search" className="font-mono text-[10px] uppercase tracking-[0.3em] text-white/55">
-            Search the archive…
-          </label>
-          <input
-            id="art-search"
-            type="search"
-            value={query}
-            onChange={(e) => setQuery(e.target.value)}
-            placeholder="Titles, writers, genres…"
-            className="mt-2 w-full border-0 border-b border-gold/40 bg-transparent pb-3 font-serif text-2xl font-light text-ivory outline-none placeholder:italic placeholder:text-ivory/35 focus:border-gold"
-          />
+          {/* P27 places the search rail in the upper-right of the desktop shelf;
+              mobile keeps it in normal flow below the title. */}
+          <div className="relative z-10 mt-5 w-full max-w-md md:mt-0 md:w-[490px] md:max-w-none">
+            <label htmlFor="art-search" className="font-mono text-[10px] uppercase tracking-[0.3em] text-white/55">
+              Search the archive…
+            </label>
+            <input
+              id="art-search"
+              type="search"
+              value={query}
+              onChange={(e) => setQuery(e.target.value)}
+              onKeyDown={onKeyDown}
+              placeholder="Titles, writers, genres…"
+              className="mt-2 w-full border border-gold/40 bg-transparent px-3 py-2 font-mono text-[10px] uppercase tracking-[0.18em] text-ivory outline-none placeholder:text-ivory/35 focus:border-gold"
+            />
+          </div>
         </div>
 
         {/* ——— MID · the category rail — seven real departments ——— */}
@@ -175,8 +176,8 @@ function Archive() {
         </div>
 
         {/* ——— FRONT · the nineteen folios — solid ivory plates on the shelf,
-            registry order. The desk grid keeps the board's central hinge: three
-            folios, the brass spine, two folios. ——— */}
+            registry order. Desktop follows P27's 7 + 7 + 5 shelf rhythm;
+            mobile collapses to one quiet column. ——— */}
         <div
           role="group"
           aria-label="The archive — nineteen folios"
@@ -189,7 +190,7 @@ function Archive() {
             className="pointer-events-none absolute bottom-0 left-1/2 top-0 z-0 hidden w-px -translate-x-1/2 bg-gradient-to-b from-transparent via-[#D9B978]/30 to-transparent xl:block"
           />
           <div
-            className="relative z-10 mt-[clamp(1.5rem,3.5vh,2.5rem)] grid grid-cols-1 items-stretch gap-x-[clamp(1.25rem,3vw,2.5rem)] gap-y-[clamp(1.4rem,3vh,2.2rem)] pb-16 sm:grid-cols-2 md:mt-[clamp(2rem,4.5vh,2.75rem)] md:pb-0 md:grid-cols-3 xl:grid-cols-5"
+            className="relative z-10 mx-auto mt-[clamp(1.5rem,3.5vh,2.5rem)] grid max-w-[1080px] grid-cols-1 items-stretch gap-x-[clamp(0.75rem,1.2vw,1.25rem)] gap-y-[clamp(1.4rem,3vh,2.2rem)] pb-16 sm:grid-cols-2 md:mt-[clamp(2rem,4.5vh,2.75rem)] md:pb-0 md:grid-cols-3 xl:grid-cols-7"
             onKeyDown={onKeyDown}
             role="list"
           >
