@@ -320,30 +320,30 @@ export default function ArticleDetail() {
         /* ——— DOCUMENTARY: the dispatch — dateline, stronger type, the cover as a
             framed plate (fixed aspect ratio, object-contain — never a stretched
             full-bleed banner, never cropped) ——— */
-        <section className="relative flex min-h-[86svh] items-end overflow-hidden border-b border-white/10 bg-wine-deep pt-36">
+        <section className="relative flex min-h-[86svh] items-center overflow-hidden border-b border-white/10 bg-wine-deep pt-36">
           <WorldTexture world={article.world} />
           <div aria-hidden="true" className="pointer-events-none absolute inset-x-0 top-0 h-72 bg-[radial-gradient(62%_55%_at_50%_6%,rgba(184,145,70,0.05),transparent_74%)]" />
-          <div className="relative z-[2] mx-auto grid w-full max-w-page grid-cols-1 items-end gap-10 px-[clamp(1.75rem,5.5vw,4.75rem)] pb-14 lg:grid-cols-[1.05fr_0.95fr]">
-            <div>
+          <div className="relative z-[2] mx-auto flex w-full max-w-page flex-col items-center px-[clamp(1.75rem,5.5vw,4.75rem)] pb-14 text-center">
+            <div className="w-full max-w-[820px]">
               <Reveal>
-                <p className="mb-6 flex items-center gap-4 font-mono text-[9px] uppercase tracking-[0.30em] text-gold">
+                <p className="mb-6 flex items-center justify-center gap-4 font-mono text-[9px] uppercase tracking-[0.30em] text-gold">
                   <span className="h-px w-10 bg-gold/60" aria-hidden="true" />
                   Dispatch — {article.date.split('-').reverse().join('.')}
                 </p>
               </Reveal>
               <Reveal><p className="kicker">Verlyse Media presents — a submission by {author?.name}</p></Reveal>
               <div className={`${vibe.titleClass} inline-block`}>
-                <SplitText as="h1" text={`“${article.title}”`} className="mt-5 max-w-[16ch] text-[clamp(2.8rem,6.8vw,6.4rem)]" />
+                <SplitText as="h1" text={`“${article.title}”`} className="mx-auto mt-5 max-w-[20ch] text-[clamp(2.8rem,6.8vw,6.4rem)]" />
               </div>
-              <Reveal delay={0.2} className="mt-8">
+              <Reveal delay={0.2} className="mt-8 flex justify-center">
                 <MetaRow category={article.category} author={author?.name} readingTime={article.readingTime} />
               </Reveal>
               <Reveal delay={0.3}>
-                <p className="mt-6 max-w-[46ch] font-serif text-lg font-light italic leading-[1.7] text-white/70">{article.excerpt}</p>
+                <p className="mx-auto mt-6 max-w-[58ch] font-serif text-lg font-light italic leading-[1.7] text-white/70">{article.excerpt}</p>
               </Reveal>
             </div>
             <Reveal delay={0.25}>
-              <figure className="relative ml-auto w-full max-w-[380px] max-sm:w-[68%]">
+              <figure className="relative mx-auto mt-12 w-full max-w-[640px] max-sm:w-[88%]">
                 <div className="img-frame relative overflow-hidden border border-white/15">
                   {/* the cover plate — the frame takes the photograph's own
                       ratio (aspect-[3/4] default), object-contain keeps the
