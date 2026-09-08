@@ -28,7 +28,7 @@ function monogram(name: string) {
  * Not a grid of profile cards: a wall whose names step forward.
  * Keyboard: names are real buttons; ← → move · Enter selects · Esc returns.
  */
-import { CrashZoom , MaskReveal, Magnetic, Tilt3D } from '../components/cinematic'
+import { CrashZoom , MaskReveal, Magnetic, Tilt3D, Slate } from '../components/cinematic'
 
 export default function Creators() {
   useSeo({
@@ -102,6 +102,7 @@ export default function Creators() {
           <p className="mt-4 font-mono text-[10px] uppercase tracking-[0.34em] text-gold/85">
             The contributor wall — {AUTHORS.length} voices · {ARTICLES.length} folios
           </p>
+          <Slate move="crash zoom" className="mt-5" />
         </div>
 
         {/* ——— FRONT · the dossier plate — the focused contributor steps forward ——— */}

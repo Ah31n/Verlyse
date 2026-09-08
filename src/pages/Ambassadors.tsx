@@ -41,7 +41,7 @@ const initialsOf = (n: string) => n.split(' ').map((p) => p[0]).join('').slice(0
  * focuses it and opens the person's record. The thirteenth seat is drawn open,
  * waiting for the first ambassador the program brings.
  */
-import { CrashZoom , MaskReveal, Magnetic, Rise3D } from '../components/cinematic'
+import { CrashZoom , MaskReveal, Magnetic, Rise3D, Slate } from '../components/cinematic'
 
 export default function Ambassadors() {
   useSeo({
@@ -102,6 +102,7 @@ export default function Ambassadors() {
           <p className="mt-4 font-mono text-[10px] uppercase tracking-[0.34em] text-gold/85">
             The people — ambassadors · team · the open seat
           </p>
+          <Slate move="crash zoom" className="mt-5" />
           <Reveal delay={0.2}>
             <p className="mx-auto mt-6 max-w-[52ch] text-lg leading-[1.8] text-white/70">
               Twelve credited in the room today, each a numbered medallion. Choose one to open the record. The thirteenth diamond is drawn open, waiting for the ambassador the program brings.

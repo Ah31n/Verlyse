@@ -13,7 +13,7 @@ function FieldHint({ show, children }: { show: boolean; children: ReactNode }) {
   )
 }
 
-import { CrashZoom , MaskReveal } from '../components/cinematic'
+import { CrashZoom , MaskReveal, Slate } from '../components/cinematic'
 
 export default function Submit() {
   useSeo({
@@ -132,6 +132,7 @@ path: '/submit',
               <span className="relative">The editorial <em className="italic text-gold">desk</em></span>
             </MaskReveal>
           </h1>
+          <Slate move="crash zoom" className="mt-6" />
           <Reveal delay={0.15}>
             <p className="mt-6 max-w-[52ch] text-lg leading-[1.8] text-white/70">
               The platform puts it plainly: “Want to submit your work too? We’d love to feature it. Submit your work through the link in our bio.”

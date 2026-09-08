@@ -13,5 +13,5 @@
  * recorded in docs/ANIMATION-DECISIONS.md. Do not add further GSAP surfaces
  * without re-reading that note.
  */
-export { CrashZoom, DepthStage, DepthLayer, OrbitalDrift, PushIn, Magnetic, LineMaskReveal, MaskReveal, Tilt3D, Rise3D } from './primitives'
+export { CrashZoom, DepthStage, DepthLayer, OrbitalDrift, PushIn, Magnetic, LineMaskReveal, MaskReveal, Tilt3D, Rise3D, Slate, DollyIn } from './primitives'
 export { useCinematic, prefersReducedMotion } from './useCinematic'

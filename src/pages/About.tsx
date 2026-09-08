@@ -3,7 +3,7 @@ import { useSeo } from '../hooks/useSeo'
 import { Link } from 'react-router-dom'
 import { BRAND, COMMUNITY_STATS } from '../data/content'
 import BrassRule from '../components/ui/BrassRule'
-import { CrashZoom, DepthStage, DepthLayer, OrbitalDrift, PushIn , MaskReveal } from '../components/cinematic'
+import { CrashZoom, DepthStage, DepthLayer, OrbitalDrift, PushIn , MaskReveal, Slate } from '../components/cinematic'
 
 /**
  * THE COLOPHON — the quiet institutional record of Verlyse Media, from the
@@ -65,6 +65,7 @@ export default function About() {
           <p className="mt-4 font-mono text-[10px] uppercase tracking-[0.34em] text-gold/80">
             The colophon — the institutional record of Verlyse Media
           </p>
+          <Slate move="crash zoom" className="mt-5" />
         </div>
 
         {/* ——— MID · the layered editorial sheets ———

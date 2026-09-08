@@ -11,7 +11,7 @@ import { AnticipatedTitle, ReflectionLine } from '../components/ui/ScrollBeat'
 import { LibraryCard, HiddenQuote } from '../components/ui/EasterEggs'
 import { MetaRow, SectionHead, UnderlineLink } from '../components/ui/primitives'
 import { ImmersiveShell, BrassThread } from '../components/immersive'
-import { Magnetic, MaskReveal, Tilt3D } from '../components/cinematic'
+import { Magnetic, MaskReveal, Tilt3D, Slate } from '../components/cinematic'
 import { ARTICLES, BRAND, CATEGORIES, getAuthor } from '../data/content'
 // The spatial engine is loaded on demand so its heavy chunk (three) never
 // ships with the initial publication shell.
@@ -155,6 +155,7 @@ function Cover({ selectedId, state }: { selectedId: string | null; state: Spatia
         >
           “Where Vision <em className="italic text-gold">Becomes</em> A Voice”
         </motion.h1>
+        <Slate move="crash zoom" className="mt-6" />
       </motion.div>
 
       {/* ——— MID · ghost folio — № 01 engraved behind the threshold ——— */}
