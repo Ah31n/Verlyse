@@ -1,0 +1,22 @@
+import puppeteer from 'puppeteer'
+const b=await puppeteer.launch({args:['--no-sandbox','--disable-dev-shm-usage'],headless:'new'})
+const p=await b.newPage(); await p.setViewport({width:1440,height:900})
+p.on('pageerror',e=>console.log('PAGEERROR:',String(e).slice(0,200)))
+p.on('console',m=>{if(m.type()==='error')console.log('CONSOLE:',m.text().slice(0,200))})
+await p.goto('http://localhost:5173/creators',{waitUntil:'domcontentloaded',timeout:30000})
+await new Promise(r=>setTimeout(r,1800))
+// direct DOM click
+await p.evaluate(()=>{const b=Array.from(document.querySelectorAll('button[aria-pressed]')).find(b=>/Anshujit/i.test(b.innerText)); b.click()})
+await new Promise(r=>setTimeout(r,1200))
+console.log('after DOM click pressed:',await p.evaluate(()=>Array.from(document.querySelectorAll('button[aria-pressed="true"]')).map(x=>x.innerText.split('\n')[1])))
+// reset to Alina then mouse click at coords
+await p.evaluate(()=>{Array.from(document.querySelectorAll('button[aria-pressed]')).find(b=>/Alina/i.test(b.innerText)).click()})
+await new Promise(r=>setTimeout(r,800))
+const box=await p.evaluate(()=>{const el=Array.from(document.querySelectorAll('button[aria-pressed]')).find(b=>/Anshujit/i.test(b.innerText)); const r=el.getBoundingClientRect(); return {x:r.x+r.width/2,y:r.y+r.height/2}})
+console.log('Anshujit button center:',box)
+const elAt=await p.evaluate(({x,y})=>{const el=document.elementFromPoint(x,y); return el?`${el.tagName}.${el.className.toString().slice(0,40)} text=${el.innerText.slice(0,20)}`:'none'},box)
+console.log('element at that point:',elAt)
+await p.mouse.click(box.x,box.y)
+await new Promise(r=>setTimeout(r,1200))
+console.log('after mouse click pressed:',await p.evaluate(()=>Array.from(document.querySelectorAll('button[aria-pressed="true"]')).map(x=>x.innerText.split('\n')[1])))
+await b.close()

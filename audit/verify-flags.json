@@ -1,0 +1,10 @@
+{
+  "search-escape-mount-unmount": {
+    "status": "PASS",
+    "detail": "dialog unmounted=true, focus on trigger=true"
+  },
+  "ending-voices-scene": {
+    "status": "PASS",
+    "detail": "scene=ending-their-voices-matter phase=FALLBACK fin(present after6s)=true"
+  }
+}

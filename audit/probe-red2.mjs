@@ -1,0 +1,17 @@
+import puppeteer from 'puppeteer'
+const b=await puppeteer.launch({args:['--no-sandbox','--disable-dev-shm-usage'],headless:'new'})
+const p=await b.newPage(); await p.setViewport({width:1440,height:900})
+await p.emulateMediaFeatures([{name:'prefers-reduced-motion',value:'reduce'}])
+await p.goto('http://localhost:5173/',{waitUntil:'domcontentloaded',timeout:30000})
+await new Promise(r=>setTimeout(r,2200))
+const run=await p.evaluate(()=>document.getAnimations().filter(a=>a.playState==='running').map(a=>{const t=a.effect?.target;return {tag:t?.tagName,cls:(t?.className||'').toString().slice(0,55),prop:Object.keys(a.effect?.getKeyframes?.()?.[0]||{}).join(','),name:a.animationName||a.constructor.name}}))
+console.log('REDUCED home running:',run.length)
+console.log(JSON.stringify(run,null,1))
+// mobile opacities
+await p.emulateMediaFeatures([])
+const p2=await b.newPage(); await p2.setViewport({width:390,height:844})
+await p2.goto('http://localhost:5173/articles',{waitUntil:'domcontentloaded',timeout:30000})
+await new Promise(r=>setTimeout(r,2000))
+const ops=await p2.evaluate(()=>Array.from(document.querySelectorAll('a[aria-label^="Folio"]')).map(a=>parseFloat(getComputedStyle(a.parentElement).opacity)))
+console.log('MOBILE ops:',JSON.stringify(ops))
+await b.close()
