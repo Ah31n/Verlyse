@@ -1,12 +1,28 @@
 import { useEffect, useRef, useState } from 'react'
 import { Link, useLocation } from 'react-router-dom'
-import { AnimatePresence, motion } from 'motion/react'
+import { AnimatePresence, motion, useReducedMotion } from 'motion/react'
 import { Magnetic } from '../cinematic'
+import { trapFocus } from '../../lib/focus'
 import { BRAND, MENU_LINKS, NAV_LINKS } from '../../data/content'
 
 /* ---------- Search + menu control (global via context-free events) ---------- */
 export function openSearch() {
   window.dispatchEvent(new CustomEvent('verlyse:search'))
+}
+
+/** The saved count — read from the shelf, kept in step with the drawer.
+    Real local data only: it counts what this reader has actually kept. */
+function useSavedCount(): number {
+  const [n, setN] = useState(0)
+  useEffect(() => {
+    const load = () => {
+      try { setN(JSON.parse(localStorage.getItem('verlyse-saved') || '[]').length) } catch { setN(0) }
+    }
+    load()
+    window.addEventListener('verlyse:saved-updated', load)
+    return () => window.removeEventListener('verlyse:saved-updated', load)
+  }, [])
+  return n
 }
 
 const SearchIcon = (
@@ -17,8 +33,10 @@ const SearchIcon = (
 )
 
 export default function Header() {
+  const reduced = useReducedMotion() === true
   const [scrolled, setScrolled] = useState(false)
   const [menuOpen, setMenuOpen] = useState(false)
+  const savedCount = useSavedCount()
   const location = useLocation()
 
   useEffect(() => {
@@ -61,6 +79,10 @@ export default function Header() {
     return () => window.removeEventListener('keydown', onKey)
   }, [menuOpen])
 
+  // Tab stays inside the open menu — the veil behind it is unreachable
+  const menuRef = useRef<HTMLDivElement | null>(null)
+  useEffect(() => (menuOpen && menuRef.current ? trapFocus(menuRef.current) : undefined), [menuOpen])
+
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
       if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === 'k') {
@@ -77,7 +99,7 @@ export default function Header() {
       <header
         className={`fixed inset-x-0 top-0 z-[1100] border-b transition-all duration-500 ${
           scrolled && !menuOpen
-            ? 'border-white/10 bg-[#25070F]'
+            ? 'border-white/10 bg-[#25070F]/[0.97] shadow-[0_12px_34px_rgba(6,1,4,0.35)] backdrop-blur-[6px]'
             : 'border-transparent bg-transparent'
         }`}
       >
@@ -87,8 +109,8 @@ export default function Header() {
               <circle cx="20" cy="20" r="18.5" fill="none" stroke="currentColor" strokeWidth="1" />
               <path d="M12.5 14.5 L20 27 L27.5 14.5" fill="none" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round" />
             </svg>
-            <span className="font-serif text-2xl leading-none">
-              Verlyse <em className="italic text-gold">Media</em>
+            <span className="font-serif text-2xl leading-none max-[479px]:text-lg">
+              Verlyse <em className="italic text-gold max-[479px]:hidden">Media</em>
             </span>
           </Link>
 
@@ -136,18 +158,23 @@ export default function Header() {
             <button
               type="button"
               onClick={() => window.dispatchEvent(new CustomEvent('verlyse:saved'))}
-              aria-label="Saved stories"
+              aria-label={savedCount > 0 ? `Saved stories — ${savedCount} kept` : 'Saved stories'}
               title="Saved stories"
-              className="relative grid h-10 w-10 place-items-center border border-gold/40 text-ivory transition-all duration-400 hover:-translate-y-0.5 hover:border-gold hover:bg-gold hover:text-charcoal max-[479px]:hidden lg:hidden xl:grid"
+              className="relative grid h-10 w-10 shrink-0 place-items-center border border-gold/40 text-ivory transition-all duration-400 hover:-translate-y-0.5 hover:border-gold hover:bg-gold hover:text-charcoal max-[479px]:h-9 max-[479px]:w-9"
             >
               <svg viewBox="0 0 24 24" aria-hidden="true" className="h-[17px] w-[17px] fill-none stroke-current [stroke-width:1.4]"><path d="M6 3.5h12v17L12 16.8 6 20.5z" /></svg>
+              {savedCount > 0 && (
+                <span aria-hidden="true" className="absolute -right-1.5 -top-1.5 grid h-4 min-w-4 place-items-center bg-gold px-1 font-mono text-[8px] font-semibold leading-none text-charcoal">
+                  {savedCount > 99 ? '99' : savedCount}
+                </span>
+              )}
             </button>
             <button
               type="button"
               onClick={openSearch}
               aria-label="Search articles (Ctrl K)"
               title="Search (Ctrl K)"
-              className="grid h-10 w-10 place-items-center border border-gold/40 text-ivory transition-all duration-400 hover:-translate-y-0.5 hover:border-gold hover:bg-gold hover:text-charcoal max-[479px]:hidden"
+              className="grid h-10 w-10 shrink-0 place-items-center border border-gold/40 text-ivory transition-all duration-400 hover:-translate-y-0.5 hover:border-gold hover:bg-gold hover:text-charcoal max-[479px]:h-9 max-[479px]:w-9"
             >
               {SearchIcon}
             </button>
@@ -182,6 +209,7 @@ export default function Header() {
       <AnimatePresence>
         {menuOpen && (
           <motion.div
+            ref={menuRef}
             id="site-menu"
             role="dialog"
             aria-modal="true"
@@ -199,9 +227,9 @@ export default function Header() {
               {MENU_LINKS.map((l, i) => (
                 <motion.div
                   key={l.to}
-                  initial={{ y: '120%' }}
+                  initial={reduced ? false : { y: '120%' }}
                   animate={{ y: 0 }}
-                  transition={{ duration: 0.9, ease: [0.65, 0.05, 0.36, 1], delay: 0.1 + i * 0.07 }}
+                  transition={{ duration: reduced ? 0 : 0.9, ease: [0.65, 0.05, 0.36, 1], delay: reduced ? 0 : 0.1 + i * 0.07 }}
                 >
                   <Link
                     to={l.to}
@@ -236,7 +264,7 @@ export default function Header() {
                   onClick={() => { setMenuOpen(false); window.dispatchEvent(new CustomEvent('verlyse:saved')) }}
                   className="border border-gold/40 px-5 py-2.5 font-mono text-[9px] uppercase tracking-[0.28em] text-ivory/80 transition-colors duration-300 hover:border-gold hover:text-gold"
                 >
-                  Saved stories
+                  Saved stories{savedCount > 0 ? ` · ${savedCount}` : ''}
                 </button>
               </div>
             </div>

@@ -4,7 +4,7 @@ import type { ReactNode } from 'react'
 import { AnimatePresence, motion, useReducedMotion } from 'motion/react'
 import Layout from './components/layout/Layout'
 import ReadingRoom from './components/reading/ReadingRoom'
-import { ARTICLES } from './data/content'
+import { ARTICLES, LEDGER } from './data/content'
 
 /* Route-level code splitting — each page loads in its own chunk, so the
    first paint ships only the cover, the chrome, and the shared editorial
@@ -36,8 +36,8 @@ function thresholdLabel(pathname: string): string {
   if (pathname.startsWith('/creator/')) return 'A contributor dossier'
   switch (pathname) {
     case '/': return 'The archive'
-    case '/articles': return 'Nineteen folios'
-    case '/categories': return 'The index'
+    case '/articles': return `${LEDGER.features} folios`
+    case '/categories': return 'The seven rooms'
     case '/creators': return 'The contributors'
     case '/ambassadors': return 'The people'
     case '/community': return 'The commons'

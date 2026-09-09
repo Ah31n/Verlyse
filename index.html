@@ -18,13 +18,35 @@
     <meta name="twitter:title" content="Verlyse Media — Where Vision Becomes A Voice" />
     <meta name="twitter:description" content="A platform presenting submissions from emerging storytellers — designed and published with care." />
     <meta name="twitter:image" content="https://verlyse-react.vercel.app/img/poster-3-13-1.webp" />
+    <meta name="color-scheme" content="dark" />
+    <meta property="og:url" content="https://verlyse-react.vercel.app/" />
+    <link rel="canonical" href="https://verlyse-react.vercel.app/" />
     <link rel="preload" href="/fonts/CormorantGaramond-normal.woff2" as="font" type="font/woff2" crossorigin />
+    <link rel="preload" href="/fonts/IBMPlexMono.woff2" as="font" type="font/woff2" crossorigin />
     <link rel="stylesheet" href="/fonts/fonts.css" crossorigin="anonymous" />
     <link rel="preload" href="/fonts/Inter.woff2" as="font" type="font/woff2" crossorigin />
+    <!-- the entrance plate's cover — fetched while the shell parses, never after -->
+    <link rel="preload" as="image" href="/img/works/DaDY7WRkw0y-1.webp" fetchpriority="low" />
     <title>Verlyse Media — Where Vision Becomes A Voice</title>
+    <style>
+      /* the first paint is already the magazine: the hall's wine holds the
+         screen until the shell mounts, so there is never a white flash */
+      html, body { background: #3B0D17; }
+    </style>
   </head>
   <body>
     <div id="root"></div>
+    <noscript>
+      <div style="min-height:100vh;display:flex;flex-direction:column;justify-content:center;padding:clamp(2rem,8vw,6rem);background:linear-gradient(170deg,#4A1120 0%,#3B0D17 52%,#1A070E 100%);color:#F8F6F2;font-family:Georgia,serif;">
+        <p style="font-family:ui-monospace,monospace;font-size:11px;letter-spacing:0.32em;text-transform:uppercase;color:#B89146;">Issue № 01 — Verlyse Media</p>
+        <h1 style="font-size:clamp(2.2rem,6vw,4rem);font-weight:300;line-height:1.1;margin-top:1.25rem;">Where Vision Becomes A Voice</h1>
+        <p style="max-width:52ch;margin-top:1.5rem;line-height:1.8;color:rgba(248,246,242,0.75);">
+          A student-led publication for poetry, essays, stories, art, lifestyle, horror and social issues.
+          The archive needs a little JavaScript to open its folios — please enable it, or read the magazine on Instagram at
+          <a href="https://instagram.com/verlyse.media" style="color:#B89146;">@verlyse.media</a>.
+        </p>
+      </div>
+    </noscript>
     <script type="module" src="/src/main.tsx"></script>
   </body>
 </html>

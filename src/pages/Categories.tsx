@@ -1,8 +1,8 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
-import { Link, useParams } from 'react-router-dom'
+import { Link, useNavigate, useParams } from 'react-router-dom'
 import { motion } from 'motion/react'
 import { useSeo } from '../hooks/useSeo'
-import { getAuthor, ARTICLES, CATEGORIES } from '../data/content'
+import { getAuthor, ARTICLES, CATEGORIES, LEDGER } from '../data/content'
 import { ImmersiveShell, BrassThread } from '../components/immersive'
 
 /**
@@ -20,6 +20,7 @@ import { ImmersiveShell, BrassThread } from '../components/immersive'
  */
 export default function Categories() {
   const { slug } = useParams<{ slug?: string }>()
+  const navigate = useNavigate()
   const selectedCategory = slug ? CATEGORIES.find((category) => category.slug === slug) : undefined
   useSeo({
     path: slug && selectedCategory ? `/categories/${selectedCategory.slug}` : '/categories',
@@ -41,9 +42,14 @@ export default function Categories() {
   const foliosOf = (name: string) => ARTICLES.map((a, i) => ({ a, i })).filter(({ a }) => a.category === name)
   const wingArticles = useMemo(() => (active ? foliosOf(active) : []), [active])
 
+  /* selecting a door also deep-links it — /categories/:slug keeps the
+     exact room on refresh and on share */
   const select = (name: string) => {
-    setActive((cur) => (cur === name ? null : name))
+    const wasActive = active === name
+    setActive(wasActive ? null : name)
     setFocusIdx(Math.max(0, CATEGORIES.findIndex((c) => c.name === name)))
+    const slugOf = CATEGORIES.find((c) => c.name === name)?.slug
+    navigate(wasActive || !slugOf ? '/categories' : `/categories/${slugOf}`, { replace: true })
   }
 
   const onKeyDown = (e: React.KeyboardEvent) => {
@@ -63,6 +69,7 @@ export default function Categories() {
         if (active) {
           e.preventDefault()
           setActive(null)
+          navigate('/categories', { replace: true })
         }
         break
     }
@@ -130,7 +137,7 @@ export default function Categories() {
           <h2 aria-live="polite" className="mt-3 font-mono text-[10px] uppercase tracking-[0.3em] text-white/60">
             {active
               ? `${active} — ${CATEGORIES.find((c) => c.name === active)?.count ?? ''} folios · step forward`
-              : 'Seven doors — nineteen folios · choose your department'}
+              : `Seven doors — ${LEDGER.features} folios · choose your department`}
           </h2>
         </div>
 
@@ -177,7 +184,9 @@ export default function Categories() {
                         'max-w-[150px] cursor-pointer xl:scale-[0.985]'
                   }`}
                 >
-                  {/* the arch — a solid ivory plate for the standing wing, gold ghost otherwise */}
+                  {/* the arch — a solid ivory plate for the standing wing, gold ghost otherwise.
+                      The wing's own accent tints the ghost once — one hue, low alpha, never a
+                      neon sign: the rooms are siblings, not rivals. */}
                   <span
                     aria-hidden="true"
                     className={`pointer-events-none absolute inset-0 rounded-t-full border transition-colors duration-500 ${
@@ -187,6 +196,7 @@ export default function Categories() {
                           ? 'border-gold/70 bg-gold/[0.04]'
                           : 'border-white/20 group-hover:border-gold/50'
                     }`}
+                    style={isPlate ? undefined : { backgroundColor: `${c.accent}0F` }}
                   />
                   {/* the plate's inner hairline — brass thread inside the ivory door */}
                   <span
@@ -210,6 +220,10 @@ export default function Categories() {
                     }`}
                   >
                     Wing {['I', 'II', 'III', 'IV', 'V', 'VI', 'VII'][i]}
+                  </span>
+                  {/* the wing's own mark — small, typographic, in the accent */}
+                  <span aria-hidden="true" className="relative mt-2 text-lg leading-none" style={{ color: isPlate ? '#7C6338' : c.accent }}>
+                    {c.motif}
                   </span>
                   <span
                     className={`relative mt-3 font-serif font-normal leading-[1.05] transition-colors duration-500 ${
@@ -282,7 +296,7 @@ export default function Categories() {
             {active && (
               <button
                 type="button"
-                onClick={() => setActive(null)}
+                onClick={() => { setActive(null); navigate('/categories', { replace: true }) }}
                 className="border-b border-gold/60 pb-0.5 font-mono text-[9px] uppercase tracking-[0.3em] text-gold no-underline transition-colors hover:text-ivory"
               >
                 Esc · return to all seven doors

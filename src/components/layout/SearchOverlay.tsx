@@ -1,11 +1,8 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
-import { useLocation, useNavigate } from 'react-router-dom'
+import { Link, useLocation, useNavigate } from 'react-router-dom'
 import { AnimatePresence, motion, useReducedMotion } from 'motion/react'
 import { ARTICLES, getAuthor } from '../../data/content'
-
-function esc(s: string) {
-  return s.replace(/&/g, '&amp;').replace(/"/g, '&quot;')
-}
+import { trapFocus } from '../../lib/focus'
 
 /** Where the search was opened from — the page context preserved beneath. */
 function contextLabel(path: string): string {
@@ -38,6 +35,7 @@ export default function SearchOverlay() {
   const openerRef = useRef<HTMLElement | null>(null)
   const inputRef = useRef<HTMLInputElement | null>(null)
   const listRef = useRef<HTMLUListElement | null>(null)
+  const panelRef = useRef<HTMLDivElement | null>(null)
 
   useEffect(() => {
     const onOpen = () => {
@@ -53,6 +51,8 @@ export default function SearchOverlay() {
   useEffect(() => {
     setOpen(false)
   }, [location.pathname])
+
+  useEffect(() => open && panelRef.current ? trapFocus(panelRef.current) : undefined, [open])
 
   useEffect(() => {
     document.body.classList.toggle('no-scroll', open)
@@ -83,16 +83,19 @@ export default function SearchOverlay() {
   }, [open])
 
   const query = q.trim().toLowerCase()
+  /* keyword scope — title, creator, category, and the feature's own tags and
+     excerpt: the index answers to the words inside the work, not just its spine */
   const results = useMemo(
     () =>
       query
         ? ARTICLES.filter((a) => {
             const author = getAuthor(a.authorId)?.name ?? ''
-            return (a.title + ' ' + a.category + ' ' + author).toLowerCase().includes(query)
-          }).slice(0, 8)
+            return `${a.title} ${a.category} ${author} ${a.tags.join(' ')} ${a.excerpt}`.toLowerCase().includes(query)
+          })
         : [],
     [query],
   )
+  const shown = results.slice(0, 8)
   // keep the roving active index in range
   useEffect(() => { setActive(0) }, [results.length, query])
 
@@ -102,10 +105,10 @@ export default function SearchOverlay() {
   }
 
   const onResultsKey = (e: React.KeyboardEvent) => {
-    if (!results.length) return
-    if (e.key === 'ArrowDown') { e.preventDefault(); setActive((a) => (a + 1) % results.length) }
-    else if (e.key === 'ArrowUp') { e.preventDefault(); setActive((a) => (a - 1 + results.length) % results.length) }
-    else if (e.key === 'Enter') { e.preventDefault(); const r = results[active]; if (r) openResult(r.id) }
+    if (!shown.length) return
+    if (e.key === 'ArrowDown') { e.preventDefault(); setActive((a) => (a + 1) % shown.length) }
+    else if (e.key === 'ArrowUp') { e.preventDefault(); setActive((a) => (a - 1 + shown.length) % shown.length) }
+    else if (e.key === 'Enter') { e.preventDefault(); const r = shown[active]; if (r) openResult(r.id) }
   }
 
   useEffect(() => {
@@ -135,6 +138,7 @@ export default function SearchOverlay() {
           />
 
           <motion.div
+            ref={panelRef}
             initial={reduced ? { opacity: 1 } : { opacity: 0, y: 18 }}
             animate={{ opacity: 1, y: 0 }}
             exit={reduced ? { opacity: 1 } : { opacity: 0, y: 18 }}
@@ -177,23 +181,23 @@ export default function SearchOverlay() {
             <p className="mt-3 font-mono text-[10px] uppercase tracking-[0.28em] text-white/55">
               {query
                 ? results.length
-                  ? `${results.length} of ${ARTICLES.length} folios found`
+                  ? `${results.length} of ${ARTICLES.length} folios found${results.length > shown.length ? ` · first ${shown.length} shown` : ''}`
                   : 'Nothing in the archive matches — not yet'
                 : `${ARTICLES.length} folios in the archive · opened from ${contextLabel(location.pathname)} · Esc returns`}
             </p>
 
-            <ul ref={listRef} className="mt-4 max-h-[44vh] overflow-y-auto">
-              {results.map((a) => {
+            <ul ref={listRef} className="mt-4 max-h-[44vh] overflow-y-auto" aria-label="Search results">
+              {shown.map((a) => {
                 const author = getAuthor(a.authorId)
                 const folio = String(ARTICLES.findIndex((x) => x.id === a.id) + 1).padStart(2, '0')
-                const isActive = results.indexOf(a) === active
+                const isActive = shown.indexOf(a) === active
                 return (
                   <li key={a.id}>
                     <a
                       href={`/article/${a.id}`}
                       data-active={isActive ? 'true' : 'false'}
                       tabIndex={isActive ? 0 : -1}
-                      onFocus={() => setActive(results.indexOf(a))}
+                      onFocus={() => setActive(shown.indexOf(a))}
                       onClick={(e) => {
                         e.preventDefault()
                         openResult(a.id)
@@ -206,7 +210,7 @@ export default function SearchOverlay() {
                         <span aria-hidden="true" className="font-mono text-[9px] tracking-[0.26em] text-gold">
                           №{folio}
                         </span>
-                        <span className="font-serif text-xl text-ivory transition-colors duration-500 group-hover:text-[#E8D9A8]">{esc(a.title)}</span>
+                        <span className="font-serif text-xl text-ivory transition-colors duration-500 group-hover:text-[#E8D9A8]">{a.title}</span>
                       </span>
                       <span className="mt-1 block pl-8 font-mono text-[10px] uppercase tracking-[0.28em] text-white/55">
                         <span className="text-gold">{a.category}</span> ✦ {author?.name ?? ''} ✦ {a.readingTime}
@@ -217,8 +221,23 @@ export default function SearchOverlay() {
               })}
             </ul>
 
+            {query && !results.length && (
+              <div className="mt-4 border border-dashed border-white/15 px-5 py-6 text-center">
+                <p className="font-serif text-lg font-light italic text-white/70">
+                  The archive holds nothing by that name — yet. Every folio here began as a submission.
+                </p>
+                <Link
+                  to="/submit"
+                  onClick={() => setOpen(false)}
+                  className="mt-3 inline-block border-b border-gold/60 pb-0.5 font-mono text-[9px] uppercase tracking-[0.28em] text-gold no-underline transition-colors hover:text-ivory"
+                >
+                  Send the missing work →
+                </Link>
+              </div>
+            )}
+
             <p className="mt-4 font-mono text-[9px] uppercase tracking-[0.24em] text-white/45">
-              {results.length ? '↑ ↓ to move · Enter to pull the folio · Esc to return' : 'Type to turn the pages — the archive dims, the index stays above'}
+              {shown.length ? '↑ ↓ to move · Enter to pull the folio · Esc to return' : 'Type to turn the pages — the archive dims, the index stays above'}
             </p>
           </motion.div>
         </div>

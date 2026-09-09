@@ -262,6 +262,33 @@
   }
 
 
+  /* ---------- The grain — film on the hall, fibre on the paper ----------
+     One inline-generated noise tile, used at very low opacity over dark
+     surfaces (mix-blend overlay) and paper surfaces (soft-light). Static:
+     it never animates, so it costs nothing per frame and survives reduced
+     motion unchanged. */
+  .grain {
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160' viewBox='0 0 160 160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='160' height='160' filter='url(%23n)' opacity='0.6'/%3E%3C/svg%3E");
+    background-repeat: repeat;
+    mix-blend-mode: overlay;
+    opacity: 0.35;
+  }
+  .grain-paper {
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140' viewBox='0 0 140 140'%3E%3Cfilter id='p'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.6' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='140' height='140' filter='url(%23p)' opacity='0.5'/%3E%3C/svg%3E");
+    background-repeat: repeat;
+    mix-blend-mode: soft-light;
+    opacity: 0.5;
+  }
+
+  /* ---------- The archive plate — a cover strip set into a shelf plate ---------- */
+  .plate-thumb {
+    @apply relative -mx-4 mb-3 overflow-hidden border-b border-[#B89146]/40;
+  }
+  .plate-thumb img {
+    @apply h-[92px] w-full object-cover transition-transform duration-[1400ms] ease-out;
+  }
+  .group:hover .plate-thumb img { transform: scale(1.05); }
+
   /* ---------- Skip link ---------- */
   .skip-link {
     @apply fixed -top-24 left-4 z-[2000] bg-gold px-5 py-3 font-mono text-[11px] uppercase tracking-[0.18em] text-charcoal no-underline transition-all;

@@ -1,6 +1,6 @@
 import { Link } from 'react-router-dom'
 import { useState, type FormEvent } from 'react'
-import { BRAND } from '../../data/content'
+import { BRAND, LEDGER } from '../../data/content'
 import Reveal from '../ui/Reveal'
 
 const SOCIALS = [
@@ -178,7 +178,7 @@ export default function Footer() {
         {/* small print — the imprint */}
         <div className="mt-16 flex flex-wrap items-center justify-between gap-4 border-t border-white/10 pt-6 font-mono text-[10px] uppercase tracking-[0.28em] text-white/50">
           <p>© {new Date().getFullYear()} Verlyse Media · {BRAND.handle}</p>
-          <p className="hidden md:inline">Nineteen features · fifteen creators · one room</p>
+          <p className="hidden md:inline">{LEDGER.features} features · {LEDGER.creators} creators · one room</p>
           <button
             type="button"
             onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}

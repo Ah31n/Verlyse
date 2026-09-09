@@ -1,8 +1,9 @@
 import { motion } from 'motion/react'
 import { useSeo } from '../hooks/useSeo'
 import { Link } from 'react-router-dom'
-import { BRAND, COMMUNITY_STATS } from '../data/content'
+import { BRAND, COMMUNITY_STATS, LEDGER } from '../data/content'
 import BrassRule from '../components/ui/BrassRule'
+import { LibraryCard } from '../components/ui/EasterEggs'
 import { CrashZoom, DepthStage, DepthLayer, OrbitalDrift, PushIn , MaskReveal, Slate } from '../components/cinematic'
 
 /**
@@ -25,7 +26,7 @@ export default function About() {
   })
 
   const principles = [
-    { n: 'I', t: 'Creator credit', d: 'All 19 features name their writers, by name and handle. The byline is not a courtesy; it is the point.' },
+    { n: 'I', t: 'Creator credit', d: `All ${LEDGER.features} features name their writers, by name and handle. The byline is not a courtesy; it is the point.` },
     { n: 'II', t: 'The conversation', d: `${COMMUNITY_STATS[2].value} comments beneath the features, all of them read, several quoted on the community page.` },
     { n: 'III', t: 'Tools disclosed', d: BRAND.disclosure },
     { n: 'IV', t: 'The door is open', d: 'Every feature began as a submission. The next one could be yours.' },
@@ -36,7 +37,7 @@ export default function About() {
     { date: '26.06.2026', title: 'The feed opens', desc: '“Their Voices Matter” — a call for Afghan women’s rights, written by the founder.' },
     { date: '30.06.2026', title: 'The first submitted feature', desc: 'Shaza Fatima’s essay on why the arts deserve respect.' },
     { date: '07.07.2026', title: '“Meet Alina Javed”', desc: 'A feature on the founder, at sixteen.' },
-    { date: 'Now', title: 'The record', desc: '19 features · 15 creators · 1281 appreciations · 585 conversations.' },
+    { date: 'Now', title: 'The record', desc: `${LEDGER.features} features · ${LEDGER.creators} creators · ${LEDGER.appreciations.toLocaleString('en-US')} appreciations · ${LEDGER.conversations} conversations.` },
   ]
 
   return (
@@ -142,6 +143,13 @@ export default function About() {
           </div>
           </OrbitalDrift>
         </DepthStage>
+
+        {/* the shelf — the catalogue card of this magazine, kept at the end
+            of the sheets the way a pocket card is kept in the back pocket */}
+        <div className="mt-[clamp(3rem,8vh,5rem)] flex flex-col items-center gap-4">
+          <p className="font-mono text-[9px] uppercase tracking-[0.3em] text-white/50">The shelf — catalogue record</p>
+          <LibraryCard to="/articles" linkLabel="Browse the shelf →" />
+        </div>
 
         {/* the brass rule — a single hairline that draws itself outward from
             the centre, closing the sheets before the imprint. Anime.js owns

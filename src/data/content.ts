@@ -107,6 +107,10 @@ export interface Category {
   name: string
   blurb: string
   count: number
+  /** the wing's own restrained accent — one hue, used at low opacity only */
+  accent: string
+  /** a typographic motif small enough for a margin note */
+  motif: string
 }
 
 export interface Voice {
@@ -1192,23 +1196,105 @@ export const ARTICLES: Article[] = [
 /* CATEGORIES — from the captions and hashtags                          */
 /* ------------------------------------------------------------------ */
 export const CATEGORIES: Category[] = [
-  { slug: 'stories', name: 'Stories', blurb: 'Stories told in the writer’s own voice — from ballrooms to 3:13 in the morning.', count: 1 },
-  { slug: 'poetry', name: 'Poetry', blurb: 'Poems and prose poems — hope, grief, forgiveness, jaldi, and the fragile line between love and idealization.', count: 7 },
-  { slug: 'essays', name: 'Essays', blurb: 'First arguments with the world — the arts, the humanities, and the quiet cost of technology.', count: 2 },
-  { slug: 'art', name: 'Art', blurb: 'Paintings, calligraphy and illustration — creativity that needs no AI to be beautiful.', count: 3 },
-  { slug: 'social-issues', name: 'Social Issues', blurb: 'Thought-provoking pieces on the topics that matter — child protection, women’s rights, human rights, and dignity.', count: 4 },
-  { slug: 'lifestyle', name: 'Lifestyle', blurb: 'The everyday, made shareable — a student’s 10-minute Khageena.', count: 1 },
-  { slug: 'horror', name: 'Horror', blurb: 'Psychological, modern, and told from inside a ringing phone.', count: 1 },
+  { slug: 'stories', name: 'Stories', blurb: 'Stories told in the writer’s own voice — from ballrooms to 3:13 in the morning.', count: 1, accent: '#C9A85C', motif: '❦' },
+  { slug: 'poetry', name: 'Poetry', blurb: 'Poems and prose poems — hope, grief, forgiveness, jaldi, and the fragile line between love and idealization.', count: 7, accent: '#9FA9BC', motif: '✧' },
+  { slug: 'essays', name: 'Essays', blurb: 'First arguments with the world — the arts, the humanities, and the quiet cost of technology.', count: 2, accent: '#B8785A', motif: '¶' },
+  { slug: 'art', name: 'Art', blurb: 'Paintings, calligraphy and illustration — creativity that needs no AI to be beautiful.', count: 3, accent: '#7E9E8B', motif: '◈' },
+  { slug: 'social-issues', name: 'Social Issues', blurb: 'Thought-provoking pieces on the topics that matter — child protection, women’s rights, human rights, and dignity.', count: 4, accent: '#C06A7D', motif: '✱' },
+  { slug: 'lifestyle', name: 'Lifestyle', blurb: 'The everyday, made shareable — a student’s 10-minute Khageena.', count: 1, accent: '#C49A6C', motif: '◍' },
+  { slug: 'horror', name: 'Horror', blurb: 'Psychological, modern, and told from inside a ringing phone.', count: 1, accent: '#6E4153', motif: '✕' },
 ]
+
+/* ------------------------------------------------------------------ */
+/* THE LEDGER — every published total on the site, derived from the    */
+/* registry itself. No component re-derives or re-types a number; the  */
+/* magazine states its counts once and everywhere reads the same page. */
+/* ------------------------------------------------------------------ */
+const _featureCount = ARTICLES.length
+const _creatorCount = new Set(ARTICLES.map((a) => a.authorId)).size
+const _appreciations = ARTICLES.reduce((s, a) => s + a.likes, 0)
+const _conversations = ARTICLES.reduce((s, a) => s + a.comments, 0)
+const _openedOn = [...ARTICLES].map((a) => a.date).sort()[0]
+const _latestOn = [...ARTICLES].map((a) => a.date).sort().slice(-1)[0]
+
+export const LEDGER = {
+  /** the current issue */
+  issueNo: '01',
+  issueLabel: 'Issue № 01',
+  /** features on the shelf */
+  features: _featureCount,
+  /** credited writers whose work is on the shelf (the masthead's own record excluded) */
+  creators: _creatorCount,
+  /** records on the contributor wall — the writers plus the masthead's own entry */
+  wallRecords: AUTHORS.length,
+  departments: CATEGORIES.length,
+  appreciations: _appreciations,
+  conversations: _conversations,
+  /** the date the feed opened and the date its newest folio was published */
+  openedOn: _openedOn,
+  latestOn: _latestOn,
+} as const
+
+/** 2026-06-26 → 26.06.2026 — the house short date */
+export function stampDate(iso: string): string {
+  const p = iso.split('-')
+  return p.length === 3 ? `${p[2]}.${p[1]}.${p[0]}` : iso
+}
+/** 2026-06-26 → 26 June 2026 — the house long date */
+export function writtenDate(iso: string): string {
+  const d = new Date(`${iso}T12:00:00Z`)
+  if (Number.isNaN(d.getTime())) return iso
+  return new Intl.DateTimeFormat('en-GB', { day: 'numeric', month: 'long', year: 'numeric', timeZone: 'UTC' }).format(d)
+}
+
+/** Five folios the desk keeps recommending — an editorial choice, not a metric. */
+export const EDITORS_PICKS: string[] = [
+  'their-voices-matter',
+  '3-13',
+  'hope-becomes-mythology',
+  'intellect-lost-to-code',
+  'khageena',
+]
+export function isEditorsPick(id: string): boolean {
+  return EDITORS_PICKS.includes(id)
+}
+
+/** A single ordered view of the feed for a sort key — honest rankings, all
+    four are computed from the registry's recorded archive data (dates, the
+    feed's like counts, its comment counts) or from the desk's own picks. */
+export type SortKey = 'latest' | 'most-read' | 'most-appreciated' | 'editors-picks'
+export const SORTS: { key: SortKey; label: string; note: string }[] = [
+  { key: 'latest', label: 'Latest', note: 'Newest folio first — the registry by date of publication.' },
+  { key: 'most-read', label: 'Most read', note: 'Ranked by the conversations each feature drew beneath it.' },
+  { key: 'most-appreciated', label: 'Most appreciated', note: 'Ranked by the appreciations the feed recorded.' },
+  { key: 'editors-picks', label: 'Editor’s picks', note: 'Five folios the desk keeps recommending — chosen, not counted.' },
+]
+export function sortArticles(key: SortKey): Article[] {
+  const list = [...ARTICLES]
+  switch (key) {
+    case 'latest':
+      return list.sort((a, b) => b.date.localeCompare(a.date) || b.likes - a.likes)
+    case 'most-read':
+      return list.sort((a, b) => b.comments - a.comments || b.likes - a.likes)
+    case 'most-appreciated':
+      return list.sort((a, b) => b.likes - a.likes || b.comments - a.comments)
+    case 'editors-picks': {
+      const picks = new Set(EDITORS_PICKS)
+      return list
+        .filter((a) => picks.has(a.id))
+        .sort((a, b) => EDITORS_PICKS.indexOf(a.id) - EDITORS_PICKS.indexOf(b.id))
+    }
+  }
+}
 
 /* ------------------------------------------------------------------ */
 /* COMMUNITY — the real numbers and voices                              */
 /* ------------------------------------------------------------------ */
 export const COMMUNITY_STATS: { value: string; label: string; note: string }[] = [
-  { value: '19', label: 'Features presented', note: 'Every post on the feed — from the founder’s call for women’s rights to the Mir Raza Ali memorial.' },
-  { value: '1281', label: 'Appreciations', note: 'Total likes across the feed — each of them an answer to a writer.' },
-  { value: '585', label: 'Conversations', note: 'Comments beneath the features, all of them read.' },
-  { value: '15', label: 'Creators credited', note: 'Every feature names its writer, by name and handle.' },
+  { value: String(LEDGER.features), label: 'Features presented', note: 'Every post on the feed — from the founder’s call for women’s rights to the Mir Raza Ali memorial.' },
+  { value: LEDGER.appreciations.toLocaleString('en-US'), label: 'Appreciations', note: 'Total likes across the feed — each of them an answer to a writer.' },
+  { value: String(LEDGER.conversations), label: 'Conversations', note: 'Comments beneath the features, all of them read.' },
+  { value: String(LEDGER.creators), label: 'Creators credited', note: 'Every feature names its writer, by name and handle.' },
 ]
 
 export const COMMUNITY_VOICES: Voice[] = [

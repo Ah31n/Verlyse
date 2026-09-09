@@ -1,6 +1,8 @@
 import { useEffect, useRef, useState } from 'react'
-import { AnimatePresence, motion } from 'motion/react'
+import { AnimatePresence, motion, useReducedMotion } from 'motion/react'
 import { Link } from 'react-router-dom'
+import { trapFocus } from '../../lib/focus'
+import { LEDGER } from '../../data/content'
 
 interface SavedItem {
   id: string
@@ -31,9 +33,11 @@ export function isSaved(id: string): boolean {
 
 /** Saved-stories drawer — slide-in from the right, localStorage-backed. */
 export default function SavedDrawer() {
+  const reduced = useReducedMotion() === true
   const [open, setOpen] = useState(false)
   const [saved, setSaved] = useState<SavedItem[]>([])
   const closeRef = useRef<HTMLButtonElement | null>(null)
+  const asideRef = useRef<HTMLElement | null>(null)
 
   useEffect(() => {
     const load = () => {
@@ -55,6 +59,8 @@ export default function SavedDrawer() {
 
   // the element that opened the drawer, so focus can be restored on close
   const openerRef = useRef<HTMLElement | null>(null)
+
+  useEffect(() => open && asideRef.current ? trapFocus(asideRef.current) : undefined, [open])
 
   useEffect(() => {
     document.body.classList.toggle('no-scroll', open)
@@ -97,15 +103,16 @@ export default function SavedDrawer() {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            transition={{ duration: 0.4 }}
+            transition={{ duration: reduced ? 0 : 0.4 }}
             className="absolute inset-0 bg-[rgba(14,3,7,0.9)]"
             onClick={() => setOpen(false)}
           />
           <motion.aside
+            ref={asideRef}
             initial={{ x: '100%' }}
             animate={{ x: 0 }}
             exit={{ x: '100%' }}
-            transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
+            transition={{ duration: reduced ? 0 : 0.6, ease: [0.22, 1, 0.36, 1] }}
             className="absolute bottom-0 right-0 top-0 flex w-full max-w-[420px] flex-col border-l border-gold/30 bg-gradient-to-b from-wine-deep to-[#2A0811] p-8 shadow-[-40px_0_90px_rgba(0,0,0,0.5)]"
             aria-labelledby="saved-title"
           >
@@ -125,10 +132,23 @@ export default function SavedDrawer() {
               </button>
             </div>
 
-            <ul className="mt-4 flex-1 overflow-y-auto">
+            <p className="mt-4 font-mono text-[9px] uppercase tracking-[0.26em] text-white/45">
+              kept {saved.length} of {LEDGER.features} · this list lives on your device, not on a server
+            </p>
+
+            <ul className="mt-3 flex-1 overflow-y-auto">
               {saved.length === 0 && (
-                <li className="py-10 text-center font-mono text-[10px] uppercase tracking-[0.28em] text-white/55">
-                  Nothing saved yet — bookmark a story and it will wait for you here.
+                <li className="py-10 text-center">
+                  <p className="font-mono text-[10px] uppercase tracking-[0.28em] text-white/55">
+                    Nothing saved yet — bookmark a story and it will wait for you here.
+                  </p>
+                  <Link
+                    to="/articles"
+                    onClick={() => setOpen(false)}
+                    className="mt-5 inline-block border-b border-gold/60 pb-1 font-mono text-[9px] uppercase tracking-[0.28em] text-gold no-underline transition-colors hover:text-ivory"
+                  >
+                    Open the shelf →
+                  </Link>
                 </li>
               )}
               {saved.map((s) => (
@@ -156,6 +176,22 @@ export default function SavedDrawer() {
                 </li>
               ))}
             </ul>
+            {saved.length > 0 && (
+              <div className="mt-4 flex items-center justify-between border-t border-white/10 pt-4">
+                <button
+                  type="button"
+                  onClick={() => {
+                    try { localStorage.setItem(KEY, '[]') } catch { /* noop */ }
+                    setSaved([])
+                    window.dispatchEvent(new CustomEvent('verlyse:saved-updated'))
+                  }}
+                  className="font-mono text-[9px] uppercase tracking-[0.26em] text-white/50 underline-offset-4 transition-colors hover:text-ivory hover:underline"
+                >
+                  Clear the bookmarks
+                </button>
+                <span className="font-mono text-[9px] uppercase tracking-[0.26em] text-white/35">saved on this device only</span>
+              </div>
+            )}
           </motion.aside>
         </div>
       )}

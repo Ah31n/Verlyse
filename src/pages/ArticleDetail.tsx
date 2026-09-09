@@ -306,6 +306,22 @@ export default function ArticleDetail() {
         <BrassThread height="100%" from={0.04} to={0.9} stroke="#D9B978" />
       </div>
     <>
+      {/* the road back to the shelf — the pair to the reading lamp; fixed,
+          quiet, and always reachable mid-read without scrolling up */}
+      <Link
+        to="/articles"
+        aria-label="Back to the archive"
+        title="Back to the archive"
+        className={`fixed left-6 top-24 z-[1200] flex items-center gap-2 border px-4 py-2.5 font-mono text-[9px] uppercase tracking-[0.30em] no-underline transition-all duration-700 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-gold ${
+          reading
+            ? 'border-gold/60 bg-[#1C0509]/80 text-gold'
+            : 'border-white/15 bg-[#1C0509]/40 text-ivory/70 hover:border-gold/50 hover:text-gold'
+        }`}
+      >
+        <span aria-hidden="true">←</span>
+        <span className="max-[479px]:sr-only">The archive</span>
+      </Link>
+
       {/* the library lamp — enter / leave the quiet reading room */}
       <button
         type="button"
@@ -313,14 +329,14 @@ export default function ArticleDetail() {
         aria-pressed={reading}
         aria-label={reading ? 'Leave reading mode' : 'Enter reading mode'}
         title={reading ? 'Leave the reading room' : 'The reading room'}
-        className={`fixed right-6 top-24 z-[1200] flex items-center gap-2 border px-4 py-2.5 font-mono text-[9px] uppercase tracking-[0.30em]  transition-all duration-700 ${
+        className={`fixed right-6 top-24 z-[1200] flex items-center gap-2 border px-4 py-2.5 font-mono text-[9px] uppercase tracking-[0.30em] transition-all duration-700 max-[479px]:px-3 ${
           reading
             ? 'border-gold/60 bg-[#1C0509]/80 text-gold'
             : 'border-white/15 bg-[#1C0509]/40 text-ivory/70 hover:border-gold/50 hover:text-gold'
         }`}
       >
         <span aria-hidden="true" className={`text-sm leading-none ${reading ? 'text-gold' : 'text-ivory/60'}`}>☙</span>
-        {reading ? 'The reading room' : 'Read quietly'}
+        <span className="max-[479px]:sr-only">{reading ? 'The reading room' : 'Read quietly'}</span>
       </button>
 
       {/* ---------- Hero — framed by the publication's world ---------- */}

@@ -72,6 +72,8 @@ path: '/submit',
     const work = String(data.get('work') ?? '').trim()
     const category = String(data.get('category') ?? '')
 
+    const original = data.get('original') === 'on'
+
     const bad: string[] = []
     if (!name) bad.push('name')
     if (!email) bad.push('email')
@@ -79,6 +81,7 @@ path: '/submit',
     if (!title) bad.push('title')
     if (!category) bad.push('category')
     if (!work) bad.push('work')
+    if (!original) bad.push('original')
 
     form.querySelectorAll('.is-invalid').forEach((el) => el.classList.remove('is-invalid'))
     bad.forEach((k) => form.querySelector<HTMLElement>(`[name="${k}"]`)?.classList.add('is-invalid'))
@@ -143,6 +146,22 @@ path: '/submit',
               Every feature on this magazine began as someone’s kept notebook page, late-night draft, or quiet painting. The desk reads everything, credits the writer by name, and answers with care. Send the one you keep rereading.
             </p>
           </Reveal>
+          <Reveal delay={0.3}>
+            <div className="mt-9 flex flex-wrap items-center gap-x-2 gap-y-3" role="group" aria-label="What Verlyse accepts — seven departments">
+              <span className="mr-2 font-mono text-[9px] uppercase tracking-[0.28em] text-white/45">The desk accepts —</span>
+              {CATEGORIES.map((c) => (
+                <span
+                  key={c.slug}
+                  className="inline-flex items-center gap-2 border border-ivory/20 px-3.5 py-1.5 font-mono text-[9px] uppercase tracking-[0.22em] text-ivory/75"
+                  title={`${c.name} — ${c.blurb}`}
+                >
+                  <span aria-hidden="true" style={{ color: c.accent }}>{c.motif}</span>
+                  {c.name}
+                </span>
+              ))}
+              <span className="font-mono text-[9px] uppercase tracking-[0.22em] text-white/45">…and ideas for a room not opened yet</span>
+            </div>
+          </Reveal>
         </div>
       </section>
 
@@ -159,7 +178,7 @@ path: '/submit',
                   Your work is on the desk — <em className="italic text-gold">the desk writes back</em>
                 </h2>
                 <p className="mt-6 max-w-[44ch] font-serif text-lg font-light italic leading-[1.7] text-white/70">
-                  Every submission is read, and every writer is credited by name. The desk will write back — to the address on the envelope.
+                  Every submission is read, and every writer is credited by name. The desk will write back — to the address on the envelope — within two weeks at the latest.
                 </p>
                 <p className="mt-6 max-w-[44ch] font-mono text-[10px] uppercase leading-[2] tracking-[0.28em] text-white/55">
                   Received · read · answered — nothing is invented
@@ -276,13 +295,48 @@ path: '/submit',
                   </div>
                 </div>
 
+                {/* ——— IV · the promise — rights, originality, the window ——— */}
+                <div>
+                  <p className="kicker">IV — the promise</p>
+                  <div className="mt-6 border-t border-white/10 pt-6">
+                    <label
+                      htmlFor="sf-original"
+                      className={`flex cursor-pointer items-start gap-4 border px-5 py-5 transition-colors duration-500 ${
+                        errors.includes('original') ? 'border-[#E8A2A2]/70' : 'border-white/15 hover:border-gold/45'
+                      }`}
+                    >
+                      <input
+                        type="checkbox"
+                        id="sf-original"
+                        name="original"
+                        className="mt-1 h-4 w-4 shrink-0 cursor-pointer accent-[#B89146] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-gold"
+                      />
+                      <span className="text-sm leading-[1.8] text-white/70">
+                        <span className="block font-mono text-[10px] uppercase tracking-[0.26em] text-ivory">Originality &amp; rights — confirmed</span>
+                        <span className="mt-2 block">
+                          I wrote or made this work myself, or I hold the right to send it. If a tool helped design the presentation, I will say so — the desk discloses the same way on its own posts. The byline, and the ownership of the words, stay mine.
+                        </span>
+                      </span>
+                    </label>
+                    <FieldHint show={errors.includes('original')}>The desk needs this before the piece can be read.</FieldHint>
+                    <p className="mt-5 max-w-[58ch] font-mono text-[9px] uppercase leading-[2.1] tracking-[0.22em] text-white/45">
+                      Privacy — your name, email and handle are used for this submission only. The desk keeps no list beyond it, sells nothing, and deletes on request at {BRAND.email}. The work is not published unless it is featured — and never without your credit.
+                    </p>
+                    <p className="mt-3 max-w-[58ch] font-mono text-[9px] uppercase leading-[2.1] tracking-[0.22em] text-white/45">
+                      Review window — the desk reads everything. Expect an answer within two weeks; selected pieces are set for the following issue.
+                    </p>
+                  </div>
+                </div>
+
                 {/* ——— the final action ——— */}
                 <div className="flex flex-col items-start gap-5">
                   <button type="submit" disabled={sending} aria-busy={sending} className="btn btn-gold self-start disabled:pointer-events-none disabled:opacity-60">
                     {sending ? 'Sending the piece…' : 'Submit the piece'}
                   </button>
-                  <p className="max-w-[52ch] text-sm leading-[1.8] text-white/60">
-                    We carefully curate each submission — every post is more than content; the writer keeps the byline, the tools are disclosed, and the desk answers.
+                  <p aria-live="polite" className="max-w-[52ch] text-sm leading-[1.8] text-white/60">
+                    {sending
+                      ? 'The piece is crossing to the desk — one moment.'
+                      : 'We carefully curate each submission — every post is more than content; the writer keeps the byline, the tools are disclosed, and the desk answers.'}
                   </p>
                   <p className="font-mono text-[9px] uppercase leading-[2] tracking-[0.30em] text-white/45">
                     Delivered to the desk · credited by name · answered by {BRAND.email}

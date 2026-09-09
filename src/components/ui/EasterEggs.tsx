@@ -1,5 +1,7 @@
 import { useState } from 'react'
 import { motion, useReducedMotion } from 'motion/react'
+import { Link } from 'react-router-dom'
+import { LEDGER, stampDate, writtenDate } from '../../data/content'
 
 /**
  * EASTER EGGS — small rewards for exploration, placed sparingly.
@@ -31,44 +33,72 @@ export function Bookmark({ className = '', delay = 0 }: { className?: string; de
 }
 
 /* ------------------------------------------------------------------ */
-/* The library card — an old catalogue card, found in the colophon.    */
-/* Reveals the magazine's shelf history on hover.                       */
+/* The library card — an old catalogue card kept in the colophon.       */
+/* Ivory stock, wine ink, brass punch; every field on it is read from   */
+/* the ledger, right down to the last date the shelf was stamped.        */
 /* ------------------------------------------------------------------ */
-export function LibraryCard() {
+export function LibraryCard({ to = '/about', linkLabel = 'Read the colophon →' }: { to?: string; linkLabel?: string }) {
   const [open, setOpen] = useState(false)
   const reduce = useReducedMotion()
   return (
-    <div className="relative">
-      <button
-        type="button"
-        onClick={() => setOpen((v) => !v)}
-        aria-expanded={open}
-        aria-label="The library card"
-        className="group relative inline-flex items-center gap-3 border border-gold/30 bg-[#17060B] px-5 py-3 font-mono text-[9px] uppercase tracking-[0.30em] text-ivory/60 transition-colors duration-500 hover:border-gold/60 hover:text-ivory"
-      >
-        <span aria-hidden="true" className="h-3 w-2 rounded-[2px] border border-gold/50 bg-[#3B0D17]" />
-        Library card — the shelf
-        <span aria-hidden="true" className="text-gold">{open ? '−' : '+'}</span>
-      </button>
-      <motion.div
-        initial={reduce ? false : { opacity: 0, y: -8, rotateX: 90 }}
-        animate={open ? { opacity: 1, y: 0, rotateX: 0, display: 'block' } : { opacity: 0, y: -8, rotateX: 90, display: 'none' }}
-        transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
-        style={{ transformPerspective: 600, transformOrigin: 'top center' }}
-        className="absolute right-0 top-full z-20 mt-3 w-[300px] max-w-[calc(100vw-2.5rem)] origin-top border border-gold/30 bg-[#17060B] p-5 shadow-[0_18px_50px_rgba(6,1,4,0.6)]"
-        aria-hidden={!open}
-      >
-        <p className="font-mono text-[9px] uppercase tracking-[0.30em] text-gold">Dewey — 808.8</p>
-        <p className="mt-4 font-serif text-xl italic text-ivory/90">Verlyse Media</p>
-        <p className="mt-2 text-sm leading-relaxed text-white/60">
-          Nineteen features, fifteen writers, one room. The shelf grows one voice at a time — and the next card could be yours.
-        </p>
-        <div className="mt-4 space-y-1 border-t border-white/10 pt-3 font-mono text-[9px] uppercase tracking-[0.30em] text-white/60">
-          <p>Accession — 2026 · 01 — 19</p>
-          <p>Last borrowed — the room writes back</p>
+    <motion.div
+      initial={reduce ? false : { rotate: -1.4 }}
+      whileHover={reduce ? undefined : { rotate: 0, y: -3 }}
+      transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
+      className="relative w-[min(21rem,calc(100vw-2.5rem))]"
+    >
+      {/* the index-card ruling, faint under the text */}
+      <span
+        aria-hidden="true"
+        className="pointer-events-none absolute inset-0 bg-[repeating-linear-gradient(180deg,transparent,transparent_27px,rgba(92,18,36,0.10)_27px,rgba(92,18,36,0.10)_28px)]"
+      />
+      <div className="relative border border-[#B89146]/60 bg-[#F2EADA] p-5 shadow-[0_16px_40px_rgba(6,1,4,0.45)]">
+        <span aria-hidden="true" className="grain-paper pointer-events-none absolute inset-0 opacity-[0.3]" />
+        {/* the brass punch-hole, top-left, as on real catalogue cards */}
+        <span aria-hidden="true" className="absolute left-4 top-3 h-2 w-2 rounded-full border border-[#2A0F18]/30 bg-[#E6DCC8]" />
+        <div className="relative flex items-center justify-between gap-3">
+          <p className="font-mono text-[8px] uppercase tracking-[0.3em] text-[#7C6338]">Verlyse Media · shelf register</p>
+          <button
+            type="button"
+            onClick={() => setOpen((v) => !v)}
+            aria-expanded={open}
+            aria-controls="library-card-detail"
+            aria-label={open ? 'Close the library card' : 'Turn the library card over'}
+            className="shrink-0 border border-[#2A0F18]/30 px-2.5 py-1 font-mono text-[8px] uppercase tracking-[0.24em] text-[#2A0F18] transition-colors duration-300 hover:border-[#7C6338] hover:text-[#7C6338] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-[#7C6338]"
+          >
+            {open ? 'face −' : 'reverse +'}
+          </button>
         </div>
-      </motion.div>
-    </div>
+        <p className="relative mt-3 font-serif text-[1.65rem] font-semibold leading-none tracking-[0.06em] text-[#2A0F18]">VERLYSE <em className="font-light italic text-[#7C6338]">MEDIA</em></p>
+        <p className="relative mt-1.5 font-mono text-[9px] uppercase tracking-[0.26em] text-[#2A0F18]/70">Where Vision Becomes A Voice</p>
+        <div className="relative mt-4 grid grid-cols-2 gap-x-4 gap-y-2 border-t border-[#2A0F18]/15 pt-3 font-mono text-[9px] uppercase leading-[1.7] tracking-[0.18em] text-[#2A0F18]/75">
+          <p>Dewey <span className="text-[#7C6338]">808.8</span></p>
+          <p>Accession <span className="text-[#7C6338]">VM · {stampDate(LEDGER.openedOn).slice(-4)} · 01–{LEDGER.features}</span></p>
+          <p>Issue № {LEDGER.issueNo} — opened {stampDate(LEDGER.openedOn)}</p>
+          <p>Latest folio {stampDate(LEDGER.latestOn)}</p>
+        </div>
+        <motion.div
+          id="library-card-detail"
+          initial={false}
+          animate={open ? { height: 'auto', opacity: 1 } : { height: 0, opacity: 0 }}
+          transition={{ duration: reduce ? 0 : 0.5, ease: [0.16, 1, 0.3, 1] }}
+          className="relative overflow-hidden"
+          aria-hidden={!open}
+        >
+          <div className="mt-3 border-t border-[#2A0F18]/15 pt-3 font-mono text-[9px] uppercase leading-[2] tracking-[0.18em] text-[#2A0F18]/70">
+            <p>Last borrowed — never overdue · {LEDGER.features} of {LEDGER.features} pages read</p>
+            <p>{LEDGER.creators} writers credited · {LEDGER.appreciations.toLocaleString('en-US')} appreciations · {LEDGER.conversations} conversations</p>
+            <p>Notarised {writtenDate(LEDGER.openedOn)} — the shelf grows one voice at a time</p>
+            <p className="mt-2 font-serif text-sm normal-case italic tracking-normal text-[#5C1224]">
+              {LEDGER.features} features, {LEDGER.creators} writers, one room — and the next card could be yours.
+            </p>
+            <Link to={to} className="mt-3 inline-block border-b border-[#7C6338] pb-0.5 font-mono text-[9px] uppercase tracking-[0.24em] text-[#7C6338] no-underline transition-colors hover:text-[#2A0F18]">
+              {linkLabel}
+            </Link>
+          </div>
+        </motion.div>
+      </div>
+    </motion.div>
   )
 }
 
@@ -87,7 +117,11 @@ export function HiddenQuote({ quote, className = '' }: { quote: string; classNam
     <span
       onMouseEnter={(e) => { setSee(true); probe(e.currentTarget) }}
       onMouseLeave={() => setSee(false)}
-      className={`relative inline-block cursor-help border-b border-dotted border-gold/40 pb-0.5 transition-colors duration-500 hover:border-gold ${className}`}
+      onFocus={() => setSee(true)}
+      onBlur={() => setSee(false)}
+      tabIndex={0}
+      role="note"
+      className={`relative inline-block cursor-help border-b border-dotted border-gold/40 pb-0.5 transition-colors duration-500 hover:border-gold focus-visible:outline focus-visible:outline-1 focus-visible:outline-gold ${className}`}
       aria-label={quote}
     >
       <span className="text-ivory/80">{'✦'}</span>

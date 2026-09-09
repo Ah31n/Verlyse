@@ -1,6 +1,6 @@
 import { Link } from 'react-router-dom'
-import { motion, useReducedMotion, useScroll, useTransform } from 'motion/react'
-import { useRef, useState, lazy, Suspense, Component, type ReactNode } from 'react'
+import { AnimatePresence, motion, useReducedMotion, useScroll, useTransform } from 'motion/react'
+import { useEffect, useRef, useState, lazy, Suspense, Component, type ReactNode } from 'react'
 import type { SpatialState } from '../lib/three/spatialState'
 import { useSeo } from '../hooks/useSeo'
 import Reveal from '../components/ui/Reveal'
@@ -12,7 +12,9 @@ import { LibraryCard, HiddenQuote } from '../components/ui/EasterEggs'
 import { MetaRow, SectionHead, UnderlineLink } from '../components/ui/primitives'
 import { ImmersiveShell, BrassThread } from '../components/immersive'
 import { Magnetic, MaskReveal, Tilt3D, Slate } from '../components/cinematic'
-import { ARTICLES, BRAND, CATEGORIES, getAuthor } from '../data/content'
+import SaveButton from '../components/ui/SaveButton'
+import { ARTICLES, BRAND, CATEGORIES, LEDGER, getAuthor } from '../data/content'
+import { introSeen, onIntroResolved } from '../lib/intro'
 // The spatial engine is loaded on demand so its heavy chunk (three) never
 // ships with the initial publication shell.
 const SpatialArchive = lazy(() => import('../components/spatial/SpatialArchive'))
@@ -43,8 +45,21 @@ function Cover({ selectedId, state }: { selectedId: string | null; state: Spatia
   const feature = ARTICLES[0]
   const author = getAuthor(feature.authorId)!
   const E = [0.22, 1, 0.36, 1] as const
-  /* entrance timeline, synced to the preloader curtain (≈2.0s) */
-  const T = { mast: 1.7, rule: 1.85, h1a: 2.1, plate: 2.2, deck: 2.8, cta: 3.05 }
+  /* The entrance rides the preloader curtain: the cover's own elements
+     begin as the curtain starts to lift (1.85s), so the whole opening —
+     curtain in, threshold up, plate landed — stays inside ~2.7 seconds.
+     Once the intro is resolved (skip pressed, reduced motion, or a repeat
+     visit in the same session) every delay collapses to stillness and the
+     cover simply presents itself, already open. */
+  const [instant, setInstant] = useState(() => reduce === true || introSeen())
+  useEffect(() => onIntroResolved(() => setInstant(true)), [])
+  const T = instant
+    ? { mast: 0.02, rule: 0.08, h1a: 0.1, plate: 0.16, deck: 0.24, cta: 0.3 }
+    : { mast: 1.35, rule: 1.45, h1a: 1.5, plate: 1.55, deck: 2.0, cta: 2.1 }
+  /* skipping resolves the timeline mid-flight: every not-yet-run entrance
+     must land at once, so the reader who skipped never watches a half-lit
+     hall — delays are already collapsed above; durations collapse here */
+  const D = (base: number) => (instant ? 0.01 : base)
 
   /* controlled parallax — a depth hierarchy: far planes lag the scroll the
      most, near planes barely lag, and the feature plate drifts a touch faster
@@ -85,6 +100,11 @@ function Cover({ selectedId, state }: { selectedId: string | null; state: Spatia
 
       {/* ——— BACK · clean atmospheric light — a soft top glow and a warm floor ——— */}
       <div aria-hidden="true" className="pointer-events-none absolute inset-0 z-[1] bg-[radial-gradient(85%_45%_at_50%_0%,rgba(248,246,242,0.045),transparent_60%),radial-gradient(70%_45%_at_88%_100%,rgba(184,145,70,0.07),transparent_62%)]" />
+
+      {/* ——— BACK · the grain — one still film over the hall, so the wine
+          reads as stock rather than as a CSS colour. Static by design: it
+          never animates, never catches the cursor, and is simply gone in print. ——— */}
+      <div aria-hidden="true" className="grain pointer-events-none absolute inset-0 z-[2] hidden opacity-[0.28] md:block" />
 
       {/* ——— MID · print registration — brass crop marks at the field's corners,
           like the registration marks of a press sheet ——— */}
@@ -142,15 +162,15 @@ function Cover({ selectedId, state }: { selectedId: string | null; state: Spatia
         <motion.p
           initial={reduce ? false : { opacity: 0, y: 14 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 1, delay: T.mast, ease: E }}
+          transition={{ duration: D(1), delay: T.mast, ease: E }}
           className="font-mono text-[9px] uppercase tracking-[0.34em] text-gold/85 md:text-[10px]"
         >
-          Issue № 01 — 19 folios · 16 voices · 7 departments
+          Issue № {LEDGER.issueNo} — {LEDGER.features} folios · {LEDGER.creators} creators · {LEDGER.departments} departments
         </motion.p>
         <motion.h1
           initial={reduce ? false : { opacity: 0, y: 26 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 1.2, delay: T.h1a, ease: E }}
+          transition={{ duration: D(1.2), delay: T.h1a, ease: E }}
           className="mx-auto mt-5 max-w-[18ch] font-serif text-[clamp(2rem,6.4vw,4.4rem)] font-light leading-[1.06] tracking-[-0.015em] text-ivory"
         >
           “Where Vision <em className="italic text-gold">Becomes</em> A Voice”
@@ -185,21 +205,27 @@ function Cover({ selectedId, state }: { selectedId: string | null; state: Spatia
         <div className="mx-auto w-full max-w-[min(36rem,88vw)] md:max-w-[min(31rem,80vw)] lg:max-w-[min(38rem,80vw)]">
           {/* ——— short brass rule above the sheet — the board's plate rule ——— */}
           <span aria-hidden="true" className="mx-auto mb-6 block h-px w-[clamp(4rem,10vw,7.5rem)] bg-[#B89146]/60" />
-          {/* ——— the ivory feature sheet ——— */}
+          {/* ——— the ivory feature sheet — the plate enters with the paper:
+                a deep-wine backing card sits behind it, a second hairline
+                card sits offset, and a still grain rides the surface, so the
+                sheet reads as three sheets squared on the hall floor rather
+                than one flat panel. ——— */}
           <Tilt3D>
           <motion.div
             initial={reduce ? false : { opacity: 0, y: 22 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 1, delay: T.plate, ease: E }}
-            className="relative border border-gold/40 bg-[#F8F6F2] p-5 md:px-7 md:py-14 lg:px-8 lg:py-8"
+            transition={{ duration: D(1), delay: T.plate, ease: E }}
+            className="relative border border-gold/40 bg-[#F8F6F2] p-5 md:px-7 md:py-10 lg:px-8 lg:py-8"
           >
-            {/* offset brass hairline — the sheet's edge, as the colophon sheets carry */}
+            {/* the backing card — the sheet's shadow drawn as a real second sheet */}
+            <span aria-hidden="true" className="pointer-events-none absolute inset-0 translate-x-1.5 translate-y-1.5 border border-[#1C0509]/40 bg-[#2A0F18]/60" />
             <span aria-hidden="true" className="pointer-events-none absolute inset-0 translate-x-2 translate-y-2 border border-gold/25" />
+            <span aria-hidden="true" className="grain-paper pointer-events-none absolute inset-0 opacity-[0.18]" />
             <motion.p
               initial={reduce ? false : { opacity: 0, y: 12 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.9, delay: T.plate + 0.05, ease: E }}
-              className="flex items-center gap-3 font-mono text-[9px] uppercase tracking-[0.3em] text-[#7C6338]"
+              transition={{ duration: D(0.9), delay: T.plate + 0.05, ease: E }}
+              className="relative flex items-center gap-3 font-mono text-[9px] uppercase tracking-[0.3em] text-[#7C6338]"
             >
               <span aria-hidden="true" className="h-px w-8 bg-[#B89146]/70" />
               Verlyse Media presents
@@ -207,16 +233,37 @@ function Cover({ selectedId, state }: { selectedId: string | null; state: Spatia
             <motion.p
               initial={reduce ? false : { opacity: 0 }}
               animate={{ opacity: 1 }}
-              transition={{ duration: 0.9, delay: T.plate + 0.1, ease: E }}
-              className="mt-5 font-mono text-[9px] uppercase tracking-[0.3em] text-[#2A0F18]/55"
+              transition={{ duration: D(0.9), delay: T.plate + 0.1, ease: E }}
+              className="relative mt-4 font-mono text-[9px] uppercase tracking-[0.3em] text-[#2A0F18]/55"
             >
               The feature — Folio № 01
             </motion.p>
+            {/* the plate itself — the feature's own cover, cropped 16:10 like
+                a still pulled from the issue; loads with the sheet, never after */}
+            <motion.div
+              initial={reduce ? false : { opacity: 0, scale: 0.985 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ duration: D(1.1), delay: T.plate + 0.12, ease: E }}
+              className="img-frame relative mt-4 aspect-[16/9] overflow-hidden border border-[#B89146]/50"
+            >
+              <img
+                src={feature.cover}
+                alt={`Cover plate — “${feature.title}”`}
+                width={1280}
+                height={720}
+                decoding="async"
+                className="h-full w-full object-cover"
+              />
+              <span aria-hidden="true" className="absolute inset-0 bg-[linear-gradient(180deg,transparent_55%,rgba(28,5,9,0.55))] " />
+              <span aria-hidden="true" className="absolute bottom-2 left-3 font-mono text-[8px] uppercase tracking-[0.3em] text-ivory/85">
+                Plate 01 / 04 — as published
+              </span>
+            </motion.div>
             <motion.div
               initial={reduce ? false : { opacity: 0, y: 18 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 1, delay: T.plate + 0.15, ease: E }}
-              className="mt-2"
+              transition={{ duration: D(1), delay: T.plate + 0.15, ease: E }}
+              className="relative mt-4"
             >
               <Link
                 to={`/article/${feature.id}`}
@@ -238,7 +285,7 @@ function Cover({ selectedId, state }: { selectedId: string | null; state: Spatia
           <motion.div
             initial={reduce ? false : { opacity: 0, y: 18 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 1, delay: T.cta, ease: E }}
+            transition={{ duration: D(1), delay: T.cta, ease: E }}
             className="mt-8 flex flex-wrap items-center gap-7"
           >
             <Magnetic>
@@ -252,10 +299,22 @@ function Cover({ selectedId, state }: { selectedId: string | null; state: Spatia
           <motion.p
             initial={reduce ? false : { opacity: 0 }}
             animate={{ opacity: 1 }}
-            transition={{ duration: 1, delay: T.deck, ease: E }}
-            className="mt-7 max-w-[44ch] text-sm leading-[1.85] text-ivory/70"
+            transition={{ duration: D(0.9), delay: T.cta + 0.12, ease: E }}
+            className="mt-5 font-mono text-[9px] uppercase leading-[2] tracking-[0.28em] text-ivory/55"
           >
-            A student-led publication — poetry, essays, art and the issues that matter. 19 features · 16 voices · 7 departments.
+            Submissions for Issue № 02 are open —{' '}
+            <Link to="/submit" className="border-b border-gold/50 pb-0.5 text-gold no-underline transition-colors hover:text-ivory">
+              send your work →
+            </Link>
+          </motion.p>
+
+          <motion.p
+            initial={reduce ? false : { opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ duration: D(1), delay: T.deck, ease: E }}
+            className="mt-6 max-w-[44ch] text-sm leading-[1.85] text-ivory/70"
+          >
+            A student-led publication — poetry, essays, art and the issues that matter. {LEDGER.features} features · {LEDGER.creators} creators · {LEDGER.departments} departments.
           </motion.p>
         </div>
       </motion.div>
@@ -265,7 +324,7 @@ function Cover({ selectedId, state }: { selectedId: string | null; state: Spatia
         <motion.div
           initial={reduce ? false : { y: 12 }}
           animate={{ y: 0 }}
-          transition={{ duration: 1.2, delay: 2.2, ease: [0.16, 1, 0.3, 1] }}
+          transition={{ duration: D(1.2), delay: instant ? 0.4 : 1.9, ease: [0.16, 1, 0.3, 1] }}
         >
           <div className="mx-auto flex max-w-page items-center justify-between border-t border-white/15 px-[clamp(1.75rem,5.5vw,4.75rem)] py-4 font-mono text-[9px] uppercase tracking-[0.34em] text-white/65">
             <span>Verlyse Media presents — Issue № 01</span>
@@ -280,16 +339,18 @@ function Cover({ selectedId, state }: { selectedId: string | null; state: Spatia
 }
 
 function IssueBand() {
+  /* every figure here is read from the ledger — the one page the magazine
+     keeps its totals on; no band, page or plate states a number of its own */
   return (
     <section className="border-b border-white/10 bg-wine py-7" aria-label="The magazine in numbers">
       <div className="mx-auto flex max-w-page flex-wrap items-center justify-center gap-x-10 gap-y-3 px-[clamp(1.75rem,5.5vw,4.75rem)] font-serif text-xl font-light italic leading-none text-ivory/85 md:text-2xl">
-        <span>19 features</span>
+        <span>{LEDGER.features} features</span>
         <i aria-hidden="true" className="text-[0.7em] not-italic text-gold">✦</i>
-        <span>15 creators</span>
+        <span>{LEDGER.creators} creators</span>
         <i aria-hidden="true" className="text-[0.7em] not-italic text-gold">✦</i>
-        <span>1281 appreciations</span>
+        <span><span className="tnum not-italic">{LEDGER.appreciations.toLocaleString('en-US')}</span> appreciations</span>
         <i aria-hidden="true" className="text-[0.7em] not-italic text-gold">✦</i>
-        <span>585 conversations</span>
+        <span><span className="tnum not-italic">{LEDGER.conversations}</span> conversations</span>
         <i aria-hidden="true" className="text-[0.7em] not-italic text-gold">✦</i>
         <span className="text-ivory/60">one room</span>
         <i aria-hidden="true" className="text-[0.7em] not-italic text-gold">✦</i>
@@ -319,23 +380,35 @@ const STORY_TITLE: Record<StorySize, string> = {
 
 function StoryCard({
   work,
-  index,
   size = 'spread',
   showExcerpt = false,
 }: {
   work: (typeof ARTICLES)[number]
-  index: string
   size?: StorySize
   showExcerpt?: boolean
 }) {
   const au = getAuthor(work.authorId)
   const cover = size === 'cover'
+  /* the plate carries its real registry number — the same № every other
+     surface in the magazine reads, never a second, display-only numbering */
+  const folioNo = String(ARTICLES.findIndex((x) => x.id === work.id) + 1).padStart(2, '0')
   return (
-    <Link
-      to={`/article/${work.id}`}
-      className={`group block no-underline ${cover ? 'lg:flex lg:h-full lg:flex-col' : ''}`}
-      aria-label={`Read “${work.title}”`}
-    >
+    <div className="group/card relative">
+      {/* the save mark sits above the plate, never inside the link — a card
+          is one action for reading and one for keeping */}
+      <SaveButton
+        id={work.id}
+        title={work.title}
+        category={work.category}
+        author={au?.name}
+        compact
+        className="absolute left-4 top-4 z-[3] md:opacity-0 md:transition-opacity md:duration-500 md:group-hover/card:opacity-100 md:focus-within:opacity-100"
+      />
+      <Link
+        to={`/article/${work.id}`}
+        className={`group block no-underline outline-none focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-gold ${cover ? 'lg:flex lg:h-full lg:flex-col' : ''}`}
+        aria-label={`Read “${work.title}”`}
+      >
       <div
         className={`img-frame relative overflow-hidden border border-white/10 transition-colors duration-700 group-hover:border-gold/45 ${
           cover ? 'aspect-[4/5] lg:aspect-auto lg:flex-1' : STORY_IMAGE[size]
@@ -355,7 +428,7 @@ function StoryCard({
             aria-hidden="true"
             className="absolute left-5 top-1/2 hidden -translate-y-1/2 -rotate-90 origin-left whitespace-nowrap font-mono text-[9px] uppercase tracking-[0.42em] text-gold/90 md:block"
           >
-            Cover story — Verlyse Media
+            The cover of the issue — Verlyse Media
           </span>
         )}
 
@@ -370,34 +443,36 @@ function StoryCard({
           aria-hidden="true"
           className={`absolute font-mono uppercase tracking-[0.26em] transition-colors duration-500 group-hover:text-gold ${cover ? 'right-5 top-5 text-[10px] text-white/70' : 'bottom-3 right-3 text-[9px] text-white/70'}`}
         >
-          {index}
+          № {folioNo}
         </span>
       </div>
 
       <div className="mt-5">
-        <MetaRow category={work.category} author={au?.name} readingTime={work.readingTime} />
+        <MetaRow category={work.category} author={au?.name} readingTime={work.readingTime} date={work.date} />
         <h3 className={`mt-3 font-serif font-normal leading-[1.12] text-ivory transition-all duration-700 group-hover:italic group-hover:text-[#E8D9A8] ${STORY_TITLE[size]}`}>
           {cover ? (
             <>
-              <span aria-hidden="true" className="mr-3 font-mono text-[0.42em] font-normal tracking-[0.3em] text-gold not-italic">01</span>
+              <span aria-hidden="true" className="mr-3 font-mono text-[0.42em] font-normal tracking-[0.3em] text-gold not-italic">№ {folioNo}</span>
               “{work.title}”
             </>
           ) : (
             <>“{work.title}”</>
           )}
         </h3>
+        {au && (
+          <p className="mt-2 font-mono text-[9px] uppercase tracking-[0.26em] text-white/45">by {au.name} {au.handle}</p>
+        )}
         {showExcerpt && (
           <p className="mt-4 max-w-[46ch] text-[15px] leading-[1.8] text-white/60">{work.excerpt}</p>
         )}
-        {cover && (
-          <p className="mt-5">
-            <span className="border-b border-gold/60 pb-1 font-mono text-[10px] uppercase tracking-[0.28em] text-gold transition-colors duration-500 group-hover:text-ivory">
-              Continue reading <span aria-hidden="true">→</span>
-            </span>
-          </p>
-        )}
+        <p className="mt-5">
+          <span className="border-b border-gold/60 pb-1 font-mono text-[10px] uppercase tracking-[0.28em] text-gold transition-colors duration-500 group-hover:text-ivory">
+            Read feature <span aria-hidden="true">→</span>
+          </span>
+        </p>
       </div>
-    </Link>
+      </Link>
+    </div>
   )
 }
 
@@ -422,8 +497,8 @@ function WorksStrip() {
               </AnticipatedTitle>
             </div>
             <div className="text-right">
-              <p className="font-mono text-[9px] uppercase tracking-[0.30em] text-white/55">Features 01–08 · June–August 2026</p>
-              <p className="mt-2 font-mono text-[9px] uppercase tracking-[0.30em] text-white/55">19 features · 15 creators · 1281 appreciations</p>
+              <p className="font-mono text-[9px] uppercase tracking-[0.30em] text-white/55">The eight newest folios · June–August 2026</p>
+              <p className="mt-2 font-mono text-[9px] uppercase tracking-[0.30em] text-white/55">{LEDGER.features} features · {LEDGER.creators} creators · {LEDGER.appreciations.toLocaleString('en-US')} appreciations</p>
               <p className="mt-3 max-w-[30ch] font-serif text-base font-light italic leading-[1.6] text-ivory/70">
                 The next issue could begin with your name.
               </p>
@@ -437,12 +512,12 @@ function WorksStrip() {
         {/* ——— the cover story + supporting stack ——— */}
         <div className="mt-16 grid grid-cols-1 gap-x-14 gap-y-16 lg:grid-cols-12">
           <Reveal className="lg:col-span-7 lg:h-full">
-            <StoryCard work={cover} index="Cover" size="cover" showExcerpt />
+            <StoryCard work={cover} size="cover" showExcerpt />
           </Reveal>
 
           <div className="flex flex-col gap-y-14 lg:col-span-5">
             <Reveal>
-              <StoryCard work={s1} index="02" size="stack" />
+              <StoryCard work={s1} size="stack" />
             </Reveal>
 
             {/* the issue note — a quiet interlude between the stack stories */}
@@ -455,7 +530,7 @@ function WorksStrip() {
             </Reveal>
 
             <Reveal delay={0.1} className="lg:mt-10">
-              <StoryCard work={s2} index="03" size="stack" />
+              <StoryCard work={s2} size="stack" />
             </Reveal>
           </div>
         </div>
@@ -464,7 +539,7 @@ function WorksStrip() {
         <div className="mt-20 grid grid-cols-1 gap-x-12 gap-y-16 sm:grid-cols-2 lg:grid-cols-3">
           {spread.map((w, i) => (
             <Reveal key={w.id} delay={i * 0.07} className={i === 1 ? 'lg:mt-20' : ''}>
-              <StoryCard work={w} index={`0${i + 4}`} size="spread" />
+              <StoryCard work={w} size="spread" />
             </Reveal>
           ))}
         </div>
@@ -472,10 +547,10 @@ function WorksStrip() {
         {/* ——— the closing duo — wide crops, set lower like the back pages ——— */}
         <div className="mt-6 grid grid-cols-1 gap-x-12 gap-y-16 md:grid-cols-2">
           <Reveal className="md:mt-24">
-            <StoryCard work={bottom[0]} index="07" size="bottom" />
+            <StoryCard work={bottom[0]} size="bottom" />
           </Reveal>
           <Reveal delay={0.08}>
-            <StoryCard work={bottom[1]} index="08" size="bottom" />
+            <StoryCard work={bottom[1]} size="bottom" />
           </Reveal>
         </div>
 
@@ -524,7 +599,7 @@ function FeatureSection({ feature, authorName }: { feature: (typeof ARTICLES)[nu
               ))}
             </div>
             <p className="mt-5 font-mono text-[10px] uppercase tracking-[0.28em] text-white/50">
-              The feature as presented — three plates, 4:5
+              The feature as presented — {plates.length} plates, 4:5 · as published on the feed
             </p>
           </Reveal>
 
@@ -575,16 +650,19 @@ function Pulse() {
         <div className="grid grid-cols-1 gap-12 lg:grid-cols-[1.15fr_0.85fr] lg:gap-20">
           <Reveal className="border-t border-white/15 pt-10">
             <p className="font-mono text-[10px] uppercase tracking-[0.28em] text-white/55">Features presented</p>
-            <p className="mt-4 font-serif text-[clamp(6rem,13vw,11rem)] font-light leading-[0.9] tracking-[-0.02em] text-ivory">19</p>
+            <p className="mt-4 font-serif text-[clamp(6rem,13vw,11rem)] font-light leading-[0.9] tracking-[-0.02em] text-ivory">{LEDGER.features}</p>
             <p className="mt-6 max-w-[34ch] text-base leading-[1.8] text-white/65">
               Every post on the feed — from the founder’s call for women’s rights to the Mir Raza Ali memorial.
+            </p>
+            <p className="mt-6 font-mono text-[9px] uppercase leading-[2] tracking-[0.26em] text-white/40">
+              Archive data — read from the published feed of June–August 2026. Not live counts.
             </p>
           </Reveal>
           <div className="border-t border-white/15">
             {[
-              ['1281', 'Appreciations', 'Likes across the feed — each of them an answer to a writer.'],
-              ['585', 'Conversations', 'Comments beneath the features, all of them read.'],
-              ['15', 'Creators credited', 'Every feature names its writer, by name and handle.'],
+              [String(LEDGER.appreciations), 'Appreciations', 'Likes across the feed — each of them an answer to a writer.'],
+              [String(LEDGER.conversations), 'Conversations', 'Comments beneath the features, all of them read.'],
+              [String(LEDGER.creators), 'Creators credited', 'Every feature names its writer, by name and handle.'],
             ].map(([v, l, n], i) => (
               <Reveal key={l} delay={0.1 + i * 0.08}>
                 <div className="flex items-baseline justify-between gap-6 border-b border-white/10 py-7">
@@ -628,8 +706,15 @@ function Departments() {
         <div className="mt-14 border-t border-white/10">
           {CATEGORIES.map((c, i) => (
             <Reveal key={c.slug} delay={Math.min(i * 0.05, 0.25)}>
-              <div className="group grid grid-cols-1 items-center gap-3 border-b border-white/10 py-8 transition-all duration-700 hover:bg-white/[0.04] md:grid-cols-[4rem_1fr_auto] md:px-5 md:py-10">
-                <span className="font-mono text-xs tracking-[0.2em] text-gold">{String(i + 1).padStart(2, '0')}</span>
+              <Link
+                to={`/categories/${c.slug}`}
+                aria-label={`Enter the ${c.name} room — ${c.count} feature${c.count === 1 ? '' : 's'}`}
+                className="group grid grid-cols-1 items-center gap-3 border-b border-white/10 py-8 no-underline transition-all duration-700 hover:bg-white/[0.04] md:grid-cols-[4rem_1fr_auto] md:px-5 md:py-10 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-[-2px] focus-visible:outline-gold"
+              >
+                <span aria-hidden="true" className="flex items-center gap-3 font-mono text-xs tracking-[0.2em] text-gold md:flex-col md:items-start md:gap-2">
+                  {String(i + 1).padStart(2, '0')}
+                  <span className="text-lg leading-none transition-transform duration-700 group-hover:-translate-y-0.5" style={{ color: c.accent }}>{c.motif}</span>
+                </span>
                 <div>
                   <h3 className="font-serif text-[clamp(2rem,3.8vw,3.4rem)] font-normal leading-[1.04] text-ivory transition-all duration-700 group-hover:translate-x-3 group-hover:italic">
                     {c.name}
@@ -637,24 +722,29 @@ function Departments() {
                   <p className="mt-2 max-w-[52ch] text-sm leading-relaxed text-white/60">{c.blurb}</p>
                 </div>
                 <p className="text-left font-mono text-[10px] uppercase tracking-[0.28em] text-white/60 md:text-right">
-                  {c.count} feature{c.count === 1 ? '' : 's'}
+                  {c.count} feature{c.count === 1 ? '' : 's'} · Browse <span aria-hidden="true">→</span>
                 </p>
-              </div>
+              </Link>
             </Reveal>
           ))}
+          {/* the invitation, set apart — it is not an eighth room; it is the
+              door the next writer opens, so it carries no folio number */}
           <Reveal delay={0.18}>
-            <Link to="/categories" className="group grid grid-cols-1 items-center gap-3 border-b border-white/10 py-8 transition-all duration-700 hover:bg-white/[0.04] md:grid-cols-[4rem_1fr_auto] md:px-5 md:py-10">
-              <span className="font-mono text-xs tracking-[0.2em] text-gold">08</span>
+            <Link to="/submit" className="group grid grid-cols-1 items-center gap-3 border-b border-dashed border-gold/30 py-8 no-underline transition-all duration-700 hover:bg-gold/[0.05] md:grid-cols-[4rem_1fr_auto] md:px-5 md:py-10 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-[-2px] focus-visible:outline-gold">
+              <span aria-hidden="true" className="flex items-center gap-3 font-mono text-xs tracking-[0.2em] text-gold md:flex-col md:items-start md:gap-2">
+                ✦
+                <span className="text-[9px] uppercase leading-none tracking-[0.24em]">Open</span>
+              </span>
               <div>
                 <h3 className="font-serif text-[clamp(2rem,3.8vw,3.4rem)] font-normal italic leading-[1.04] text-white/60 transition-all duration-700 group-hover:translate-x-3 group-hover:text-ivory">
-                  Your department
+                  Your department — a submission invitation
                 </h3>
                 <p className="mt-2 max-w-[52ch] text-sm leading-relaxed text-white/60">
                   Every room on this page was opened — or will be opened — by a writer who sent their work in. Yours could open the next one.
                 </p>
               </div>
-              <p className="text-left font-mono text-[10px] uppercase tracking-[0.28em] text-white/60 md:text-right">
-                See the rooms <span aria-hidden="true">→</span>
+              <p className="text-left font-mono text-[10px] uppercase tracking-[0.28em] text-gold/90 md:text-right">
+                Send your work <span aria-hidden="true">→</span>
               </p>
             </Link>
           </Reveal>
@@ -733,7 +823,7 @@ function Colophon() {
             </Reveal>
             <Reveal delay={0.16}>
               <p className="mt-7 max-w-[52ch] leading-[1.85] text-white/70">
-                A platform for artists, writers and storytellers — where every meaningful creation gets an audience, a credit, and a room of its own. The feed opened on the twenty-sixth of June 2026 with the founder’s call for Afghan women’s rights, “Their Voices Matter” — and has presented nineteen features since.
+                A platform for artists, writers and storytellers — where every meaningful creation gets an audience, a credit, and a room of its own. The feed opened on the twenty-sixth of June 2026 with the founder’s call for Afghan women’s rights, “Their Voices Matter” — and has presented {LEDGER.features} features since.
               </p>
             </Reveal>
             <Reveal delay={0.24} className="mt-9">
@@ -758,54 +848,189 @@ function Colophon() {
 /** The four initial spatial-reading works — sourced from the article registry. */
 const SPATIAL_PICKS = ['their-voices-matter', '3-13', 'the-garden-beyond-my-tower', 'behind-every-headline']
 
-/** Optional spatial reading — an accessible selector that drives the archive scene. */
-function SpatialReading({ selectedId, onSelect }: { selectedId: string | null; onSelect: (id: string) => void }) {
+/**
+ * Spatial reading — an accessible plate selector that drives the archive
+ * scene behind the masthead. The tabs move the atmosphere; the plate panel
+ * shows what was chosen: the real cover, a crossfade between picks, the
+ * folio's own excerpt, and one clear road into the full feature.
+ *
+ * Keyboard: ← → Home End move between plates (automatic activation, as the
+ * ARIA tab pattern prescribes). Touch: a horizontal swipe turns the plate.
+ * Reduced motion: every transition collapses to a cut; nothing else changes.
+ */
+function SpatialReading({ pickIdx, onSelect }: { pickIdx: number; onSelect: (i: number) => void }) {
+  const reduce = useReducedMotion() === true
+  const picks = SPATIAL_PICKS.map((id) => ARTICLES.find((x) => x.id === id)).filter(Boolean) as typeof ARTICLES
+  const active = picks[pickIdx] ?? picks[0]
+  const au = getAuthor(active.authorId)
+  const folio = String(ARTICLES.findIndex((x) => x.id === active.id) + 1).padStart(2, '0')
+  const tabRefs = useRef<Array<HTMLButtonElement | null>>([])
+  const touch = useRef<{ x: number; y: number } | null>(null)
+
+  const move = (from: number, dir: 1 | -1) => {
+    const n = picks.length
+    const target = ((from + dir) % n + n) % n
+    onSelect(target)
+    tabRefs.current[target]?.focus()
+  }
+
+  const onTabKey = (e: React.KeyboardEvent) => {
+    if (e.key === 'ArrowRight' || e.key === 'ArrowDown') { e.preventDefault(); move(pickIdx, 1) }
+    else if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') { e.preventDefault(); move(pickIdx, -1) }
+    else if (e.key === 'Home') { e.preventDefault(); onSelect(0); tabRefs.current[0]?.focus() }
+    else if (e.key === 'End') { e.preventDefault(); onSelect(picks.length - 1); tabRefs.current[picks.length - 1]?.focus() }
+  }
+
+  /* swipe — horizontal intent only (a vertical scroll must never turn a plate) */
+  const onTouchStart = (e: React.TouchEvent) => {
+    touch.current = { x: e.touches[0].clientX, y: e.touches[0].clientY }
+  }
+  const onTouchEnd = (e: React.TouchEvent) => {
+    if (!touch.current) return
+    const dx = e.changedTouches[0].clientX - touch.current.x
+    const dy = e.changedTouches[0].clientY - touch.current.y
+    if (Math.abs(dx) > 44 && Math.abs(dx) > Math.abs(dy) * 1.6) onSelect(pickIdx + (dx < 0 ? 1 : -1))
+    touch.current = null
+  }
+
   return (
     <section className="relative border-t border-white/10 py-[clamp(5rem,10vh,8rem)]" aria-labelledby="spatial-reading-title">
       <div className="mx-auto max-w-page px-[clamp(1.75rem,5.5vw,4.75rem)]">
-        <p className="kicker">Optional spatial reading</p>
-        <h2 id="spatial-reading-title" className="mt-5 max-w-[22ch] font-serif text-[clamp(2.2rem,4.6vw,4rem)] font-light leading-[1.05] text-ivory">
-          Read a plate. <em className="italic text-gold">Shift the atmosphere.</em>
-        </h2>
+        <div className="flex flex-wrap items-end justify-between gap-6">
+          <div>
+            <p className="kicker">Optional spatial reading</p>
+            <h2 id="spatial-reading-title" className="mt-5 max-w-[22ch] font-serif text-[clamp(2.2rem,4.6vw,4rem)] font-light leading-[1.05] text-ivory">
+              Read a plate. <em className="italic text-gold">Shift the atmosphere.</em>
+            </h2>
+          </div>
+          {/* progress — the plate index, the travel, and a brass measure */}
+          <div className="flex items-center gap-4" aria-hidden="true">
+            <span className="font-mono text-[10px] uppercase tracking-[0.28em] text-white/55">
+              <span className="text-gold">№ {String(pickIdx + 1).padStart(2, '0')}</span> / {String(picks.length).padStart(2, '0')}
+            </span>
+            <span className="relative block h-px w-[clamp(6rem,14vw,12rem)] bg-white/15">
+              <motion.span
+                className="absolute left-0 top-0 h-px bg-gold"
+                animate={{ width: `${((pickIdx + 1) / picks.length) * 100}%` }}
+                transition={{ duration: reduce ? 0 : 0.7, ease: [0.16, 1, 0.3, 1] }}
+              />
+            </span>
+            {/* next / previous — quiet, square, labelled */}
+            <span className="flex gap-1">
+              <button
+                type="button"
+                onClick={() => onSelect(pickIdx - 1)}
+                aria-label="Previous plate"
+                className="grid h-9 w-9 place-items-center border border-gold/40 text-ivory transition-colors duration-300 hover:border-gold hover:bg-gold hover:text-charcoal"
+              >←</button>
+              <button
+                type="button"
+                onClick={() => onSelect(pickIdx + 1)}
+                aria-label="Next plate"
+                className="grid h-9 w-9 place-items-center border border-gold/40 text-ivory transition-colors duration-300 hover:border-gold hover:bg-gold hover:text-charcoal"
+              >→</button>
+            </span>
+          </div>
+        </div>
         <p className="mt-5 max-w-[44ch] font-serif text-lg font-light italic leading-[1.7] text-ivory/65">
           Choose a feature and the archive leans in to meet it. The full story is always one tap away on its own page.
         </p>
-        <div className="mt-10 grid grid-cols-1 gap-4 sm:grid-cols-2" role="tablist" aria-label="Spatial reading options">
-          {SPATIAL_PICKS.map((id) => {
-            const a = ARTICLES.find((x) => x.id === id)
-            if (!a) return null
-            const au = getAuthor(a.authorId)
-            const activeSel = selectedId === id
-            return (
-              <button
-                key={id}
-                type="button"
-                role="tab"
-                aria-selected={activeSel}
-                onClick={() => onSelect(id)}
-                className={`group flex items-start gap-5 border px-6 py-5 text-left no-underline transition-colors duration-500 ${
-                  activeSel ? 'border-gold/70 bg-gold/5' : 'border-white/15 hover:border-gold/40'
-                }`}
+
+        <div className="mt-10 grid grid-cols-1 gap-x-12 gap-y-10 lg:grid-cols-[0.92fr_1.08fr]">
+          {/* the selector — a vertical stack of plates, tab pattern with roving focus */}
+          <div role="tablist" aria-label="Spatial reading options" aria-orientation="vertical" onKeyDown={onTabKey} onTouchStart={onTouchStart} onTouchEnd={onTouchEnd}>
+            <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-1">
+              {picks.map((a, i) => {
+                const author = getAuthor(a.authorId)
+                const activeSel = i === pickIdx
+                return (
+                  <button
+                    key={a.id}
+                    ref={(el) => { tabRefs.current[i] = el }}
+                    type="button"
+                    role="tab"
+                    id={`spatial-tab-${a.id}`}
+                    aria-selected={activeSel}
+                    aria-controls="spatial-plate-panel"
+                    tabIndex={activeSel ? 0 : -1}
+                    onClick={() => onSelect(i)}
+                    className={`group flex items-start gap-5 border px-6 py-5 text-left no-underline transition-colors duration-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-gold ${
+                      activeSel ? 'border-gold/70 bg-gold/5' : 'border-white/15 hover:border-gold/40'
+                    }`}
+                  >
+                    <span aria-hidden="true" className={`mt-1 font-serif text-2xl leading-none ${activeSel ? 'text-gold' : 'text-white/40'}`}>✦</span>
+                    <span className="flex-1">
+                      <span className={`block font-serif text-xl leading-tight ${activeSel ? 'text-ivory' : 'text-ivory/80'} transition-colors group-hover:text-ivory`}>
+                        “{a.title}”
+                      </span>
+                      <span className="mt-2 block font-mono text-[10px] uppercase tracking-[0.28em] text-white/55">
+                        № {String(ARTICLES.findIndex((x) => x.id === a.id) + 1).padStart(2, '0')} · {a.category} · {author?.name}
+                      </span>
+                    </span>
+                    <span aria-hidden="true" className={`ml-auto self-center font-serif text-lg transition-opacity duration-500 ${activeSel ? 'text-gold opacity-100' : 'text-gold opacity-0 group-hover:opacity-100'}`}>
+                      →
+                    </span>
+                  </button>
+                )
+              })}
+            </div>
+            {/* dots — the small map of where the plate stands */}
+            <div className="mt-6 flex items-center gap-3" aria-hidden="true">
+              {picks.map((a, i) => (
+                <span key={a.id} className={`h-1.5 w-1.5 rotate-45 border transition-colors duration-500 ${i === pickIdx ? 'border-gold bg-gold' : 'border-white/30 bg-transparent'}`} />
+              ))}
+              <span className="ml-3 font-mono text-[9px] uppercase tracking-[0.24em] text-white/40">swipe or use ← → on a plate</span>
+            </div>
+          </div>
+
+          {/* the plate itself — one panel that all tabs control; the image
+              crossfades under reduced motion to a plain cut, nothing else */}
+          <div
+            role="tabpanel"
+            id="spatial-plate-panel"
+            aria-labelledby={`spatial-tab-${active.id}`}
+            tabIndex={0}
+            className="relative min-h-[420px] border border-white/12 outline-none focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-gold lg:min-h-[480px]"
+            onTouchStart={onTouchStart}
+            onTouchEnd={onTouchEnd}
+          >
+            <AnimatePresence mode="wait">
+              <motion.div
+                key={active.id}
+                initial={reduce ? false : { opacity: 0, scale: 1.015 }}
+                animate={{ opacity: 1, scale: 1 }}
+                exit={reduce ? undefined : { opacity: 0 }}
+                transition={{ duration: 0.9, ease: [0.16, 1, 0.3, 1] }}
+                className="absolute inset-0"
               >
-                <span aria-hidden="true" className={`mt-1 font-serif text-2xl leading-none ${activeSel ? 'text-gold' : 'text-white/40'}`}>✦</span>
-                <span className="flex-1">
-                  <span className={`block font-serif text-xl leading-tight ${activeSel ? 'text-ivory' : 'text-ivory/80'} transition-colors group-hover:text-ivory`}>
-                    “{a.title}”
-                  </span>
-                  <span className="mt-2 block font-mono text-[10px] uppercase tracking-[0.28em] text-white/55">
-                    {a.category} · {au?.name}
-                  </span>
-                </span>
-                <span aria-hidden="true" className="ml-auto self-center font-serif text-lg text-gold opacity-0 transition-opacity duration-500 group-hover:opacity-100">
-                  →
-                </span>
-              </button>
-            )
-          })}
+                <img
+                  src={active.cover}
+                  alt={`Selected plate — “${active.title}” by ${au?.name}`}
+                  loading="lazy"
+                  decoding="async"
+                  className="h-full w-full object-cover"
+                />
+                <span aria-hidden="true" className="absolute inset-0 bg-[linear-gradient(180deg,rgba(28,5,9,0.06)_36%,rgba(20,5,9,0.9))]" />
+                <span aria-hidden="true" className="grain absolute inset-0 opacity-20" />
+                <div className="absolute inset-x-0 bottom-0 p-6 md:p-8">
+                  <p className="font-mono text-[9px] uppercase tracking-[0.3em] text-gold">
+                    Folio № {folio} · {active.category} · {active.readingTime} · {active.date}
+                  </p>
+                  <p className="mt-3 line-clamp-2 max-w-[46ch] text-sm leading-[1.8] text-white/70">{active.excerpt}</p>
+                  <p className="mt-4 font-serif text-base italic text-ivory/85">By {au?.name} — {au?.handle}</p>
+                  <div className="mt-6 flex flex-wrap items-center gap-6">
+                    <Link to={`/article/${active.id}`} className="btn btn-gold !px-7 !py-3">
+                      Open the full feature →
+                    </Link>
+                    <span className="font-mono text-[9px] uppercase tracking-[0.26em] text-white/45">
+                      The hall above is leaning toward this plate
+                    </span>
+                  </div>
+                </div>
+              </motion.div>
+            </AnimatePresence>
+          </div>
         </div>
-        <p className="mt-8 font-mono text-[10px] uppercase tracking-[0.28em] text-white/45">
-          {selectedId ? 'Reading the selected plate — the archive is leaning in' : 'Select a plate to shift the atmosphere'}
-        </p>
       </div>
     </section>
   )
@@ -818,11 +1043,18 @@ export default function Home() {
   })
   const feature = ARTICLES[0]
   const author = getAuthor(feature.authorId)!
-  const [selectedId, setSelectedId] = useState<string | null>(null)
+  /* the plate carousel owns the index; the atmosphere follows only once the
+     reader has actually chosen — the hall stays at threshold until then, so
+     the untouched cover is never biased toward a plate nobody picked */
+  const [pickIdx, setPickIdx] = useState(0)
+  const [touched, setTouched] = useState(false)
   const [spatialState, setSpatialState] = useState<SpatialState>('threshold')
+  const selectedId = touched ? SPATIAL_PICKS[pickIdx] ?? null : null
 
-  const select = (id: string) => {
-    setSelectedId(id)
+  const select = (idx: number) => {
+    const n = SPATIAL_PICKS.length
+    setPickIdx(((idx % n) + n) % n)
+    setTouched(true)
     setSpatialState('selected')
   }
 
@@ -842,7 +1074,7 @@ export default function Home() {
       <WorksStrip />
       <MotifDivider label="The feature" motif="quote" />
       <FeatureSection feature={feature} authorName={author.name} />
-      <SpatialReading selectedId={selectedId} onSelect={select} />
+      <SpatialReading pickIdx={pickIdx} onSelect={select} />
       <MotifDivider label="The room" motif="voices" />
       <Pulse />
       <Departments />

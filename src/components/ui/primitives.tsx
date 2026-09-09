@@ -28,8 +28,8 @@ export function SectionHead({
   )
 }
 
-/* ---------- Meta row: category ✦ author ✦ reading time ---------- */
-export function MetaRow({ category, author, readingTime, className = '' }: { category: string; author?: string; readingTime?: string; className?: string }) {
+/* ---------- Meta row: category ✦ author ✦ reading time ✦ date ---------- */
+export function MetaRow({ category, author, readingTime, date, className = '' }: { category: string; author?: string; readingTime?: string; date?: string; className?: string }) {
   return (
     <p className={`flex flex-wrap items-center gap-x-2.5 gap-y-1 font-mono text-[10px] uppercase tracking-[0.16em] text-white/60 sm:gap-3 sm:text-[11px] sm:tracking-[0.24em] ${className}`}>
       <span className="text-gold">{category}</span>
@@ -43,6 +43,12 @@ export function MetaRow({ category, author, readingTime, className = '' }: { cat
         <>
           <i aria-hidden="true" className="text-[0.6em] not-italic text-gold">✦</i>
           <span>{readingTime}</span>
+        </>
+      )}
+      {date && (
+        <>
+          <i aria-hidden="true" className="text-[0.6em] not-italic text-gold">✦</i>
+          <span>{date}</span>
         </>
       )}
     </p>

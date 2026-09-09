@@ -2,7 +2,7 @@ import { useMemo, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { motion, AnimatePresence, useReducedMotion } from 'motion/react'
 import { useSeo } from '../hooks/useSeo'
-import { ARTICLES, AUTHORS, authorPhoto } from '../data/content'
+import { ARTICLES, AUTHORS, LEDGER, authorPhoto, stampDate } from '../data/content'
 
 /** The folios a creator holds in the archive — their own entries. */
 function foliosOf(authorId: string) {
@@ -34,7 +34,7 @@ export default function Creators() {
   useSeo({
     path: '/creators',
     title: 'Featured Creators',
-    description: 'The creators featured by Verlyse Media — sixteen names, credited by name and handle on every feature.',
+    description: `The creators featured by Verlyse Media — ${LEDGER.creators} writers plus the masthead's own record, credited by name and handle on every feature.`,
   })
   const reduced = useReducedMotion() === true
   const [selectedId, setSelectedId] = useState<string>(AUTHORS[0]?.id ?? 'alina-javed')
@@ -46,6 +46,13 @@ export default function Creators() {
   const folioNums = folios
     .map((f) => `№ ${String(ARTICLES.findIndex((x) => x.id === f.id) + 1).padStart(2, '0')}`)
     .join(' · ')
+  /* the rooms this name writes in, and their most-kept piece — both read
+     from the registry, never declared by hand */
+  const theirCats = useMemo(() => [...new Set(folios.map((f) => f.category))], [folios])
+  const selectedFeature = useMemo(
+    () => folios.length ? [...folios].sort((a, b) => b.likes - a.likes)[0] : undefined,
+    [folios],
+  )
 
   const select = (id: string) => {
     setSelectedId(id)
@@ -100,7 +107,10 @@ export default function Creators() {
             </MaskReveal>
           </h1>
           <p className="mt-4 font-mono text-[10px] uppercase tracking-[0.34em] text-gold/85">
-            The contributor wall — {AUTHORS.length} voices · {ARTICLES.length} folios
+            The contributor wall — {LEDGER.wallRecords} records · {LEDGER.creators} bylined in the archive · {ARTICLES.length} folios
+          </p>
+          <p className="mx-auto mt-2 max-w-[70ch] font-mono text-[9px] uppercase leading-[1.9] tracking-[0.22em] text-white/45">
+            {LEDGER.creators} records carry a feature byline — {LEDGER.creators - 1} named writers plus the masthead’s own dispatch; one poet wrote the verse beside a painting. Every record on this wall is real
           </p>
           <Slate move="crash zoom" className="mt-5" />
         </div>
@@ -133,8 +143,54 @@ export default function Creators() {
                       {selected.role}
                     </p>
                     <p className="mt-2 max-w-[56ch] font-mono text-[10px] uppercase tracking-[0.26em] text-gold/90">
-                      {folios.length} folio{folios.length === 1 ? '' : 's'} in the archive — {folioNums}
+                      {folios.length} folio{folios.length === 1 ? '' : 's'} in the archive{folioNums ? ` — ${folioNums}` : ''}
                     </p>
+                    {theirCats.length > 0 && (
+                      <p className="mt-3 flex flex-wrap items-center gap-2" aria-label="Rooms this name writes in">
+                        <span className="font-mono text-[9px] uppercase tracking-[0.24em] text-white/45">Rooms</span>
+                        {theirCats.map((c) => (
+                          <Link
+                            key={c}
+                            to={`/categories/${c.toLowerCase().replace(/\s+/g, '-')}`}
+                            className="border border-white/15 px-2.5 py-1 font-mono text-[8px] uppercase tracking-[0.22em] text-ivory/75 no-underline transition-colors hover:border-gold/60 hover:text-gold"
+                          >
+                            {c}
+                          </Link>
+                        ))}
+                      </p>
+                    )}
+                    {/* the short record — the first line of the desk's own note */}
+                    <p className="mt-4 max-w-[56ch] text-sm leading-[1.8] text-white/60">
+                      {selected.bio.split('—')[0].trim().replace(/\.$/, '')}.
+                    </p>
+
+                    {/* the selected feature — this name's most-kept folio */}
+                    {selectedFeature && (
+                      <Link
+                        to={`/article/${selectedFeature.id}`}
+                        aria-label={`Selected feature — “${selectedFeature.title}”`}
+                        className="group mt-5 flex items-center gap-4 border border-white/10 bg-[#F8F6F2]/[0.03] p-3 no-underline transition-colors duration-500 hover:border-gold/40 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-gold"
+                      >
+                        <img
+                          src={selectedFeature.thumbnail ?? selectedFeature.cover}
+                          alt=""
+                          loading="lazy"
+                          decoding="async"
+                          className="h-14 w-[72px] shrink-0 border border-white/10 object-cover"
+                        />
+                        <span className="min-w-0">
+                          <span className="block font-mono text-[8px] uppercase tracking-[0.28em] text-gold">
+                            Selected feature · № {String(ARTICLES.findIndex((x) => x.id === selectedFeature.id) + 1).padStart(2, '0')} · {stampDate(selectedFeature.date)}
+                          </span>
+                          <span className="mt-1 block truncate font-serif text-lg text-ivory/90 transition-colors group-hover:text-gold">
+                            “{selectedFeature.title}”
+                          </span>
+                        </span>
+                        <span aria-hidden="true" className="ml-auto self-center font-mono text-[9px] uppercase tracking-[0.24em] text-white/45 transition-colors group-hover:text-gold">
+                          Read →
+                        </span>
+                      </Link>
+                    )}
 
                     <div className="mt-7 flex flex-wrap items-center gap-6">
                       <Magnetic><Link to={`/creator/${selected.id}`} className="btn btn-gold">
@@ -201,7 +257,7 @@ export default function Creators() {
         {/* ——— MID · the wall of names — the other fifteen, architectural ——— */}
         <div className="mt-[clamp(3rem,8vh,5rem)] border-t border-white/10 pt-8">
           <p className="font-mono text-[10px] uppercase tracking-[0.3em] text-gold/80">
-            {resting ? 'The wall — choose a name' : 'The wall — sixteen names, every credit real'}
+            {resting ? 'The wall — choose a name' : `The wall — ${LEDGER.wallRecords} names, every credit real`}
           </p>
           <div className="mt-6 grid grid-cols-1 gap-x-8 gap-y-[clamp(1.4rem,3vh,2rem)] sm:grid-cols-2 lg:grid-cols-4">
             {AUTHORS.map((a) => {

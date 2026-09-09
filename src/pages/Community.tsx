@@ -2,7 +2,16 @@ import { useRef } from 'react'
 import { Link } from 'react-router-dom'
 import { motion } from 'motion/react'
 import { useSeo } from '../hooks/useSeo'
-import { ARTICLES, BRAND, COMMUNITY_STATS, COMMUNITY_VOICES, type Article } from '../data/content'
+import { ARTICLES, BRAND, COMMUNITY_STATS, COMMUNITY_VOICES, LEDGER, stampDate, type Article } from '../data/content'
+
+/** The five most recent replies in the commons — real comments, read from
+    the feed backwards by publication date, each tied to its folio. */
+function recentResponses() {
+  return [...ARTICLES]
+    .sort((a, b) => b.date.localeCompare(a.date))
+    .flatMap((a) => a.voices.slice(0, 2).map((v) => ({ ...v, article: a })))
+    .slice(0, 5)
+}
 
 /** The perforated rail of the film strip — sprocket holes, punched in the dark. */
 function FilmRail() {
@@ -59,11 +68,12 @@ export default function Community() {
   useSeo({
     path: '/community',
     title: 'Community',
-    description: 'The Verlyse Media community — 19 features, 1281 appreciations, 585 conversations, and a rule of transparency.',
+    description: `The Verlyse Media commons — ${LEDGER.features} features, ${LEDGER.appreciations.toLocaleString('en-US')} appreciations, ${LEDGER.conversations} conversations, and a rule of transparency.`,
   })
 
   const covers = ARTICLES
   const folioOf = (id: string) => String(ARTICLES.findIndex((a) => a.id === id) + 1).padStart(2, '0')
+  const responses = recentResponses()
   const featureVoice = COMMUNITY_VOICES.find((v) => v.handle === '@marziaontop') ?? COMMUNITY_VOICES[0]
   const otherVoices = COMMUNITY_VOICES.filter((v) => v !== featureVoice)
 
@@ -149,7 +159,7 @@ export default function Community() {
           </div>
           <FilmRail />
           <p className="mt-3 font-mono text-[9px] uppercase tracking-[0.28em] text-white/45">
-            № 01 — “Their Voices Matter” → № 19 — “Mir Raza Ali” · drag the reel, don’t drive it
+            № 01 — “{covers[0].title}” → № {covers.length} — “{covers[covers.length - 1].title}” · drag the reel, don’t drive it
           </p>
         </section>
 
@@ -206,6 +216,45 @@ export default function Community() {
               </p>
             ))}
           </div>
+        </section>
+
+        {/* ——— FRONT · recent responses — the newest replies, read backwards
+            from the latest folio; the shelf's living margin ——— */}
+        <section aria-label="Recent reader responses" className="mt-[clamp(3.5rem,9vh,6rem)] border-t border-white/10 pt-12">
+          <div className="flex flex-wrap items-end justify-between gap-4">
+            <p className="font-mono text-[10px] uppercase tracking-[0.3em] text-gold">Recent responses — from the folios back</p>
+            <p className="font-mono text-[9px] uppercase tracking-[0.26em] text-white/45">
+              {responses.length > 0
+                ? `The reel is quiet between features — the last folio opened ${stampDate(LEDGER.latestOn)}`
+                : 'Nothing replied to yet — the commons keeps an honest empty shelf'}
+            </p>
+          </div>
+          {responses.length > 0 ? (
+            <ul className="mt-6 grid grid-cols-1 gap-px bg-white/10 sm:grid-cols-2 lg:grid-cols-3">
+              {responses.map((r) => (
+                <li key={`${r.post}-${r.handle}-${r.text.slice(0, 12)}`} className="bg-[#22060D] p-5">
+                  <p className="font-mono text-[9px] uppercase tracking-[0.26em] text-gold/90">
+                    № {folioOf(r.article.id)} · {r.article.title} · {stampDate(r.article.date)}
+                  </p>
+                  <p className="mt-2.5 font-serif text-[15px] italic leading-[1.65] text-ivory/85">“{r.text}”</p>
+                  <p className="mt-2 font-mono text-[9px] uppercase tracking-[0.24em] text-white/50">
+                    {r.handle.startsWith('@') ? r.handle : `@${r.handle}`}
+                  </p>
+                </li>
+              ))}
+              {/* the sixth cell — the honest invitation in the margin */}
+              <li className="flex flex-col items-start justify-center gap-3 bg-[#1B0610] p-5">
+                <p className="font-mono text-[9px] uppercase tracking-[0.26em] text-white/45">The next response could answer you</p>
+                <Link to="/submit" className="border-b border-gold/60 pb-0.5 font-mono text-[9px] uppercase tracking-[0.28em] text-gold no-underline transition-colors hover:text-ivory">
+                  Send your work →
+                </Link>
+              </li>
+            </ul>
+          ) : (
+            <p className="mt-6 border border-dashed border-white/15 px-6 py-10 text-center font-serif text-lg font-light italic text-white/60">
+              The commons is silent between two folios — it answers the moment a voice arrives.
+            </p>
+          )}
         </section>
 
         {/* ——— FRONT · the letter from the desk ——— */}

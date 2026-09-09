@@ -312,7 +312,7 @@ export default function Room() {
         {state === 'arrival' && (
           <Overlay key="arrival">
             <p className="font-mono text-[12px] font-medium uppercase tracking-[0.32em] text-gold">
-              A spatial archive of {count} voices
+              A spatial archive of {count} folios
             </p>
             <h1 className="mt-4 max-w-[10ch] font-serif text-[clamp(2.7rem,13vw,7.5rem)] font-semibold leading-[0.94] md:max-w-none">
               The Keeping<br />Room
