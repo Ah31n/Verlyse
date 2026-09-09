@@ -140,6 +140,53 @@ export default function About() {
             </div>
           </motion.section>
           </DepthLayer>
+
+          {/* Sheet IV — The founder. The one photograph in the colophon: the
+              person whose name is set in the imprint at the foot of the page.
+              Kept as a mounted plate — brass hairline, offset shadow sheet —
+              so it reads as a tipped-in portrait rather than an avatar. */}
+          <DepthLayer distance={8}>
+          <motion.section
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true, margin: '0px 0px -6% 0px' }}
+            transition={{ duration: 0.9, delay: 0.2, ease: [0.16, 1, 0.3, 1] }}
+            className="relative border border-gold/20 bg-[#F8F6F2]/[0.05] p-7 md:p-10"
+          >
+            <span aria-hidden="true" className="absolute inset-0 -translate-x-1 -translate-y-2 border border-gold/10" />
+            <p className="font-mono text-[9px] uppercase tracking-[0.3em] text-gold">The founder — Sheet IV</p>
+            <div className="mt-6 grid grid-cols-1 items-center gap-8 sm:grid-cols-[minmax(0,200px)_1fr] md:gap-10">
+              <figure className="relative m-0">
+                <span aria-hidden="true" className="absolute inset-0 translate-x-2 translate-y-2 border border-gold/25" />
+                <img
+                  src="/img/founder-alina.webp"
+                  alt="Alina Javed, founder of Verlyse Media"
+                  width={640}
+                  height={640}
+                  loading="lazy"
+                  decoding="async"
+                  className="relative aspect-square w-full border border-gold/30 object-cover object-center grayscale-[0.15] contrast-[1.02]"
+                />
+              </figure>
+              <div>
+                <p className="font-serif text-[clamp(1.5rem,3vw,2.1rem)] font-light leading-[1.15] text-ivory">
+                  Alina Javed
+                </p>
+                <p className="mt-2 font-mono text-[9px] uppercase tracking-[0.28em] text-gold/90">
+                  Founder · prose poet · sixteen
+                </p>
+                <p className="mt-5 max-w-[52ch] text-[15px] leading-[1.85] text-white/72">
+                  She founded Verlyse Media after her own effort went unrecognised elsewhere —
+                  and built, instead, the platform she wished had existed. Every byline on this
+                  masthead answers that decision.
+                </p>
+                <p className="mt-5 max-w-[46ch] border-l border-gold/40 pl-5 font-serif text-[15px] font-light italic leading-[1.8] text-ivory/85">
+                  “Words have the power to inspire, influence, and leave a lasting impact.”
+                </p>
+              </div>
+            </div>
+          </motion.section>
+          </DepthLayer>
           </div>
           </OrbitalDrift>
         </DepthStage>
