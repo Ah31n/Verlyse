@@ -1,0 +1,29 @@
+{
+  "routes": {
+    "/": {
+      "title": "Where Vision Becomes A Voice — Verlyse Media",
+      "h1": "Where VisionBecomes A Voice",
+      "scrollHeight": 14574,
+      "footerTop": 13315,
+      "footerBottom": 14574,
+      "footerBottomOnScreen": 14574,
+      "footerVisible": false,
+      "overflowX": false,
+      "scrollWidth": 1440,
+      "innerWidth": 1440
+    },
+    "/article/their-voices-matter": {
+      "title": "Their Voices Matter — Verlyse Media",
+      "h1": "“Their Voices Matter”",
+      "scrollHeight": 9684,
+      "footerTop": 8426,
+      "footerBottom": 9684,
+      "footerBottomOnScreen": 9684,
+      "footerVisible": false,
+      "overflowX": false,
+      "scrollWidth": 1440,
+      "innerWidth": 1440
+    }
+  },
+  "records": "clean"
+}

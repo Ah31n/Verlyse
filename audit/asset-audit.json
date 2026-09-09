@@ -1,0 +1,70 @@
+{
+  "findings": {
+    "covers": {
+      "count": 19,
+      "resolved": 19,
+      "missing": [],
+      "wrongRole": []
+    },
+    "inner": {
+      "count": 7,
+      "resolved": 7,
+      "missing": [],
+      "wrongRole": []
+    },
+    "signature": {
+      "count": 1,
+      "resolved": 1,
+      "missing": [],
+      "wrongRole": []
+    },
+    "portrait": {
+      "count": 5,
+      "resolved": 5,
+      "missing": [],
+      "wrongRole": []
+    },
+    "fonts": {
+      "count": 4,
+      "resolved": 4,
+      "missing": [],
+      "wrongRole": []
+    },
+    "logo": {
+      "count": 1,
+      "resolved": 1,
+      "missing": [],
+      "wrongRole": []
+    },
+    "poster": {
+      "count": 3,
+      "resolved": 3,
+      "missing": [],
+      "wrongRole": []
+    }
+  },
+  "liveRequests": [
+    "http://127.0.0.1:5173/fonts/CormorantGaramond-normal.woff2",
+    "http://127.0.0.1:5173/fonts/Inter.woff2",
+    "http://127.0.0.1:5173/fonts/CormorantGaramond-italic.woff2",
+    "http://127.0.0.1:5173/fonts/IBMPlexMono.woff2",
+    "http://127.0.0.1:5173/img/works/DaDY7WRkw0y-2.webp",
+    "http://127.0.0.1:5173/img/works/DciqQXTCilh-1.webp",
+    "http://127.0.0.1:5173/img/works/Dbf7jnBk3ho-1.webp",
+    "http://127.0.0.1:5173/img/works/DbaNAZTk5X9-1.webp",
+    "http://127.0.0.1:5173/img/works/DbYa5WSE5wf-1.webp",
+    "http://127.0.0.1:5173/img/works/DbQMFVEitsU-1.webp",
+    "http://127.0.0.1:5173/img/works/DbKynTxk_6F-1.webp",
+    "http://127.0.0.1:5173/img/works/DbCuHgrEypR-1.webp",
+    "http://127.0.0.1:5173/img/poster-3-13-1.webp",
+    "http://127.0.0.1:5173/img/works/DaDY7WRkw0y-1.webp",
+    "http://127.0.0.1:5173/img/works/DaDY7WRkw0y-3.webp",
+    "http://127.0.0.1:5173/img/works/DaDY7WRkw0y-4.webp",
+    "http://127.0.0.1:5173/img/poster-3-13-3.webp",
+    "http://127.0.0.1:5173/img/works/Dar3wIXk02U-1.webp",
+    "http://127.0.0.1:5173/img/authors/alina-javed-about.jpg",
+    "http://127.0.0.1:5173/img/inner/afghanistan-photo.webp",
+    "http://127.0.0.1:5173/img/signatures/tvm-hero.webp"
+  ],
+  "failedAll": []
+}

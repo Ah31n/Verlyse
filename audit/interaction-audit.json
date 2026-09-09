@@ -1,0 +1,45 @@
+{
+  "results": {
+    "search-open-focus": {
+      "status": "PASS",
+      "detail": "overlay open=true"
+    },
+    "search-query-results": {
+      "status": "PASS",
+      "detail": "typing \"Their Voices\" surfaced Their Voices Matter"
+    },
+    "search-escape-close": {
+      "status": "PASS",
+      "detail": "Escape closed/freed focus"
+    },
+    "shelf-open": {
+      "status": "PASS",
+      "detail": "Save button present=true, Shelf opened=true"
+    },
+    "shelf-saved-item": {
+      "status": "PASS",
+      "detail": "saved article present in Shelf"
+    },
+    "mobile-menu-open": {
+      "status": "PASS",
+      "detail": "burger clicked=true, menu content=true"
+    },
+    "ending-voices": {
+      "status": "PASS",
+      "detail": "{\"hasSig\":true,\"scene\":\"ending-their-voices-matter\"}"
+    },
+    "ending-wait": {
+      "status": "PASS",
+      "detail": "{\"hasSig\":true,\"scene\":\"ending-3-13\"}"
+    },
+    "reduced-motion-preserves": {
+      "status": "PASS",
+      "detail": "reduced motion: h1 present, no overflow"
+    },
+    "no-webgl-fallback": {
+      "status": "PASS",
+      "detail": "{\"h1\":true,\"canvases\":0,\"scrollWidth\":1440,\"innerWidth\":1440}"
+    }
+  },
+  "consoleErrorsCaptured": []
+}

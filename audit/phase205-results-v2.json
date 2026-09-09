@@ -1,0 +1,447 @@
+[
+  {
+    "check": "desktop 01 arrival",
+    "status": "PASS",
+    "detail": ""
+  },
+  {
+    "check": "desktop brand hierarchy + 19 voices",
+    "status": "PASS",
+    "detail": ""
+  },
+  {
+    "check": "desktop PULL→READ→RETURN vocabulary",
+    "status": "PASS",
+    "detail": ""
+  },
+  {
+    "check": "desktop footer state 01",
+    "status": "PASS",
+    "detail": ""
+  },
+  {
+    "check": "desktop 02 discovery: 19 plates",
+    "status": "PASS",
+    "detail": ""
+  },
+  {
+    "check": "desktop footer state 02",
+    "status": "PASS",
+    "detail": ""
+  },
+  {
+    "check": "desktop №01 = Their Voices Matter / Alina Javed",
+    "status": "PASS",
+    "detail": ""
+  },
+  {
+    "check": "desktop arrow moves focus to folio 02",
+    "status": "PASS",
+    "detail": ""
+  },
+  {
+    "check": "desktop 03 focus: pull affordance",
+    "status": "PASS",
+    "detail": ""
+  },
+  {
+    "check": "desktop 04 settle: ENTER/RETURN on plate",
+    "status": "PASS",
+    "detail": ""
+  },
+  {
+    "check": "desktop Esc settle→focus",
+    "status": "PASS",
+    "detail": ""
+  },
+  {
+    "check": "desktop ArrowUp focus→discovery",
+    "status": "PASS",
+    "detail": ""
+  },
+  {
+    "check": "desktop 12 search dialog aria-modal",
+    "status": "PASS",
+    "detail": ""
+  },
+  {
+    "check": "desktop 12 search: 1 results (≤6)",
+    "status": "PASS",
+    "detail": ""
+  },
+  {
+    "check": "desktop 12 search Esc closes",
+    "status": "PASS",
+    "detail": ""
+  },
+  {
+    "check": "desktop 10 category: state 10 (Social Issues)",
+    "status": "PASS",
+    "detail": ""
+  },
+  {
+    "check": "desktop 10 category: 4/19 plates visible (ghosts recede)",
+    "status": "PASS",
+    "detail": ""
+  },
+  {
+    "check": "desktop 10 category Esc → discovery",
+    "status": "PASS",
+    "detail": ""
+  },
+  {
+    "check": "desktop 05/06 entry → article handoff (their-voices-matter)",
+    "status": "PASS",
+    "detail": ""
+  },
+  {
+    "check": "desktop 06 article: masthead present",
+    "status": "PASS",
+    "detail": ""
+  },
+  {
+    "check": "desktop 07 ending after Back (footer null)",
+    "status": "PASS",
+    "detail": ""
+  },
+  {
+    "check": "desktop 08 next: №19 Mir Raza Ali",
+    "status": "PASS",
+    "detail": ""
+  },
+  {
+    "check": "desktop 09 return: thread remembers",
+    "status": "PASS",
+    "detail": ""
+  },
+  {
+    "check": "desktop 09 READ ✓ badge present",
+    "status": "PASS",
+    "detail": ""
+  },
+  {
+    "check": "desktop console clean",
+    "status": "PASS",
+    "detail": ""
+  },
+  {
+    "check": "desktop no failed requests",
+    "status": "PASS",
+    "detail": ""
+  },
+  {
+    "check": "desktop overflow 0/0",
+    "status": "PASS",
+    "detail": ""
+  },
+  {
+    "check": "tablet 01 arrival",
+    "status": "PASS",
+    "detail": ""
+  },
+  {
+    "check": "tablet brand hierarchy + 19 voices",
+    "status": "PASS",
+    "detail": ""
+  },
+  {
+    "check": "tablet PULL→READ→RETURN vocabulary",
+    "status": "PASS",
+    "detail": ""
+  },
+  {
+    "check": "tablet footer state 01",
+    "status": "PASS",
+    "detail": ""
+  },
+  {
+    "check": "tablet 02 discovery: 19 plates",
+    "status": "PASS",
+    "detail": ""
+  },
+  {
+    "check": "tablet footer state 02",
+    "status": "PASS",
+    "detail": ""
+  },
+  {
+    "check": "tablet №01 = Their Voices Matter / Alina Javed",
+    "status": "PASS",
+    "detail": ""
+  },
+  {
+    "check": "tablet arrow moves focus to folio 02",
+    "status": "PASS",
+    "detail": ""
+  },
+  {
+    "check": "tablet 03 focus: pull affordance",
+    "status": "PASS",
+    "detail": ""
+  },
+  {
+    "check": "tablet 04 settle: ENTER/RETURN on plate",
+    "status": "PASS",
+    "detail": ""
+  },
+  {
+    "check": "tablet Esc settle→focus",
+    "status": "PASS",
+    "detail": ""
+  },
+  {
+    "check": "tablet ArrowUp focus→discovery",
+    "status": "PASS",
+    "detail": ""
+  },
+  {
+    "check": "tablet 12 search dialog aria-modal",
+    "status": "PASS",
+    "detail": ""
+  },
+  {
+    "check": "tablet 12 search: 1 results (≤6)",
+    "status": "PASS",
+    "detail": ""
+  },
+  {
+    "check": "tablet 12 search Esc closes",
+    "status": "PASS",
+    "detail": ""
+  },
+  {
+    "check": "tablet 10 category: state 10 (Social Issues)",
+    "status": "PASS",
+    "detail": ""
+  },
+  {
+    "check": "tablet 10 category: 4/19 plates visible (ghosts recede)",
+    "status": "PASS",
+    "detail": ""
+  },
+  {
+    "check": "tablet 10 category Esc → discovery",
+    "status": "PASS",
+    "detail": ""
+  },
+  {
+    "check": "tablet 05/06 entry → article handoff (their-voices-matter)",
+    "status": "PASS",
+    "detail": ""
+  },
+  {
+    "check": "tablet 06 article: masthead present",
+    "status": "PASS",
+    "detail": ""
+  },
+  {
+    "check": "tablet 07 ending after Back (footer null)",
+    "status": "PASS",
+    "detail": ""
+  },
+  {
+    "check": "tablet 08 next: №19 Mir Raza Ali",
+    "status": "PASS",
+    "detail": ""
+  },
+  {
+    "check": "tablet 09 return: thread remembers",
+    "status": "PASS",
+    "detail": ""
+  },
+  {
+    "check": "tablet 09 READ ✓ badge present",
+    "status": "PASS",
+    "detail": ""
+  },
+  {
+    "check": "tablet console clean",
+    "status": "PASS",
+    "detail": ""
+  },
+  {
+    "check": "tablet no failed requests",
+    "status": "PASS",
+    "detail": ""
+  },
+  {
+    "check": "tablet overflow 0/0",
+    "status": "PASS",
+    "detail": ""
+  },
+  {
+    "check": "mobile 01 arrival",
+    "status": "PASS",
+    "detail": ""
+  },
+  {
+    "check": "mobile brand hierarchy + 19 voices",
+    "status": "PASS",
+    "detail": ""
+  },
+  {
+    "check": "mobile PULL→READ→RETURN vocabulary",
+    "status": "PASS",
+    "detail": ""
+  },
+  {
+    "check": "mobile footer state 01",
+    "status": "PASS",
+    "detail": ""
+  },
+  {
+    "check": "mobile 02 discovery: 19 plates",
+    "status": "PASS",
+    "detail": ""
+  },
+  {
+    "check": "mobile footer state 02",
+    "status": "PASS",
+    "detail": ""
+  },
+  {
+    "check": "mobile №01 = Their Voices Matter / Alina Javed",
+    "status": "PASS",
+    "detail": ""
+  },
+  {
+    "check": "mobile arrow moves focus to folio 18",
+    "status": "PASS",
+    "detail": ""
+  },
+  {
+    "check": "mobile 03 focus: pull affordance",
+    "status": "PASS",
+    "detail": ""
+  },
+  {
+    "check": "mobile 04 settle: ENTER/RETURN on plate",
+    "status": "PASS",
+    "detail": ""
+  },
+  {
+    "check": "mobile Esc settle→focus",
+    "status": "PASS",
+    "detail": ""
+  },
+  {
+    "check": "mobile ArrowUp focus→discovery",
+    "status": "PASS",
+    "detail": ""
+  },
+  {
+    "check": "mobile 12 search dialog aria-modal",
+    "status": "PASS",
+    "detail": ""
+  },
+  {
+    "check": "mobile 12 search: 1 results (≤6)",
+    "status": "PASS",
+    "detail": ""
+  },
+  {
+    "check": "mobile 12 search Esc closes",
+    "status": "PASS",
+    "detail": ""
+  },
+  {
+    "check": "mobile 05/06 entry → article handoff (the-garden-beyond-my-tower)",
+    "status": "PASS",
+    "detail": ""
+  },
+  {
+    "check": "mobile 06 article: masthead present",
+    "status": "PASS",
+    "detail": ""
+  },
+  {
+    "check": "mobile 07 ending after Back (footer null)",
+    "status": "PASS",
+    "detail": ""
+  },
+  {
+    "check": "mobile 08 next: №19 Mir Raza Ali",
+    "status": "PASS",
+    "detail": ""
+  },
+  {
+    "check": "mobile 09 return: thread remembers",
+    "status": "PASS",
+    "detail": ""
+  },
+  {
+    "check": "mobile 09 READ ✓ badge present",
+    "status": "PASS",
+    "detail": ""
+  },
+  {
+    "check": "mobile console clean",
+    "status": "PASS",
+    "detail": ""
+  },
+  {
+    "check": "mobile no failed requests",
+    "status": "PASS",
+    "detail": ""
+  },
+  {
+    "check": "mobile overflow 0/0",
+    "status": "PASS",
+    "detail": ""
+  },
+  {
+    "check": "canonical 200 /article/their-voices-matter",
+    "status": "PASS",
+    "detail": ""
+  },
+  {
+    "check": "canonical 200 /article/mir-raza-ali",
+    "status": "PASS",
+    "detail": ""
+  },
+  {
+    "check": "canonical 200 /creator/alina-javed",
+    "status": "PASS",
+    "detail": ""
+  },
+  {
+    "check": "canonical 200 /ambassadors",
+    "status": "PASS",
+    "detail": ""
+  },
+  {
+    "check": "invalid article → 200 graceful \"not on the shelf\"",
+    "status": "PASS",
+    "detail": ""
+  },
+  {
+    "check": "canonical routes console clean",
+    "status": "PASS",
+    "detail": ""
+  },
+  {
+    "check": "reduced motion: transition 0.001s",
+    "status": "PASS",
+    "detail": ""
+  },
+  {
+    "check": "reduced motion: perspective disabled",
+    "status": "PASS",
+    "detail": ""
+  },
+  {
+    "check": "reduced motion console clean",
+    "status": "PASS",
+    "detail": ""
+  },
+  {
+    "check": "WebGL-off: room + 19 plates render",
+    "status": "PASS",
+    "detail": ""
+  },
+  {
+    "check": "WebGL-off console clean",
+    "status": "PASS",
+    "detail": ""
+  }
+]

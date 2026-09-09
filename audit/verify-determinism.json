@@ -1,0 +1,12 @@
+{
+  "results": {
+    "deterministic-same-article": {
+      "status": "PASS",
+      "detail": "tvm=voices 3-13=clock (stable across reloads)"
+    },
+    "story-specific-distinct": {
+      "status": "PASS",
+      "detail": "distinct sceneKinds voices vs clock"
+    }
+  }
+}
