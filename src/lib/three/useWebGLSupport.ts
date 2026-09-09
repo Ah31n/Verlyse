@@ -11,6 +11,10 @@ import { useMemo } from 'react'
  * WebGL detection runs once per app load and is safe to call in render.
  */
 function detectWebGL(): boolean {
+  // Server prerender (vite build --ssr) has no DOM: report unsupported and
+  // let the static fallback composition stand — it is the same fallback a
+  // browser without WebGL would receive.
+  if (typeof document === 'undefined') return false
   if (typeof window === 'undefined') return false
   try {
     const canvas = document.createElement('canvas')

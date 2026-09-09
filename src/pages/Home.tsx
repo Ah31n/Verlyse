@@ -14,6 +14,7 @@ import { ImmersiveShell, BrassThread } from '../components/immersive'
 import { Magnetic, MaskReveal, Tilt3D, Slate } from '../components/cinematic'
 import SaveButton from '../components/ui/SaveButton'
 import { ARTICLES, BRAND, CATEGORIES, LEDGER, getAuthor } from '../data/content'
+import { useWebGLSupport } from '../lib/three/useWebGLSupport'
 import { introSeen, onIntroResolved } from '../lib/intro'
 // The spatial engine is loaded on demand so its heavy chunk (three) never
 // ships with the initial publication shell.
@@ -186,7 +187,9 @@ function Cover({ selectedId, state }: { selectedId: string | null; state: Spatia
       </motion.div>
 
       {/* ——— The spatial archive — a bounded three.js layer behind the threshold.
-          Only the “enter the archive” frame; it recedes under reduced-motion /
+          A threshold-only atmosphere: it holds the feature “selected” until the
+          reader first engages the selector below, then keeps the chosen folio
+          raised while the hall reads. Recedes entirely under reduced-motion /
           no-WebGL, where the layered gradients above remain the fallback. ——— */}
       <div className="pointer-events-none absolute inset-0 z-[1] [&_canvas]:mix-blend-lighten" aria-hidden="true">
         <SpatialBoundary>
@@ -256,7 +259,7 @@ function Cover({ selectedId, state }: { selectedId: string | null; state: Spatia
               />
               <span aria-hidden="true" className="absolute inset-0 bg-[linear-gradient(180deg,transparent_55%,rgba(28,5,9,0.55))] " />
               <span aria-hidden="true" className="absolute bottom-2 left-3 font-mono text-[8px] uppercase tracking-[0.3em] text-ivory/85">
-                Plate 01 / 04 — as published
+                Plate № 01 — as published in the issue
               </span>
             </motion.div>
             <motion.div
@@ -441,7 +444,7 @@ function StoryCard({
 
         <span
           aria-hidden="true"
-          className={`absolute font-mono uppercase tracking-[0.26em] transition-colors duration-500 group-hover:text-gold ${cover ? 'right-5 top-5 text-[10px] text-white/70' : 'bottom-3 right-3 text-[9px] text-white/70'}`}
+          className={`absolute font-mono uppercase tracking-[0.26em] transition-colors duration-500 group-hover:text-gold ${cover ? 'bottom-5 right-5 text-[10px] text-white/70' : 'bottom-3 right-3 text-[9px] text-white/70'}`}
         >
           № {folioNo}
         </span>
@@ -489,7 +492,7 @@ function WorksStrip() {
         <Reveal>
           <div className="flex flex-wrap items-end justify-between gap-6 border-b border-white/10 pb-10">
             <div>
-              <p className="kicker mb-5">The feed — issue 01</p>
+              <p className="kicker mb-5">The feed — issue № {String(LEDGER.issueNo).padStart(2, '0')}</p>
               <AnticipatedTitle className="max-w-[18ch]">
                 <h2 className="font-serif text-[clamp(2.4rem,4.8vw,4.2rem)] font-light leading-[1.02] text-ivory">
                   In this <em className="italic text-gold">issue</em>
@@ -503,7 +506,7 @@ function WorksStrip() {
                 The next issue could begin with your name.
               </p>
               <div className="mt-4">
-                <UnderlineLink to="/articles">All 19 works</UnderlineLink>
+                <UnderlineLink to="/articles">All {LEDGER.features} works</UnderlineLink>
               </div>
             </div>
           </div>
@@ -633,7 +636,7 @@ function FeatureSection({ feature, authorName }: { feature: (typeof ARTICLES)[nu
   )
 }
 
-/** The community ledger. */
+
 /** The community ledger — the magazine's own numbers, set like marginalia. */
 function Pulse() {
   return (
@@ -860,6 +863,10 @@ const SPATIAL_PICKS = ['their-voices-matter', '3-13', 'the-garden-beyond-my-towe
  */
 function SpatialReading({ pickIdx, onSelect }: { pickIdx: number; onSelect: (i: number) => void }) {
   const reduce = useReducedMotion() === true
+  /* whether the WebGL hall is actually alive behind the cover — the panel's
+     marginal note may only claim the hall is leaning when it truly is */
+  const { supported: glSupported } = useWebGLSupport()
+  const hallLive = glSupported && !reduce
   const picks = SPATIAL_PICKS.map((id) => ARTICLES.find((x) => x.id === id)).filter(Boolean) as typeof ARTICLES
   const active = picks[pickIdx] ?? picks[0]
   const au = getAuthor(active.authorId)
@@ -889,7 +896,10 @@ function SpatialReading({ pickIdx, onSelect }: { pickIdx: number; onSelect: (i: 
     if (!touch.current) return
     const dx = e.changedTouches[0].clientX - touch.current.x
     const dy = e.changedTouches[0].clientY - touch.current.y
-    if (Math.abs(dx) > 44 && Math.abs(dx) > Math.abs(dy) * 1.6) onSelect(pickIdx + (dx < 0 ? 1 : -1))
+    if (Math.abs(dx) > 44 && Math.abs(dx) > Math.abs(dy) * 1.6) {
+      const n = picks.length
+      onSelect(((pickIdx + (dx < 0 ? 1 : -1)) % n + n) % n) // wrap, exactly like the arrows
+    }
     touch.current = null
   }
 
@@ -1023,7 +1033,9 @@ function SpatialReading({ pickIdx, onSelect }: { pickIdx: number; onSelect: (i: 
                       Open the full feature →
                     </Link>
                     <span className="font-mono text-[9px] uppercase tracking-[0.26em] text-white/45">
-                      The hall above is leaning toward this plate
+                      {hallLive
+                        ? 'The hall above is leaning toward this plate'
+                        : 'This reader keeps the hall still — the plate still turns'}
                     </span>
                   </div>
                 </div>
