@@ -1,9 +1,10 @@
 import { Link } from 'react-router-dom'
-import { ARTICLES, getAuthor, type Author , authorPhoto } from '../../data/content'
+import { ARTICLES, getAuthor, coCreditedWorks, type Author , authorPhoto } from '../../data/content'
 import { AuthorFrame, AuthorPhoto } from './AuthorFrame'
 import Reveal from './Reveal'
 import { Signature } from './ArticleClosing'
 import { MetaRow } from './primitives'
+import { handleImgError } from '../../lib/imgFallback'
 
 /** The writer's own note — the first note found across their features. */
 export function writerNoteOf(authorId: string): string | undefined {
@@ -33,8 +34,14 @@ export function socialOf(author: Author): string {
  */
 export default function WriterProfile({ author }: { author: Author }) {
   const works = worksOf(author.id)
+  const coWorks = coCreditedWorks(author)
+  /* names with no primary folio but a real secondary byline (the poet
+     beside a painting) are honoured through their co-credit instead */
+  const isCoCredit = works.length === 0 && coWorks.length > 0
+  const listedWorks = works.length > 0 ? works : coWorks
   const note = writerNoteOf(author.id)
-  const others = ARTICLES.filter((a) => a.authorId !== author.id && a.category === works[0]?.category).slice(0, 3)
+  const roomCategory = works[0]?.category ?? coWorks[0]?.category
+  const others = ARTICLES.filter((a) => a.authorId !== author.id && a.category === roomCategory).slice(0, 3)
 
   return (
     <div className="relative">
@@ -51,7 +58,7 @@ export default function WriterProfile({ author }: { author: Author }) {
               <div aria-hidden="true" className="absolute -inset-4 translate-x-5 translate-y-5 border border-gold/30" />
               {author.portrait && !author.hideArticlePhoto ? (
                 <AuthorFrame variant="matte" rotate={-0.6} caption={author.name}>
-                  <AuthorPhoto src={author.profilePhoto ?? authorPhoto(author.id)} alt={`${author.name} — photograph`} className="h-auto w-full" />
+                  <AuthorPhoto src={author.profilePhoto ?? authorPhoto(author.id)} alt={`${author.name} — photograph`} fallbackLabel={author.name} className="h-auto w-full" />
                 </AuthorFrame>
               ) : (
                 <div className="relative grid aspect-[3/4] place-items-center overflow-hidden border border-gold/25 bg-[radial-gradient(80%_60%_at_50%_30%,rgba(184,145,70,0.1),transparent_65%)]">
@@ -142,18 +149,18 @@ export default function WriterProfile({ author }: { author: Author }) {
             </div>
           </Reveal>
 
-          {/* published works */}
+          {/* published works — or the folios this name is co-credited in */}
           <Reveal className="mt-14">
-            <p className="kicker">Published works</p>
+            <p className="kicker">{isCoCredit ? 'Co-credited in the archive' : 'Published works'}</p>
             <div className="mt-7 space-y-0 border-t border-white/10">
-              {works.map((a) => (
+              {listedWorks.map((a) => (
                 <Link
                   key={a.id}
                   to={`/article/${a.id}`}
                   className="group flex items-center gap-6 border-b border-white/10 py-5 no-underline"
                 >
                   <div className="img-frame relative h-20 w-16 shrink-0 overflow-hidden">
-                    <img src={a.cover} alt="" loading="lazy" className="h-full w-full object-cover transition-transform duration-[1200ms] group-hover:scale-[1.1]" />
+                    <img src={a.cover} alt="" loading="lazy" decoding="async" onError={(e) => handleImgError(e, a.title)} className="h-full w-full object-cover transition-transform duration-[1200ms] group-hover:scale-[1.1]" />
                   </div>
                   <div className="min-w-0">
                     <MetaRow category={a.category} readingTime={a.readingTime} />
@@ -161,12 +168,21 @@ export default function WriterProfile({ author }: { author: Author }) {
                       “{a.title}”
                     </p>
                     <p className="mt-1 font-mono text-[9px] uppercase tracking-[0.30em] text-white/60">
-                      {a.date.split('-').reverse().join('.')} · {a.likes} appreciations
+                      {isCoCredit
+                        ? `Co-credited · ${a.date.split('-').reverse().join('.')}`
+                        : a.likes > 0
+                          ? `${a.date.split('-').reverse().join('.')} · ${a.likes} appreciations`
+                          : `${a.date.split('-').reverse().join('.')} · appreciations not tallied in the ledger`}
                     </p>
                   </div>
                   <span aria-hidden="true" className="ml-auto shrink-0 font-serif text-xl text-gold opacity-0 transition-opacity duration-500 group-hover:opacity-100">→</span>
                 </Link>
               ))}
+              {listedWorks.length === 0 && (
+                <p className="py-6 font-serif text-base font-light italic leading-relaxed text-white/55">
+                  No folio carries this name yet — the wall grows with every feature, and the desk keeps the record ready.
+                </p>
+              )}
             </div>
           </Reveal>
 
@@ -178,7 +194,7 @@ export default function WriterProfile({ author }: { author: Author }) {
                 {others.map((a) => (
                   <Link key={a.id} to={`/article/${a.id}`} className="group block no-underline">
                     <div className="img-frame relative aspect-[4/5] overflow-hidden border border-white/10">
-                      <img src={a.cover} alt="" loading="lazy" className="h-full w-full object-cover transition-transform duration-[1400ms] group-hover:scale-[1.08]" />
+                      <img src={a.cover} alt="" loading="lazy" decoding="async" onError={(e) => handleImgError(e, a.title)} className="h-full w-full object-cover transition-transform duration-[1400ms] group-hover:scale-[1.08]" />
                     </div>
                     <p className="mt-2.5 font-serif text-base leading-snug text-ivory/90 transition-colors group-hover:text-[#E8D9A8]">“{a.title}”</p>
                     <p className="mt-1 font-mono text-[9px] uppercase tracking-[0.30em] text-white/60">{getAuthor(a.authorId)?.name}</p>

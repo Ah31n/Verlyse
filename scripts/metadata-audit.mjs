@@ -3,7 +3,7 @@ import { readFile, readdir } from 'node:fs/promises'
 import { join, relative } from 'node:path'
 
 const root = join(process.cwd(), 'dist')
-const origin = process.env.PUBLIC_SITE_ORIGIN || 'https://verlyse-react.vercel.app'
+const origin = process.env.PUBLIC_SITE_ORIGIN || 'https://verlysemedia.kesug.com'
 const files = []
 async function walk(dir) {
   for (const entry of await readdir(dir, { withFileTypes: true })) {

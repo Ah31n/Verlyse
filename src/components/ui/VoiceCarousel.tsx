@@ -14,7 +14,7 @@ export default function VoiceCarousel() {
           <div className="flex flex-wrap items-end justify-between gap-4 border-b border-white/10 pb-8">
             <p className="kicker mb-0">The letters</p>
             <p className="font-mono text-[9px] uppercase tracking-[0.30em] text-white/60">
-              real comments beneath the features — read, all of them
+              real conversations from beneath the features — read, all of them
             </p>
           </div>
         </Reveal>
@@ -50,7 +50,7 @@ export default function VoiceCarousel() {
 
         <Reveal delay={0.15}>
           <p className="mt-12 text-center font-serif text-lg font-light italic leading-[1.7] text-white/55">
-            Every one of these is a real comment from beneath a real feature — the room answers in its own words.
+            Every one of these is a real conversation from beneath a real feature — the room answers in its own words.
           </p>
         </Reveal>
       </div>

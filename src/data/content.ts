@@ -292,7 +292,7 @@ export const AUTHORS: Author[] = [
 ]
 
 /* ------------------------------------------------------------------ */
-/* ARTICLES — the full feed, 14 works                                   */
+/* ARTICLES — the full feed, 19 folios                                  */
 /* ------------------------------------------------------------------ */
 export const ARTICLES: Article[] = [
   {
@@ -1211,8 +1211,17 @@ export const CATEGORIES: Category[] = [
 /* magazine states its counts once and everywhere reads the same page. */
 /* ------------------------------------------------------------------ */
 const _featureCount = ARTICLES.length
-const _creatorCount = new Set(ARTICLES.map((a) => a.authorId)).size
+const _primaryAuthorIds = new Set(ARTICLES.map((a) => a.authorId))
+/* 15 byline names carry a primary byline on the shelf — fourteen human
+   writers plus Verlyse Media's own dispatch (“Mir Raza Ali”). */
+const _creatorCount = _primaryAuthorIds.size
+/* human writers only — the masthead is the platform, not a guest writer */
+const _humanCreators = ARTICLES.map((a) => a.authorId).filter((id) => id !== 'verlyse-media')
+const _humanCreatorCount = new Set(_humanCreators).size
 const _appreciations = ARTICLES.reduce((s, a) => s + a.likes, 0)
+/* Canonical UI vocabulary: the 585 metric is “conversations” everywhere —
+   the comments beneath the features, all of them read. `Article.comments`
+   stays the name of the underlying data field. */
 const _conversations = ARTICLES.reduce((s, a) => s + a.comments, 0)
 const _openedOn = [...ARTICLES].map((a) => a.date).sort()[0]
 const _latestOn = [...ARTICLES].map((a) => a.date).sort().slice(-1)[0]
@@ -1223,9 +1232,12 @@ export const LEDGER = {
   issueLabel: 'Issue № 01',
   /** features on the shelf */
   features: _featureCount,
-  /** credited writers whose work is on the shelf (the masthead's own record excluded) */
+  /** credited names with a primary byline — fourteen writers + the masthead */
   creators: _creatorCount,
-  /** records on the contributor wall — the writers plus the masthead's own entry */
+  /** human writers only (the masthead's own dispatch excluded) */
+  humanCreators: _humanCreatorCount,
+  /** records on the contributor wall — the fifteen byline names plus Mochi,
+      the poet whose verse accompanies Folio 06's painting (no primary folio) */
   wallRecords: AUTHORS.length,
   departments: CATEGORIES.length,
   appreciations: _appreciations,
@@ -1265,7 +1277,7 @@ export function isEditorsPick(id: string): boolean {
 export type SortKey = 'latest' | 'most-read' | 'most-appreciated' | 'editors-picks'
 export const SORTS: { key: SortKey; label: string; note: string }[] = [
   { key: 'latest', label: 'Latest', note: 'Newest folio first — the registry by date of publication.' },
-  { key: 'most-read', label: 'Most read', note: 'Ranked by the conversations each feature drew beneath it.' },
+  { key: 'most-read', label: 'Most discussed', note: 'Ranked by the conversations each feature drew beneath it — the desk keeps no read-count analytics.' },
   { key: 'most-appreciated', label: 'Most appreciated', note: 'Ranked by the appreciations the feed recorded.' },
   { key: 'editors-picks', label: 'Editor’s picks', note: 'Five folios the desk keeps recommending — chosen, not counted.' },
 ]
@@ -1293,8 +1305,8 @@ export function sortArticles(key: SortKey): Article[] {
 export const COMMUNITY_STATS: { value: string; label: string; note: string }[] = [
   { value: String(LEDGER.features), label: 'Features presented', note: 'Every post on the feed — from the founder’s call for women’s rights to the Mir Raza Ali memorial.' },
   { value: LEDGER.appreciations.toLocaleString('en-US'), label: 'Appreciations', note: 'Total likes across the feed — each of them an answer to a writer.' },
-  { value: String(LEDGER.conversations), label: 'Conversations', note: 'Comments beneath the features, all of them read.' },
-  { value: String(LEDGER.creators), label: 'Creators credited', note: 'Every feature names its writer, by name and handle.' },
+  { value: String(LEDGER.conversations), label: 'Conversations', note: 'Conversations beneath the features — all of them read.' },
+  { value: String(LEDGER.creators), label: 'Creators credited', note: 'Fourteen named writers plus the masthead’s own dispatch — every feature credited.' },
 ]
 
 export const COMMUNITY_VOICES: Voice[] = [
@@ -1319,10 +1331,36 @@ export const BRAND = {
   bio: 'Student-led media platform sharing youth perspectives on culture, global issues and creativity.',
   mission:
     'Verlyse Media is a creative platform dedicated to giving artists, writers, and storytellers a space where their voices can be seen and celebrated. From poetry, essays, and creative writing to paintings, photography, and thought-provoking pieces on social issues, we believe every meaningful creation deserves an audience. We carefully curate each submission — either transforming it into a visually engaging post that reflects our signature aesthetic, or featuring already-designed work that aligns with our creative standards. At Verlyse Media, every post is more than content; it’s a story, an emotion, and a voice worth sharing.',
-  submitCta: 'Want to submit your work too? We’d love to feature it. Submit your work through the link in our bio.',
+  /* The on-site /submit form is the primary submission path — never
+     redirect writers to an Instagram bio. The site itself is the desk. */
+  submitCta: 'Want to submit your work too? We’d love to feature it — the editorial desk’s own form on this site is the way in.',
   ambassadorForm: 'https://docs.google.com/forms/d/e/1FAIpQLSfwggEIWE-dPLoU2uL1bKkBA3mwFvEPGO05DrxyyKoHIBpAwA/viewform',
-  ambassadorNote: 'Brand Ambassador & submission application now open — the form lives in the bio.',
+  ambassadorNote: 'Brand Ambassador & submission application now open.',
   presentationLine: 'Verlyse Media presents',
+  /* The Brand Ambassador programme — every line below is sourced from the
+     programme's own application form (the Google Form linked above) or the
+     public profile announcement. No stipend, deadline, term length, campus
+     list or benefit is invented; where the source is silent, the site is
+     silent too. */
+  ambassadorProgram: {
+    /* the role, word for word from the top of the application form */
+    role: 'As a Brand Ambassador, you’ll help spread awareness about our mission, engage with our content, and contribute to building a platform that empowers creators, encourages meaningful conversations, and highlights stories that matter.',
+    lead: 'Javeria Karim',
+    leadRole: 'Head of Brand Ambassador',
+    onePerCampus: true,
+    /* the questions the form actually asks — the honest shape of an application */
+    applicationAsks: [
+      'your email and full name',
+      'your age',
+      'whether you have taken part in a brand ambassador programme before — no, I know about it, or yes',
+      'what makes you a great fit for the role',
+      'why you want to become a Verlyse Media Brand Ambassador',
+      'your first campaign idea — how you would promote Verlyse Media on your platform',
+      'anything else you would like the desk to know',
+      'how you discovered Verlyse Media — an Instagram story, a post, or a friend (and, where applicable, the ambassador who pointed you here)',
+    ],
+    discovery: ['Through Instagram stories', 'A post', 'Through a friend'],
+  },
   disclosure:
     'When a post is created with design tools, the caption says so — as the platform replied to a commenter: “microsoft designer is used to create this post.” The writing remains the writer’s.',
   team: [
@@ -1370,6 +1408,27 @@ export const DOCK_LINKS = [
   { to: '/submit', label: 'Submit' },
 ]
 
+/** The single keyword search used by the archive page and the global search
+    overlay: title, writer name AND handle, department, tags, and excerpt. */
+export function articleSearchText(a: Article): string {
+  const author = getAuthor(a.authorId)
+  return [
+    a.title,
+    a.category,
+    author?.name ?? '',
+    author?.handle ?? '',
+    a.credit ?? '',
+    a.tags.join(' '),
+    a.excerpt,
+    a.description ?? '',
+  ].join(' ').toLowerCase()
+}
+export function searchArticles(query: string): Article[] {
+  const q = query.trim().toLowerCase()
+  if (!q) return []
+  return ARTICLES.filter((a) => articleSearchText(a).includes(q))
+}
+
 export function getArticle(id: string): Article | undefined {
   return ARTICLES.find((a) => a.id === id)
 }
@@ -1383,6 +1442,23 @@ export function authorPhoto(id: string): string {
 
 export function getAuthor(id: string): Author | undefined {
   return AUTHORS.find((a) => a.id === id)
+}
+/** Folios where the author is the primary byline. */
+export function worksBy(authorId: string): Article[] {
+  return ARTICLES.filter((a) => a.authorId === authorId)
+}
+/** Registry folio number of an article as a zero-padded string (01…19). */
+export function folioNoOf(articleId: string): string {
+  return String(ARTICLES.findIndex((x) => x.id === articleId) + 1).padStart(2, '0')
+}
+/** Folios that name the author in a secondary credit line (the poem
+    written beside a painting). This is how a record with zero primary
+    folios still holds a real byline in the archive. */
+export function coCreditedWorks(author: Author): Article[] {
+  const handle = author.handle.replace(/^@/, '').toLowerCase()
+  return ARTICLES.filter(
+    (a) => a.authorId !== author.id && !!a.credit && a.credit.toLowerCase().includes(`@${handle}`),
+  )
 }
 export function relatedArticles(article: Article): Article[] {
   return ARTICLES.filter((a) => a.id !== article.id && a.category === article.category).slice(0, 3)

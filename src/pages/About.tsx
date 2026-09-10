@@ -5,6 +5,7 @@ import { BRAND, COMMUNITY_STATS, LEDGER } from '../data/content'
 import BrassRule from '../components/ui/BrassRule'
 import { LibraryCard } from '../components/ui/EasterEggs'
 import { CrashZoom, DepthStage, DepthLayer, OrbitalDrift, PushIn , MaskReveal, Slate } from '../components/cinematic'
+import { handleImgError } from '../lib/imgFallback'
 
 /**
  * THE COLOPHON — the quiet institutional record of Verlyse Media, from the
@@ -27,7 +28,7 @@ export default function About() {
 
   const principles = [
     { n: 'I', t: 'Creator credit', d: `All ${LEDGER.features} features name their writers, by name and handle. The byline is not a courtesy; it is the point.` },
-    { n: 'II', t: 'The conversation', d: `${COMMUNITY_STATS[2].value} comments beneath the features, all of them read, several quoted on the community page.` },
+    { n: 'II', t: 'The conversation', d: `${COMMUNITY_STATS[2].value} conversations beneath the features, all of them read, several quoted on the community page.` },
     { n: 'III', t: 'Tools disclosed', d: BRAND.disclosure },
     { n: 'IV', t: 'The door is open', d: 'Every feature began as a submission. The next one could be yours.' },
   ]
@@ -165,6 +166,7 @@ export default function About() {
                   height={640}
                   loading="lazy"
                   decoding="async"
+                  onError={(e) => handleImgError(e, 'Alina Javed — Founder')}
                   className="relative aspect-square w-full border border-gold/30 object-cover object-center grayscale-[0.15] contrast-[1.02]"
                 />
               </figure>

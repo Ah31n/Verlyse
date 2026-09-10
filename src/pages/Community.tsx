@@ -1,8 +1,9 @@
 import { useRef } from 'react'
 import { Link } from 'react-router-dom'
-import { motion } from 'motion/react'
+import { motion, useReducedMotion } from 'motion/react'
 import { useSeo } from '../hooks/useSeo'
 import { ARTICLES, BRAND, COMMUNITY_STATS, COMMUNITY_VOICES, LEDGER, stampDate, type Article } from '../data/content'
+import { handleImgError } from '../lib/imgFallback'
 
 /** The five most recent replies in the commons — real comments, read from
     the feed backwards by publication date, each tied to its folio. */
@@ -32,6 +33,8 @@ function FilmFrame({ article, folio }: { article: Article; folio: string }) {
           src={article.cover}
           alt={`${article.title} — cover`}
           loading="lazy"
+          decoding="async"
+          onError={(e) => handleImgError(e, article.title, folio)}
           className="h-full w-full object-cover transition-transform duration-[1400ms] ease-out group-hover:scale-[1.1]"
         />
         <span aria-hidden="true" className="absolute left-3 top-3 border border-gold/60 bg-[#14060B]/60 px-2 py-1 font-mono text-[8px] uppercase tracking-[0.26em] text-ivory opacity-0 transition-opacity duration-500 group-hover:opacity-100">
@@ -78,6 +81,7 @@ export default function Community() {
   const otherVoices = COMMUNITY_VOICES.filter((v) => v !== featureVoice)
 
   /* the reel is held, not driven: drag to move it, like a strip of film */
+  const reduced = useReducedMotion() === true
   const reelRef = useRef<HTMLDivElement>(null)
   const drag = useRef<{ x: number; l: number } | null>(null)
   const dragged = useRef(false)
@@ -100,6 +104,23 @@ export default function Community() {
   const endDrag = () => {
     drag.current = null
     reelRef.current?.classList.remove('is-dragging')
+  }
+  /** keyboard users move the reel a frame at a time — the strip itself
+      is a tab stop, and ← → page it without a drag gesture */
+  const scrollReel = (dir: 1 | -1) => {
+    const el = reelRef.current
+    if (!el) return
+    el.scrollBy({ left: dir * (el.clientWidth * 0.8), behavior: reduced ? 'auto' : 'smooth' })
+  }
+  const onReelKey = (e: React.KeyboardEvent) => {
+    if (e.key === 'ArrowRight') { e.preventDefault(); scrollReel(1) }
+    else if (e.key === 'ArrowLeft') { e.preventDefault(); scrollReel(-1) }
+    else if (e.key === 'Home') { e.preventDefault(); reelRef.current?.scrollTo({ left: 0, behavior: reduced ? 'auto' : 'smooth' }) }
+    else if (e.key === 'End') {
+      e.preventDefault()
+      const el = reelRef.current
+      el?.scrollTo({ left: el.scrollWidth, behavior: reduced ? 'auto' : 'smooth' })
+    }
   }
   const swallowClickAfterDrag = (e: React.MouseEvent) => {
     if (dragged.current) {
@@ -136,7 +157,30 @@ export default function Community() {
         </div>
 
         {/* ——— MID · the film strip — all nineteen real covers, in order ——— */}
-        <section aria-label="The feed in pictures — nineteen covers" className="mt-[clamp(2.5rem,7vh,4.5rem)]">
+        <section aria-labelledby="reel-title" className="mt-[clamp(2.5rem,7vh,4.5rem)]">
+          <div className="flex flex-wrap items-end justify-between gap-4">
+            <h2 id="reel-title" className="font-mono text-[10px] uppercase tracking-[0.3em] text-gold/85">
+              The feed in pictures — {covers.length} covers
+            </h2>
+            <div className="flex items-center gap-2" role="group" aria-label="Move the cover reel">
+              <button
+                type="button"
+                onClick={() => scrollReel(-1)}
+                aria-label="Earlier covers"
+                className="grid h-10 w-10 place-items-center border border-gold/40 font-mono text-sm text-gold transition-colors hover:border-gold hover:bg-gold/10 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-gold"
+              >
+                ←
+              </button>
+              <button
+                type="button"
+                onClick={() => scrollReel(1)}
+                aria-label="Later covers"
+                className="grid h-10 w-10 place-items-center border border-gold/40 font-mono text-sm text-gold transition-colors hover:border-gold hover:bg-gold/10 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-gold"
+              >
+                →
+              </button>
+            </div>
+          </div>
           <FilmRail />
           <div
             ref={reelRef}
@@ -144,10 +188,12 @@ export default function Community() {
             onPointerMove={moveDrag}
             onPointerUp={endDrag}
             onPointerLeave={endDrag}
+            onKeyDown={onReelKey}
             onClick={swallowClickAfterDrag}
             className="vm-film-scroll flex gap-6 overflow-x-auto overscroll-x-contain py-8"
             tabIndex={0}
-            aria-label="Nineteen covers in publication order — scroll or drag to move the reel"
+            role="region"
+            aria-label={`${covers.length} covers in publication order — drag, scroll, or use the arrow keys to move the reel`}
           >
             {covers.map((a) => (
               <Tilt3D key={a.id}>
@@ -159,7 +205,7 @@ export default function Community() {
           </div>
           <FilmRail />
           <p className="mt-3 font-mono text-[9px] uppercase tracking-[0.28em] text-white/45">
-            № 01 — “{covers[0].title}” → № {covers.length} — “{covers[covers.length - 1].title}” · drag the reel, don’t drive it
+            № 01 — “{covers[0].title}” → № {covers.length} — “{covers[covers.length - 1].title}” · drag the reel or focus it and use ← →, Home and End
           </p>
         </section>
 

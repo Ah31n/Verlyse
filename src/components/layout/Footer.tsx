@@ -103,7 +103,7 @@ const INDEX = [
 
 export default function Footer() {
   return (
-    <footer className="relative z-10 border-t border-white/10 bg-charcoal" aria-label="Footer">
+    <footer className="relative z-10 max-lg:pb-[62px] border-t border-white/10 bg-charcoal" aria-label="Footer">
       {/* the closing invitation */}
       <div className="border-b border-white/10">
         <div className="mx-auto max-w-page px-[clamp(1.75rem,5.5vw,4.75rem)] py-[clamp(4.5rem,9vh,7rem)]">

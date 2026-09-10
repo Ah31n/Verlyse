@@ -54,8 +54,11 @@ async function snap(page) {
       scrollHeight: se.scrollHeight,
       footerTop: fr ? Math.round(fr.top) : null,
       footerBottom: fr ? Math.round(fr.bottom) : null,
-      footerAtBottom: fr ? Math.abs(fr.bottom - se.scrollHeight) <= 8 : false,
-      footerIsFixedOffset: fr ? Math.abs(fr.bottom - se.scrollHeight) : 0,
+      // getBoundingClientRect is viewport-relative, so add scrollY before
+      // comparing against the document's scrollHeight (a route legitimately
+      // scrolled on load — e.g. an autofocus move — otherwise reads as a gap).
+      footerAtBottom: fr ? Math.abs(fr.bottom + window.scrollY - se.scrollHeight) <= 8 : false,
+      footerIsFixedOffset: fr ? Math.abs(fr.bottom + window.scrollY - se.scrollHeight) : 0,
       overflowX: document.documentElement.scrollWidth > window.innerWidth,
       scrollWidth: document.documentElement.scrollWidth,
       innerWidth: window.innerWidth,

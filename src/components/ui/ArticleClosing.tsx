@@ -1,7 +1,8 @@
 import { motion } from 'motion/react'
-import { BRAND, type Article, type Closing , getAuthor , authorPhoto } from '../../data/content'
+import { BRAND, folioNoOf, type Article, type Closing , getAuthor , authorPhoto } from '../../data/content'
 import { MotifGlyph } from './Motifs'
 import Reveal from './Reveal'
+import { handleImgError } from '../../lib/imgFallback'
 
 /**
  * The closing of every article — the post's final slide (About Us card,
@@ -295,7 +296,7 @@ export function WritersNoteClosing({
           </div>
           {portrait && (
             <span className="hidden max-h-24 max-w-24 shrink-0 border border-gold/30 bg-[#F8F6F2] p-1 shadow-[0_10px_24px_rgba(0,0,0,0.35)] sm:block" style={{ transform: 'rotate(-1.2deg)' }}>
-              <img src={portrait} alt="" aria-hidden="true" className="block h-auto w-auto max-h-20 max-w-20 object-contain object-center" />
+              <img src={portrait} alt="" aria-hidden="true" loading="lazy" decoding="async" onError={(e) => { e.currentTarget.style.display = 'none' }} className="block h-auto w-auto max-h-20 max-w-20 object-contain object-center" />
             </span>
           )}
         </div>
@@ -397,11 +398,13 @@ export function ArtworkClosing({
             className="relative mx-auto mt-16 max-w-[620px]"
           >
             <div aria-hidden="true" className="absolute -inset-5 translate-x-5 translate-y-5 border border-gold/30" />
-            <div className="img-frame relative overflow-hidden border border-gold/30">
+            <div className="img-frame relative aspect-[4/5] overflow-hidden border border-gold/30 sm:aspect-[4/3]">
               <img
                 src={work.src}
                 alt={`${work.label} — ${article.title}`}
                 loading="lazy"
+                decoding="async"
+                onError={(e) => handleImgError(e, article.title, folioNoOf(article.id))}
                 className="h-full w-full object-cover animate-vm-kenburns"
               />
               <span aria-hidden="true" className="pointer-events-none absolute inset-3 border border-gold/40" />

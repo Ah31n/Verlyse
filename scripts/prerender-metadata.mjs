@@ -10,7 +10,7 @@ import ts from 'typescript'
 
 const root = process.cwd()
 const dist = join(root, 'dist')
-const origin = process.env.PUBLIC_SITE_ORIGIN || 'https://verlyse-react.vercel.app'
+const origin = process.env.PUBLIC_SITE_ORIGIN || 'https://verlysemedia.kesug.com'
 const shell = await readFile(join(dist, 'index.html'), 'utf8')
 const contentSource = await readFile(join(root, 'src/data/content.ts'), 'utf8')
 const tempModule = '/tmp/verlyse-content-metadata.mjs'

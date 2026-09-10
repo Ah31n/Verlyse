@@ -47,7 +47,7 @@ export default function Ambassadors() {
   useSeo({
     path: '/ambassadors',
     title: 'Brand Ambassador',
-    description: 'The Verlyse Media Brand Ambassador program — application open, as announced on the profile.',
+    description: `The Verlyse Media Brand Ambassador programme, led by ${BRAND.ambassadorProgram.lead} (${BRAND.ambassadorProgram.leadRole}) — the role and application, word for word from the programme's own form.`,
   })
   const reduced = useReducedMotion() === true
   const [selectedId, setSelectedId] = useState<string | null>(null)
@@ -179,7 +179,7 @@ export default function Ambassadors() {
                 <p className="font-mono text-[10px] uppercase tracking-[0.28em] text-gold">The open seat</p>
                 <MaskReveal><h2 className="mt-1.5 font-serif text-[clamp(1.6rem,3vw,2.4rem)] font-light italic text-ivory">The next ambassador</h2></MaskReveal>
                 <p className="mt-2 max-w-[58ch] text-sm leading-[1.75] text-white/65">
-                  The profile announces it plainly: “{BRAND.ambassadorNote}” — the program is led by {BRAND.team.find((t) => t.role === 'Head of Brand Ambassador')?.name}. The application form is open, one ambassador per campus.
+                  The profile announces it plainly: “{BRAND.ambassadorNote}” The programme is led by {BRAND.ambassadorProgram.lead}, {BRAND.ambassadorProgram.leadRole}. The application form is open, one ambassador per campus.
                 </p>
               </div>
               <Magnetic><a href={BRAND.ambassadorForm} target="_blank" rel="noopener noreferrer" className="btn btn-gold shrink-0">
@@ -260,20 +260,90 @@ export default function Ambassadors() {
         )}
       </AnimatePresence>
 
-      {/* the program — the application, word for word */}
-      <section className="border-t border-white/10 py-[clamp(5rem,10vh,8rem)]">
+      {/* the programme — the role and the application, word for word
+          from the programme's own form; nothing is invented */}
+      <section className="border-t border-white/10 py-[clamp(5rem,10vh,8rem)]" aria-labelledby="programme-title">
         <div className="mx-auto max-w-page px-[clamp(1.75rem,5.5vw,4.75rem)]">
-          <SectionHead eyebrow="The program" page="P. 02" ghost="02" />
-          <Reveal className="border border-gold/25 bg-gradient-to-b from-wine-deep to-[#2A0811] p-12 text-center md:p-16">
-            <p className="font-serif text-[clamp(2rem,4vw,3.4rem)] font-light text-ivory">The application is open</p>
-            <p className="mx-auto mt-5 max-w-[46ch] [overflow-wrap:anywhere] font-serif text-xl font-light italic leading-[1.6] text-white/60">
-              “Brand Ambassador &amp; submission application now open” — the announcement on the profile, word for word. The application form is open — <a href={BRAND.ambassadorForm} target="_blank" rel="noopener noreferrer" className="font-mono text-[11px] tracking-[0.08em] text-gold underline decoration-gold/40 underline-offset-4 transition-colors hover:text-ivory">apply now →</a>
-            </p>
-            <p className="mt-8 font-mono text-[10px] uppercase tracking-[0.28em] text-gold">
-              Questions? Write to us at {BRAND.handle} on Instagram
-            </p>
-            <Magnetic><Link to="/submit" className="btn btn-ghost mt-6">or send your work →</Link></Magnetic>
-          </Reveal>
+          <SectionHead eyebrow="The programme" page="P. 02" ghost="02" />
+
+          <div className="grid grid-cols-1 gap-[clamp(2.5rem,5vw,5rem)] lg:grid-cols-[1.02fr_0.98fr]">
+            {/* LEFT — the role, exactly as the form states it */}
+            <div>
+              <Reveal>
+                <h2 id="programme-title" className="max-w-[20ch] font-serif text-[clamp(2rem,4vw,3.2rem)] font-light leading-[1.08] text-ivory">
+                  What a Brand Ambassador <em className="italic text-gold">does</em>
+                </h2>
+                <figure className="mt-8 border-l-2 border-gold/60 pl-6">
+                  <blockquote className="font-serif text-[clamp(1.15rem,1.8vw,1.5rem)] font-light italic leading-[1.7] text-ivory/85">
+                    “{BRAND.ambassadorProgram.role}”
+                  </blockquote>
+                  <figcaption className="mt-4 font-mono text-[9px] uppercase tracking-[0.26em] text-white/45">
+                    The role, word for word from the top of the application form
+                  </figcaption>
+                </figure>
+              </Reveal>
+
+              {/* the shape of the programme — only what is sourced */}
+              <Reveal delay={0.12} className="mt-10">
+                <p className="font-mono text-[10px] uppercase tracking-[0.28em] text-gold">The shape of it</p>
+                <ul className="mt-5 space-y-3 text-sm leading-[1.8] text-white/70">
+                  <li className="flex gap-3">
+                    <span aria-hidden="true" className="mt-0.5 font-mono text-gold">✦</span>
+                    <span>The programme is led by <strong className="font-normal text-ivory">{BRAND.ambassadorProgram.lead}</strong> — {BRAND.ambassadorProgram.leadRole}.</span>
+                  </li>
+                  <li className="flex gap-3">
+                    <span aria-hidden="true" className="mt-0.5 font-mono text-gold">✦</span>
+                    <span>{BRAND.ambassadorProgram.onePerCampus ? 'One ambassador represents a campus — the open seat is taken once per campus.' : 'Ambassadors represent their campuses.'}</span>
+                  </li>
+                  <li className="flex gap-3">
+                    <span aria-hidden="true" className="mt-0.5 font-mono text-gold">✦</span>
+                    <span>Applications come through the programme’s own form — the questions on the right are the questions it asks, in order.</span>
+                  </li>
+                  <li className="flex gap-3">
+                    <span aria-hidden="true" className="mt-0.5 font-mono text-gold">✦</span>
+                    <span>You tell the desk how you found Verlyse Media: {BRAND.ambassadorProgram.discovery.join(' · ').toLowerCase()}.</span>
+                  </li>
+                </ul>
+              </Reveal>
+
+              <Reveal delay={0.2} className="mt-8 border border-white/10 bg-[#F8F6F2]/[0.04] p-5">
+                <p className="font-mono text-[9px] uppercase leading-[1.9] tracking-[0.22em] text-white/50">
+                  The form states no stipend, no closing deadline, no fixed term, and no list of campuses — so neither do we. Where the form is silent, the magazine is silent; nothing on this page is promised on the programme’s behalf.
+                </p>
+              </Reveal>
+            </div>
+
+            {/* RIGHT — the application, ask by ask, from the form */}
+            <Reveal delay={0.1}>
+              <div className="relative border border-gold/30 bg-gradient-to-b from-[#2A0F18] to-[#220B13] p-8 md:p-10">
+                <span aria-hidden="true" className="pointer-events-none absolute inset-2 border border-gold/15" />
+                <p className="relative font-mono text-[10px] uppercase tracking-[0.28em] text-gold">The application asks for</p>
+                <ol className="relative mt-6 space-y-4">
+                  {BRAND.ambassadorProgram.applicationAsks.map((ask, i) => (
+                    <li key={i} className="flex gap-4">
+                      <span aria-hidden="true" className="grid h-7 w-7 shrink-0 place-items-center border border-gold/50 font-mono text-[10px] text-gold">
+                        {String(i + 1).padStart(2, '0')}
+                      </span>
+                      <span className="pt-1 text-sm leading-[1.7] text-white/75">{ask}</span>
+                    </li>
+                  ))}
+                </ol>
+                <div className="relative mt-9 flex flex-col gap-4 border-t border-white/10 pt-7 sm:flex-row sm:items-center">
+                  <Magnetic>
+                    <a href={BRAND.ambassadorForm} target="_blank" rel="noopener noreferrer" className="btn btn-gold">
+                      Open the application form →
+                    </a>
+                  </Magnetic>
+                  <Link to="/submit" className="font-mono text-[10px] uppercase tracking-[0.24em] text-white/55 no-underline transition-colors hover:text-gold">
+                    or send your work →
+                  </Link>
+                </div>
+                <p className="relative mt-6 font-mono text-[9px] uppercase tracking-[0.22em] text-white/40">
+                  Questions? Write to {BRAND.handle} on Instagram
+                </p>
+              </div>
+            </Reveal>
+          </div>
         </div>
       </section>
     </>
