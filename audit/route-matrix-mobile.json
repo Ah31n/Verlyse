@@ -130,9 +130,9 @@
   "contact|mobile": {
     "title": "Contact — Verlyse Media",
     "h1": "THE CORRESPONDENCE DESKThe correspondence desk",
-    "scrollHeight": 4710,
-    "footerTop": 2557,
-    "footerBottom": 4710,
+    "scrollHeight": 4730,
+    "footerTop": 2577,
+    "footerBottom": 4730,
     "footerAtBottom": true,
     "footerIsFixedOffset": 0.03125,
     "overflowX": false,
