@@ -158,7 +158,7 @@ path: '/contact',
               {[
                 ['Email', BRAND.email, `mailto:${BRAND.email}`],
                 ['Instagram', BRAND.handle, BRAND.instagram],
-                ['Everything else', 'A letter through the form, or a comment beneath any feature', null],
+                ['Everything else', 'A letter through the form, or a conversation beneath any feature', null],
               ].map(([role, value, href], i) => (
                 <Reveal key={role} delay={i * 0.08} as="li">
                   <div className="flex flex-col gap-2 border-b border-white/10 py-6">
@@ -181,7 +181,7 @@ path: '/contact',
                 The desk is small, and it answers everything — a question, a note about a feature that stayed with you, or the beginning of the next one.
               </p>
               <p className="mt-4 font-mono text-[10px] uppercase tracking-[0.28em] leading-[2] text-white/50">
-                Every letter is read · every comment is answered · nothing is invented
+                Every letter is read · every conversation is answered · nothing is invented
               </p>
             </Reveal>
           </div>

@@ -691,7 +691,7 @@ export default function ArticleDetail() {
             <EditorialWipe>
               <p className="kicker">Conversations</p>
               <p className="mt-3 font-mono text-[10px] uppercase tracking-[0.28em] text-white/55">
-                {article.comments} comments beneath this feature — all of them read
+                {article.comments} conversations beneath this feature — all of them read
               </p>
             </EditorialWipe>
             <div className="mt-8 border-t border-white/10">

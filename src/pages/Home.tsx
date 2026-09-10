@@ -670,7 +670,7 @@ function Pulse() {
           <div className="border-t border-white/15">
             {[
               [String(LEDGER.appreciations), 'Appreciations', 'Likes across the feed — each of them an answer to a writer.'],
-              [String(LEDGER.conversations), 'Conversations', 'Comments beneath the features, all of them read.'],
+              [String(LEDGER.conversations), 'Conversations', 'Conversations beneath the features, all of them read.'],
               [String(LEDGER.creators), 'Creators credited', 'Every feature names its writer, by name and handle.'],
             ].map(([v, l, n], i) => (
               <Reveal key={l} delay={0.1 + i * 0.08}>

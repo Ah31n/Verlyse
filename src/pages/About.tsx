@@ -28,7 +28,7 @@ export default function About() {
 
   const principles = [
     { n: 'I', t: 'Creator credit', d: `All ${LEDGER.features} features name their writers, by name and handle. The byline is not a courtesy; it is the point.` },
-    { n: 'II', t: 'The conversation', d: `${COMMUNITY_STATS[2].value} comments beneath the features, all of them read, several quoted on the community page.` },
+    { n: 'II', t: 'The conversation', d: `${COMMUNITY_STATS[2].value} conversations beneath the features, all of them read, several quoted on the community page.` },
     { n: 'III', t: 'Tools disclosed', d: BRAND.disclosure },
     { n: 'IV', t: 'The door is open', d: 'Every feature began as a submission. The next one could be yours.' },
   ]
