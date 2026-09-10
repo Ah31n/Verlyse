@@ -2,7 +2,7 @@ import { useMemo, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { motion, AnimatePresence, useReducedMotion } from 'motion/react'
 import { useSeo } from '../hooks/useSeo'
-import { ARTICLES, AUTHORS, LEDGER, authorPhoto, folioNoOf, stampDate } from '../data/content'
+import { ARTICLES, AUTHORS, LEDGER, authorPhoto, coCreditedWorks, folioNoOf, stampDate } from '../data/content'
 import { handleImgError } from '../lib/imgFallback'
 
 /** The folios a creator holds in the archive — their own entries. */
@@ -43,13 +43,23 @@ export default function Creators() {
 
   const selected = useMemo(() => AUTHORS.find((a) => a.id === selectedId) ?? AUTHORS[0], [selectedId])
   const folios = useMemo(() => foliosOf(selected.id), [selected])
+  /* secondary bylines — folios that name this creator in a credit line
+     (e.g. the poet whose verse accompanies another creator's painting) */
+  const coCredits = useMemo(() => coCreditedWorks(selected), [selected])
   const recordNo = AUTHORS.findIndex((a) => a.id === selected.id) + 1
   const folioNums = folios
-    .map((f) => `№ ${String(ARTICLES.findIndex((x) => x.id === f.id) + 1).padStart(2, '0')}`)
+    .map((f) => `№ ${folioNoOf(f.id)}`)
+    .join(' · ')
+  const coFolioNums = coCredits
+    .map((f) => `№ ${folioNoOf(f.id)}`)
     .join(' · ')
   /* the rooms this name writes in, and their most-kept piece — both read
-     from the registry, never declared by hand */
-  const theirCats = useMemo(() => [...new Set(folios.map((f) => f.category))], [folios])
+     from the registry, never declared by hand; a co-credited name keeps
+     the room of the folio it appears beside */
+  const theirCats = useMemo(
+    () => [...new Set(folios.concat(coCredits).map((f) => f.category))],
+    [folios, coCredits],
+  )
   const selectedFeature = useMemo(
     () => folios.length ? [...folios].sort((a, b) => b.likes - a.likes)[0] : undefined,
     [folios],
@@ -111,7 +121,7 @@ export default function Creators() {
             The contributor wall — {LEDGER.wallRecords} records · {LEDGER.creators} bylined in the archive · {ARTICLES.length} folios
           </p>
           <p className="mx-auto mt-2 max-w-[70ch] font-mono text-[9px] uppercase leading-[1.9] tracking-[0.22em] text-white/45">
-            {LEDGER.creators} records carry a feature byline — {LEDGER.creators - 1} named writers plus the masthead’s own dispatch; one poet wrote the verse beside a painting. Every record on this wall is real
+            {LEDGER.creators} byline names carry a feature — {LEDGER.humanCreators} named writers plus the masthead’s own dispatch; the wall holds {LEDGER.wallRecords} records because the extra one is the poet who wrote the verse beside a painting. Every record is real
           </p>
           <Slate move="crash zoom" className="mt-5" />
         </div>
@@ -136,7 +146,12 @@ export default function Creators() {
                       {selected.name.toUpperCase()}
                     </h2>
                     <p className="mt-3 font-mono text-[10px] uppercase tracking-[0.3em] text-white/60">
-                      {selected.handle} · {folios.length} folio{folios.length === 1 ? '' : 's'}
+                      {selected.handle} ·{' '}
+                      {folios.length > 0
+                        ? `${folios.length} folio${folios.length === 1 ? '' : 's'}`
+                        : coCredits.length > 0
+                          ? `${coCredits.length} co-credit${coCredits.length === 1 ? '' : 's'}`
+                          : 'no folio yet'}
                     </p>
 
                     <div className="mt-6 h-px w-24 bg-gold" aria-hidden />
@@ -144,7 +159,11 @@ export default function Creators() {
                       {selected.role}
                     </p>
                     <p className="mt-2 max-w-[56ch] font-mono text-[10px] uppercase tracking-[0.26em] text-gold/90">
-                      {folios.length} folio{folios.length === 1 ? '' : 's'} in the archive{folioNums ? ` — ${folioNums}` : ''}
+                      {folios.length > 0
+                        ? `${folios.length} folio${folios.length === 1 ? '' : 's'} in the archive — ${folioNums}`
+                        : coCredits.length > 0
+                          ? `Co-credited on folio ${coFolioNums}`
+                          : 'No folio yet — the wall grows with every feature'}
                     </p>
                     {theirCats.length > 0 && (
                       <p className="mt-3 flex flex-wrap items-center gap-2" aria-label="Rooms this name writes in">
@@ -186,6 +205,37 @@ export default function Creators() {
                           </span>
                           <span className="mt-1 block truncate font-serif text-lg text-ivory/90 transition-colors group-hover:text-gold">
                             “{selectedFeature.title}”
+                          </span>
+                        </span>
+                        <span aria-hidden="true" className="ml-auto self-center font-mono text-[9px] uppercase tracking-[0.24em] text-white/45 transition-colors group-hover:text-gold">
+                          Read →
+                        </span>
+                      </Link>
+                    )}
+
+                    {/* names with no primary folio but a real secondary
+                        byline — the poet beside a painting — get the same
+                        card, honestly labelled as a co-credit */}
+                    {folios.length === 0 && coCredits.length > 0 && (
+                      <Link
+                        to={`/article/${coCredits[0].id}`}
+                        aria-label={`Co-credited folio — “${coCredits[0].title}”`}
+                        className="group mt-5 flex items-center gap-4 border border-white/10 bg-[#F8F6F2]/[0.03] p-3 no-underline transition-colors duration-500 hover:border-gold/40 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-gold"
+                      >
+                        <img
+                          src={coCredits[0].thumbnail ?? coCredits[0].cover}
+                          alt=""
+                          loading="lazy"
+                          decoding="async"
+                          onError={(e) => handleImgError(e, coCredits[0].title, folioNoOf(coCredits[0].id))}
+                          className="h-14 w-[72px] shrink-0 border border-white/10 object-cover"
+                        />
+                        <span className="min-w-0">
+                          <span className="block font-mono text-[8px] uppercase tracking-[0.28em] text-gold">
+                            Co-credited · № {folioNoOf(coCredits[0].id)} · {stampDate(coCredits[0].date)}
+                          </span>
+                          <span className="mt-1 block truncate font-serif text-lg text-ivory/90 transition-colors group-hover:text-gold">
+                            “{coCredits[0].title}”
                           </span>
                         </span>
                         <span aria-hidden="true" className="ml-auto self-center font-mono text-[9px] uppercase tracking-[0.24em] text-white/45 transition-colors group-hover:text-gold">
@@ -266,7 +316,13 @@ export default function Creators() {
             {AUTHORS.map((a) => {
               const isSel = a.id === selected.id
               const n = foliosOf(a.id).length
+              const co = coCreditedWorks(a).length
               const faded = !resting && !isSel
+              const tileLine = n > 0
+                ? `${n} folio${n === 1 ? '' : 's'}`
+                : co > 0
+                  ? `${co} co-credit${co === 1 ? '' : 's'}`
+                  : 'the platform'
               return (
                 <button
                   key={a.id}
@@ -286,7 +342,7 @@ export default function Creators() {
                     {a.name}
                   </span>
                   <span className="mt-1.5 block font-mono text-[9px] uppercase tracking-[0.22em] text-white/50">
-                    {a.handle} · {n} folio{n === 1 ? '' : 's'}
+                    {a.handle} · {tileLine}
                   </span>
                   {!resting && isSel && (
                     <span aria-hidden="true" className="mt-2 block h-px w-full max-w-[3rem] bg-gold/50" />

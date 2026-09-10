@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom'
-import { ARTICLES, getAuthor, type Author , authorPhoto } from '../../data/content'
+import { ARTICLES, getAuthor, coCreditedWorks, type Author , authorPhoto } from '../../data/content'
 import { AuthorFrame, AuthorPhoto } from './AuthorFrame'
 import Reveal from './Reveal'
 import { Signature } from './ArticleClosing'
@@ -34,8 +34,14 @@ export function socialOf(author: Author): string {
  */
 export default function WriterProfile({ author }: { author: Author }) {
   const works = worksOf(author.id)
+  const coWorks = coCreditedWorks(author)
+  /* names with no primary folio but a real secondary byline (the poet
+     beside a painting) are honoured through their co-credit instead */
+  const isCoCredit = works.length === 0 && coWorks.length > 0
+  const listedWorks = works.length > 0 ? works : coWorks
   const note = writerNoteOf(author.id)
-  const others = ARTICLES.filter((a) => a.authorId !== author.id && a.category === works[0]?.category).slice(0, 3)
+  const roomCategory = works[0]?.category ?? coWorks[0]?.category
+  const others = ARTICLES.filter((a) => a.authorId !== author.id && a.category === roomCategory).slice(0, 3)
 
   return (
     <div className="relative">
@@ -143,11 +149,11 @@ export default function WriterProfile({ author }: { author: Author }) {
             </div>
           </Reveal>
 
-          {/* published works */}
+          {/* published works — or the folios this name is co-credited in */}
           <Reveal className="mt-14">
-            <p className="kicker">Published works</p>
+            <p className="kicker">{isCoCredit ? 'Co-credited in the archive' : 'Published works'}</p>
             <div className="mt-7 space-y-0 border-t border-white/10">
-              {works.map((a) => (
+              {listedWorks.map((a) => (
                 <Link
                   key={a.id}
                   to={`/article/${a.id}`}
@@ -162,12 +168,19 @@ export default function WriterProfile({ author }: { author: Author }) {
                       “{a.title}”
                     </p>
                     <p className="mt-1 font-mono text-[9px] uppercase tracking-[0.30em] text-white/60">
-                      {a.date.split('-').reverse().join('.')} · {a.likes} appreciations
+                      {isCoCredit
+                        ? `Co-credited · ${a.date.split('-').reverse().join('.')}`
+                        : `${a.date.split('-').reverse().join('.')} · ${a.likes} appreciations`}
                     </p>
                   </div>
                   <span aria-hidden="true" className="ml-auto shrink-0 font-serif text-xl text-gold opacity-0 transition-opacity duration-500 group-hover:opacity-100">→</span>
                 </Link>
               ))}
+              {listedWorks.length === 0 && (
+                <p className="py-6 font-serif text-base font-light italic leading-relaxed text-white/55">
+                  No folio carries this name yet — the wall grows with every feature, and the desk keeps the record ready.
+                </p>
+              )}
             </div>
           </Reveal>
 

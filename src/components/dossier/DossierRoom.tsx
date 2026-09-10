@@ -1,6 +1,6 @@
 import { Link } from 'react-router-dom'
 import { motion, useReducedMotion, useScroll, useTransform } from 'motion/react'
-import { ARTICLES, AUTHORS, authorPhoto, type Author } from '../../data/content'
+import { ARTICLES, AUTHORS, authorPhoto, coCreditedWorks, type Author } from '../../data/content'
 import { AuthorPhoto } from '../ui/AuthorFrame'
 import { worksOf } from '../ui/WriterProfile'
 
@@ -37,11 +37,16 @@ export default function DossierRoom({ author }: { author: Author }) {
   const total = String(AUTHORS.length).padStart(2, '0')
 
   const works = worksOf(author.id) // newest first, from the registry
+  /* secondary bylines — folios that name this creator in a credit line
+     (the poet beside another creator's painting) */
+  const coWorks = coCreditedWorks(author)
+  const coCredit = works.length === 0 && coWorks.length > 0
   /* the featured folio is the contributor's first-published work — the one the
-     dossier leads with (Penpot board: №01 Their Voices Matter for Alina Javed). */
-  const featured = works[works.length - 1]
+     dossier leads with (Penpot board: №01 Their Voices Matter for Alina Javed).
+     A name with only a co-credit leads with that folio instead. */
+  const featured = works[works.length - 1] ?? coWorks[0]
   const also = works.slice(0, -1) // the rest of the archive behind this name
-  const first = works[works.length - 1] // the first folio in the archive
+  const first = works[works.length - 1] ?? coWorks[0] // earliest byline
   const initials = author.name.split(' ').map((n) => n[0]).join('')
   const portrait = author.portrait && !author.hideArticlePhoto ? author.profilePhoto ?? authorPhoto(author.id) : null
 
@@ -182,12 +187,16 @@ export default function DossierRoom({ author }: { author: Author }) {
                 </p>
                 <dl className="mt-4 space-y-2.5 font-mono text-[10px] uppercase tracking-[0.1em] text-[#241D18]/80">
                   <div className="flex justify-between gap-4 border-b border-[#3A332C]/30 pb-2">
-                    <dt className="text-[#8A8178]">First folio</dt>
+                    <dt className="text-[#8A8178]">{coCredit ? 'First co-credit' : 'First folio'}</dt>
                     <dd>{first ? first.date.split('-').reverse().join('.') : '—'}</dd>
                   </div>
                   <div className="flex justify-between gap-4 border-b border-[#3A332C]/30 pb-2">
-                    <dt className="text-[#8A8178]">Folios in archive</dt>
+                    <dt className="text-[#8A8178]">Primary folios</dt>
                     <dd>{String(works.length).padStart(2, '0')}</dd>
+                  </div>
+                  <div className="flex justify-between gap-4 border-b border-[#3A332C]/30 pb-2">
+                    <dt className="text-[#8A8178]">Co-credits</dt>
+                    <dd>{String(coWorks.length).padStart(2, '0')}</dd>
                   </div>
                   <div className="flex justify-between gap-4 border-b border-[#3A332C]/30 pb-2">
                     <dt className="text-[#8A8178]">Portrait</dt>
@@ -213,12 +222,12 @@ export default function DossierRoom({ author }: { author: Author }) {
                 <div className="relative border border-[#7C6338]/70 bg-[#EFE8DD] px-5 py-5 text-[#241D18]">
                   <div aria-hidden="true" className="pointer-events-none absolute inset-1.5 border border-[#D9B978]/50" />
                   <p className="font-mono text-[10px] font-semibold uppercase tracking-[0.2em] text-[#7C6338]">
-                    Featured folio — № {folioOf(featured.id)}
+                    {coCredit ? 'Co-credited folio' : 'Featured folio'} — № {folioOf(featured.id)}
                   </p>
                   <Link
                     to={`/article/${featured.id}`}
                     className="group mt-3 block no-underline focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#B89146]/80"
-                    aria-label={`Open folio ${folioOf(featured.id)} — ${featured.title}`}
+                    aria-label={`Open ${coCredit ? 'co-credited ' : ''}folio ${folioOf(featured.id)} — ${featured.title}`}
                   >
                     <p className="font-serif text-[clamp(1.4rem,2.2vw,1.8rem)] font-semibold leading-[1.1] text-[#241D18] transition-colors group-hover:text-[#5C1224]">
                       “{featured.title}”
@@ -229,7 +238,7 @@ export default function DossierRoom({ author }: { author: Author }) {
                       <br />
                       {featured.date.split('-').reverse().join('.')} · {featured.readingTime}
                       <br />
-                      by {author.name.toUpperCase()}
+                      {coCredit ? 'co-credited — ' : 'by '}{author.name.toUpperCase()}
                     </p>
                     <p className="mt-4 inline-flex items-center gap-2 font-mono text-[11px] font-semibold uppercase tracking-[0.2em] text-[#5C1224] transition-all group-hover:gap-3">
                       Open folio <span aria-hidden="true">→</span>
@@ -246,7 +255,9 @@ export default function DossierRoom({ author }: { author: Author }) {
                   ? `Also in the archive — ${also.map((w) => `№ ${folioOf(w.id)} · ${w.title} · ${w.category} · ${w.readingTime}`).join('   ·   ')}`
                   : works.length === 1
                     ? `In the archive — № ${folioOf(works[0].id)} · ${works[0].category}`
-                    : 'The archive holds no folios for this name yet.'}
+                    : coWorks.length > 0
+                      ? `Co-credited in the archive — ${coWorks.map((w) => `№ ${folioOf(w.id)} · ${w.title} · ${w.category}`).join('   ·   ')}`
+                      : 'The archive holds no folios for this name yet.'}
               </p>
             </div>
 

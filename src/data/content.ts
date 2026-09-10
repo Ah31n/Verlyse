@@ -1417,6 +1417,7 @@ export function articleSearchText(a: Article): string {
     a.category,
     author?.name ?? '',
     author?.handle ?? '',
+    a.credit ?? '',
     a.tags.join(' '),
     a.excerpt,
     a.description ?? '',
