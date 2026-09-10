@@ -1,4 +1,5 @@
 import type { ReactNode } from 'react'
+import { handleImgError } from '../../lib/imgFallback'
 
 /**
  * AUTHOR FRAME — the editorial frame that carries every creator photograph.
@@ -57,10 +58,13 @@ export function AuthorPhoto({
   src,
   alt = '',
   className = '',
+  fallbackLabel,
 }: {
   src: string
   alt?: string
   className?: string
+  /** label for the typographic plate used if the photograph is missing */
+  fallbackLabel?: string
 }) {
   return (
     <img
@@ -69,6 +73,13 @@ export function AuthorPhoto({
       loading="lazy"
       decoding="async"
       draggable={false}
+      onError={(e) => {
+        if (!fallbackLabel) {
+          e.currentTarget.style.display = 'none'
+          return
+        }
+        handleImgError(e, fallbackLabel)
+      }}
       className={`block object-contain ${className}`}
     />
   )

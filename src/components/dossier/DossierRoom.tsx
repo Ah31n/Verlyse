@@ -147,6 +147,7 @@ export default function DossierRoom({ author }: { author: Author }) {
                     <AuthorPhoto
                       src={portrait}
                       alt={`${author.name} — photograph`}
+                      fallbackLabel={author.name}
                       className="h-full w-full object-cover"
                     />
                   ) : (

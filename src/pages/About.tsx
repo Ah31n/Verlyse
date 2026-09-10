@@ -5,6 +5,7 @@ import { BRAND, COMMUNITY_STATS, LEDGER } from '../data/content'
 import BrassRule from '../components/ui/BrassRule'
 import { LibraryCard } from '../components/ui/EasterEggs'
 import { CrashZoom, DepthStage, DepthLayer, OrbitalDrift, PushIn , MaskReveal, Slate } from '../components/cinematic'
+import { handleImgError } from '../lib/imgFallback'
 
 /**
  * THE COLOPHON — the quiet institutional record of Verlyse Media, from the
@@ -165,6 +166,7 @@ export default function About() {
                   height={640}
                   loading="lazy"
                   decoding="async"
+                  onError={(e) => handleImgError(e, 'Alina Javed — Founder')}
                   className="relative aspect-square w-full border border-gold/30 object-cover object-center grayscale-[0.15] contrast-[1.02]"
                 />
               </figure>

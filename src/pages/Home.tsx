@@ -13,7 +13,8 @@ import { MetaRow, SectionHead, UnderlineLink } from '../components/ui/primitives
 import { ImmersiveShell, BrassThread } from '../components/immersive'
 import { Magnetic, MaskReveal, Tilt3D, Slate } from '../components/cinematic'
 import SaveButton from '../components/ui/SaveButton'
-import { ARTICLES, BRAND, CATEGORIES, LEDGER, getAuthor } from '../data/content'
+import { ARTICLES, BRAND, CATEGORIES, LEDGER, folioNoOf, getAuthor } from '../data/content'
+import { handleImgError } from '../lib/imgFallback'
 import { useWebGLSupport } from '../lib/three/useWebGLSupport'
 import { introSeen, onIntroResolved } from '../lib/intro'
 // The spatial engine is loaded on demand so its heavy chunk (three) never
@@ -255,6 +256,7 @@ function Cover({ selectedId, state }: { selectedId: string | null; state: Spatia
                 width={1280}
                 height={720}
                 decoding="async"
+                onError={(e) => handleImgError(e, feature.title, folioNoOf(feature.id))}
                 className="h-full w-full object-cover"
               />
               <span aria-hidden="true" className="absolute inset-0 bg-[linear-gradient(180deg,transparent_55%,rgba(28,5,9,0.55))] " />
@@ -421,6 +423,8 @@ function StoryCard({
           src={work.cover}
           alt={`${work.title} — ${work.category}`}
           loading="lazy"
+          decoding="async"
+          onError={(e) => handleImgError(e, work.title, folioNoOf(work.id))}
           className={`h-full w-full object-cover ${cover ? 'animate-vm-kenburns' : 'transition-transform duration-[1800ms] ease-out group-hover:scale-[1.06]'}`}
         />
         <div aria-hidden="true" className="absolute inset-0 bg-gradient-to-t from-[#1C0509]/70 via-transparent to-transparent opacity-0 transition-opacity duration-700 group-hover:opacity-100" />
@@ -593,6 +597,8 @@ function FeatureSection({ feature, authorName }: { feature: (typeof ARTICLES)[nu
                     src={src}
                     alt={`${feature.title} — plate ${i + 1} of ${plates.length}`}
                     loading="lazy"
+                    decoding="async"
+                    onError={(e) => handleImgError(e, feature.title, folioNoOf(feature.id))}
                     className="aspect-[4/5] w-full object-cover transition-transform duration-[1400ms] ease-out hover:scale-[1.07]"
                   />
                   <figcaption className="border-t border-white/10 px-2 py-2 font-mono text-[8px] uppercase tracking-[0.26em] text-white/50">
@@ -767,6 +773,8 @@ function Invitation() {
               src="/img/poster-3-13-3.webp"
               alt="Plate III — “3:13” by Anshujit Singh"
               loading="lazy"
+              decoding="async"
+              onError={(e) => handleImgError(e, '3:13', folioNoOf('3-13'))}
               className="h-full w-full object-cover"
             />
           </figure>
@@ -835,7 +843,7 @@ function Colophon() {
           </div>
           <Reveal className="relative">
             <div className="img-frame aspect-[4/5] max-w-[92%]">
-              <img src="/img/works/DaDY7WRkw0y-2.webp" alt="Plate II of the first feature, “Their Voices Matter”" className="h-full w-full object-cover" loading="lazy" />
+              <img src="/img/works/DaDY7WRkw0y-2.webp" alt="Plate II of the first feature, “Their Voices Matter”" className="h-full w-full object-cover" loading="lazy" decoding="async" onError={(e) => handleImgError(e, 'Their Voices Matter', folioNoOf('their-voices-matter'))} />
             </div>
             <div aria-hidden="true" className="absolute -bottom-7 -left-7 -right-7 top-7 border border-gold/50" />
           </Reveal>
@@ -1018,6 +1026,7 @@ function SpatialReading({ pickIdx, onSelect }: { pickIdx: number; onSelect: (i: 
                   alt={`Selected plate — “${active.title}” by ${au?.name}`}
                   loading="lazy"
                   decoding="async"
+                  onError={(e) => handleImgError(e, active.title, folio)}
                   className="h-full w-full object-cover"
                 />
                 <span aria-hidden="true" className="absolute inset-0 bg-[linear-gradient(180deg,rgba(28,5,9,0.06)_36%,rgba(20,5,9,0.9))]" />

@@ -1,6 +1,8 @@
 import { useEffect, useState } from 'react'
 import { AnimatePresence, motion, useReducedMotion } from 'motion/react'
 import type { Article } from '../../data/content'
+import { folioNoOf } from '../../data/content'
+import { handleImgError } from '../../lib/imgFallback'
 
 /**
  * THE GALLERY — for publications that are artworks. The slides become a
@@ -49,6 +51,8 @@ export default function ArtGallery({ article }: { article: Article }) {
                 src={src}
                 alt={`${article.title} — plate ${i + 1}`}
                 loading="lazy"
+                decoding="async"
+                onError={(e) => handleImgError(e, article.title, folioNoOf(article.id))}
                 className="h-full w-full object-cover transition-transform duration-[1600ms] ease-out group-hover:scale-[1.06]"
               />
               <span aria-hidden="true" className="absolute inset-3 border border-gold/30 transition-colors duration-500 group-hover:border-gold/60" />
@@ -99,6 +103,8 @@ export default function ArtGallery({ article }: { article: Article }) {
               <img
                 src={slides[open]}
                 alt={`${article.title} — plate ${open + 1}`}
+                decoding="async"
+                onError={(e) => handleImgError(e, article.title, folioNoOf(article.id))}
                 className="max-h-[76vh] w-auto border border-gold/40 object-contain"
               />
               <figcaption className="mt-4 flex items-center justify-between border-t border-white/10 pt-3">

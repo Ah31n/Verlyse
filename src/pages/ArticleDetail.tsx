@@ -6,7 +6,8 @@ import Reveal from '../components/ui/Reveal'
 import SplitText from '../components/ui/SplitText'
 import { MetaRow } from '../components/ui/primitives'
 import ShareButtons from '../components/ui/ShareButtons'
-import { getArticle, getAuthor, relatedArticles, type Vibe , AUTHORS , authorPhoto } from '../data/content'
+import { getArticle, getAuthor, relatedArticles, folioNoOf, type Vibe , AUTHORS , authorPhoto } from '../data/content'
+import { handleImgError } from '../lib/imgFallback'
 import { AuthorPhoto } from '../components/ui/AuthorFrame'
 import { ArticleEnding, MotifDivider, Signature, WritersNoteClosing } from '../components/ui/ArticleClosing'
 import { MARGINALIA } from '../components/ui/Motifs'
@@ -265,6 +266,7 @@ export default function ArticleDetail() {
 
   const author = getAuthor(article.authorId)
   const related = relatedArticles(article)
+  const folio = folioNoOf(article.id)
   const vibe = VIBES[article.vibe ?? 'solemn']
   const v = REVEAL_VARIANTS[vibe.reveal]
   const figures = article.figures ?? []
@@ -399,6 +401,8 @@ export default function ArticleDetail() {
                     alt=""
                     className="aspect-[4/5] w-full object-contain"
                     loading="lazy"
+                    decoding="async"
+                    onError={(e) => handleImgError(e, article.title, folio)}
                   />
                   <span aria-hidden="true" className="absolute inset-2 border border-gold/30" />
                 </div>
@@ -429,7 +433,7 @@ export default function ArticleDetail() {
                 <figure className="relative w-full max-w-[300px]">
                   <div aria-hidden="true" className="absolute -inset-3 translate-x-3 translate-y-3 border border-gold/35" />
                   <div className="img-frame relative overflow-hidden border border-gold/25">
-                    <img src={article.cover} alt="" className="aspect-[4/5] w-full object-cover" loading="lazy" />
+                    <img src={article.cover} alt="" className="aspect-[4/5] w-full object-cover" loading="lazy" decoding="async" onError={(e) => handleImgError(e, article.title, folio)} />
                     <span aria-hidden="true" className="absolute inset-2 border border-gold/40" />
                   </div>
                   <figcaption className="mt-3 flex items-center justify-between font-mono text-[9px] uppercase tracking-[0.30em] text-white/50">
@@ -445,7 +449,7 @@ export default function ArticleDetail() {
         /* ——— CINEMATIC: the default full-bleed ——— */
         <section className="relative flex min-h-[92svh] items-end overflow-hidden pt-36">
           <div aria-hidden="true" className="absolute inset-0">
-            <img src={article.cover} alt="" className="h-full w-full object-cover" />
+            <img src={article.cover} alt="" className="h-full w-full object-cover" decoding="async" onError={(e) => handleImgError(e, article.title, folio)} />
           </div>
           <div aria-hidden="true" className={`absolute inset-0 ${vibe.overlay}`} />
           <VibeAmbient vibe={article.vibe ?? 'solemn'} section="hero" />
@@ -499,7 +503,7 @@ export default function ArticleDetail() {
               >
                 {author?.portrait && !author.hideArticlePhoto ? (
                   <span className="block h-16 shrink-0">
-                    <AuthorPhoto src={author.profilePhoto ?? authorPhoto(author.id)} alt={`${author.name} — photograph`} className="h-16 w-auto object-contain" />
+                    <AuthorPhoto src={author.profilePhoto ?? authorPhoto(author.id)} alt={`${author.name} — photograph`} fallbackLabel={author.name} className="h-16 w-auto object-contain" />
                   </span>
                 ) : (
                   <span aria-hidden="true" className="relative grid h-16 w-16 shrink-0 place-items-center">
@@ -591,11 +595,13 @@ export default function ArticleDetail() {
                 <div className={`grid grid-cols-1 gap-10 ${figures.length > 1 ? 'sm:grid-cols-2' : ''}`}>
                   {figures.map((f, i) => (
                     <figure key={f.src}>
-                      <div className={`img-frame relative overflow-hidden border ${vibe.figFrame}`}>
+                      <div className={`img-frame relative aspect-[4/5] overflow-hidden border sm:aspect-[4/3] ${vibe.figFrame}`}>
                         <img
                           src={f.src}
                           alt={`${f.label} — ${article.title}`}
                           loading="lazy"
+                          decoding="async"
+                          onError={(e) => handleImgError(e, article.title, folio)}
                           className={`h-full w-full object-cover ${vibe.figMotion}`}
                         />
                         <span aria-hidden="true" className="pointer-events-none absolute inset-3 border border-gold/40" />
@@ -723,6 +729,8 @@ export default function ArticleDetail() {
                   <img
                     src={related[0].cover}
                     alt=""
+                    decoding="async"
+                    onError={(e) => handleImgError(e, related[0].title, folioNoOf(related[0].id))}
                     className="h-full w-full object-cover opacity-40 animate-vm-kenburns"
                   />
                   <div className="absolute inset-0 bg-gradient-to-t from-[#1C0509] via-[#1C0509]/60 to-[#1C0509]/20" />
@@ -767,7 +775,7 @@ export default function ArticleDetail() {
                   <Reveal key={a.id}>
                     <Link to={`/article/${a.id}`} className="group flex items-center gap-6 border-t border-white/10 pt-6 no-underline">
                       <div className="img-frame relative h-24 w-20 shrink-0 overflow-hidden">
-                        <img src={a.cover} alt="" loading="lazy" className="h-full w-full object-cover transition-transform duration-[1200ms] group-hover:scale-[1.1]" />
+                        <img src={a.cover} alt="" loading="lazy" decoding="async" onError={(e) => handleImgError(e, a.title, folioNoOf(a.id))} className="h-full w-full object-cover transition-transform duration-[1200ms] group-hover:scale-[1.1]" />
                       </div>
                       <div>
                         <MetaRow category={a.category} author={au?.name} readingTime={a.readingTime} />

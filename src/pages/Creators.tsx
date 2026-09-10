@@ -2,7 +2,8 @@ import { useMemo, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { motion, AnimatePresence, useReducedMotion } from 'motion/react'
 import { useSeo } from '../hooks/useSeo'
-import { ARTICLES, AUTHORS, LEDGER, authorPhoto, stampDate } from '../data/content'
+import { ARTICLES, AUTHORS, LEDGER, authorPhoto, folioNoOf, stampDate } from '../data/content'
+import { handleImgError } from '../lib/imgFallback'
 
 /** The folios a creator holds in the archive — their own entries. */
 function foliosOf(authorId: string) {
@@ -176,6 +177,7 @@ export default function Creators() {
                           alt=""
                           loading="lazy"
                           decoding="async"
+                          onError={(e) => handleImgError(e, selectedFeature.title, folioNoOf(selectedFeature.id))}
                           className="h-14 w-[72px] shrink-0 border border-white/10 object-cover"
                         />
                         <span className="min-w-0">
@@ -212,6 +214,7 @@ export default function Creators() {
                         loading="lazy"
                         decoding="async"
                         draggable={false}
+                        onError={(e) => handleImgError(e, selected.name, String(recordNo).padStart(2, '0'))}
                         className="block max-h-[260px] w-full object-contain shadow-[0_4px_14px_rgba(0,0,0,0.3)]"
                       />
                     ) : (

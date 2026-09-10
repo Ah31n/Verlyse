@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom'
 import { motion } from 'motion/react'
 import { useSeo } from '../hooks/useSeo'
 import { ARTICLES, BRAND, COMMUNITY_STATS, COMMUNITY_VOICES, LEDGER, stampDate, type Article } from '../data/content'
+import { handleImgError } from '../lib/imgFallback'
 
 /** The five most recent replies in the commons — real comments, read from
     the feed backwards by publication date, each tied to its folio. */
@@ -32,6 +33,8 @@ function FilmFrame({ article, folio }: { article: Article; folio: string }) {
           src={article.cover}
           alt={`${article.title} — cover`}
           loading="lazy"
+          decoding="async"
+          onError={(e) => handleImgError(e, article.title, folio)}
           className="h-full w-full object-cover transition-transform duration-[1400ms] ease-out group-hover:scale-[1.1]"
         />
         <span aria-hidden="true" className="absolute left-3 top-3 border border-gold/60 bg-[#14060B]/60 px-2 py-1 font-mono text-[8px] uppercase tracking-[0.26em] text-ivory opacity-0 transition-opacity duration-500 group-hover:opacity-100">

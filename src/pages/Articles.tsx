@@ -2,8 +2,9 @@ import { useEffect, useMemo, useRef, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { motion } from 'motion/react'
 import { useSeo } from '../hooks/useSeo'
-import { getAuthor, ARTICLES, LEDGER, sortArticles, stampDate, isEditorsPick, SORTS, type SortKey } from '../data/content'
+import { getAuthor, ARTICLES, LEDGER, sortArticles, stampDate, isEditorsPick, folioNoOf, SORTS, type SortKey } from '../data/content'
 import SaveButton from '../components/ui/SaveButton'
+import { handleImgError } from '../lib/imgFallback'
 import { ImmersiveShell, BrassThread } from '../components/immersive'
 
 /** keyword match — the title, the writer, the department, and the feature's
@@ -306,6 +307,7 @@ function Archive() {
                           alt=""
                           loading="lazy"
                           decoding="async"
+                          onError={(e) => handleImgError(e, a.title, folioNoOf(a.id))}
                           className="h-[92px] w-full object-cover object-top"
                         />
                         <span aria-hidden="true" className="absolute inset-0 bg-[linear-gradient(180deg,rgba(42,15,24,0.12),rgba(42,15,24,0.34))]" />

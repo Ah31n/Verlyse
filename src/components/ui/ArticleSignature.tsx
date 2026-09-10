@@ -84,6 +84,7 @@ function SceneVoices({ anim }: { anim: boolean }) {
             loading="lazy"
             decoding="async"
             draggable={false}
+            onError={(e) => { e.currentTarget.style.display = 'none' }}
             className="block h-[clamp(340px,58vh,620px)] w-auto select-none"
           />
         </div>
@@ -500,6 +501,7 @@ function SceneHeadline({ anim }: { anim: boolean }) {
             loading="lazy"
             decoding="async"
             draggable={false}
+            onError={(e) => { e.currentTarget.style.display = 'none' }}
             className="h-full w-full border border-white/12 object-cover"
           />
           <figcaption className="mt-3 text-center font-mono text-[9px] uppercase tracking-[0.30em] text-white/50">
