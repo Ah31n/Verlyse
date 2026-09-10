@@ -73,3 +73,6 @@ secrets.*
 # manifests and written reports are tracked; the PNG evidence they emit is not.
 audit/screenshots/
 audit/shots/
+
+# local InfinityFree deploy bundle (download artifact, never committed)
+verlyse-site.zip
