@@ -109,8 +109,9 @@ export default function Header() {
               <circle cx="20" cy="20" r="18.5" fill="none" stroke="currentColor" strokeWidth="1" />
               <path d="M12.5 14.5 L20 27 L27.5 14.5" fill="none" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round" />
             </svg>
-            <span className="font-serif text-2xl leading-none max-[479px]:text-lg">
-              Verlyse <em className="italic text-gold max-[479px]:hidden">Media</em>
+            <span className="flex items-baseline gap-[0.32em] font-serif text-2xl leading-none max-[479px]:text-lg">
+              <span>Verlyse</span>
+              <em className="italic text-gold max-[479px]:hidden">Media</em>
             </span>
           </Link>
 

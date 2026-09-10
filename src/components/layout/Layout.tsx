@@ -42,9 +42,7 @@ export default function Layout({ children }: { children: ReactNode }) {
       <SavedDrawer />
       <main id="main">{children}</main>
       <div className={`transition-all duration-1000 ${reading ? 'pointer-events-none opacity-0' : 'opacity-100'}`}>
-        <div className="max-lg:pb-[62px]">
-          <Footer />
-        </div>
+        <Footer />
         <Dock />
       </div>
     </>

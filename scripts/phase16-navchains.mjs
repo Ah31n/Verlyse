@@ -13,24 +13,64 @@ async function fresh(path) {
   await new Promise(r=>setTimeout(r, 1800))
   await p.evaluate(() => { document.documentElement.style.scrollBehavior='auto'; window.scrollTo(0,0) })
 }
-async function clickFirst(text, tag = 'a') {
-  const clicked = await p.evaluate(({ text, tag }) => {
-    const els = Array.from(document.querySelectorAll(tag))
+async function clickFirst(text, tag = 'a', scopeSel = '') {
+  const clicked = await p.evaluate(({ text, tag, scopeSel }) => {
+    const root = scopeSel ? document.querySelector(scopeSel) : document
+    const els = Array.from(root ? root.querySelectorAll(tag) : [])
     const el = els.find(e => e.textContent.replace(/\s+/g,' ').trim().toLowerCase().includes(text.toLowerCase()))
     if (!el) return false
     el.scrollIntoView({ block: 'center' })
     el.click()
     return true
-  }, { text, tag })
+  }, { text, tag, scopeSel })
   await new Promise(r=>setTimeout(r, 1600))
   return clicked
 }
-const where = () => p.evaluate(() => ({ path: location.pathname, h1: document.querySelector('h1')?.textContent || '', text: (document.body.innerText||'').slice(0, 400) }))
+/* wait until the rendered page actually carries the expected words and
+   keeps carrying them — cinematic hero chains paint a title before the
+   ~2s intro, hide it, then reveal the settled page, so a single hit would
+   race the transition. Require two consecutive reads 450ms apart. */
+async function waitForText(snippet, ms = 12000) {
+  const has = () => p.evaluate((s) => (document.body.innerText || '').toLowerCase().includes(s.toLowerCase()), snippet)
+  const t0 = Date.now()
+  while (Date.now() - t0 < ms) {
+    if (await has()) {
+      await new Promise((r) => setTimeout(r, 450))
+      if (await has()) return true
+    }
+    await new Promise((r) => setTimeout(r, 150))
+  }
+  return false
+}
+const where = () => p.evaluate(() => ({ path: location.pathname, h1: document.querySelector('h1')?.textContent || '', text: document.body.innerText || '' }))
+
+/* wait for the cinematic h1 to settle. SplitText masks each word in
+   overflow-hidden line spans, so the phrase can be present visually and
+   in the aria-label while absent from innerText — assert the accessible
+   name (aria-label) and, failing that, the text content. Two reads 450ms
+   apart keep the pre-hydration prerender flash from winning the race. */
+async function waitForH1(snippet, ms = 12000) {
+  const has = () => p.evaluate((s) => {
+    const h = document.querySelector('h1')
+    const t = h ? (h.getAttribute('aria-label') || h.textContent || '') : ''
+    return t.includes(s)
+  }, snippet)
+  const t0 = Date.now()
+  while (Date.now() - t0 < ms) {
+    if (await has()) {
+      await new Promise((r) => setTimeout(r, 450))
+      if (await has()) return true
+    }
+    await new Promise((r) => setTimeout(r, 150))
+  }
+  return false
+}
 
 /* 1. Home → Article (current feature) */
 await fresh('/')
 await clickFirst('READ THE CURRENT FEATURE')
-let w = await where(); log('Home → Article (current feature)', w.path === '/article/their-voices-matter' && w.text.includes('Their Voices Matter'), `landed ${w.path}`)
+const titleSettled = await waitForH1('Their Voices Matter')
+let w = await where(); log('Home → Article (current feature)', w.path === '/article/their-voices-matter' && titleSettled, `landed ${w.path}, title settled=${titleSettled}`)
 
 /* 1b. Home → Article (latest work card) */
 await fresh('/')
@@ -42,10 +82,15 @@ await fresh('/article/mir-raza-ali')
 const byline = await clickFirst('Verlyse Media', 'a')
 w = await where(); log('Article → Creator (byline)', byline && w.path === '/creator/verlyse-media', `clicked=${byline} landed ${w.path}`)
 
-/* 3. Article → Category */
+/* 3. Article → Category. The kicker deep-links the room door
+   (/categories/:slug), the same convention the home and wall use; the
+   generic /categories index is also a valid landing. The lookup is scoped
+   to the article's own hero kicker: the reading room's Up Next cards
+   legitimately repeat the room name inside their folio links, but the
+   kicker is the chain this test names. */
 await fresh('/article/mir-raza-ali')
-const cat = await clickFirst('Social Issues', 'a')
-w = await where(); log('Article → Category (kicker)', cat && w.path === '/categories', `clicked=${cat} landed ${w.path}`)
+const cat = await clickFirst('Social Issues', 'a', '[data-hero-kicker]')
+w = await where(); log('Article → Category (kicker)', cat && (w.path === '/categories/social-issues' || w.path === '/categories'), `clicked=${cat} landed ${w.path}`)
 
 /* 4. Article → Related */
 await fresh('/article/behind-every-headline')
@@ -100,10 +145,14 @@ for (const l of footLinks) {
   }, { text: l.text })
   await new Promise(r=>setTimeout(r, 1400))
   const cur = await p.evaluate(() => location.pathname)
+  // External destinations (Instagram over https, the desk over mailto)
+  // legitimately leave the SPA and cannot be landed inside the headless
+  // page; a well-formed scheme is their complete contract.
+  const external = /^(https?:|mailto:|tel:)/i.test(l.href)
   // A footer link is good if the click fired and we land on a valid internal route
   // (staying on /about is only valid for an /about self-link).
   const self = (l.href === '/about' || l.href === 'about')
-  const good = ok && cur.startsWith('/') && (cur !== '/about' || self || l.href === '/')
+  const good = external ? ok : ok && cur.startsWith('/') && (cur !== '/about' || self || l.href === '/')
   if (!good) footBad.push(`${l.text} -> clicked=${ok} at=${cur} (href ${l.href})`)
 }
 log('Footer → every destination', footBad.length === 0, footBad.length ? footBad.join('; ') : `${footLinks.length} links all resolve (${footLinks.map(l=>l.text).join(', ')})`)

@@ -298,7 +298,7 @@ function Cover({ selectedId, state }: { selectedId: string | null; state: Spatia
                 Enter the archive →
               </Link>
             </Magnetic>
-            <UnderlineLink to={`/article/${feature.id}`}>Read folio № 01</UnderlineLink>
+            <UnderlineLink to={`/article/${feature.id}`}>Read the current feature — folio № 01</UnderlineLink>
           </motion.div>
 
           <motion.p

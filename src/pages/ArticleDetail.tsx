@@ -1,12 +1,12 @@
 import { Link, useParams } from 'react-router-dom'
-import { useEffect, useState, lazy, Suspense } from 'react'
+import { useEffect, lazy, Suspense } from 'react'
 import { motion } from 'motion/react'
 import { useArticleSeo } from '../hooks/useSeo'
 import Reveal from '../components/ui/Reveal'
 import SplitText from '../components/ui/SplitText'
 import { MetaRow } from '../components/ui/primitives'
 import ShareButtons from '../components/ui/ShareButtons'
-import { getArticle, getAuthor, relatedArticles, folioNoOf, type Vibe , AUTHORS , authorPhoto } from '../data/content'
+import { getArticle, getAuthor, relatedArticles, folioNoOf, type Vibe, type Article, type Author, AUTHORS, authorPhoto } from '../data/content'
 import { handleImgError } from '../lib/imgFallback'
 import { AuthorPhoto } from '../components/ui/AuthorFrame'
 import { ArticleEnding, MotifDivider, Signature, WritersNoteClosing } from '../components/ui/ArticleClosing'
@@ -18,7 +18,7 @@ import { InkSpread, EditorialWipe } from '../components/ui/MotionMoves'
 import ArticleSignature from '../components/ui/ArticleSignature'
 // The story-ending spatial atmosphere is loaded on demand (three is heavy).
 const StoryEnding3D = lazy(() => import('../components/spatial/StoryEnding3D'))
-import { isSaved, toggleSaved } from '../components/layout/SavedDrawer'
+import SaveButton from '../components/ui/SaveButton'
 import { useReadingMode } from '../components/ui/ReadingMode'
 import { ImmersiveShell, BrassThread, ReadingMeasure } from '../components/immersive'
 
@@ -177,23 +177,25 @@ const REVEAL_VARIANTS: Record<VibeSpec['reveal'], { initial: Record<string, numb
   urgent: { initial: { opacity: 0, y: 26 }, animate: { opacity: 1, y: 0 }, duration: 0.7 },
 }
 
-function BookmarkBtn({ id, title, category, author }: { id: string; title: string; category: string; author?: string }) {
-  const [on, setOn] = useState(false)
-  useEffect(() => { setOn(isSaved(id)) }, [id])
+/** The hero kicker — the room and the byline are real chains: the
+    department links to its room door, the writer links to their dossier. */
+function HeroKicker({ article, author }: { article: Article; author?: Author }) {
+  const catSlug = article.category.toLowerCase().replace(/\s+/g, '-')
+  const linkCls = 'text-gold no-underline underline-offset-4 transition-shadow hover:underline focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-gold'
   return (
-    <button
-      type="button"
-      onClick={() => { const now = toggleSaved({ id, title, category, author }); setOn(now) }}
-      aria-pressed={on}
-      aria-label={on ? `Remove ${title} from saved` : `Save ${title}`}
-      className={`inline-flex items-center gap-2 border-y px-4 py-2 font-mono text-[10px] uppercase tracking-[0.28em] transition-colors max-[767px]:py-3 ${on ? 'border-gold bg-gold text-charcoal' : 'border-gold/45 text-ivory/80 hover:text-gold'}`}
-    >
-      <svg viewBox="0 0 24 24" aria-hidden="true" className="h-3.5 w-3.5 fill-none stroke-current [stroke-width:1.5]"><path d="M6 3.5h12v17L12 16.8 6 20.5z" /></svg>
-      {on ? 'Saved' : 'Save'}
-    </button>
+    <p className="kicker" data-hero-kicker>
+      <Link to={`/categories/${catSlug}`} className={linkCls}>{article.category}</Link>
+      <span aria-hidden="true"> — </span>
+      <span>Verlyse Media presents</span>
+      {author && (
+        <>
+          <span aria-hidden="true"> — a submission by </span>
+          <Link to={`/creator/${author.id}`} className={linkCls}>{author.name}</Link>
+        </>
+      )}
+    </p>
   )
 }
-
 
 /** A second creator credited in the caption (e.g. “Poem written by @mochjixx”).
     Rendered with the house quiet: a hairline, small caps, and a linked handle. */
@@ -348,7 +350,7 @@ export default function ArticleDetail() {
           <WorldTexture world={article.world} />
           <div aria-hidden="true" className="pointer-events-none absolute inset-x-0 top-0 h-72 bg-[radial-gradient(62%_55%_at_50%_6%,rgba(184,145,70,0.05),transparent_74%)]" />
           <div className="relative z-[2] mx-auto w-full max-w-page px-[clamp(1.75rem,5.5vw,4.75rem)] pb-16">
-            <Reveal><p className="kicker">Verlyse Media presents — a submission by {author?.name}</p></Reveal>
+            <Reveal><HeroKicker article={article} author={author} /></Reveal>
             <InkSpread className={`${vibe.titleClass} inline-block`} origin="50% 80%">
               <SplitText as="h1" text={`“${article.title}”`} className="mt-6 max-w-[18ch] text-[clamp(3rem,8vw,7.5rem)]" />
             </InkSpread>
@@ -378,7 +380,7 @@ export default function ArticleDetail() {
                   Dispatch — {article.date.split('-').reverse().join('.')}
                 </p>
               </Reveal>
-              <Reveal><p className="kicker">Verlyse Media presents — a submission by {author?.name}</p></Reveal>
+              <Reveal><HeroKicker article={article} author={author} /></Reveal>
               <div className={`${vibe.titleClass} inline-block`}>
                 <SplitText as="h1" text={`“${article.title}”`} className="mx-auto mt-5 max-w-[20ch] text-[clamp(2.8rem,6.8vw,6.4rem)]" />
               </div>
@@ -421,7 +423,7 @@ export default function ArticleDetail() {
           <div className="relative z-[2] mx-auto w-full max-w-page px-[clamp(1.75rem,5.5vw,4.75rem)] pb-16">
             <div className="grid grid-cols-1 items-end gap-10 lg:grid-cols-[1fr_auto]">
               <div>
-                <Reveal><p className="kicker">Verlyse Media presents — a submission by {author?.name}</p></Reveal>
+                <Reveal><HeroKicker article={article} author={author} /></Reveal>
                 <div className={`${vibe.titleClass} inline-block`}>
                   <SplitText as="h1" text={`“${article.title}”`} className="mt-5 max-w-[18ch] text-[clamp(2.8rem,7vw,6.6rem)]" />
                 </div>
@@ -454,7 +456,7 @@ export default function ArticleDetail() {
           <div aria-hidden="true" className={`absolute inset-0 ${vibe.overlay}`} />
           <VibeAmbient vibe={article.vibe ?? 'solemn'} section="hero" />
           <div className="relative z-[2] mx-auto w-full max-w-page px-[clamp(1.75rem,5.5vw,4.75rem)] pb-12">
-            <Reveal><p className="kicker">Verlyse Media presents — a submission by {author?.name}</p></Reveal>
+            <Reveal><HeroKicker article={article} author={author} /></Reveal>
             <InkSpread className={`${vibe.titleClass} inline-block`} origin="50% 80%">
               <SplitText as="h1" text={`“${article.title}”`} className="mt-6 max-w-[20ch] text-[clamp(2.8rem,7vw,6.6rem)]" />
             </InkSpread>
@@ -634,7 +636,7 @@ export default function ArticleDetail() {
             <div className="flex flex-wrap items-center justify-between gap-5 border-t border-white/10 pt-6">
               <div className="flex flex-wrap items-center gap-4">
                 <span className="font-mono text-[10px] uppercase tracking-[0.28em] text-white/55">Save this story</span>
-                <BookmarkBtn id={article.id} title={article.title} category={article.category} author={author?.name} />
+                <SaveButton id={article.id} title={article.title} category={article.category} author={author?.name} />
               </div>
               <div className="flex flex-wrap items-center gap-4">
                 <span className="font-mono text-[10px] uppercase tracking-[0.28em] text-white/55">Share</span>

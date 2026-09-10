@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { Link, useLocation, useNavigate } from 'react-router-dom'
 import { AnimatePresence, motion, useReducedMotion } from 'motion/react'
-import { ARTICLES, getAuthor } from '../../data/content'
+import { ARTICLES, getAuthor, searchArticles } from '../../data/content'
 import { trapFocus } from '../../lib/focus'
 
 /** Where the search was opened from — the page context preserved beneath. */
@@ -82,19 +82,11 @@ export default function SearchOverlay() {
     return () => window.removeEventListener('keydown', onKey)
   }, [open])
 
+  /* the same index the archive page uses — title, writer name AND handle,
+     category, secondary credits, tags, excerpt and description, so the
+     overlay and the shelf never disagree about what a word finds */
+  const results = useMemo(() => searchArticles(q), [q])
   const query = q.trim().toLowerCase()
-  /* keyword scope — title, creator, category, and the feature's own tags and
-     excerpt: the index answers to the words inside the work, not just its spine */
-  const results = useMemo(
-    () =>
-      query
-        ? ARTICLES.filter((a) => {
-            const author = getAuthor(a.authorId)?.name ?? ''
-            return `${a.title} ${a.category} ${author} ${a.tags.join(' ')} ${a.excerpt}`.toLowerCase().includes(query)
-          })
-        : [],
-    [query],
-  )
   const shown = results.slice(0, 8)
   // keep the roving active index in range
   useEffect(() => { setActive(0) }, [results.length, query])

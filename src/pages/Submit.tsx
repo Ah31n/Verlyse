@@ -28,6 +28,36 @@ path: '/submit',
   const [viaBackend, setViaBackend] = useState(true)
   const [errors, setErrors] = useState<string[]>([])
   const [fileName, setFileName] = useState('')
+  const [fileError, setFileError] = useState('')
+  /** the forwarding inbox never sees a cover larger than this; the mail
+      fallback can only name a file, so an honest size keeps both paths sane */
+  const MAX_COVER_BYTES = 8 * 1024 * 1024
+  const ACCEPTED_COVER = ['image/jpeg', 'image/png', 'image/webp', 'image/avif', 'image/gif']
+
+  /** validate a chosen cover before the form can name it — type and size
+      only; the writer is told exactly why a file was refused */
+  const onCoverChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0]
+    if (!file) {
+      setFileName('')
+      setFileError('')
+      return
+    }
+    if (!ACCEPTED_COVER.includes(file.type)) {
+      setFileError('The desk reads JPG, PNG, WEBP, AVIF or GIF covers — please choose an image.')
+      e.target.value = ''
+      setFileName('')
+      return
+    }
+    if (file.size > MAX_COVER_BYTES) {
+      setFileError('That image is over 8 MB — please send a smaller cover (the writing is the piece).')
+      e.target.value = ''
+      setFileName('')
+      return
+    }
+    setFileError('')
+    setFileName(file.name)
+  }
 
   /** Deliver the piece to the desk — posts to the forwarding service so it
       arrives in the Verlyse Media inbox; if the network path fails, the
@@ -64,6 +94,9 @@ path: '/submit',
 
   const onSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault()
+    /* double-submit guard — a second press while the piece is crossing
+       must never open two requests or two drafts */
+    if (sending || sent) return
     const form = e.currentTarget
     const data = new FormData(form)
     const name = String(data.get('name') ?? '').trim()
@@ -113,6 +146,7 @@ path: '/submit',
     setSent(false)
     setErrors([])
     setFileName('')
+    setFileError('')
   }
 
   return (
@@ -138,12 +172,12 @@ path: '/submit',
           <Slate move="crash zoom" className="mt-6" />
           <Reveal delay={0.15}>
             <p className="mt-6 max-w-[52ch] text-lg leading-[1.8] text-white/70">
-              The platform puts it plainly: “Want to submit your work too? We’d love to feature it. Submit your work through the link in our bio.”
+              The platform puts it plainly: “{BRAND.submitCta}”
             </p>
           </Reveal>
           <Reveal delay={0.22}>
             <p className="mt-4 max-w-[52ch] text-base leading-[1.8] text-white/60">
-              Every feature on this magazine began as someone’s kept notebook page, late-night draft, or quiet painting. The desk reads everything, credits the writer by name, and answers with care. Send the one you keep rereading.
+              Every feature in this magazine began as someone’s kept notebook page, late-night draft, or quiet painting. The desk reads everything, credits the writer by name, and answers with care. Send the one you keep rereading.
             </p>
           </Reveal>
           <Reveal delay={0.3}>
@@ -285,12 +319,17 @@ path: '/submit',
                         <input
                           type="file"
                           name="cover"
-                          accept="image/*"
+                          accept="image/jpeg,image/png,image/webp,image/avif,image/gif"
                           aria-label="Cover image — optional"
                           className="sr-only"
-                          onChange={(e) => setFileName(e.target.files?.[0]?.name ?? '')}
+                          onChange={onCoverChange}
                         />
                       </label>
+                      {fileError
+                        ? <FieldHint show>{fileError}</FieldHint>
+                        : fileName
+                          ? <p className="mt-2 font-mono text-[9px] uppercase tracking-[0.22em] text-gold/80">Cover attached — {fileName}</p>
+                          : null}
                     </div>
                   </div>
                 </div>
@@ -355,7 +394,7 @@ path: '/submit',
                 ['02', 'Credit is a rule', 'The writer is named on every feature, by name and handle. That is the magazine\'s first promise.'],
                 ['03', 'Transparency', 'If the presentation is designed with tools, the caption will say so. The writing stays yours.'],
                 ['04', 'A response', 'The desk reads everything. If the story belongs in the magazine, it becomes a feature.'],
-                ['05', 'Where to send it', BRAND.email + ' — or the submission form in the bio.'],
+                ['05', 'Where to send it', BRAND.email + ' — or this page’s own submission form, the desk’s way in.'],
               ].map(([n, t, d], i) => (
                 <Reveal key={n} delay={i * 0.08} as="li">
                   <div className="grid grid-cols-[44px_1fr] gap-4 border-b border-white/10 py-6">

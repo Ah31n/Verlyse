@@ -1,19 +1,25 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
-import { Link } from 'react-router-dom'
+import { Link, useSearchParams } from 'react-router-dom'
 import { motion } from 'motion/react'
 import { useSeo } from '../hooks/useSeo'
-import { getAuthor, ARTICLES, LEDGER, sortArticles, stampDate, isEditorsPick, folioNoOf, SORTS, type SortKey } from '../data/content'
+import { getAuthor, ARTICLES, LEDGER, sortArticles, stampDate, isEditorsPick, folioNoOf, articleSearchText, SORTS, type SortKey } from '../data/content'
 import SaveButton from '../components/ui/SaveButton'
 import { handleImgError } from '../lib/imgFallback'
 import { ImmersiveShell, BrassThread } from '../components/immersive'
 
-/** keyword match — the title, the writer, the department, and the feature's
-    own tags and excerpt: the archive answers to more than its headline. */
+const ROOM_PARAM = 'room'
+const QUERY_PARAM = 'q'
+const ORDER_PARAM = 'order'
+const SORT_KEYS = new Set<SortKey | 'registry'>(['registry', 'latest', 'most-read', 'most-appreciated', 'editors-picks'])
+
+/** keyword match — the title, the writer (name AND handle), the department,
+    secondary credits, tags, excerpt and description: the archive answers to
+    more than its headline, and a shared index keeps it identical to the
+    global search overlay. */
 function matchesQuery(id: string, q: string): boolean {
   if (!q) return true
   const a = ARTICLES.find((x) => x.id === id)!
-  const author = getAuthor(a.authorId)?.name ?? ''
-  return `${a.title} ${a.category} ${author} ${a.tags.join(' ')} ${a.excerpt}`.toLowerCase().includes(q)
+  return articleSearchText(a).includes(q)
 }
 
 /**
@@ -22,7 +28,7 @@ function matchesQuery(id: string, q: string): boolean {
  *
  * BACK  · wine hall with shelf depths (hairline shelf rows receding)
  * MID   · SEARCH THE ARCHIVE… + department rail (seven real rooms) + a
- *         quiet order rail (registry · latest · most read · most
+ *         quiet order rail (registry · latest · most discussed · most
  *         appreciated · editor's picks — honest rankings, each explained)
  * FRONT · the nineteen folios as shelf spines — each plate now carries its
  *         own cover strip, its date, its reading time and a save mark.
@@ -41,14 +47,37 @@ function Archive() {
     description: `The Verlyse Media archive — ${LEDGER.features} features, ${LEDGER.creators} credited creators, seven departments. Browse, search and sort the folios.`,
   })
 
-  const [query, setQuery] = useState('')
-  const [cat, setCat] = useState('All')
-  const [sort, setSort] = useState<SortKey | 'registry'>('registry')
+  /* the archive state lives in the URL — q, room, order — so a search or
+     room is shareable and survives a deep-link refresh, exactly like the
+     rest of the publication */
+  const [searchParams, setSearchParams] = useSearchParams()
+  const validCats = useMemo(() => ['All', ...new Set(ARTICLES.map((a) => a.category))], [])
+  const initialSort = (searchParams.get(ORDER_PARAM) ?? 'registry') as SortKey | 'registry'
+  const [query, setQuery] = useState(searchParams.get(QUERY_PARAM) ?? '')
+  const [cat, setCat] = useState(
+    validCats.includes(searchParams.get(ROOM_PARAM) ?? '') ? (searchParams.get(ROOM_PARAM) as string) : 'All',
+  )
+  const [sort, setSort] = useState<SortKey | 'registry'>(
+    SORT_KEYS.has(initialSort) ? initialSort : 'registry',
+  )
   const [selId, setSelId] = useState<string>(ARTICLES[0].id)
   const [busy, setBusy] = useState(false)
   const railRef = useRef<HTMLDivElement>(null)
 
-  const cats = useMemo(() => ['All', ...new Set(ARTICLES.map((a) => a.category))], [])
+  const cats = validCats
+
+  /* write the shelf state back to the URL (replace — typing a query must
+     not fill the browser history with one entry per keystroke) */
+  useEffect(() => {
+    const next = new URLSearchParams()
+    if (query.trim()) next.set(QUERY_PARAM, query.trim())
+    if (cat !== 'All') next.set(ROOM_PARAM, cat)
+    if (sort !== 'registry') next.set(ORDER_PARAM, sort)
+    const as = next.toString()
+    const cur = searchParams.toString()
+    if (as !== cur) setSearchParams(next, { replace: true })
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [query, cat, sort])
 
   /* the ordered shelf — sorting rearranges the row; the folio number stays
      the registry number, because that is how the archive itself files them */
@@ -188,8 +217,12 @@ function Archive() {
               aria-describedby="art-search-status"
               className="mt-2 w-full border border-gold/40 bg-transparent px-3 py-2 font-mono text-[10px] uppercase tracking-[0.18em] text-ivory outline-none placeholder:text-ivory/35 focus:border-gold"
             />
-            <p id="art-search-status" aria-live="polite" className="mt-1.5 h-4 font-mono text-[9px] uppercase tracking-[0.24em] text-white/45">
-              {busy ? 'Reading the index…' : query ? `${visibleIds.length} of ${LEDGER.features} folios found` : `${LEDGER.features} folios — title, writer, department, keyword`}
+            <p id="art-search-status" aria-live="polite" className="mt-1.5 min-h-4 font-mono text-[9px] uppercase tracking-[0.24em] text-white/45">
+              {busy
+                ? 'Reading the index…'
+                : (query.trim() || cat !== 'All' || sort !== 'registry')
+                  ? `${visibleIds.length} of ${LEDGER.features} folio${visibleIds.length === 1 ? '' : 's'} ${visibleIds.length === 1 ? 'matches' : 'match'}${cat !== 'All' ? ` in ${cat}` : ''}${sort === 'editors-picks' ? ' · desk picks' : sort !== 'registry' ? ` · ${SORTS.find((s) => s.key === sort)?.label ?? ''}` : ''}`
+                  : `${LEDGER.features} folios — title, writer name or handle, department, co-credit, keyword`}
             </p>
           </div>
         </div>
