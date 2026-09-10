@@ -76,7 +76,10 @@ export default function Categories() {
   }
 
   useEffect(() => {
-    hallRef.current?.focus()
+    // Move the accessible focus to the hall without scrolling the document:
+    // the hall starts below the masthead, and a bare focus() on load made the
+    // browser pull the page ~18px down so the focused box met the viewport.
+    hallRef.current?.focus({ preventScroll: true })
   }, [focusIdx])
 
   return (
