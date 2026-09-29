@@ -9,7 +9,7 @@
 
 Two passes were run:
 
-1. **Live crawl** of the deployed site — every route template, fetched and rendered, output compared against the content registry (`src/data/content.ts`).
+1. **Live crawl** of the deployed site — **all 52 routes fetched and read individually** (not sampled by template), output compared against the content registry (`src/data/content.ts`). Where a route returned a suspiciously thin body it was re-fetched with a cache-busting query string before being called a defect.
 2. **Source audit** of the checkout, plus the repo's own headless gates.
 
 **The caveat:** this sandbox has no outbound access to the Chrome/Chromium download CDNs, so no browser could be installed. Every Playwright/Puppeteer gate in this repo (`verify-flags`, `asset-audit`, `interaction-audit`, `full-matrix-audit`, the `audit/phase*` validators) **could not run**, and no pixel/layout/screenshot pass was possible. So:
@@ -25,19 +25,21 @@ A local build of the current source is running in the preview pane so you can cl
 
 ## 1 · Route inventory — what's actually deployed
 
-**52 addressable routes.** 50 ship a prerendered metadata shell; 2 do not.
+**All 52 addressable routes fetched and read individually.** 50 ship a prerendered metadata shell; 2 do not.
 
-| Group | Count | Status |
-|---|---|---|
-| `/` , `/about`, `/articles`, `/categories`, `/community`, `/contact`, `/submit`, `/ambassadors` | 8 | ✅ prerendered, crawled, correct |
-| `/article/:id` | 19 | ✅ prerendered — but see **D1** |
-| `/creator/:id` | 16 | ✅ prerendered, crawled |
-| `/categories/:slug` | 7 | ✅ prerendered — but see **D2** |
-| `/creators` | 1 | ⚠️ **in sitemap, no prerendered shell** (D5) |
-| `/room` | 1 | ⚠️ **no shell, no sitemap entry, no `<title>`** (D6) |
-| 404 fallback | — | ✅ `.htaccess` rewrite works; NotFound renders correctly |
+| Group | Count | Crawled | Status |
+|---|---|---|---|
+| `/` , `/about`, `/articles`, `/categories`, `/community`, `/contact`, `/submit`, `/ambassadors` | 8 | 8/8 | ✅ prerendered, correct |
+| `/article/:id` | 19 | 19/19 | ✅ all render — but see **D1** |
+| `/creator/:id` | 16 | 16/16 | ✅ all render — but see **D12**, **D13** |
+| `/categories/:slug` | 7 | 7/7 | ✅ prerendered — but see **D2**, **D11** |
+| `/creators` | 1 | 1/1 | ⚠️ **in sitemap, no prerendered shell** (D5) |
+| `/room` | 1 | 1/1 | ⚠️ **no shell, no sitemap entry, no `<title>`** (D6) |
+| 404 fallback | — | ✅ | `.htaccess` rewrite works; NotFound renders correctly |
 
-Content integrity is genuinely good: 19 folios / 16 contributor records / 7 wings reconcile across home, `/articles`, `/categories`, `/creators` and `/community`. **91 referenced assets, 0 missing.** No broken internal links found outside D2.
+Content integrity is genuinely good: 19 folios / 16 contributor records / 7 wings reconcile across home, `/articles`, `/categories`, `/creators` and `/community`. Every folio number, byline, handle, date, reading time and appreciation count matches the registry on every page it appears. **91 referenced assets, 0 missing.** No broken internal links outside D2.
+
+Per-route notes worth keeping: all 19 article pages carry the D1 label bug; the Poetry-variant articles (`forgive-me-mother`, `jaldi`, `failure`, `hope-becomes-mythology`, `if-hope-were-a-feather`) deliberately render no cover plate, which is consistent across all five; `mir-raza-ali` correctly degrades its appreciation count to "not tallied in the ledger" on the `verlyse-media` dossier rather than showing 0.
 
 ---
 
@@ -134,15 +136,66 @@ Result: a ~16px invisible full-width strip across the top of every page that int
 
 ---
 
-### D10 · `/article/3-13` returned an empty body twice — [NEEDS EYES]
+### ~~D10 · `/article/3-13` returned an empty body~~ — **RETRACTED, not a site defect**
 
-Two independent live fetches of `/article/3-13` returned **only the preloader markup** — no article body, no reading room, no footer. Every other article route returned full content. Against that:
+During the first pass `/article/3-13` returned only preloader markup on two attempts, and `/article/if-hope-were-a-feather` did the same on three. Both looked like client-side crashes.
 
-* SSR smoke renders the same route fine (`/article (horror) ✓ 55748 chars`).
-* The route's prerendered shell exists in `dist/article/3-13/index.html`.
-* It is the only article carrying a WebGL clock scene (`ArticleSignature.tsx:687` → `SceneClock`, plus the `three` chunk at 770 kB).
+They are not. Re-fetching each with a cache-busting query string (`?nocache=1`) returned the **full** article — body, reading room, signature scene, conversations, up-next rail. The empty responses were the crawler's own cached/early-render artifact, not the site. Both routes are healthy and are counted as passing in the inventory above.
 
-Most likely explanation: the 770 kB three.js chunk pushes this page past the crawler's render budget, and the content is simply late rather than absent. But it is also the exact signature of a client-side crash in a lazy chunk, and it happened on the single heaviest page on the site. **Open `/article/3-13` in a real browser with the console visible before dismissing this.** If it is just slow, the 770 kB `three` chunk on a mobile connection is its own problem worth solving.
+Recorded here rather than deleted because the first version of this report flagged it as a likely high-severity bug, and that call was wrong.
+
+---
+
+### D11 · "1 folios" — missing pluralisation on three category pages — [CONFIRMED, live]
+
+`/categories/stories`, `/categories/horror` and `/categories/lifestyle` all render the subtitle **"Stories — 1 folios · step forward"**.
+
+**Cause** — `src/pages/Categories.tsx:142` hardcodes the plural:
+
+```tsx
+`${active} — ${CATEGORIES.find((c) => c.name === active)?.count ?? ''} folios · step forward`
+```
+
+The wing headers on the very same page get it right ("1 folio"), and `Creators.tsx:322` already has the correct helper (`` `${n} folio${n === 1 ? '' : 's'}` ``). Only this one string was missed.
+
+---
+
+### D12 · Doubled quotation marks on 6 contributor dossiers — [CONFIRMED, live]
+
+`WriterProfile.tsx:141` wraps the writer's note in literal curly quotes:
+
+```tsx
+“{note ?? author.favoriteQuote}”
+```
+
+But **6 of the 14 notes in `content.ts` already open and close with their own curly quotes.** The result, live:
+
+* `/creator/kenza-imene` → `““The cats always reflect people’s unspoken personalities…””`
+* `/creator/abheesha-ghosh` → `“…repeating her words to her.” — Abheesha”`
+* `/creator/haiqa-nafees` → `“…helps the mind work better.” — Haiqa Nafees”`
+* `/creator/syeda-tasbeeha-noman` → `“…a tower and a garden.” — Syeda Tasbeeha Noman”`
+* plus `anshujit-singh` and `haieqa-wahab`
+
+Two flavours of wrong: a visible double `““ … ””`, and — worse for a publication whose whole premise is crediting writers properly — the attribution dash swallowed *inside* the outer quotation mark, so it reads as if the writer quoted their own name.
+
+*Fix:* strip leading/trailing `“ ”` from the note before wrapping, or drop the literal quotes and let the data own them.
+
+---
+
+### D13 · The "Stories beside theirs" rail is 0, 1, 2 or 3 cards in a 3-column grid — [CONFIRMED, live]
+
+`WriterProfile.tsx:193` renders the related rail as `grid-cols-1 sm:grid-cols-3`, filled from same-category articles only. Across the 16 dossiers the live counts are:
+
+| Cards | Dossiers |
+|---|---|
+| 3 | alina-javed, mochjixx, abheesha-ghosh, hadia-raza, syeda-tasbeeha-noman, kazi-fatimataz-zahra, verlyse-media |
+| 2 | adeena-irfan, craft-with-bro, kenza-imene, zuha-farhan |
+| 1 | shaza-fatima, munkashay-javed |
+| **0** | **haieqa-wahab, anshujit-singh, haiqa-nafees** |
+
+At 1 card the rail is a lone thumbnail with two thirds of the row empty. At 0 the section is hidden entirely (`others.length > 0`), which leaves three dossiers ending on the published-works block with no onward link except the back-to-wall control — the only dead ends in the site's navigation graph.
+
+Both are consequences of same-category-only matching in wings that hold 1 folio (Stories, Horror, Lifestyle). Widening the fallback to "same category, then newest elsewhere" fixes the empty and the thin cases at once.
 
 ---
 
@@ -158,14 +211,16 @@ Worth saying, because it's not common: focus traps, Escape handling and focus re
 |---|---|---|---|
 | 1 | **D1** — folio label broken on all 19 article pages | High (visible, production-only) | 1 line |
 | 2 | **D2** — 126 dead/invisible-focusable links across 7 category pages | High (a11y + SEO) | ~10 lines |
-| 3 | **D10** — verify `/article/3-13` in a browser | High *if* real | unknown |
+| 3 | **D12** — doubled quote marks on 6 dossiers, attribution inside the quote | Medium-High (credit is the brand promise) | ~3 lines |
 | 4 | **D4** — scroll lock on 3 dialogs + dead `.preloading` hook | Medium | ~15 lines |
 | 5 | **D3** — reduced-motion guard in `ArticleClosing` | Medium (a11y) | ~20 lines |
 | 6 | **D8** — static fallback for home ledger numbers | Medium | ~5 lines |
-| 7 | **D5 / D6 / D7** — prerender `/creators`, register `/room`, fix canonicals | Low–Medium | ~15 lines |
-| 8 | **D9** — `pointer-events-none` on the progress strip | Low | 1 word |
+| 7 | **D13** — related rail empty on 3 dossiers, 1-of-3 on 2 more | Medium | ~8 lines |
+| 8 | **D5 / D6 / D7** — prerender `/creators`, register `/room`, fix canonicals | Low–Medium | ~15 lines |
+| 9 | **D11** — "1 folios" on 3 category pages | Low | 1 line |
+| 10 | **D9** — `pointer-events-none` on the progress strip | Low | 1 word |
 
-D1, D2, D7, D8 and D9 are each a handful of lines and could go out as one commit.
+D1, D7, D8, D9 and D11 are one-to-five-line changes and could go out as a single commit.
 
 ---
 
