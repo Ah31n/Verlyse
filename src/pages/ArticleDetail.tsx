@@ -21,6 +21,7 @@ const StoryEnding3D = lazy(() => import('../components/spatial/StoryEnding3D'))
 import SaveButton from '../components/ui/SaveButton'
 import { useReadingMode } from '../components/ui/ReadingMode'
 import { ImmersiveShell, BrassThread, ReadingMeasure } from '../components/immersive'
+import { progress } from '../lib/stringTune/attrs'
 
 /* ------------------------------------------------------------------ */
 /* Every feature carries its own temperament — motion and finish      */
@@ -534,8 +535,20 @@ export default function ArticleDetail() {
             </div>
           </Reveal>
 
-          {/* Body — prose or verse, set with care, moved by the feature's vibe */}
-          <article>
+          {/* Body — prose or verse, set with care, moved by the feature's vibe.
+              The <article> carries the scroll-progress binding; --progress
+              inherits to the sticky measure below, which fills as the reader
+              moves through the feature. The body text itself is never moved
+              by it — the reading column stays still by rule. */}
+          <article {...progress('bottom', 'top')}>
+            {/* the reading measure — a brass hairline, part of the page
+                furniture rather than a browser chrome bar */}
+            <div
+              aria-hidden="true"
+              className="pointer-events-none sticky top-[72px] z-[3] -mx-1 mb-8 h-px bg-gold/15"
+            >
+              <div className="st-measure h-px w-full origin-left bg-gold/70" />
+            </div>
             {article.body.map((p, i) => (
               <motion.div
                 key={i}

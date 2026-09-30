@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { Link, useSearchParams } from 'react-router-dom'
+import { spotlitGlide } from '../lib/stringTune/attrs'
 import { motion } from 'motion/react'
 import { useSeo } from '../hooks/useSeo'
 import { getAuthor, ARTICLES, LEDGER, sortArticles, stampDate, isEditorsPick, folioNoOf, articleSearchText, SORTS, type SortKey } from '../data/content'
@@ -342,7 +343,10 @@ function Archive() {
                     >
                       {/* the cover strip — the feature's own plate, cropped wide
                           so the shelf reads as filed photographs, not text rows */}
-                      <span className="plate-thumb block w-full">
+                      <span
+                        className="plate-thumb st-spotlit block w-full"
+                        {...spotlitGlide('restrained')}
+                      >
                         <img
                           src={a.thumbnail ?? a.cover}
                           alt=""

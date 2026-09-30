@@ -17,6 +17,7 @@ import { ARTICLES, BRAND, CATEGORIES, LEDGER, folioNoOf, getAuthor } from '../da
 import { handleImgError } from '../lib/imgFallback'
 import { useWebGLSupport } from '../lib/three/useWebGLSupport'
 import { introSeen, onIntroResolved } from '../lib/intro'
+import { drift } from '../lib/stringTune/attrs'
 // The spatial engine is loaded on demand so its heavy chunk (three) never
 // ships with the initial publication shell.
 const SpatialArchive = lazy(() => import('../components/spatial/SpatialArchive'))
@@ -257,7 +258,8 @@ function Cover({ selectedId, state }: { selectedId: string | null; state: Spatia
                 height={720}
                 decoding="async"
                 onError={(e) => handleImgError(e, feature.title, folioNoOf(feature.id))}
-                className="h-full w-full object-cover"
+                className="h-full w-full scale-[1.06] object-cover"
+                {...drift('restrained')}
               />
               <span aria-hidden="true" className="absolute inset-0 bg-[linear-gradient(180deg,transparent_55%,rgba(28,5,9,0.55))] " />
               <span aria-hidden="true" className="absolute bottom-2 left-3 font-mono text-[8px] uppercase tracking-[0.3em] text-ivory/85">

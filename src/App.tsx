@@ -4,6 +4,7 @@ import type { ReactNode } from 'react'
 import { AnimatePresence, motion, useReducedMotion } from 'motion/react'
 import Layout from './components/layout/Layout'
 import RouteErrorBoundary from './components/layout/RouteErrorBoundary'
+import StringTuneProvider from './lib/stringTune/StringTuneProvider'
 import ReadingRoom from './components/reading/ReadingRoom'
 import { ARTICLES, LEDGER } from './data/content'
 import { ROUTE_PATTERNS as R } from './data/routes'
@@ -123,6 +124,9 @@ export default function App() {
   return (
     <>
       <ScrollToTop />
+      {/* Scroll-linked DOM motion for the whole publication. Client-only,
+          booted on idle after first paint, re-scanned per route. */}
+      <StringTuneProvider />
       {isRoom ? (
         <RouteErrorBoundary resetKey={location.pathname}>
           <Suspense fallback={<div className="min-h-screen bg-charcoal" aria-hidden="true" />}>

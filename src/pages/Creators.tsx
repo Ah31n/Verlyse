@@ -30,6 +30,7 @@ function monogram(name: string) {
  * Keyboard: names are real buttons; ← → move · Enter selects · Esc returns.
  */
 import { CrashZoom , MaskReveal, Magnetic, Tilt3D, Slate } from '../components/cinematic'
+import { spotlight } from '../lib/stringTune/attrs'
 
 export default function Creators() {
   useSeo({
@@ -256,7 +257,10 @@ export default function Creators() {
 
                   {/* portrait / monogram plate */}
                   <Tilt3D>
-                  <div className="img-frame relative flex aspect-[3/4] w-full max-w-[190px] items-center justify-center overflow-hidden bg-[#F2EADA] p-3">
+                  <div
+                    className="img-frame st-spotlit relative flex aspect-[3/4] w-full max-w-[190px] items-center justify-center overflow-hidden bg-[#F2EADA] p-3"
+                    {...spotlight()}
+                  >
                     {selected.portrait || selected.profilePhoto ? (
                       <img
                         src={selected.profilePhoto ?? selected.portrait ?? authorPhoto(selected.id)}

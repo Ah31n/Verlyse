@@ -556,3 +556,105 @@
       transition: none !important;
     }
   }
+
+/* ==================================================================== */
+/* THE STRINGTUNE CONTRACT                                              */
+/*                                                                      */
+/* StringTune publishes numeric custom properties onto the elements it  */
+/* binds; the publication decides what they MEAN here, in CSS. Keeping  */
+/* the visual result in the stylesheet is what makes the static state   */
+/* the real design rather than a fallback: when the runtime never runs  */
+/* (reduced motion, no JS, failed chunk) these properties keep their    */
+/* initial values and every rule below resolves to the composed,        */
+/* at-rest layout.                                                      */
+/* ==================================================================== */
+
+/* Registered so they can be interpolated and so they inherit to the
+   children that actually paint. Without @property a custom property is
+   an unanimatable string. */
+@property --progress {
+  syntax: '<number>';
+  inherits: true;
+  initial-value: 1;
+}
+@property --spotlight-angle {
+  syntax: '<number>';
+  inherits: true;
+  initial-value: 0;
+}
+@property --spotlight-distance {
+  syntax: '<number>';
+  inherits: true;
+  initial-value: 1;
+}
+
+@layer components {
+  /* ---- the reading measure: a hairline that fills with progress ----
+     Used on the article rail. --progress is 0 at the top of the feature
+     and 1 at its end; with no runtime it reads as a complete rule, which
+     is the correct resting state for a page you have finished. */
+  .st-measure {
+    transform: scaleX(var(--progress, 1));
+    transform-origin: left center;
+  }
+
+  /* ---- an editorial plate entering ----
+     Travel is small and the opacity floor is high: the plate is legible
+     before it has finished arriving, never a blank rectangle. */
+  .st-enter {
+    opacity: calc(0.35 + (0.65 * var(--progress, 1)));
+    transform: translate3d(0, calc((1 - var(--progress, 1)) * 1.25rem), 0);
+  }
+
+  /* ---- a plate that catches the cursor's light ----
+     Desktop only: the spotlight module is not registered on touch, so
+     --spotlight-distance stays at 1 and the overlay stays invisible. */
+  .st-spotlit {
+    position: relative;
+    isolation: isolate;
+  }
+  .st-spotlit::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    z-index: 2;
+    pointer-events: none;
+    opacity: calc((1 - var(--spotlight-distance, 1)) * 0.5);
+    background: linear-gradient(
+      calc(var(--spotlight-angle, 0) * 1deg),
+      rgba(232, 217, 168, 0.22),
+      transparent 62%
+    );
+    transition: opacity 240ms cubic-bezier(0.22, 1, 0.36, 1);
+  }
+
+  /* ---- split headings ----
+     StringTune marks the parent `.-splitted` and wraps each unit. The
+     parent keeps its aria-label, so the accessible name is unchanged and
+     the split is purely visual. */
+  .st-heading.-splitted .-s-word,
+  .st-heading.-splitted .-s-line {
+    display: inline-block;
+    will-change: transform, opacity;
+  }
+  .st-heading.-splitted .-s-word {
+    opacity: calc(0.15 + 0.85 * var(--progress, 1));
+    transform: translate3d(0, calc((1 - var(--progress, 1)) * 0.5em), 0);
+    transition-delay: calc(var(--word-index, 0) * 28ms);
+  }
+
+  /* Reduced motion and no-pointer devices get the composition at rest. */
+  @media (prefers-reduced-motion: reduce) {
+    .st-measure { transform: none; }
+    .st-enter,
+    .st-heading.-splitted .-s-word {
+      opacity: 1;
+      transform: none;
+      transition-delay: 0ms;
+    }
+    .st-spotlit::after { opacity: 0; }
+  }
+  @media (hover: none), (max-width: 1023px) {
+    .st-spotlit::after { opacity: 0; }
+  }
+}
