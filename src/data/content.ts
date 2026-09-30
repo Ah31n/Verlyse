@@ -1320,7 +1320,9 @@ export const COMMUNITY_STATS: { value: string; label: string; note: string }[] =
   { value: String(LEDGER.features), label: 'Features presented', note: 'Every post on the feed — from the founder’s call for women’s rights to the Mir Raza Ali memorial.' },
   { value: LEDGER.appreciations.toLocaleString('en-US'), label: 'Appreciations', note: 'Total likes across the feed — each of them an answer to a writer.' },
   { value: String(LEDGER.conversations), label: 'Conversations', note: 'Conversations beneath the features — all of them read.' },
-  { value: String(LEDGER.creators), label: 'Creators credited', note: 'Fourteen named writers plus the masthead’s own dispatch — every feature credited.' },
+  /* The count is derived, so the sentence describing it must be too — a
+     spelled-out "Fourteen" would quietly go wrong the day a writer is added. */
+  { value: String(LEDGER.creators), label: 'Creators credited', note: `${LEDGER.humanCreators} named writers plus the masthead’s own dispatch — every feature credited.` },
 ]
 
 export const COMMUNITY_VOICES: Voice[] = [
