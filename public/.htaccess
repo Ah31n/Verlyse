@@ -1,13 +1,26 @@
 # Verlyse Media — InfinityFree (Apache/LiteSpeed) static hosting rules.
-# Every real route ships a prerendered directory-index shell; the rewrite
-# below is the safety net for client-side routes and query states so a hard
-# refresh / deep link never hits the host's default 404 page.
+#
+# This host is the CANONICAL deployment: robots.txt, sitemap.xml and every
+# <link rel="canonical"> point here. It therefore has to carry the same
+# transport and header protection as the Vercel mirror — vercel.json is never
+# read by this host, so the two files must be kept in step by hand.
+# Any change to the CSP or the header set below must be mirrored in vercel.json.
 
 DirectoryIndex index.html
 AddDefaultCharset UTF-8
 
 <IfModule mod_rewrite.c>
   RewriteEngine On
+
+  # ---- Transport ---------------------------------------------------------
+  # Force HTTPS before anything else. The site collects submissions, contact
+  # messages and email addresses; none of that may travel in the clear.
+  # X-Forwarded-Proto is checked too because the host terminates TLS upstream.
+  RewriteCond %{HTTPS} !=on
+  RewriteCond %{HTTP:X-Forwarded-Proto} !=https
+  RewriteRule ^ https://%{HTTP_HOST}%{REQUEST_URI} [R=301,L,NE]
+
+  # ---- Routing -----------------------------------------------------------
   # Existing files and directories (including prerendered shells) pass through.
   RewriteCond %{REQUEST_FILENAME} -f [OR]
   RewriteCond %{REQUEST_FILENAME} -d
@@ -20,8 +33,21 @@ AddDefaultCharset UTF-8
   ErrorDocument 404 /index.html
 </IfModule>
 
-# Hashed build assets are immutable; HTML shells must always revalidate.
 <IfModule mod_headers.c>
+  # ---- Security headers --------------------------------------------------
+  # Mirrors vercel.json. `always` is required so these are emitted on error
+  # responses (404/500) as well as on 200s.
+  Header always set X-Content-Type-Options "nosniff"
+  Header always set X-Frame-Options "SAMEORIGIN"
+  Header always set Referrer-Policy "strict-origin-when-cross-origin"
+  Header always set Strict-Transport-Security "max-age=31536000; includeSubDomains"
+  Header always set Permissions-Policy "geolocation=(), camera=(), microphone=(), payment=(), usb=(), bluetooth=(), magnetometer=(), gyroscope=(), accelerometer=(), interest-cohort=()"
+  # form-action allows formsubmit.co so that the no-JS <form action> fallback
+  # on /submit and /contact keeps working; the JS path uses connect-src.
+  Header always set Content-Security-Policy "default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self'; connect-src 'self' https://verlyse-react.vercel.app https://formsubmit.co; frame-ancestors 'self'; base-uri 'self'; form-action 'self' https://formsubmit.co; object-src 'none'; upgrade-insecure-requests"
+
+  # ---- Caching -----------------------------------------------------------
+  # Hashed build assets are immutable; HTML shells must always revalidate.
   <FilesMatch "\.(js|css|woff2|woff|webp|avif|png|jpe?g|gif|svg|ico)$">
     Header set Cache-Control "public, max-age=31536000, immutable"
   </FilesMatch>

@@ -3,6 +3,7 @@ import { Link, Routes, Route, useLocation } from 'react-router-dom'
 import type { ReactNode } from 'react'
 import { AnimatePresence, motion, useReducedMotion } from 'motion/react'
 import Layout from './components/layout/Layout'
+import RouteErrorBoundary from './components/layout/RouteErrorBoundary'
 import ReadingRoom from './components/reading/ReadingRoom'
 import { ARTICLES, LEDGER } from './data/content'
 
@@ -116,13 +117,16 @@ export default function App() {
     <>
       <ScrollToTop />
       {isRoom ? (
-        <Suspense fallback={<div className="min-h-screen bg-charcoal" aria-hidden="true" />}>
-          <Routes location={location}>
-            <Route path="/room" element={<RoomPage />} />
-          </Routes>
-        </Suspense>
+        <RouteErrorBoundary resetKey={location.pathname}>
+          <Suspense fallback={<div className="min-h-screen bg-charcoal" aria-hidden="true" />}>
+            <Routes location={location}>
+              <Route path="/room" element={<RoomPage />} />
+            </Routes>
+          </Suspense>
+        </RouteErrorBoundary>
       ) : (
       <Layout>
+      <RouteErrorBoundary resetKey={location.pathname}>
       <Suspense fallback={<div className="min-h-[80vh] bg-wine-deep" aria-hidden="true" />}>
       <AnimatePresence mode="wait">
         <Routes location={location} key={location.pathname}>
@@ -142,6 +146,7 @@ export default function App() {
         </Routes>
       </AnimatePresence>
       </Suspense>
+      </RouteErrorBoundary>
       </Layout>
       )}
     </>

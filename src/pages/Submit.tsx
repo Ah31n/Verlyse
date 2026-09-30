@@ -224,7 +224,7 @@ path: '/submit',
                 )}
                 {viaBackend && fileName && (
                   <p className="mt-4 max-w-[44ch] text-sm leading-[1.8] text-white/60">
-                    The cover image ({fileName}) is noted with the submission — the desk will ask for the file itself if the piece is selected.
+                    The cover image ({fileName}) is noted by name only — the file itself did not travel with this form. Reply to the desk’s email with it attached, or send it to {BRAND.email} now.
                   </p>
                 )}
                 <button type="button" onClick={resetForm} className="btn btn-ghost mt-10">
@@ -311,7 +311,7 @@ path: '/submit',
                       <span className="field-label">Cover / supporting image <span className="text-white/40">— optional</span></span>
                       <label className="mt-1 flex cursor-pointer items-center justify-between gap-4 border border-dashed border-gold/30 px-5 py-4 transition-colors duration-500 hover:border-gold/60">
                         <span className="min-w-0 truncate font-serif text-base italic text-white/70">
-                          {fileName || 'Choose a file — a cover plate, a photograph, a scan'}
+                          {fileName || 'Name your cover — a plate, a photograph, a scan'}
                         </span>
                         <span className="shrink-0 border border-gold/50 px-4 py-2 font-mono text-[9px] uppercase tracking-[0.28em] text-gold">
                           Choose
@@ -328,8 +328,14 @@ path: '/submit',
                       {fileError
                         ? <FieldHint show>{fileError}</FieldHint>
                         : fileName
-                          ? <p className="mt-2 font-mono text-[9px] uppercase tracking-[0.22em] text-gold/80">Cover attached — {fileName}</p>
+                          ? <p className="mt-2 font-mono text-[9px] uppercase tracking-[0.22em] text-gold/80">Cover noted — {fileName}</p>
                           : null}
+                      {/* The desk must never imply it is holding a file it does
+                          not have: this form records the cover's name, and the
+                          image itself arrives by email. */}
+                      <p className="mt-2 max-w-[44ch] text-xs leading-[1.7] text-white/50">
+                        The image file isn’t sent with this form — only its name. The desk will reply to your email address and ask you to attach it there.
+                      </p>
                     </div>
                   </div>
                 </div>
