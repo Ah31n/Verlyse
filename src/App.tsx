@@ -6,6 +6,7 @@ import Layout from './components/layout/Layout'
 import RouteErrorBoundary from './components/layout/RouteErrorBoundary'
 import ReadingRoom from './components/reading/ReadingRoom'
 import { ARTICLES, LEDGER } from './data/content'
+import { ROUTE_PATTERNS as R } from './data/routes'
 
 /* Route-level code splitting — each page loads in its own chunk, so the
    first paint ships only the cover, the chrome, and the shared editorial
@@ -120,7 +121,7 @@ export default function App() {
         <RouteErrorBoundary resetKey={location.pathname}>
           <Suspense fallback={<div className="min-h-screen bg-charcoal" aria-hidden="true" />}>
             <Routes location={location}>
-              <Route path="/room" element={<RoomPage />} />
+              <Route path={R.room} element={<RoomPage />} />
             </Routes>
           </Suspense>
         </RouteErrorBoundary>
@@ -130,19 +131,19 @@ export default function App() {
       <Suspense fallback={<div className="min-h-[80vh] bg-wine-deep" aria-hidden="true" />}>
       <AnimatePresence mode="wait">
         <Routes location={location} key={location.pathname}>
-          <Route path="/" element={<PageTransition label={threshold}><Home /></PageTransition>} />
-          <Route path="/about" element={<PageTransition label={threshold}><About /></PageTransition>} />
-          <Route path="/articles" element={<PageTransition label={threshold}><Articles /></PageTransition>} />
-          <Route path="/article/:id" element={<PageTransition label={threshold}><ReadingRoom><ArticleDetail /></ReadingRoom></PageTransition>} />
-          <Route path="/categories" element={<PageTransition label={threshold}><Categories /></PageTransition>} />
-          <Route path="/categories/:slug" element={<PageTransition label={threshold}><Categories /></PageTransition>} />
-          <Route path="/community" element={<PageTransition label={threshold}><Community /></PageTransition>} />
-          <Route path="/submit" element={<PageTransition label={threshold}><Submit /></PageTransition>} />
-          <Route path="/ambassadors" element={<PageTransition label={threshold}><Ambassadors /></PageTransition>} />
-          <Route path="/creators" element={<PageTransition label={threshold}><Creators /></PageTransition>} />
-          <Route path="/contact" element={<PageTransition label={threshold}><Contact /></PageTransition>} />
-          <Route path="/creator/:authorId" element={<PageTransition label={threshold}><WriterProfilePage /></PageTransition>} />
-          <Route path="*" element={<PageTransition label={threshold}><NotFound /></PageTransition>} />
+          <Route path={R.home} element={<PageTransition label={threshold}><Home /></PageTransition>} />
+          <Route path={R.about} element={<PageTransition label={threshold}><About /></PageTransition>} />
+          <Route path={R.articles} element={<PageTransition label={threshold}><Articles /></PageTransition>} />
+          <Route path={R.article} element={<PageTransition label={threshold}><ReadingRoom><ArticleDetail /></ReadingRoom></PageTransition>} />
+          <Route path={R.categories} element={<PageTransition label={threshold}><Categories /></PageTransition>} />
+          <Route path={R.category} element={<PageTransition label={threshold}><Categories /></PageTransition>} />
+          <Route path={R.community} element={<PageTransition label={threshold}><Community /></PageTransition>} />
+          <Route path={R.submit} element={<PageTransition label={threshold}><Submit /></PageTransition>} />
+          <Route path={R.ambassadors} element={<PageTransition label={threshold}><Ambassadors /></PageTransition>} />
+          <Route path={R.creators} element={<PageTransition label={threshold}><Creators /></PageTransition>} />
+          <Route path={R.contact} element={<PageTransition label={threshold}><Contact /></PageTransition>} />
+          <Route path={R.creator} element={<PageTransition label={threshold}><WriterProfilePage /></PageTransition>} />
+          <Route path={R.notFound} element={<PageTransition label={threshold}><NotFound /></PageTransition>} />
         </Routes>
       </AnimatePresence>
       </Suspense>

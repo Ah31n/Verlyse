@@ -1194,16 +1194,26 @@ export const ARTICLES: Article[] = [
 
 /* ------------------------------------------------------------------ */
 /* CATEGORIES — from the captions and hashtags                          */
+/*                                                                      */
+/* The seven wings are editorial facts; their counts are not. A count   */
+/* typed by hand is a number that can disagree with the shelf, so each  */
+/* wing derives its own from ARTICLES. Add a folio and the wing, the    */
+/* ledger and the category page all move together.                      */
 /* ------------------------------------------------------------------ */
-export const CATEGORIES: Category[] = [
-  { slug: 'stories', name: 'Stories', blurb: 'Stories told in the writer’s own voice — from ballrooms to 3:13 in the morning.', count: 1, accent: '#C9A85C', motif: '❦' },
-  { slug: 'poetry', name: 'Poetry', blurb: 'Poems and prose poems — hope, grief, forgiveness, jaldi, and the fragile line between love and idealization.', count: 7, accent: '#9FA9BC', motif: '✧' },
-  { slug: 'essays', name: 'Essays', blurb: 'First arguments with the world — the arts, the humanities, and the quiet cost of technology.', count: 2, accent: '#B8785A', motif: '¶' },
-  { slug: 'art', name: 'Art', blurb: 'Paintings, calligraphy and illustration — creativity that needs no AI to be beautiful.', count: 3, accent: '#7E9E8B', motif: '◈' },
-  { slug: 'social-issues', name: 'Social Issues', blurb: 'Thought-provoking pieces on the topics that matter — child protection, women’s rights, human rights, and dignity.', count: 4, accent: '#C06A7D', motif: '✱' },
-  { slug: 'lifestyle', name: 'Lifestyle', blurb: 'The everyday, made shareable — a student’s 10-minute Khageena.', count: 1, accent: '#C49A6C', motif: '◍' },
-  { slug: 'horror', name: 'Horror', blurb: 'Psychological, modern, and told from inside a ringing phone.', count: 1, accent: '#6E4153', motif: '✕' },
+const _CATEGORY_DEFS: Omit<Category, 'count'>[] = [
+  { slug: 'stories', name: 'Stories', blurb: 'Stories told in the writer’s own voice — from ballrooms to 3:13 in the morning.', accent: '#C9A85C', motif: '❦' },
+  { slug: 'poetry', name: 'Poetry', blurb: 'Poems and prose poems — hope, grief, forgiveness, jaldi, and the fragile line between love and idealization.', accent: '#9FA9BC', motif: '✧' },
+  { slug: 'essays', name: 'Essays', blurb: 'First arguments with the world — the arts, the humanities, and the quiet cost of technology.', accent: '#B8785A', motif: '¶' },
+  { slug: 'art', name: 'Art', blurb: 'Paintings, calligraphy and illustration — creativity that needs no AI to be beautiful.', accent: '#7E9E8B', motif: '◈' },
+  { slug: 'social-issues', name: 'Social Issues', blurb: 'Thought-provoking pieces on the topics that matter — child protection, women’s rights, human rights, and dignity.', accent: '#C06A7D', motif: '✱' },
+  { slug: 'lifestyle', name: 'Lifestyle', blurb: 'The everyday, made shareable — a student’s 10-minute Khageena.', accent: '#C49A6C', motif: '◍' },
+  { slug: 'horror', name: 'Horror', blurb: 'Psychological, modern, and told from inside a ringing phone.', accent: '#6E4153', motif: '✕' },
 ]
+
+export const CATEGORIES: Category[] = _CATEGORY_DEFS.map((wing) => ({
+  ...wing,
+  count: ARTICLES.filter((a) => a.category === wing.name).length,
+}))
 
 /* ------------------------------------------------------------------ */
 /* THE LEDGER — every published total on the site, derived from the    */
@@ -1442,6 +1452,31 @@ export function authorPhoto(id: string): string {
 
 export function getAuthor(id: string): Author | undefined {
   return AUTHORS.find((a) => a.id === id)
+}
+
+/**
+ * The contributor's own role, for titles, descriptions and structured data.
+ *
+ * The archive credits poets, painters, calligraphers, essayists, an artist,
+ * two editors and the platform itself. Calling all of them "Writer" — as the
+ * metadata previously did on all sixteen dossiers — is not a styling choice,
+ * it is a miscrediting. The role is real data; this reads it.
+ *
+ * Compound roles ("Writer · Associate Editor", "Founder · prose poet") are
+ * reduced to their first segment for a page title, where brevity matters;
+ * every other surface keeps the full role string.
+ */
+export function primaryRole(author: Author): string {
+  const first = author.role.split('·')[0]?.trim()
+  return first && first.length ? first : author.role.trim()
+}
+
+/** Role phrased to sit inside a sentence: "— a poet on Verlyse Media." */
+export function roleInSentence(author: Author): string {
+  const role = primaryRole(author)
+  // "The platform" is a thing, not a person; it reads wrong with an article.
+  if (/^the\b/i.test(role)) return role.toLowerCase()
+  return `${/^[aeiou]/i.test(role) ? 'an' : 'a'} ${role.toLowerCase()}`
 }
 /** Folios where the author is the primary byline. */
 export function worksBy(authorId: string): Article[] {

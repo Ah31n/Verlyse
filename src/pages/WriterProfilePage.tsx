@@ -2,7 +2,7 @@ import { Link, useParams } from 'react-router-dom'
 import { useSeo } from '../hooks/useSeo'
 import DossierRoom from '../components/dossier/DossierRoom'
 import WriterProfile from '../components/ui/WriterProfile'
-import { getAuthor } from '../data/content'
+import { getAuthor, primaryRole, roleInSentence } from '../data/content'
 
 /**
  * THE DOSSIER — /creator/:id
@@ -15,10 +15,13 @@ export default function WriterProfilePage() {
   const author = authorId ? getAuthor(authorId) : undefined
 
   useSeo({
-    title: author ? `${author.name} — Writer` : 'Writer not found',
+    /* The role comes from the contributor record. This page previously
+       announced every one of the sixteen dossiers as a "Writer", including
+       a painter, a calligrapher, an artist and the platform itself. */
+    title: author ? `${author.name} — ${primaryRole(author)}` : 'Contributor not found',
     description: author
-      ? `${author.name} (${author.handle}) — a writer on Verlyse Media. ${author.favoriteQuote ?? author.bio}`
-      : 'This writer has not been featured yet.',
+      ? `${author.name} (${author.handle}) — ${roleInSentence(author)} on Verlyse Media. ${author.favoriteQuote ?? author.bio}`
+      : 'This contributor has not been featured yet.',
     path: author ? `/creator/${author.id}` : '/',
   })
 
