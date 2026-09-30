@@ -1284,10 +1284,14 @@ export function isEditorsPick(id: string): boolean {
 /** A single ordered view of the feed for a sort key — honest rankings, all
     four are computed from the registry's recorded archive data (dates, the
     feed's like counts, its comment counts) or from the desk's own picks. */
-export type SortKey = 'latest' | 'most-read' | 'most-appreciated' | 'editors-picks'
+/* 'most-discussed' was named 'most-read' internally while the UI
+   correctly said "Most discussed". The desk keeps no read analytics, so
+   the code no longer claims any either. Articles.tsx still accepts the old
+   value in ?order= so existing shared links keep working. */
+export type SortKey = 'latest' | 'most-discussed' | 'most-appreciated' | 'editors-picks'
 export const SORTS: { key: SortKey; label: string; note: string }[] = [
   { key: 'latest', label: 'Latest', note: 'Newest folio first — the registry by date of publication.' },
-  { key: 'most-read', label: 'Most discussed', note: 'Ranked by the conversations each feature drew beneath it — the desk keeps no read-count analytics.' },
+  { key: 'most-discussed', label: 'Most discussed', note: 'Ranked by the conversations each feature drew beneath it — the desk keeps no read-count analytics.' },
   { key: 'most-appreciated', label: 'Most appreciated', note: 'Ranked by the appreciations the feed recorded.' },
   { key: 'editors-picks', label: 'Editor’s picks', note: 'Five folios the desk keeps recommending — chosen, not counted.' },
 ]
@@ -1296,7 +1300,7 @@ export function sortArticles(key: SortKey): Article[] {
   switch (key) {
     case 'latest':
       return list.sort((a, b) => b.date.localeCompare(a.date) || b.likes - a.likes)
-    case 'most-read':
+    case 'most-discussed':
       return list.sort((a, b) => b.comments - a.comments || b.likes - a.likes)
     case 'most-appreciated':
       return list.sort((a, b) => b.likes - a.likes || b.comments - a.comments)
@@ -1439,6 +1443,21 @@ export function searchArticles(query: string): Article[] {
   return ARTICLES.filter((a) => articleSearchText(a).includes(q))
 }
 
+/**
+ * Alt text for a feature's cover plate.
+ *
+ * On an Art folio the plate IS the published work — a painting, a
+ * calligraphy set, an illustration — so it must be described. Elsewhere the
+ * plate is a designed title card sitting directly beside the same title and
+ * byline in text, so an empty alt is correct and avoids making a screen
+ * reader hear the headline twice.
+ */
+export function coverAlt(a: Article): string {
+  if (a.category !== 'Art') return ''
+  const author = getAuthor(a.authorId)
+  return author ? `“${a.title}” — ${a.category.toLowerCase()} by ${author.name}` : `“${a.title}”`
+}
+
 export function getArticle(id: string): Article | undefined {
   return ARTICLES.find((a) => a.id === id)
 }
@@ -1468,7 +1487,12 @@ export function getAuthor(id: string): Author | undefined {
  */
 export function primaryRole(author: Author): string {
   const first = author.role.split('·')[0]?.trim()
-  return first && first.length ? first : author.role.trim()
+  if (first && first.length) return first
+  const whole = author.role.trim()
+  /* The generic fallback is "Contributor". The archive holds poets,
+     painters, a calligrapher, an artist and the platform itself; none of
+     them is a "Writer" by default. */
+  return whole.length ? whole : 'Contributor'
 }
 
 /** Role phrased to sit inside a sentence: "— a poet on Verlyse Media." */

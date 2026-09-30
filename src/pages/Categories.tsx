@@ -18,6 +18,10 @@ import { ImmersiveShell, BrassThread } from '../components/immersive'
  * Keyboard: doors are real buttons (Tab / Enter / Space); ← → move between
  * doors · Esc returns to REST (all seven doors).
  */
+/** "1 folio" / "7 folios" — the wing headers already get this right; the
+    selected-wing line used to read "1 folios". */
+const folioWord = (n: number) => `${n} folio${n === 1 ? '' : 's'}`
+
 export default function Categories() {
   const { slug } = useParams<{ slug?: string }>()
   const navigate = useNavigate()
@@ -137,11 +141,14 @@ export default function Categories() {
           <p className="mt-4 font-mono text-[10px] uppercase tracking-[0.34em] text-gold/85">
             The wings — seven departments of Verlyse Media
           </p>
-          <h2 aria-live="polite" className="mt-3 font-mono text-[10px] uppercase tracking-[0.3em] text-white/60">
+          {/* A live status line, not a section heading. As an <h2> it put a
+              changing sentence into the document outline between the page
+              title and the real section headings. */}
+          <p role="status" aria-live="polite" className="mt-3 font-mono text-[10px] uppercase tracking-[0.3em] text-white/60">
             {active
-              ? `${active} — ${CATEGORIES.find((c) => c.name === active)?.count ?? ''} folios · step forward`
+              ? `${active} — ${folioWord(CATEGORIES.find((c) => c.name === active)?.count ?? 0)} · step forward`
               : `Seven doors — ${LEDGER.features} folios · choose your department`}
-          </h2>
+          </p>
         </div>
 
         {/* ——— MID · the seven wing-doors — the active wing becomes a solid
@@ -263,10 +270,21 @@ export default function Categories() {
                     const folio = String(i + 1).padStart(2, '0')
                     const ghosted = !!active && !isActive
                     return (
-                      <li key={a.id} className={`transition-opacity duration-700 ${ghosted ? 'opacity-10' : 'opacity-100'}`}>
+                      /* A ghosted row belongs to a wing that is not the
+                         selected one: it is dimmed to 10% and is effectively
+                         invisible. It previously kept a real tab stop and an
+                         aria-label while pointing at '#', so a keyboard or
+                         screen-reader user met eighteen unreadable links that
+                         went nowhere. The href stays correct — every folio
+                         link resolves — but the row is inert while dimmed. */
+                      <li
+                        key={a.id}
+                        className={`transition-opacity duration-700 ${ghosted ? 'pointer-events-none opacity-10' : 'opacity-100'}`}
+                        aria-hidden={ghosted || undefined}
+                      >
                         <Link
-                          to={ghosted ? '#' : `/article/${a.id}`}
-                          onClick={(e) => { if (ghosted) e.preventDefault() }}
+                          to={`/article/${a.id}`}
+                          tabIndex={ghosted ? -1 : undefined}
                           aria-label={`Folio ${folio} — ${a.title}, ${c.name}`}
                           className="group block no-underline focus-visible:outline focus-visible:outline-2 focus-visible:outline-gold/70"
                         >

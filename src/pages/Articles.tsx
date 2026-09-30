@@ -10,7 +10,15 @@ import { ImmersiveShell, BrassThread } from '../components/immersive'
 const ROOM_PARAM = 'room'
 const QUERY_PARAM = 'q'
 const ORDER_PARAM = 'order'
-const SORT_KEYS = new Set<SortKey | 'registry'>(['registry', 'latest', 'most-read', 'most-appreciated', 'editors-picks'])
+const SORT_KEYS = new Set<SortKey | 'registry'>(['registry', 'latest', 'most-discussed', 'most-appreciated', 'editors-picks'])
+/* Links shared before the key was renamed still carry ?order=most-read.
+   They must keep resolving to the same view. */
+const LEGACY_ORDER: Record<string, SortKey> = { 'most-read': 'most-discussed' }
+const normaliseOrder = (raw: string | null): SortKey | 'registry' => {
+  if (!raw) return 'registry'
+  const mapped = LEGACY_ORDER[raw] ?? raw
+  return SORT_KEYS.has(mapped as SortKey | 'registry') ? (mapped as SortKey | 'registry') : 'registry'
+}
 
 /** keyword match — the title, the writer (name AND handle), the department,
     secondary credits, tags, excerpt and description: the archive answers to
@@ -52,7 +60,7 @@ function Archive() {
      rest of the publication */
   const [searchParams, setSearchParams] = useSearchParams()
   const validCats = useMemo(() => ['All', ...new Set(ARTICLES.map((a) => a.category))], [])
-  const initialSort = (searchParams.get(ORDER_PARAM) ?? 'registry') as SortKey | 'registry'
+  const initialSort = normaliseOrder(searchParams.get(ORDER_PARAM))
   const [query, setQuery] = useState(searchParams.get(QUERY_PARAM) ?? '')
   const [cat, setCat] = useState(
     validCats.includes(searchParams.get(ROOM_PARAM) ?? '') ? (searchParams.get(ROOM_PARAM) as string) : 'All',

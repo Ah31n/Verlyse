@@ -6,7 +6,7 @@ import Reveal from '../components/ui/Reveal'
 import SplitText from '../components/ui/SplitText'
 import { MetaRow } from '../components/ui/primitives'
 import ShareButtons from '../components/ui/ShareButtons'
-import { getArticle, getAuthor, relatedArticles, folioNoOf, type Vibe, type Article, type Author, AUTHORS, authorPhoto } from '../data/content'
+import { getArticle, getAuthor, relatedArticles, folioNoOf, type Vibe, type Article, type Author, AUTHORS, authorPhoto , coverAlt, primaryRole } from '../data/content'
 import { handleImgError } from '../lib/imgFallback'
 import { AuthorPhoto } from '../components/ui/AuthorFrame'
 import { ArticleEnding, MotifDivider, Signature, WritersNoteClosing } from '../components/ui/ArticleClosing'
@@ -435,7 +435,7 @@ export default function ArticleDetail() {
                 <figure className="relative w-full max-w-[300px]">
                   <div aria-hidden="true" className="absolute -inset-3 translate-x-3 translate-y-3 border border-gold/35" />
                   <div className="img-frame relative overflow-hidden border border-gold/25">
-                    <img src={article.cover} alt="" className="aspect-[4/5] w-full object-cover" loading="lazy" decoding="async" onError={(e) => handleImgError(e, article.title, folio)} />
+                    <img src={article.cover} alt={coverAlt(article)} className="aspect-[4/5] w-full object-cover" loading="lazy" decoding="async" onError={(e) => handleImgError(e, article.title, folio)} />
                     <span aria-hidden="true" className="absolute inset-2 border border-gold/40" />
                   </div>
                   <figcaption className="mt-3 flex items-center justify-between font-mono text-[9px] uppercase tracking-[0.30em] text-white/50">
@@ -451,7 +451,7 @@ export default function ArticleDetail() {
         /* ——— CINEMATIC: the default full-bleed ——— */
         <section className="relative flex min-h-[92svh] items-end overflow-hidden pt-36">
           <div aria-hidden="true" className="absolute inset-0">
-            <img src={article.cover} alt="" className="h-full w-full object-cover" decoding="async" onError={(e) => handleImgError(e, article.title, folio)} />
+            <img src={article.cover} alt={coverAlt(article)} className="h-full w-full object-cover" decoding="async" onError={(e) => handleImgError(e, article.title, folio)} />
           </div>
           <div aria-hidden="true" className={`absolute inset-0 ${vibe.overlay}`} />
           <VibeAmbient vibe={article.vibe ?? 'solemn'} section="hero" />
@@ -526,7 +526,7 @@ export default function ArticleDetail() {
                   to={`/creator/${author.id}`}
                   className="mt-5 inline-flex items-center gap-2 border-b border-gold/50 pb-1 font-mono text-[10px] uppercase tracking-[0.28em] text-gold no-underline transition-colors hover:text-ivory max-[767px]:py-2"
                 >
-                  About the writer <span aria-hidden="true">→</span>
+                  About the {primaryRole(author).toLowerCase()} <span aria-hidden="true">→</span>
                 </Link>
               )}
               {/* a second creator, credited by the caption itself */}

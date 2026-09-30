@@ -29,8 +29,14 @@ const RoomPage = lazy(() => import('./pages/Room'))
 /** Route-aware transition label — the "folio" the reader is moving toward,
  *  so every navigation reads like moving through the publication. */
 function thresholdLabel(pathname: string): string {
+  /* The primary host serves prerendered shells as directory indexes, so it
+     301s /article/khageena to /article/khageena/. Splitting the raw pathname
+     kept that trailing slash, the lookup missed, and every one of the 19
+     article pages read "Folio — · Reading" in production while looking
+     correct in dev. Normalise before matching. */
+  const segment = (prefix: string) => pathname.split(prefix)[1]?.replace(/\/+$/, '') ?? ''
   if (pathname.startsWith('/article/')) {
-    const id = pathname.split('/article/')[1]
+    const id = segment('/article/')
     const i = ARTICLES.findIndex((a) => a.id === id)
     const folio = i >= 0 ? String(i + 1).padStart(2, '0') : '—'
     return `Folio ${folio} · Reading`
