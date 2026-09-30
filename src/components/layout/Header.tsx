@@ -4,6 +4,7 @@ import { AnimatePresence, motion, useReducedMotion } from 'motion/react'
 import { Magnetic } from '../cinematic'
 import { trapFocus } from '../../lib/focus'
 import { BRAND, MENU_LINKS, NAV_LINKS } from '../../data/content'
+import { useBodyScrollLock } from '../../hooks/useBodyScrollLock'
 
 /* ---------- Search + menu control (global via context-free events) ---------- */
 export function openSearch() {
@@ -36,6 +37,8 @@ export default function Header() {
   const reduced = useReducedMotion() === true
   const [scrolled, setScrolled] = useState(false)
   const [menuOpen, setMenuOpen] = useState(false)
+  /* R08/D4: hold the page still behind the full-screen menu. */
+  useBodyScrollLock(menuOpen)
   const savedCount = useSavedCount()
   const location = useLocation()
 

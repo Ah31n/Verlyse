@@ -16,7 +16,8 @@
     "test:metadata": "node scripts/metadata-audit.mjs",
     "test:newsletter": "node scripts/newsletter-smoke.mjs",
     "test:smoke": "node scripts/ssr-smoke.mjs",
-    "test:routes": "node scripts/metadata-audit.mjs"
+    "test:routes": "node scripts/metadata-audit.mjs",
+    "test:flows": "node scripts/interaction-jsdom.mjs"
   },
   "dependencies": {
     "@react-three/fiber": "^8.18.0",
@@ -30,12 +31,15 @@
   },
   "devDependencies": {
     "@playwright/test": "^1.62.1",
+    "@testing-library/dom": "^10.4.2",
+    "@testing-library/react": "^16.3.3",
     "@types/node": "^26.4.0",
     "@types/react": "^18.3.12",
     "@types/react-dom": "^18.3.1",
     "@types/three": "^0.185.4",
     "@vitejs/plugin-react": "^4.7.0",
     "autoprefixer": "^10.4.20",
+    "jsdom": "^30.1.1",
     "postcss": "^8.4.49",
     "puppeteer": "^24.43.1",
     "puppeteer-core": "^24.43.1",

@@ -3,6 +3,7 @@ import { AnimatePresence, motion, useReducedMotion } from 'motion/react'
 import { Link } from 'react-router-dom'
 import { trapFocus } from '../../lib/focus'
 import { LEDGER } from '../../data/content'
+import { useBodyScrollLock } from '../../hooks/useBodyScrollLock'
 
 interface SavedItem {
   id: string
@@ -38,6 +39,11 @@ export default function SavedDrawer() {
   const [saved, setSaved] = useState<SavedItem[]>([])
   const closeRef = useRef<HTMLButtonElement | null>(null)
   const asideRef = useRef<HTMLElement | null>(null)
+
+  /* R08/D4: hold the page still behind the dialog. */
+
+  useBodyScrollLock(open)
+
 
   useEffect(() => {
     const load = () => {
