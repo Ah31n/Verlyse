@@ -1,5 +1,8 @@
 import puppeteer from 'puppeteer-core'
 
+if (!process.env.LD_LIBRARY_PATH && process.platform === 'linux') {
+  process.env.LD_LIBRARY_PATH = '/home/user/browser-tools/libs'
+}
 const BASE_URL = process.env.BASE_URL || 'http://127.0.0.1:5173'
 const executablePath = process.env.PUPPETEER_EXECUTABLE_PATH || '/tmp/chromium'
 

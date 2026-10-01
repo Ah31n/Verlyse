@@ -19,7 +19,6 @@
     "test:crawl": "node scripts/route-crawl-53.mjs",
     "test:mobile-perf": "node scripts/mobile-perf-audit.mjs",
     "test:mobile-audit": "node scripts/full-mobile-perf-suite.mjs",
-    "test:mobile-audit": "node scripts/full-mobile-perf-suite.mjs",
     "test:room": "node scripts/room-interaction-audit.mjs",
     "asset-audit": "node scripts/asset-audit.mjs"
   },
