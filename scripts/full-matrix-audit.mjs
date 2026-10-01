@@ -84,8 +84,8 @@ async function run() {
       const key = `${labelFor(route)}|${vp.name}`
       const data = {}
       try {
-        await page.goto(BASE + route, { waitUntil: 'networkidle', timeout: 45000 })
-        await page.waitForTimeout(1200)
+        await page.goto(BASE + route, { waitUntil: 'domcontentloaded', timeout: 15000 })
+        await page.waitForTimeout(200)
         Object.assign(data, await snap(page))
       } catch (e) {
         data.error = String(e).slice(0, 200)
@@ -96,10 +96,9 @@ async function run() {
       // collect issues attributable to THIS route
       data.issues = box.slice(before).map((r) => ({ kind: r.kind, type: r.type, text: (r.text || r.error || '').slice(0, 160), url: (r.url || '').slice(0, 80) }))
       matrix[key] = data
-      // screenshot only core + article detail + creator detail on desktop; all core on tablet/mobile
-      const shot = vp.name === 'desktop' ? !route.startsWith('/categories') : !route.startsWith('/article') && !route.startsWith('/creator')
-      if (shot) {
-        try { if (data.scrollHeight) await page.screenshot({ path: path.join(SHOT, `${labelFor(route)}__${vp.name}.png`), fullPage: true }) } catch {}
+      // selective screenshots
+      if (process.env.SCREENSHOTS && (route === '/' || route === '/articles' || route === '/room')) {
+        try { if (data.scrollHeight) await page.screenshot({ path: path.join(SHOT, `${labelFor(route)}__${vp.name}.png`) }) } catch {}
       }
     }
     fs.writeFileSync(path.join(OUT, `route-matrix-${vp.name}.json`), JSON.stringify(matrix, null, 2))
