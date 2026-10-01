@@ -178,6 +178,8 @@ export default function Creators() {
                           string-lazy=""
                           src={selectedFeature.thumbnail ?? selectedFeature.cover}
                           alt=""
+                          width={72}
+                          height={56}
                           loading="lazy"
                           decoding="async"
                           className="h-14 w-[72px] shrink-0 border border-white/10 object-cover"

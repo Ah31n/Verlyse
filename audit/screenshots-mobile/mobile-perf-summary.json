@@ -1,15 +1,27 @@
 {
+<<<<<<< HEAD
   "auditDate": "2026-10-01T09:47:49.171Z",
+=======
+  "auditDate": "2026-10-01T10:50:47.695Z",
+>>>>>>> c79c814 (feat(room): complete Keeping Room spatial archive redesign, modular UI components, dossier panel, collection rail, and verification suite)
   "results": [
     {
       "route": "/",
       "name": "01-mobile-home",
       "screenshot": "audit/screenshots-mobile/01-mobile-home.png",
+<<<<<<< HEAD
       "loadTimeMs": 1649,
       "lcpMs": 1200,
       "cls": 0,
       "hasOverflow": false,
       "threeDownloaded": true,
+=======
+      "loadTimeMs": 1369,
+      "lcpMs": 1200,
+      "cls": 0,
+      "hasOverflow": false,
+      "threeDownloaded": false,
+>>>>>>> c79c814 (feat(room): complete Keeping Room spatial archive redesign, modular UI components, dossier panel, collection rail, and verification suite)
       "magneticBypassed": true,
       "stringTuneNodes": 4
     },
@@ -17,8 +29,13 @@
       "route": "/articles",
       "name": "02-mobile-articles",
       "screenshot": "audit/screenshots-mobile/02-mobile-articles.png",
+<<<<<<< HEAD
       "loadTimeMs": 1073,
       "lcpMs": 1073,
+=======
+      "loadTimeMs": 1078,
+      "lcpMs": 1078,
+>>>>>>> c79c814 (feat(room): complete Keeping Room spatial archive redesign, modular UI components, dossier panel, collection rail, and verification suite)
       "cls": 0,
       "hasOverflow": false,
       "threeDownloaded": false,
@@ -29,11 +46,19 @@
       "route": "/article/their-voices-matter",
       "name": "03-mobile-article-detail",
       "screenshot": "audit/screenshots-mobile/03-mobile-article-detail.png",
+<<<<<<< HEAD
       "loadTimeMs": 1051,
       "lcpMs": 1051,
       "cls": 0,
       "hasOverflow": false,
       "threeDownloaded": true,
+=======
+      "loadTimeMs": 1028,
+      "lcpMs": 1028,
+      "cls": 0,
+      "hasOverflow": false,
+      "threeDownloaded": false,
+>>>>>>> c79c814 (feat(room): complete Keeping Room spatial archive redesign, modular UI components, dossier panel, collection rail, and verification suite)
       "magneticBypassed": true,
       "stringTuneNodes": 3
     },
@@ -41,8 +66,13 @@
       "route": "/creators",
       "name": "04-mobile-creators",
       "screenshot": "audit/screenshots-mobile/04-mobile-creators.png",
+<<<<<<< HEAD
       "loadTimeMs": 1018,
       "lcpMs": 1018,
+=======
+      "loadTimeMs": 958,
+      "lcpMs": 958,
+>>>>>>> c79c814 (feat(room): complete Keeping Room spatial archive redesign, modular UI components, dossier panel, collection rail, and verification suite)
       "cls": 0,
       "hasOverflow": false,
       "threeDownloaded": false,
@@ -53,8 +83,13 @@
       "route": "/submit",
       "name": "05-mobile-submit",
       "screenshot": "audit/screenshots-mobile/05-mobile-submit.png",
+<<<<<<< HEAD
       "loadTimeMs": 1082,
       "lcpMs": 1082,
+=======
+      "loadTimeMs": 1004,
+      "lcpMs": 1004,
+>>>>>>> c79c814 (feat(room): complete Keeping Room spatial archive redesign, modular UI components, dossier panel, collection rail, and verification suite)
       "cls": 0,
       "hasOverflow": false,
       "threeDownloaded": false,
@@ -65,8 +100,13 @@
       "route": "/room",
       "name": "06-mobile-room",
       "screenshot": "audit/screenshots-mobile/06-mobile-room.png",
+<<<<<<< HEAD
       "loadTimeMs": 832,
       "lcpMs": 832,
+=======
+      "loadTimeMs": 874,
+      "lcpMs": 874,
+>>>>>>> c79c814 (feat(room): complete Keeping Room spatial archive redesign, modular UI components, dossier panel, collection rail, and verification suite)
       "cls": 0,
       "hasOverflow": false,
       "threeDownloaded": false,

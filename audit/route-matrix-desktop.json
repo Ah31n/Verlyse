@@ -48,6 +48,7 @@
     "issues": []
   },
   "creators|desktop": {
+<<<<<<< HEAD
     "title": "Featured Creators — Verlyse Media",
     "h1": "CONTRIBUTORSThe wall of names",
     "scrollHeight": 3021,
@@ -55,6 +56,15 @@
     "footerBottom": 3021,
     "footerAtBottom": true,
     "footerIsFixedOffset": 0.015625,
+=======
+    "title": "Verlyse Media — Where Vision Becomes A Voice",
+    "h1": null,
+    "scrollHeight": 1999,
+    "footerTop": 720,
+    "footerBottom": 1999,
+    "footerAtBottom": true,
+    "footerIsFixedOffset": 0.21875,
+>>>>>>> c79c814 (feat(room): complete Keeping Room spatial archive redesign, modular UI components, dossier panel, collection rail, and verification suite)
     "overflowX": false,
     "scrollWidth": 1440,
     "innerWidth": 1440,
@@ -227,10 +237,17 @@
     "title": "Categories — Verlyse Media",
     "h1": "WINGSThe wings",
     "scrollHeight": 2801,
+<<<<<<< HEAD
     "footerTop": 1507,
     "footerBottom": 2786,
     "footerAtBottom": false,
     "footerIsFixedOffset": 15.171875,
+=======
+    "footerTop": 1522,
+    "footerBottom": 2801,
+    "footerAtBottom": true,
+    "footerIsFixedOffset": 0.171875,
+>>>>>>> c79c814 (feat(room): complete Keeping Room spatial archive redesign, modular UI components, dossier panel, collection rail, and verification suite)
     "overflowX": false,
     "scrollWidth": 1440,
     "innerWidth": 1440,
@@ -288,7 +305,7 @@
     "issues": []
   },
   "article-the-empty-waltz|desktop": {
-    "title": "The Empty Waltz — Verlyse Media",
+    "title": "Verlyse Media — Where Vision Becomes A Voice",
     "h1": "“The Empty Waltz”",
     "scrollHeight": 15305,
     "footerTop": 14026,
@@ -304,6 +321,7 @@
     "issues": []
   },
   "article-the-arts-deserve-respect|desktop": {
+<<<<<<< HEAD
     "title": "Verlyse Media — Where Vision Becomes A Voice",
     "h1": null,
     "scrollHeight": 1999,
@@ -311,6 +329,15 @@
     "footerBottom": 1999,
     "footerAtBottom": true,
     "footerIsFixedOffset": 0.21875,
+=======
+    "title": "The Arts Deserve Respect — Verlyse Media",
+    "h1": "“The ArtsDeserve Respect”",
+    "scrollHeight": 11403,
+    "footerTop": 10125,
+    "footerBottom": 11403,
+    "footerAtBottom": true,
+    "footerIsFixedOffset": 0.484375,
+>>>>>>> c79c814 (feat(room): complete Keeping Room spatial archive redesign, modular UI components, dossier panel, collection rail, and verification suite)
     "overflowX": false,
     "scrollWidth": 1440,
     "innerWidth": 1440,
@@ -546,11 +573,19 @@
   "article-mir-raza-ali|desktop": {
     "title": "Mir Raza Ali — Verlyse Media",
     "h1": "“Mir Raza Ali”",
+<<<<<<< HEAD
     "scrollHeight": 10862,
     "footerTop": 9584,
     "footerBottom": 10862,
     "footerAtBottom": true,
     "footerIsFixedOffset": 0.421875,
+=======
+    "scrollHeight": 10523,
+    "footerTop": 9244,
+    "footerBottom": 10523,
+    "footerAtBottom": true,
+    "footerIsFixedOffset": 0.015625,
+>>>>>>> c79c814 (feat(room): complete Keeping Room spatial archive redesign, modular UI components, dossier panel, collection rail, and verification suite)
     "overflowX": false,
     "scrollWidth": 1440,
     "innerWidth": 1440,

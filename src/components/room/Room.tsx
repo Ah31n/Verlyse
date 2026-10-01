@@ -1,22 +1,34 @@
 // The Keeping Room — Verlyse Media's spatial editorial archive.
-// Penpot (Phase 19) is the visual source of truth. PULL -> READ -> RETURN.
-// Isolated: reads the canonical registry; never modifies ArticleDetail or any
-// protected system. Reading hands off to /article/:id; the canonical routes
-// (search, people, creators) stay canonical — the room only links into them.
+// PULL -> READ -> RETURN.
+// Technologies: React, TypeScript, Tailwind CSS, Motion/React, CSS 3D, StringTune.
 import { useCallback, useEffect, useMemo, useRef, useState, type ReactNode } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { AnimatePresence, motion, useReducedMotion } from 'motion/react'
 import Plate from './Plate'
 import BrassThread from './BrassThread'
+import { RoomMasthead } from './RoomMasthead'
+import { StatusRail } from './StatusRail'
+import { CollectionRail } from './CollectionRail'
+import { NavigationControls } from './NavigationControls'
+import { DossierPanel } from './DossierPanel'
+import { HelpModal } from './HelpModal'
+import { NoWebGLFallback } from './NoWebGLFallback'
 import {
-  FOLIOS, FEATURED, NEXT_FOLIO, CATEGORIES, foliosByAuthor, searchFolios,
+  FOLIOS,
+  FEATURED,
+  NEXT_FOLIO,
+  CATEGORY_COUNTS,
+  foliosByAuthor,
+  searchFolios,
+  type Folio,
 } from '../../lib/room/folios'
 import { getAuthor } from '../../data/content'
+import { type RoomState, STATE_HINT } from '../../lib/room/state'
 import {
-  type RoomState, STATE_HINT,
-} from '../../lib/room/state'
-import {
-  plateTransform, layoutForWidth, type Layout, type RoomTransformContext,
+  plateTransform,
+  layoutForWidth,
+  type Layout,
+  type RoomTransformContext,
 } from '../../lib/room/geometry'
 
 const count = FOLIOS.length
@@ -32,9 +44,6 @@ function loadSet(key: string): Set<string> {
   }
 }
 
-// The closing pull-quote (frame 07) is the story's own final line — real
-// registry text, never invented. Falls back to the full excerpt if it can't
-// be split into sentences.
 function closingLine(excerpt: string): string {
   const sentences = excerpt.split(/(?<=[.!?…])\s+/).filter(Boolean)
   return sentences.length > 1 ? sentences[sentences.length - 1] : excerpt
@@ -45,27 +54,29 @@ export default function Room() {
   const reduced = useReducedMotion() === true
   const [state, setState] = useState<RoomState>('arrival')
   const [layout, setLayout] = useState<Layout>(
-    typeof window !== 'undefined' ? layoutForWidth(window.innerWidth) : 'desktop',
+    typeof window !== 'undefined' ? layoutForWidth(window.innerWidth) : 'desktop'
   )
-  // Desktop/tablet open on the primary folio №01; the mobile composition puts
-  // the newest folio №19 in hand (Penpot frame 15).
   const [focus, setFocus] = useState<number>(
     typeof window !== 'undefined' && layoutForWidth(window.innerWidth) === 'mobile'
       ? NEXT_FOLIO.index
-      : FEATURED.index,
+      : FEATURED.index
   )
   const [readSet, setReadSet] = useState<Set<string>>(() => loadSet(READ_KEY))
   const [category, setCategory] = useState<string | null>(null)
   const [dossierAuthor, setDossierAuthor] = useState<string | null>(null)
+  const [dossierItem, setDossierItem] = useState<Folio | null>(null)
   const [searchOpen, setSearchOpen] = useState(false)
+  const [helpOpen, setHelpOpen] = useState(false)
   const [query, setQuery] = useState('')
-  const searchRef = useRef<HTMLInputElement>(null)
-  const booted = useRef(false)
-  // the folio most recently read — so NEXT can step back to its Ending beat
-  const lastRead = useRef<number>(FEATURED.index)
+  const [hasWebGLError] = useState(false)
 
-  // On mount, a reader returning from the article lands in the ENDING beat
-  // (the room reforms); from there NEXT or RETURN completes the loop.
+  const searchRef = useRef<HTMLInputElement>(null)
+  const stageRef = useRef<HTMLDivElement>(null)
+  const booted = useRef(false)
+  const lastRead = useRef<number>(FEATURED.index)
+  const dragStartX = useRef<number | null>(null)
+
+  // On mount, return from an article lands in the ENDING beat
   useEffect(() => {
     if (booted.current) return
     booted.current = true
@@ -80,7 +91,7 @@ export default function Room() {
         sessionStorage.removeItem(RETURN_KEY)
       }
     } catch {
-      /* ignore malformed marker */
+      /* ignore */
     }
   }, [])
 
@@ -103,44 +114,60 @@ export default function Room() {
     }
   }, [searchOpen])
 
-  const focusedFolio = FOLIOS[focus]
+  const focusedFolio = FOLIOS[focus] || FEATURED
 
-  const go = useCallback((s: RoomState) => setState(s), [])
+  const go = useCallback((s: RoomState) => {
+    setState(s)
+    if (s === 'focus' || s === 'settle') {
+      setDossierItem(FOLIOS[focus] || null)
+    } else if (s === 'discovery' || s === 'arrival' || s === 'return') {
+      setDossierItem(null)
+    }
+  }, [focus])
 
-  // NEXT on the thread offers the newest folio (№19); move attention to it.
   const goNext = useCallback(() => {
     setFocus(NEXT_FOLIO.index)
     setState('next')
+    setDossierItem(NEXT_FOLIO)
   }, [])
 
   const markRead = useCallback((id: string) => {
     setReadSet((prev) => {
       const next = new Set(prev)
       next.add(id)
-      try { sessionStorage.setItem(READ_KEY, JSON.stringify([...next])) } catch { /* noop */ }
+      try {
+        sessionStorage.setItem(READ_KEY, JSON.stringify([...next]))
+      } catch {
+        /* noop */
+      }
       return next
     })
   }, [])
 
   const select = useCallback((i: number) => {
     setFocus(i)
-    // In the spatial discovery layers, selecting a neighbour draws attention to
-    // it without changing state; in discovery the room deepens toward focus.
     setState((s) => {
       if (s === 'arrival' || s === 'discovery') return 'focus'
       return s
     })
+    setDossierItem(FOLIOS[i])
   }, [])
 
-  const enter = useCallback((i: number) => {
-    setFocus(i)
-    lastRead.current = i
-    markRead(FOLIOS[i].id)
-    setState('entry')
-    try { sessionStorage.setItem(RETURN_KEY, JSON.stringify({ focus: i })) } catch { /* noop */ }
-    // entry: the wine threshold holds briefly, then hands off to the canonical article
-    window.setTimeout(() => navigate(`/article/${FOLIOS[i].id}`), reduced ? 80 : 950)
-  }, [navigate, reduced, markRead])
+  const enter = useCallback(
+    (i: number) => {
+      setFocus(i)
+      lastRead.current = i
+      markRead(FOLIOS[i].id)
+      setState('entry')
+      try {
+        sessionStorage.setItem(RETURN_KEY, JSON.stringify({ focus: i }))
+      } catch {
+        /* noop */
+      }
+      window.setTimeout(() => navigate(`/article/${FOLIOS[i].id}`), reduced ? 80 : 950)
+    },
+    [navigate, reduced, markRead]
+  )
 
   const openDossier = useCallback((authorId: string) => {
     setDossierAuthor(authorId)
@@ -149,75 +176,159 @@ export default function Room() {
     setState('dossier')
   }, [])
 
-  const openCategory = useCallback((cat: string) => {
+  const handleCategorySelect = useCallback((cat: string | null) => {
     setCategory(cat)
-    const first = FOLIOS.find((f) => f.category === cat)
-    if (first) setFocus(first.index)
-    setState('category')
+    if (cat) {
+      const first = FOLIOS.find((f) => f.category === cat)
+      if (first) setFocus(first.index)
+      setState('category')
+    } else {
+      setState('discovery')
+    }
   }, [])
 
   const closeLayer = useCallback(() => {
     setSearchOpen(false)
     setCategory(null)
     setDossierAuthor(null)
+    setDossierItem(null)
     setState((s) => (s === 'category' || s === 'dossier' ? 'discovery' : s))
   }, [])
 
-  // keyboard: arrows/enter/esc drive the slice; "/" opens search
+  // Touch and pointer drag navigation across cylindrical arc
+  const handlePointerDown = (e: React.PointerEvent) => {
+    dragStartX.current = e.clientX
+  }
+
+  const handlePointerUp = (e: React.PointerEvent) => {
+    if (dragStartX.current === null) return
+    const deltaX = e.clientX - dragStartX.current
+    dragStartX.current = null
+
+    if (Math.abs(deltaX) > 40) {
+      if (deltaX > 0) {
+        // Drag right -> step left (prev)
+        setFocus((f) => Math.max(0, f - 1))
+      } else {
+        // Drag left -> step right (next)
+        setFocus((f) => Math.min(count - 1, f + 1))
+      }
+      if (state === 'arrival') setState('discovery')
+    }
+  }
+
+  // Keyboard navigation
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
       if (e.key === 'Escape') {
-        if (searchOpen) { setSearchOpen(false); return }
-        if (state === 'category' || state === 'dossier') { closeLayer(); return }
+        if (searchOpen) {
+          setSearchOpen(false)
+          return
+        }
+        if (helpOpen) {
+          setHelpOpen(false)
+          return
+        }
+        if (dossierItem) {
+          setDossierItem(null)
+        }
+        if (state === 'category' || state === 'dossier') {
+          closeLayer()
+          return
+        }
         if (state === 'discovery' || state === 'focus') setState('arrival')
         else if (state === 'settle') setState('focus')
-        else if (state === 'next') { setFocus(lastRead.current); setState('ending') }
-        else if (state === 'return' || state === 'ending') setState('discovery')
+        else if (state === 'next') {
+          setFocus(lastRead.current)
+          setState('ending')
+        } else if (state === 'return' || state === 'ending') setState('discovery')
         return
       }
+
+      if (e.key === '?') {
+        if (!searchOpen) setHelpOpen((prev) => !prev)
+        return
+      }
+
       if (searchOpen) {
         if (e.key === 'Enter') {
           const r = searchFolios(query)
-          if (r[0]) { setSearchOpen(false); enter(r[0].index) }
+          if (r[0]) {
+            setSearchOpen(false)
+            enter(r[0].index)
+          }
         }
         return
       }
+
       if (e.key === '/' && (state === 'discovery' || state === 'arrival')) {
-        e.preventDefault(); setSearchOpen(true); return
+        e.preventDefault()
+        setSearchOpen(true)
+        return
       }
+
       if (e.key === 'Enter') {
-        if (state === 'arrival') { setState('discovery'); return }
-        if (state === 'discovery') { setState('focus'); return }
-        // Enter in FOCUS settles the plate face-on; it must not skip SETTLE and
-        // hand off to the article. STATE_ORDER is …focus -> settle -> entry, and
-        // the room's own affordance advertises "Enter pull". Entry is the next
-        // Enter, from SETTLE. A focused control (e.g. the "Pull the plate"
-        // button) owns Enter via its own onClick, so stand down here and let one
-        // Enter advance exactly one state instead of firing both paths.
+        if (state === 'arrival') {
+          setState('discovery')
+          return
+        }
+        if (state === 'discovery') {
+          setState('focus')
+          setDossierItem(FOLIOS[focus])
+          return
+        }
         if (state === 'focus') {
           const t = e.target as HTMLElement | null
           if (t && typeof t.closest === 'function' && t.closest('button, a, input, [role="button"]')) return
-          setState('settle'); return
+          setState('settle')
+          return
         }
         if (state === 'settle') {
           const t = e.target as HTMLElement | null
           if (t && typeof t.closest === 'function' && t.closest('button, a, input, [role="button"]')) return
-          enter(focus); return
+          enter(focus)
+          return
         }
-        if (state === 'ending') { goNext(); return }
-        if (state === 'next') { enter(focus); return }
-        if (state === 'category') { setState('focus'); return }
-        if (state === 'dossier') { enter(focus); return }
+        if (state === 'ending') {
+          goNext()
+          return
+        }
+        if (state === 'next') {
+          enter(focus)
+          return
+        }
+        if (state === 'category') {
+          setState('focus')
+          return
+        }
+        if (state === 'dossier') {
+          enter(focus)
+          return
+        }
       }
-      if (e.key === 'ArrowRight') { setFocus((f) => Math.min(count - 1, f + 1)); if (state === 'arrival') setState('discovery') }
-      if (e.key === 'ArrowLeft') setFocus((f) => Math.max(0, f - 1))
-      if (e.key === 'ArrowDown' && state === 'discovery') setState('focus')
-      if (e.key === 'ArrowUp' && (state === 'focus' || state === 'settle')) setState('discovery')
-      if (e.key === 'ArrowDown' && state === 'focus') setState('settle')
+
+      if (e.key === 'ArrowRight') {
+        setFocus((f) => Math.min(count - 1, f + 1))
+        if (state === 'arrival') setState('discovery')
+      }
+      if (e.key === 'ArrowLeft') {
+        setFocus((f) => Math.max(0, f - 1))
+      }
+      if (e.key === 'ArrowDown' && state === 'discovery') {
+        setState('focus')
+        setDossierItem(FOLIOS[focus])
+      }
+      if (e.key === 'ArrowUp' && (state === 'focus' || state === 'settle')) {
+        setState('discovery')
+        setDossierItem(null)
+      }
+      if (e.key === 'ArrowDown' && state === 'focus') {
+        setState('settle')
+      }
     }
     window.addEventListener('keydown', onKey)
     return () => window.removeEventListener('keydown', onKey)
-  }, [state, focus, enter, reduced, searchOpen, query, category, closeLayer])
+  }, [state, focus, enter, searchOpen, helpOpen, query, category, dossierItem, closeLayer, goNext])
 
   const roomProgress = useMemo(() => STATE_INDEX[state] ?? 1, [state])
 
@@ -225,7 +336,9 @@ export default function Room() {
   const ctx = useMemo<RoomTransformContext>(() => {
     if (state === 'category' && category) {
       const set = new Set<number>()
-      FOLIOS.forEach((f, i) => { if (f.category === category) set.add(i) })
+      FOLIOS.forEach((f, i) => {
+        if (f.category === category) set.add(i)
+      })
       return { categorySet: set }
     }
     if (state === 'dossier' && dossierAuthor) {
@@ -233,7 +346,10 @@ export default function Room() {
       const authorRank: Record<number, number> = {}
       let rank = 0
       FOLIOS.forEach((f, i) => {
-        if (f.authorId === dossierAuthor) { authorSet.add(i); authorRank[i] = rank++; }
+        if (f.authorId === dossierAuthor) {
+          authorSet.add(i)
+          authorRank[i] = rank++
+        }
       })
       return { authorSet, authorRank, authorCount: rank }
     }
@@ -244,16 +360,20 @@ export default function Room() {
   const dossierAuthorRecord = dossierAuthor ? getAuthor(dossierAuthor) : null
   const dossierFolios = dossierAuthor ? foliosByAuthor(dossierAuthor) : []
 
+  if (hasWebGLError) {
+    return <NoWebGLFallback items={FOLIOS} reason="error" />
+  }
+
   return (
     <main
-      className="room relative min-h-[100svh] w-full touch-pan-y overflow-x-clip overflow-y-auto bg-charcoal text-ivory lg:h-screen lg:overflow-hidden"
+      className="room relative min-h-[100svh] w-full touch-pan-y overflow-x-clip overflow-y-auto bg-charcoal text-ivory lg:h-screen lg:overflow-hidden select-none"
       style={{ perspective: reduced ? undefined : '1600px' }}
       aria-label="The Keeping Room — a Verlyse Media spatial archive"
     >
-      {/* room atmosphere: warm vignette, no neon / particles */}
+      {/* Room atmosphere vignette */}
       <div
         aria-hidden
-        className="absolute inset-0"
+        className="absolute inset-0 pointer-events-none"
         style={{
           background:
             'radial-gradient(120% 90% at 32% 18%, rgba(92,18,36,0.55) 0%, rgba(30,11,18,0.35) 38%, #161412 78%)',
@@ -262,11 +382,50 @@ export default function Room() {
 
       <BrassThread state={state} reduced={reduced} mobile={layout === 'mobile'} />
 
-      {/* 3D stage */}
-      {/* Mobile gets real document height instead of a clipped desktop stage. */}
+      {/* Persistent Quiet Masthead Layer */}
+      {state !== 'entry' && state !== 'ending' && (
+        <RoomMasthead
+          onOpenSearch={() => setSearchOpen(true)}
+          onOpenHelp={() => setHelpOpen(true)}
+        />
+      )}
+
+      {/* Segmented Category Rail (Discovery & Category states) */}
+      {(state === 'discovery' || state === 'category') && (
+        <div className="fixed top-16 md:top-20 inset-x-0 z-[400] flex justify-center px-4">
+          <CollectionRail
+            categories={CATEGORY_COUNTS}
+            activeCategory={category}
+            onSelectCategory={handleCategorySelect}
+          />
+        </div>
+      )}
+
+      {/* Discovery Dossier Quick Trigger */}
+      {state === 'discovery' && (
+        <div className="pointer-events-none fixed top-28 md:top-32 inset-x-0 z-[390] flex justify-center px-4">
+          <div className="pointer-events-auto flex items-center gap-2 border border-gold/20 bg-[#160309]/80 px-3 py-1 backdrop-blur-sm">
+            <span className="font-mono text-[8px] uppercase tracking-widest text-gold/70">
+              Featured Monograph:
+            </span>
+            <button
+              type="button"
+              onClick={() => openDossier(FEATURED.authorId)}
+              className="font-serif italic text-xs text-gold hover:underline"
+            >
+              {FEATURED.author} →
+            </button>
+          </div>
+        </div>
+      )}
+
+      {/* 3D Spatial Stage */}
       <div aria-hidden="true" className="h-[32svh] md:hidden" />
       <div
-        className="absolute inset-0 min-h-[132svh] md:min-h-0"
+        ref={stageRef}
+        onPointerDown={handlePointerDown}
+        onPointerUp={handlePointerUp}
+        className="absolute inset-0 min-h-[132svh] md:min-h-0 cursor-grab active:cursor-grabbing"
         style={{ transformStyle: 'preserve-3d', perspective: reduced ? undefined : '1600px' }}
       >
         {FOLIOS.map((f, i) => (
@@ -279,35 +438,66 @@ export default function Room() {
             transform={plateTransform(state, i, focus, count, layout, ctx)}
             onSelect={select}
             onEnter={enter}
-            onPull={() => setState('settle')}
-            onBack={() => setState('discovery')}
+            onPull={() => {
+              setState('settle')
+              setDossierItem(f)
+            }}
+            onBack={() => {
+              setState('discovery')
+              setDossierItem(null)
+            }}
           />
         ))}
       </div>
 
-      {/* ---- persistent editorial chrome (hidden during the full-screen wine
-            takeover beats — entry & ending carry their own masthead) ---- */}
-      {state !== 'entry' && state !== 'ending' && (
-      <header className="pointer-events-none absolute inset-x-0 top-0 z-[400] flex items-start justify-between p-5 md:p-10">
-        <div>
-          <p className="font-mono text-[10px] font-medium uppercase tracking-[0.28em] text-gold md:text-[11px] md:tracking-[0.32em]">
-            Verlyse Media
-          </p>
-          <p className="font-mono text-[10px] font-medium uppercase tracking-[0.28em] text-gold/70 md:text-[11px] md:tracking-[0.32em]">
-            The Keeping Room
-          </p>
-        </div>
-        <nav className="pointer-events-auto flex gap-3 font-mono text-[10px] uppercase tracking-[0.16em] text-ivory/70 md:gap-5 md:text-[11px] md:tracking-[0.2em]">
-          <button type="button" onClick={() => setSearchOpen(true)} className="transition-colors hover:text-gold">
-            Search
-          </button>
-          <Link to="/ambassadors" className="transition-colors hover:text-gold">People</Link>
-          <Link to="/articles" className="transition-colors hover:text-gold">Articles</Link>
-        </nav>
-      </header>
+      {/* Selected Folio Dossier Panel */}
+      {dossierItem && (state === 'focus' || state === 'settle') && (
+        <DossierPanel
+          item={dossierItem}
+          onClose={() => {
+            setDossierItem(null)
+            setState('discovery')
+          }}
+        />
       )}
 
-      {/* ---- state-specific content ---- */}
+      {/* Status Rail */}
+      {state !== 'entry' && state !== 'ending' && (
+        <StatusRail
+          currentIndex={focus}
+          totalItems={count}
+          selectedItem={dossierItem}
+          activeCategory={category}
+        />
+      )}
+
+      {/* Navigation Controls Bar */}
+      {state !== 'entry' && state !== 'ending' && (
+        <div className="fixed bottom-4 md:bottom-6 inset-x-0 z-[450] flex justify-center px-4">
+          <NavigationControls
+            onPrev={() => setFocus((f) => Math.max(0, f - 1))}
+            onNext={() => setFocus((f) => Math.min(count - 1, f + 1))}
+            onReset={() => {
+              setState('arrival')
+              setFocus(FEATURED.index)
+              setCategory(null)
+              setDossierItem(null)
+            }}
+            onFocusSelected={() => {
+              if (dossierItem) {
+                setDossierItem(null)
+                setState('discovery')
+              } else {
+                setState('focus')
+                setDossierItem(focusedFolio)
+              }
+            }}
+            hasSelected={!!dossierItem}
+          />
+        </div>
+      )}
+
+      {/* ---- State-specific content overlays ---- */}
       <AnimatePresence mode="wait">
         {state === 'arrival' && (
           <Overlay key="arrival">
@@ -317,19 +507,18 @@ export default function Room() {
             <h1
               string="split"
               string-id="room-title"
-              className="mt-4 max-w-[10ch] font-serif text-[clamp(2.7rem,13vw,7.5rem)] font-semibold leading-[0.94] md:max-w-none"
+              className="mt-4 max-w-[10ch] font-serif text-[clamp(2.7rem,13vw,7.5rem)] font-semibold leading-[0.94] md:max-w-none text-ivory"
             >
               The Keeping<br />Room
             </h1>
             <p className="mt-6 max-w-xl font-serif text-[clamp(1.1rem,2vw,1.5rem)] italic leading-snug text-cream/90">
-              Enter quietly. Pull a plate when a title calls to you. Read, then return it
-              to the thread.
+              Enter quietly. Pull a plate when a title calls to you. Read, then return it to the thread.
             </p>
             <div className="mt-8 h-px w-64 bg-gold" aria-hidden />
             <button
               type="button"
               onClick={() => go('discovery')}
-              className="btn btn-gold mt-8 pointer-events-auto"
+              className="btn btn-gold mt-8 pointer-events-auto shadow-xl"
             >
               Enter the archive
             </button>
@@ -340,7 +529,6 @@ export default function Room() {
         )}
 
         {state === 'ending' && (
-          /* frame 07 — the wine threshold closes around the story; room re-forms */
           <motion.div
             key="ending"
             className="absolute inset-0 z-[480] flex items-center justify-center bg-[#2A0F18] px-6"
@@ -377,7 +565,11 @@ export default function Room() {
                 <button type="button" className="btn btn-gold pointer-events-auto" onClick={goNext}>
                   Next on the thread →
                 </button>
-                <button type="button" className="btn btn-ghost pointer-events-auto" onClick={() => go('return')}>
+                <button
+                  type="button"
+                  className="btn btn-ghost pointer-events-auto"
+                  onClick={() => go('return')}
+                >
                   Return to archive
                 </button>
               </div>
@@ -386,7 +578,6 @@ export default function Room() {
         )}
 
         {state === 'entry' && (
-          /* frame 05 — wine threshold: room hands off into editorial reading */
           <motion.div
             key="entry"
             className="absolute inset-0 z-[500] bg-[#1E0B12]"
@@ -397,7 +588,9 @@ export default function Room() {
             aria-live="polite"
           >
             <div className="absolute inset-x-0 top-0 flex items-start justify-between p-6 md:p-10">
-              <p className="font-mono text-[11px] uppercase tracking-[0.3em] text-[#D9B978]">Verlyse Media</p>
+              <p className="font-mono text-[11px] uppercase tracking-[0.3em] text-[#D9B978]">
+                Verlyse Media
+              </p>
               <p className="font-mono text-[11px] uppercase tracking-[0.24em] text-ivory/60">
                 Folio №{focusedFolio.folio} · {focusedFolio.category.toUpperCase()}
               </p>
@@ -407,7 +600,9 @@ export default function Room() {
                 <h2 className="font-serif text-[clamp(2.6rem,7vw,5.5rem)] font-semibold leading-[1.02] text-ivory">
                   {focusedFolio.title}
                 </h2>
-                <p className="mt-10 font-serif text-xl text-[#D9B978] md:text-2xl">{focusedFolio.author}</p>
+                <p className="mt-10 font-serif text-xl text-[#D9B978] md:text-2xl">
+                  {focusedFolio.author}
+                </p>
                 <p className="mt-3 font-mono text-[12px] uppercase tracking-[0.2em] text-ivory/55">
                   {focusedFolio.date} · {focusedFolio.readingTime.toUpperCase()}
                 </p>
@@ -417,21 +612,7 @@ export default function Room() {
         )}
       </AnimatePresence>
 
-      {/* ---- category header (state 10) ---- */}
-      {state === 'category' && category && (
-        <div className="pointer-events-none absolute inset-x-0 top-24 z-[360] px-6 md:px-16">
-          <p className="font-mono text-[11px] uppercase tracking-[0.28em] text-gold">Filter the thread</p>
-          <h2 className="mt-2 font-serif text-[clamp(2.2rem,5vw,3.6rem)] font-semibold leading-none">{category}</h2>
-          <p className="mt-2 font-mono text-[11px] uppercase tracking-[0.2em] text-ivory/60">
-            {FOLIOS.filter((f) => f.category === category).length} folios · the room never becomes a list
-          </p>
-          <button type="button" onClick={closeLayer} className="btn btn-ghost pointer-events-auto mt-4 !px-4 !py-2 text-[11px]">
-            Clear filter ↩
-          </button>
-        </div>
-      )}
-
-      {/* ---- creator dossier panel (state 11) ---- */}
+      {/* Creator Dossier Side Drawer (State 11) */}
       {state === 'dossier' && dossierAuthorRecord && (
         <motion.aside
           initial={{ opacity: 0, x: -24 }}
@@ -474,14 +655,18 @@ export default function Room() {
             >
               Full profile →
             </Link>
-            <button type="button" onClick={closeLayer} className="btn btn-ghost pointer-events-auto w-full">
+            <button
+              type="button"
+              onClick={closeLayer}
+              className="btn btn-ghost pointer-events-auto w-full"
+            >
               Back to the room
             </button>
           </div>
         </motion.aside>
       )}
 
-      {/* ---- search overlay (state 12) ---- */}
+      {/* Search Overlay */}
       <AnimatePresence>
         {searchOpen && (
           <motion.div
@@ -489,132 +674,116 @@ export default function Room() {
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             transition={{ duration: reduced ? 0 : 0.35 }}
-            className="absolute inset-0 z-[600] flex items-start justify-center overflow-y-auto bg-[#2A0F18]/90 px-6 pt-[18vh] pb-12"
+            className="absolute inset-0 z-[600] flex items-start justify-center overflow-y-auto bg-[#2A0F18]/95 px-6 pt-[14vh] pb-12 backdrop-blur-md"
             role="dialog"
             aria-modal="true"
-            aria-label="Search the archive"
+            aria-label="Search the spatial archive"
           >
             <div className="w-full max-w-xl">
-              <p className="text-center font-mono text-[12px] uppercase tracking-[0.3em] text-gold">Search the archive</p>
+              <div className="flex items-center justify-between border-b border-gold/30 pb-3">
+                <p className="font-mono text-[11px] uppercase tracking-[0.3em] text-gold">
+                  Search the Spatial Archive
+                </p>
+                <button
+                  type="button"
+                  onClick={() => setSearchOpen(false)}
+                  className="text-sm font-mono text-white/50 hover:text-gold"
+                >
+                  ✕ Esc
+                </button>
+              </div>
+
               <input
                 ref={searchRef}
                 value={query}
                 onChange={(e) => setQuery(e.target.value)}
-                placeholder="title, author, or category…"
+                placeholder="Title, author, or category…"
                 aria-label="Search folios"
                 className="mt-6 w-full border-b border-gold/60 bg-transparent pb-3 text-center font-serif text-3xl italic text-ivory placeholder:text-ivory/30 focus:outline-none focus:ring-0 md:text-4xl"
               />
-              <ul className="mt-6 space-y-2">
+
+              <ul className="mt-6 space-y-2.5">
                 {searchResults.map((f) => (
                   <li key={f.id}>
                     <button
                       type="button"
-                      onClick={() => { setSearchOpen(false); enter(f.index) }}
-                      className="flex w-full items-center gap-4 rounded-sm bg-ivory px-4 py-3 text-left transition-transform hover:-translate-y-0.5"
+                      onClick={() => {
+                        setSearchOpen(false)
+                        select(f.index)
+                      }}
+                      className="flex w-full items-center gap-4 rounded-sm border border-gold/20 bg-[#160309] px-4 py-3 text-left transition-all hover:border-gold hover:bg-[#20050E]"
                     >
-                      <span className="font-mono text-base font-semibold text-gold">{f.folio}</span>
+                      <span className="font-mono text-sm font-semibold text-gold">
+                        №{f.folio}
+                      </span>
                       <span className="flex-1">
-                        <span className="block font-serif text-xl font-semibold text-[#241D18]">{f.title}</span>
-                        <span className="block font-mono text-[10px] uppercase tracking-[0.12em] text-gold/80">
+                        <span className="block font-serif text-lg text-ivory font-light">
+                          {f.title}
+                        </span>
+                        <span className="block font-mono text-[9px] uppercase tracking-[0.14em] text-gold/80 mt-0.5">
                           {f.author} · {f.category}
                         </span>
                       </span>
+                      <span className="font-mono text-[9px] text-white/40">Inspect →</span>
                     </button>
                   </li>
                 ))}
                 {query.trim() && searchResults.length === 0 && (
-                  <li className="text-center font-mono text-[11px] uppercase tracking-[0.2em] text-ivory/50">
+                  <li className="py-6 text-center font-mono text-[11px] uppercase tracking-[0.2em] text-ivory/50">
                     No folios on the thread match “{query}”.
                   </li>
                 )}
               </ul>
-              <p className="mt-6 text-center font-mono text-[11px] uppercase tracking-[0.24em] text-ivory/50">
-                Esc to return · or <Link to="/articles" className="text-gold underline underline-offset-4">browse the full archive</Link>
+
+              <p className="mt-8 text-center font-mono text-[10px] uppercase tracking-[0.24em] text-ivory/50">
+                Press Enter to select · or{' '}
+                <Link to="/articles" className="text-gold underline underline-offset-4">
+                  browse canonical archive
+                </Link>
               </p>
             </div>
           </motion.div>
         )}
       </AnimatePresence>
 
-      {/* ---- discovery controls: categories + dossier (discovery only, so they
-            never collide with the focus plate or the RETURN headline) ---- */}
-      {state === 'discovery' && (
-        <div className="pointer-events-none absolute inset-x-0 bottom-16 z-[400] hidden flex-col items-center gap-3 px-6 md:flex">
-          <div className="pointer-events-auto flex max-w-full flex-wrap items-center justify-center gap-2">
-            <button
-              type="button"
-              onClick={() => openDossier(FEATURED.authorId)}
-              className="rounded-full border border-gold/50 px-3 py-1 font-mono text-[10px] uppercase tracking-[0.16em] text-gold/90 transition-colors hover:border-gold hover:text-gold"
-            >
-              Dossier · {FEATURED.author}
-            </button>
-            {CATEGORIES.slice(0, 5).map((c) => (
-              <button
-                key={c}
-                type="button"
-                onClick={() => openCategory(c)}
-                className="rounded-full border border-ivory/20 px-3 py-1 font-mono text-[10px] uppercase tracking-[0.16em] text-ivory/60 transition-colors hover:border-gold hover:text-gold"
-              >
-                {c}
-              </button>
-            ))}
-          </div>
-        </div>
-      )}
+      {/* Help Modal */}
+      <HelpModal isOpen={helpOpen} onClose={() => setHelpOpen(false)} />
 
-      {/* discovery-layer chips should not overlay the focus/settle/next plates */}
-
-      {/* ---- discovery hint / controls ---- */}
-      {state === 'discovery' && (
-        <div className="pointer-events-none absolute inset-x-0 bottom-0 z-[400] flex flex-col items-center gap-3 p-8 pb-20 md:pb-8">
-          <p className="text-center font-mono text-[10px] uppercase tracking-[0.2em] text-ivory/60 md:text-[11px] md:tracking-[0.24em]">
-            <span className="md:hidden">Tap a plate · Enter pulls · Esc back</span>
-            <span className="hidden md:inline">← → choose plate · Enter pull · / search · Esc back</span>
-          </p>
-          <button type="button" className="btn btn-seal pointer-events-auto" onClick={() => go('focus')}>
-            Pull folio {focusedFolio.folio}
-          </button>
-        </div>
-      )}
-
-      {state === 'return' && (
-        <>
-          {/* frame 09 — RETURN headline over the restored thread */}
-          <div className="pointer-events-none absolute inset-x-0 top-24 z-[400] px-6 md:px-16">
-            <p className="font-mono text-[11px] uppercase tracking-[0.3em] text-gold">Return</p>
-            <h2 className="mt-3 font-serif text-[clamp(2.2rem,5vw,4rem)] font-semibold leading-none text-ivory">
-              Back to the archive.
-            </h2>
-            <div className="mt-5 h-px w-full bg-gold/40" aria-hidden />
-          </div>
-          <div className="pointer-events-none absolute inset-x-0 bottom-0 z-[400] flex flex-col items-center gap-2 p-8 pb-20 md:pb-8">
-            <p className="text-center font-mono text-[10px] uppercase tracking-[0.2em] text-ivory/60 md:text-[11px] md:tracking-[0.24em]">
-              {readSet.size} folio{readSet.size === 1 ? '' : 's'} read · the thread remembers
-            </p>
-            <button type="button" className="btn btn-ghost pointer-events-auto" onClick={() => go('discovery')}>
-              Browse the threads
-            </button>
-          </div>
-        </>
-      )}
-
-      {/* ---- footer meta (hidden during the wine takeover beats) ---- */}
+      {/* Archival Registration / State Footer */}
       {state !== 'entry' && state !== 'ending' && (
-      <footer className="pointer-events-none absolute inset-x-0 bottom-0 z-[300] flex items-end justify-between p-4 font-mono text-[10px] uppercase tracking-[0.2em] text-ivory/40 md:p-6">
-        <span>State {String(roomProgress).padStart(2, '0')} · {STATE_HINT[state]}</span>
-        <span className="hidden md:inline">Folio {focusedFolio.folio} / {String(count).padStart(2, '0')}</span>
-      </footer>
+        <footer className="pointer-events-none fixed inset-x-0 bottom-0 z-[350] flex items-end justify-between p-2.5 font-mono text-[8px] md:text-[9px] uppercase tracking-[0.22em] text-ivory/30">
+          <span>
+            Phase {String(roomProgress).padStart(2, '0')} · {STATE_HINT[state]}
+          </span>
+          <span className="hidden md:inline">
+            Meridian · Verlyse Media Keeping Room
+          </span>
+        </footer>
       )}
     </main>
   )
 }
 
 const STATE_INDEX: Partial<Record<RoomState, number>> = {
-  arrival: 1, discovery: 2, focus: 3, settle: 4, entry: 5,
-  ending: 7, next: 8, return: 9, category: 10, dossier: 11,
+  arrival: 1,
+  discovery: 2,
+  focus: 3,
+  settle: 4,
+  entry: 5,
+  ending: 7,
+  next: 8,
+  return: 9,
+  category: 10,
+  dossier: 11,
 }
 
-function Overlay({ children, align = 'center' }: { children: ReactNode; align?: 'center' | 'bottom' }) {
+function Overlay({
+  children,
+  align = 'center',
+}: {
+  children: ReactNode
+  align?: 'center' | 'bottom'
+}) {
   const pos =
     align === 'bottom'
       ? 'inset-x-0 bottom-24 items-center pb-6 text-center'
