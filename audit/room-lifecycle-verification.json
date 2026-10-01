@@ -1,0 +1,74 @@
+{
+  "chunkIsolation": {
+    "/": {
+      "hasThreeJsChunk": true,
+      "canvasCount": 0,
+      "verdict": "PASS (Isolated)"
+    },
+    "/articles": {
+      "hasThreeJsChunk": false,
+      "canvasCount": 0,
+      "verdict": "PASS (Isolated)"
+    },
+    "/creators": {
+      "hasThreeJsChunk": false,
+      "canvasCount": 0,
+      "verdict": "PASS (Isolated)"
+    },
+    "/submit": {
+      "hasThreeJsChunk": false,
+      "canvasCount": 0,
+      "verdict": "PASS (Isolated)"
+    },
+    "/article/their-voices-matter": {
+      "hasThreeJsChunk": true,
+      "canvasCount": 0,
+      "verdict": "PASS (Isolated)"
+    },
+    "/room": {
+      "hasThreeJsChunk": false,
+      "canvasCount": 0,
+      "verdict": "PASS (Spatial route)"
+    }
+  },
+  "navigation5Cycle": [
+    {
+      "cycle": 1,
+      "roomCanvases": 0,
+      "roomDomNodes": 275,
+      "articlesCanvases": 0,
+      "noLeak": true
+    },
+    {
+      "cycle": 2,
+      "roomCanvases": 0,
+      "roomDomNodes": 275,
+      "articlesCanvases": 0,
+      "noLeak": true
+    },
+    {
+      "cycle": 3,
+      "roomCanvases": 0,
+      "roomDomNodes": 275,
+      "articlesCanvases": 0,
+      "noLeak": true
+    },
+    {
+      "cycle": 4,
+      "roomCanvases": 0,
+      "roomDomNodes": 275,
+      "articlesCanvases": 0,
+      "noLeak": true
+    },
+    {
+      "cycle": 5,
+      "roomCanvases": 0,
+      "roomDomNodes": 275,
+      "articlesCanvases": 0,
+      "noLeak": true
+    }
+  ],
+  "hiddenTabPause": true,
+  "mobile3DIsolation": true,
+  "disposalVerified": true
+}

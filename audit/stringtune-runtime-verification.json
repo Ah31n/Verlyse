@@ -1,0 +1,207 @@
+{
+  "packageName": "@fiddle-digital/string-tune",
+  "installedVersion": "1.2.5",
+  "verifiedExportCount": 55,
+  "exportedClasses": [
+    "CursorReactiveModule",
+    "DOMBatcher",
+    "GridAdapter",
+    "ScrollController",
+    "StringAnchor",
+    "StringAttractor",
+    "StringCircularText",
+    "StringCursor",
+    "StringData",
+    "StringDelayLerpTracker",
+    "StringDevIconRegistry",
+    "StringDevInview",
+    "StringDevLayout",
+    "StringDevModule",
+    "StringDevOverlayRegistry",
+    "StringDevProgress",
+    "StringDevRulers",
+    "StringFPSTracker",
+    "StringForm",
+    "StringGlide",
+    "StringImpulse",
+    "StringLazy",
+    "StringLerp",
+    "StringLerpTracker",
+    "StringLoading",
+    "StringMagnetic",
+    "StringMarquee",
+    "StringMasonry",
+    "StringModule",
+    "StringObject",
+    "StringParallax",
+    "StringPositionTracker",
+    "StringProgress",
+    "StringProgressPart",
+    "StringRandom",
+    "StringResponsive",
+    "StringScrollContainer",
+    "StringScrollbar",
+    "StringScroller",
+    "StringSequence",
+    "StringSignal",
+    "StringSplit",
+    "StringSpotlight",
+    "StringTilt",
+    "StringTune",
+    "StringTuneScrollSettings",
+    "StringVelocity",
+    "StringVideoAutoplay",
+    "buildDevtoolsThemeBlock",
+    "default",
+    "ensureStringDevtoolsSharedStyles",
+    "frameDOM",
+    "resolveDevtoolsIcon",
+    "startPointerDrag",
+    "styleTxn"
+  ],
+  "moduleMatrix": {
+    "split": {
+      "exportedClass": "StringSplit",
+      "isExported": true,
+      "supportedAttribute": "string=\"split\"",
+      "configAttributes": [
+        "string-id",
+        "string-split"
+      ],
+      "implementation": "Native StringTune",
+      "description": "Breaks headline typography into character/word spans for GPU-accelerated reveal."
+    },
+    "spotlight": {
+      "exportedClass": "StringSpotlight",
+      "isExported": true,
+      "supportedAttribute": "string=\"spotlight\"",
+      "configAttributes": [
+        "string-id",
+        "string-lerp"
+      ],
+      "implementation": "Native StringTune",
+      "description": "Draws dynamic key-light radial gradient following pointer coordinates on cards."
+    },
+    "tilt": {
+      "exportedClass": "StringTilt",
+      "isExported": true,
+      "supportedAttribute": "string=\"tilt\"",
+      "configAttributes": [
+        "string-tilt-max",
+        "string-tilt-tension"
+      ],
+      "implementation": "Native StringTune",
+      "description": "3D perspective card tilt responding to pointer movement."
+    },
+    "magnetic": {
+      "exportedClass": "StringMagnetic",
+      "isExported": true,
+      "supportedAttribute": "string=\"magnetic\"",
+      "configAttributes": [
+        "string-strength",
+        "string-radius"
+      ],
+      "implementation": "Native StringTune",
+      "description": "Pulls interactive CTAs toward fine pointer within proximity threshold."
+    },
+    "progress": {
+      "exportedClass": "StringProgress",
+      "isExported": true,
+      "supportedAttribute": "string=\"progress\"",
+      "configAttributes": [
+        "string-progress-part"
+      ],
+      "implementation": "Native StringTune",
+      "description": "Tracks scroll progress and drives synchronized CSS custom properties."
+    },
+    "lazy": {
+      "exportedClass": "StringLazy",
+      "isExported": true,
+      "supportedAttribute": "string=\"lazy\"",
+      "configAttributes": [
+        "string-lazy"
+      ],
+      "implementation": "Native StringTune",
+      "description": "Restrained image loading and reveal upon viewport intersection."
+    },
+    "masonry": {
+      "exportedClass": "StringMasonry",
+      "isExported": true,
+      "supportedAttribute": "string=\"masonry\"",
+      "configAttributes": [
+        "string-masonry-cols",
+        "string-masonry-gap"
+      ],
+      "implementation": "Native StringTune",
+      "description": "Asymmetric column layout with deterministic fallback."
+    },
+    "parallax": {
+      "exportedClass": "StringParallax",
+      "isExported": true,
+      "supportedAttribute": "string=\"parallax\"",
+      "configAttributes": [
+        "string-factor",
+        "string-parallax"
+      ],
+      "implementation": "Native StringTune",
+      "description": "Restrained layer depth scroll tracking."
+    },
+    "reveal": {
+      "exportedClass": null,
+      "isExported": false,
+      "supportedAttribute": "string=\"reveal\"",
+      "configAttributes": [
+        "string-reveal"
+      ],
+      "implementation": "Local In-View Motion/React Adapter (Motion.div)",
+      "description": "Declarative hook routed through <Reveal> or StringTune split; Motion/React manages opacity/translate."
+    }
+  },
+  "runtimeDomVerification": {
+    "/": {
+      "splitSpansCount": 0,
+      "spotlightNodesCount": 0,
+      "splitActive": false,
+      "spotlightActive": false
+    },
+    "/articles": {
+      "spotlightNodesCount": 19,
+      "spotlightActive": true
+    },
+    "/creators": {
+      "tiltNodesCount": 1,
+      "tiltActive": true
+    },
+    "/article/their-voices-matter": {
+      "splitSpansCount": 6,
+      "splitActive": true
+    }
+  },
+  "motionOwnershipPolicy": {
+    "stringTune": [
+      "split",
+      "spotlight",
+      "tilt",
+      "magnetic",
+      "progress",
+      "lazy",
+      "masonry",
+      "parallax"
+    ],
+    "motionReact": [
+      "route-transitions",
+      "drawer-presence",
+      "modal-dialogs",
+      "in-view-reveal"
+    ],
+    "css": [
+      "color-transitions",
+      "pressed-scaling",
+      "haptic-feedback"
+    ],
+    "threeJsR3f": [
+      "spatial-3d-scene",
+      "cylindrical-camera-meridian"
+    ]
+  }
+}

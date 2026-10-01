@@ -19,23 +19,6 @@
       "canvases": 0,
       "scrollHeight": 21028,
       "brokenImages": [
-<<<<<<< HEAD
-<<<<<<< HEAD
-        "http://127.0.0.1:5173/img/works/DbaNAZTk5X9-1.webp",
-        "http://127.0.0.1:5173/img/works/DbYa5WSE5wf-1.webp",
-=======
->>>>>>> 6b1e357 (feat(routes): full 53-route architectural refinement, route-local component suites, state matrices, motion ownership, and validation reports)
-        "http://127.0.0.1:5173/img/works/DbQMFVEitsU-1.webp",
-        "http://127.0.0.1:5173/img/works/DbKynTxk_6F-1.webp",
-        "http://127.0.0.1:5173/img/works/DbCuHgrEypR-1.webp",
-        "http://127.0.0.1:5173/img/poster-3-13-1.webp",
-        "http://127.0.0.1:5173/img/works/DaDY7WRkw0y-3.webp",
-        "http://127.0.0.1:5173/img/works/DaDY7WRkw0y-4.webp",
-<<<<<<< HEAD
-=======
->>>>>>> c79c814 (feat(room): complete Keeping Room spatial archive redesign, modular UI components, dossier panel, collection rail, and verification suite)
-=======
->>>>>>> 6b1e357 (feat(routes): full 53-route architectural refinement, route-local component suites, state matrices, motion ownership, and validation reports)
         "http://127.0.0.1:5173/img/poster-3-13-3.webp"
       ],
       "consoleErrors": [],
@@ -358,10 +341,7 @@
       "canvases": 0,
       "scrollHeight": 15305,
       "brokenImages": [
-<<<<<<< HEAD
         "http://127.0.0.1:5173/img/poster-3-13-1.webp",
-=======
->>>>>>> 6b1e357 (feat(routes): full 53-route architectural refinement, route-local component suites, state matrices, motion ownership, and validation reports)
         "http://127.0.0.1:5173/img/works/DaMui9Ekrmy-1.webp"
       ],
       "consoleErrors": [],
@@ -438,6 +418,7 @@
       "canvases": 0,
       "scrollHeight": 9945,
       "brokenImages": [
+        "http://127.0.0.1:5173/img/inner/students-painting.webp",
         "http://127.0.0.1:5173/img/works/DakDJF9Ez1l-1.webp"
       ],
       "consoleErrors": [],
@@ -462,16 +443,7 @@
       },
       "canvases": 0,
       "scrollHeight": 8478,
-      "brokenImages": [
-<<<<<<< HEAD
-<<<<<<< HEAD
-        "http://127.0.0.1:5173/img/inner/tasbih-calligraphy.webp",
-=======
->>>>>>> c79c814 (feat(room): complete Keeping Room spatial archive redesign, modular UI components, dossier panel, collection rail, and verification suite)
-=======
->>>>>>> 6b1e357 (feat(routes): full 53-route architectural refinement, route-local component suites, state matrices, motion ownership, and validation reports)
-        "http://127.0.0.1:5173/img/works/DakDJF9Ez1l-1.webp"
-      ],
+      "brokenImages": [],
       "consoleErrors": [],
       "failedRequests": [],
       "passed": true
@@ -650,19 +622,11 @@
       "canvases": 0,
       "scrollHeight": 11764,
       "brokenImages": [
-<<<<<<< HEAD
-<<<<<<< HEAD
         "http://127.0.0.1:5173/img/inner/kashmir-photo.webp",
         "http://127.0.0.1:5173/img/inner/balochistan-photo.webp",
         "http://127.0.0.1:5173/img/inner/kashmir-photo.webp",
-=======
-        "http://127.0.0.1:5173/img/inner/balochistan-photo.webp",
->>>>>>> c79c814 (feat(room): complete Keeping Room spatial archive redesign, modular UI components, dossier panel, collection rail, and verification suite)
         "http://127.0.0.1:5173/img/works/Dar3wIXk02U-1.webp",
         "http://127.0.0.1:5173/img/works/DciqQXTCilh-1.webp"
-=======
-        "http://127.0.0.1:5173/img/inner/balochistan-photo.webp"
->>>>>>> 6b1e357 (feat(routes): full 53-route architectural refinement, route-local component suites, state matrices, motion ownership, and validation reports)
       ],
       "consoleErrors": [],
       "failedRequests": [],
@@ -713,14 +677,6 @@
       "canvases": 0,
       "scrollHeight": 8497,
       "brokenImages": [
-<<<<<<< HEAD
-<<<<<<< HEAD
-        "http://127.0.0.1:5173/img/works/DaXQtNiEzeH-1.webp",
-=======
->>>>>>> c79c814 (feat(room): complete Keeping Room spatial archive redesign, modular UI components, dossier panel, collection rail, and verification suite)
-=======
-        "http://127.0.0.1:5173/img/works/DaXQtNiEzeH-1.webp",
->>>>>>> 6b1e357 (feat(routes): full 53-route architectural refinement, route-local component suites, state matrices, motion ownership, and validation reports)
         "http://127.0.0.1:5173/img/works/Dae6nNME5bg-1.webp"
       ],
       "consoleErrors": [],
@@ -745,14 +701,10 @@
       },
       "canvases": 0,
       "scrollHeight": 9444,
-<<<<<<< HEAD
       "brokenImages": [
         "http://127.0.0.1:5173/img/works/DaXQtNiEzeH-1.webp",
         "http://127.0.0.1:5173/img/works/Dae6nNME5bg-1.webp"
       ],
-=======
-      "brokenImages": [],
->>>>>>> 6b1e357 (feat(routes): full 53-route architectural refinement, route-local component suites, state matrices, motion ownership, and validation reports)
       "consoleErrors": [],
       "failedRequests": [],
       "passed": true
@@ -777,13 +729,6 @@
       "scrollHeight": 12521,
       "brokenImages": [
         "http://127.0.0.1:5173/img/authors/syeda-tasbeeha-noman.jpg",
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
-        "http://127.0.0.1:5173/img/works/DbaNAZTk5X9-1.webp",
->>>>>>> c79c814 (feat(room): complete Keeping Room spatial archive redesign, modular UI components, dossier panel, collection rail, and verification suite)
-=======
->>>>>>> 6b1e357 (feat(routes): full 53-route architectural refinement, route-local component suites, state matrices, motion ownership, and validation reports)
         "http://127.0.0.1:5173/img/works/DaXQtNiEzeH-1.webp",
         "http://127.0.0.1:5173/img/works/Dae6nNME5bg-1.webp"
       ],
