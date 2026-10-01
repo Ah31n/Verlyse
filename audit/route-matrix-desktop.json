@@ -56,6 +56,7 @@
     "footerBottom": 3021,
     "footerAtBottom": true,
     "footerIsFixedOffset": 0.015625,
+<<<<<<< HEAD
 =======
     "title": "Verlyse Media — Where Vision Becomes A Voice",
     "h1": null,
@@ -65,6 +66,8 @@
     "footerAtBottom": true,
     "footerIsFixedOffset": 0.21875,
 >>>>>>> c79c814 (feat(room): complete Keeping Room spatial archive redesign, modular UI components, dossier panel, collection rail, and verification suite)
+=======
+>>>>>>> 6b1e357 (feat(routes): full 53-route architectural refinement, route-local component suites, state matrices, motion ownership, and validation reports)
     "overflowX": false,
     "scrollWidth": 1440,
     "innerWidth": 1440,
@@ -238,16 +241,22 @@
     "h1": "WINGSThe wings",
     "scrollHeight": 2801,
 <<<<<<< HEAD
+<<<<<<< HEAD
     "footerTop": 1507,
     "footerBottom": 2786,
     "footerAtBottom": false,
     "footerIsFixedOffset": 15.171875,
 =======
+=======
+>>>>>>> 6b1e357 (feat(routes): full 53-route architectural refinement, route-local component suites, state matrices, motion ownership, and validation reports)
     "footerTop": 1522,
     "footerBottom": 2801,
     "footerAtBottom": true,
     "footerIsFixedOffset": 0.171875,
+<<<<<<< HEAD
 >>>>>>> c79c814 (feat(room): complete Keeping Room spatial archive redesign, modular UI components, dossier panel, collection rail, and verification suite)
+=======
+>>>>>>> 6b1e357 (feat(routes): full 53-route architectural refinement, route-local component suites, state matrices, motion ownership, and validation reports)
     "overflowX": false,
     "scrollWidth": 1440,
     "innerWidth": 1440,
@@ -322,6 +331,7 @@
   },
   "article-the-arts-deserve-respect|desktop": {
 <<<<<<< HEAD
+<<<<<<< HEAD
     "title": "Verlyse Media — Where Vision Becomes A Voice",
     "h1": null,
     "scrollHeight": 1999,
@@ -338,6 +348,15 @@
     "footerAtBottom": true,
     "footerIsFixedOffset": 0.484375,
 >>>>>>> c79c814 (feat(room): complete Keeping Room spatial archive redesign, modular UI components, dossier panel, collection rail, and verification suite)
+=======
+    "title": "The Arts Deserve Respect — Verlyse Media",
+    "h1": "“The ArtsDeserve Respect”",
+    "scrollHeight": 11403,
+    "footerTop": 10125,
+    "footerBottom": 11403,
+    "footerAtBottom": true,
+    "footerIsFixedOffset": 0.484375,
+>>>>>>> 6b1e357 (feat(routes): full 53-route architectural refinement, route-local component suites, state matrices, motion ownership, and validation reports)
     "overflowX": false,
     "scrollWidth": 1440,
     "innerWidth": 1440,
@@ -347,6 +366,7 @@
     "issues": []
   },
   "article-hope-becomes-mythology|desktop": {
+<<<<<<< HEAD
     "title": "Hope Becomes Mythology — Verlyse Media",
     "h1": "“Hope BecomesMythology”",
     "scrollHeight": 9052,
@@ -354,6 +374,15 @@
     "footerBottom": 9052,
     "footerAtBottom": true,
     "footerIsFixedOffset": 0.09375,
+=======
+    "title": "Verlyse Media — Where Vision Becomes A Voice",
+    "h1": null,
+    "scrollHeight": 1999,
+    "footerTop": 720,
+    "footerBottom": 1999,
+    "footerAtBottom": true,
+    "footerIsFixedOffset": 0.21875,
+>>>>>>> 6b1e357 (feat(routes): full 53-route architectural refinement, route-local component suites, state matrices, motion ownership, and validation reports)
     "overflowX": false,
     "scrollWidth": 1440,
     "innerWidth": 1440,
@@ -379,6 +408,7 @@
     "issues": []
   },
   "article-tasbih-e-fatima|desktop": {
+<<<<<<< HEAD
     "title": "Tasbih-e-Fatima — Verlyse Media",
     "h1": "“Tasbih-e-Fatima”",
     "scrollHeight": 8478,
@@ -386,6 +416,15 @@
     "footerBottom": 8478,
     "footerAtBottom": true,
     "footerIsFixedOffset": 0.34375,
+=======
+    "title": "Verlyse Media — Where Vision Becomes A Voice",
+    "h1": null,
+    "scrollHeight": 1999,
+    "footerTop": 720,
+    "footerBottom": 1999,
+    "footerAtBottom": true,
+    "footerIsFixedOffset": 0.21875,
+>>>>>>> 6b1e357 (feat(routes): full 53-route architectural refinement, route-local component suites, state matrices, motion ownership, and validation reports)
     "overflowX": false,
     "scrollWidth": 1440,
     "innerWidth": 1440,
@@ -464,6 +503,7 @@
     "scrollHeight": 10711,
     "footerTop": 9432,
     "footerBottom": 10711,
+<<<<<<< HEAD
     "footerAtBottom": true,
     "footerIsFixedOffset": 0.15625,
     "overflowX": false,
@@ -512,8 +552,58 @@
     "scrollHeight": 10531,
     "footerTop": 9252,
     "footerBottom": 10531,
+=======
+>>>>>>> 6b1e357 (feat(routes): full 53-route architectural refinement, route-local component suites, state matrices, motion ownership, and validation reports)
     "footerAtBottom": true,
     "footerIsFixedOffset": 0.15625,
+    "overflowX": false,
+    "scrollWidth": 1440,
+    "innerWidth": 1440,
+    "route": "/article/the-horrors-of-child-sexual-abuse",
+    "viewport": "desktop",
+    "recordStart": 0,
+    "issues": []
+  },
+  "article-khageena|desktop": {
+    "title": "Khageena — Verlyse Media",
+    "h1": "“Khageena”",
+    "scrollHeight": 10786,
+    "footerTop": 9507,
+    "footerBottom": 10786,
+    "footerAtBottom": true,
+    "footerIsFixedOffset": 0.21875,
+    "overflowX": false,
+    "scrollWidth": 1440,
+    "innerWidth": 1440,
+    "route": "/article/khageena",
+    "viewport": "desktop",
+    "recordStart": 0,
+    "issues": []
+  },
+  "article-behind-every-headline|desktop": {
+    "title": "Behind Every Headline — Verlyse Media",
+    "h1": "“Behind EveryHeadline”",
+    "scrollHeight": 11764,
+    "footerTop": 10485,
+    "footerBottom": 11764,
+    "footerAtBottom": true,
+    "footerIsFixedOffset": 0.25,
+    "overflowX": false,
+    "scrollWidth": 1440,
+    "innerWidth": 1440,
+    "route": "/article/behind-every-headline",
+    "viewport": "desktop",
+    "recordStart": 0,
+    "issues": []
+  },
+  "article-jaldi|desktop": {
+    "title": "Verlyse Media — Where Vision Becomes A Voice",
+    "h1": null,
+    "scrollHeight": 1999,
+    "footerTop": 720,
+    "footerBottom": 1999,
+    "footerAtBottom": true,
+    "footerIsFixedOffset": 0.21875,
     "overflowX": false,
     "scrollWidth": 1440,
     "innerWidth": 1440,
@@ -574,11 +664,15 @@
     "title": "Mir Raza Ali — Verlyse Media",
     "h1": "“Mir Raza Ali”",
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> 6b1e357 (feat(routes): full 53-route architectural refinement, route-local component suites, state matrices, motion ownership, and validation reports)
     "scrollHeight": 10862,
     "footerTop": 9584,
     "footerBottom": 10862,
     "footerAtBottom": true,
     "footerIsFixedOffset": 0.421875,
+<<<<<<< HEAD
 =======
     "scrollHeight": 10523,
     "footerTop": 9244,
@@ -586,6 +680,8 @@
     "footerAtBottom": true,
     "footerIsFixedOffset": 0.015625,
 >>>>>>> c79c814 (feat(room): complete Keeping Room spatial archive redesign, modular UI components, dossier panel, collection rail, and verification suite)
+=======
+>>>>>>> 6b1e357 (feat(routes): full 53-route architectural refinement, route-local component suites, state matrices, motion ownership, and validation reports)
     "overflowX": false,
     "scrollWidth": 1440,
     "innerWidth": 1440,
