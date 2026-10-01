@@ -345,14 +345,19 @@ export default function ArticleDetail() {
       {/* ---------- Hero — framed by the publication's world ---------- */}
       {article.heroMode === 'quiet' ? (
         /* ——— QUIET: the poem as a letterhead — no bleed image, all type ——— */
-        <section className="relative flex min-h-[72svh] items-end overflow-hidden border-b border-white/10 bg-wine-deep pt-36">
+        <section
+          string="parallax"
+          string-parallax="0.06"
+          string-id={`article-hero-${article.id}`}
+          className="relative flex min-h-[72svh] items-end overflow-hidden border-b border-white/10 bg-wine-deep pt-36"
+        >
           <WorldTexture world={article.world} />
           <div aria-hidden="true" className="pointer-events-none absolute inset-x-0 top-0 h-72 bg-[radial-gradient(62%_55%_at_50%_6%,rgba(184,145,70,0.05),transparent_74%)]" />
           <div className="relative z-[2] mx-auto w-full max-w-page px-[clamp(1.75rem,5.5vw,4.75rem)] pb-16">
             <BreadcrumbFolio category={article.category} folioNumber={ARTICLES.findIndex(a => a.id === article.id) + 1} className="mb-6" />
             <Reveal><p className="kicker">Verlyse Media presents — a submission by {author?.name}</p></Reveal>
             <InkSpread className={`${vibe.titleClass} inline-block`} origin="50% 80%">
-              <SplitText as="h1" text={`“${article.title}”`} className="mt-6 max-w-[18ch] text-[clamp(3rem,8vw,7.5rem)]" />
+              <SplitText string="split" string-id={`title-${article.id}`} as="h1" text={`“${article.title}”`} className="mt-6 max-w-[18ch] text-[clamp(3rem,8vw,7.5rem)]" />
             </InkSpread>
             <Reveal delay={0.2} className="mt-8">
               <MetaRow category={article.category} author={author?.name} readingTime={article.readingTime} />
@@ -369,7 +374,12 @@ export default function ArticleDetail() {
         /* ——— DOCUMENTARY: the dispatch — dateline, stronger type, the cover as a
             framed plate (fixed aspect ratio, object-contain — never a stretched
             full-bleed banner, never cropped) ——— */
-        <section className="relative flex min-h-[86svh] items-center overflow-hidden border-b border-white/10 bg-wine-deep pt-36">
+        <section
+          string="parallax"
+          string-parallax="0.08"
+          string-id={`article-hero-${article.id}`}
+          className="relative flex min-h-[86svh] items-center overflow-hidden border-b border-white/10 bg-wine-deep pt-36"
+        >
           <WorldTexture world={article.world} />
           <div aria-hidden="true" className="pointer-events-none absolute inset-x-0 top-0 h-72 bg-[radial-gradient(62%_55%_at_50%_6%,rgba(184,145,70,0.05),transparent_74%)]" />
           <div className="relative z-[2] mx-auto flex w-full max-w-page flex-col items-center px-[clamp(1.75rem,5.5vw,4.75rem)] pb-14 text-center">
@@ -383,7 +393,7 @@ export default function ArticleDetail() {
               </Reveal>
               <Reveal><p className="kicker">Verlyse Media presents — a submission by {author?.name}</p></Reveal>
               <div className={`${vibe.titleClass} inline-block`}>
-                <SplitText as="h1" text={`“${article.title}”`} className="mx-auto mt-5 max-w-[20ch] text-[clamp(2.8rem,6.8vw,6.4rem)]" />
+                <SplitText string="split" string-id={`title-${article.id}`} as="h1" text={`“${article.title}”`} className="mx-auto mt-5 max-w-[20ch] text-[clamp(2.8rem,6.8vw,6.4rem)]" />
               </div>
               <Reveal delay={0.2} className="mt-8 flex justify-center">
                 <MetaRow category={article.category} author={author?.name} readingTime={article.readingTime} />
@@ -395,11 +405,9 @@ export default function ArticleDetail() {
             <Reveal delay={0.25}>
               <figure className="relative mx-auto mt-12 w-full max-w-[640px] max-sm:w-[88%]">
                 <div className="img-frame relative overflow-hidden border border-white/15">
-                  {/* the cover plate — the frame takes the photograph's own
-                      ratio (aspect-[3/4] default), object-contain keeps the
-                      entire original visible. On phones it is scaled down so
-                      the title and metadata stay the focal point. */}
                   <img
+                    string="lazy"
+                    string-lazy=""
                     src={article.cover}
                     alt=""
                     className="aspect-[4/5] w-full object-contain"
@@ -417,14 +425,19 @@ export default function ArticleDetail() {
         </section>
       ) : article.heroMode === 'gallery' ? (
         /* ——— GALLERY: the artwork itself is the hero — the plate, framed ——— */
-        <section className="relative flex min-h-[80svh] items-end overflow-hidden border-b border-white/10 bg-wine-deep pt-36">
+        <section
+          string="parallax"
+          string-parallax="0.08"
+          string-id={`article-hero-${article.id}`}
+          className="relative flex min-h-[80svh] items-end overflow-hidden border-b border-white/10 bg-wine-deep pt-36"
+        >
           <WorldTexture world={article.world} />
           <div className="relative z-[2] mx-auto w-full max-w-page px-[clamp(1.75rem,5.5vw,4.75rem)] pb-16">
             <div className="grid grid-cols-1 items-end gap-10 lg:grid-cols-[1fr_auto]">
               <div>
                 <Reveal><p className="kicker">Verlyse Media presents — a submission by {author?.name}</p></Reveal>
                 <div className={`${vibe.titleClass} inline-block`}>
-                  <SplitText as="h1" text={`“${article.title}”`} className="mt-5 max-w-[18ch] text-[clamp(2.8rem,7vw,6.6rem)]" />
+                  <SplitText string="split" string-id={`title-${article.id}`} as="h1" text={`“${article.title}”`} className="mt-5 max-w-[18ch] text-[clamp(2.8rem,7vw,6.6rem)]" />
                 </div>
                 <Reveal delay={0.2} className="mt-7">
                   <MetaRow category={article.category} author={author?.name} readingTime={article.readingTime} />
@@ -434,7 +447,7 @@ export default function ArticleDetail() {
                 <figure className="relative w-full max-w-[300px]">
                   <div aria-hidden="true" className="absolute -inset-3 translate-x-3 translate-y-3 border border-gold/35" />
                   <div className="img-frame relative overflow-hidden border border-gold/25">
-                    <img src={article.cover} alt="" className="aspect-[4/5] w-full object-cover" loading="lazy" />
+                    <img string="lazy" string-lazy="" src={article.cover} alt="" className="aspect-[4/5] w-full object-cover" loading="lazy" />
                     <span aria-hidden="true" className="absolute inset-2 border border-gold/40" />
                   </div>
                   <figcaption className="mt-3 flex items-center justify-between font-mono text-[9px] uppercase tracking-[0.30em] text-white/50">
@@ -448,9 +461,14 @@ export default function ArticleDetail() {
         </section>
       ) : (
         /* ——— CINEMATIC: the default full-bleed ——— */
-        <section className="relative flex min-h-[92svh] items-end overflow-hidden pt-36">
+        <section
+          string="parallax"
+          string-parallax="0.08"
+          string-id={`article-hero-${article.id}`}
+          className="relative flex min-h-[92svh] items-end overflow-hidden pt-36"
+        >
           <div aria-hidden="true" className="absolute inset-0">
-            <img src={article.cover} alt="" className="h-full w-full object-cover" />
+            <img string="lazy" string-lazy="" src={article.cover} alt="" className="h-full w-full object-cover" />
           </div>
           <div aria-hidden="true" className={`absolute inset-0 ${vibe.overlay}`} />
           <VibeAmbient vibe={article.vibe ?? 'solemn'} section="hero" />
@@ -458,7 +476,7 @@ export default function ArticleDetail() {
             <BreadcrumbFolio category={article.category} folioNumber={ARTICLES.findIndex(a => a.id === article.id) + 1} className="mb-6" />
             <Reveal><p className="kicker">Verlyse Media presents — a submission by {author?.name}</p></Reveal>
             <InkSpread className={`${vibe.titleClass} inline-block`} origin="50% 80%">
-              <SplitText as="h1" text={`“${article.title}”`} className="mt-6 max-w-[20ch] text-[clamp(2.8rem,7vw,6.6rem)]" />
+              <SplitText string="split" string-id={`title-${article.id}`} as="h1" text={`“${article.title}”`} className="mt-6 max-w-[20ch] text-[clamp(2.8rem,7vw,6.6rem)]" />
             </InkSpread>
             <Reveal delay={0.2} className="mt-8">
               <div className="flex flex-wrap items-center gap-5">

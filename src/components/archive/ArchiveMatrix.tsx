@@ -22,7 +22,14 @@ export function ArchiveMatrix({
   const [hoveredId, setHoveredId] = useState<string | null>(null)
 
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-12 gap-6 md:gap-8 items-start">
+    <div
+      string="masonry"
+      string-id="archive-masonry-matrix"
+      string-masonry-cols="1|640:2|1024:3"
+      string-masonry-gap="20|640:28|1024:36"
+      string-masonry-mode="auto"
+      className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-12 gap-6 md:gap-8 items-start"
+    >
       {articles.map((article, index) => {
         const author = getAuthor(article.authorId)
         const folioNum = String(ARTICLES.findIndex((a) => a.id === article.id) + 1).padStart(2, '0')

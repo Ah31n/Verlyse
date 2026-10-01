@@ -561,6 +561,49 @@
    STRINGTUNE & COMPONENT INTERACTION UTILITIES
    ============================================================ */
 
+/* StringTune Attribute & Custom Property Bridges */
+[string="magnetic"], [data-string="magnetic"] {
+  will-change: transform;
+  transform: translate3d(calc(var(--magnetic-x, 0) * 1px), calc(var(--magnetic-y, 0) * 1px), 0);
+  transition: transform 0.15s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+@media (pointer: coarse), (prefers-reduced-motion: reduce) {
+  [string="magnetic"], [data-string="magnetic"] {
+    transform: none !important;
+  }
+}
+
+[string="tilt"], [data-string="tilt"] {
+  will-change: transform;
+  transform: perspective(1000px) rotateX(calc(var(--tilt-y, 0) * 1deg)) rotateY(calc(var(--tilt-x, 0) * 1deg));
+  transition: transform 0.2s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+@media (pointer: coarse), (prefers-reduced-motion: reduce) {
+  [string="tilt"], [data-string="tilt"] {
+    transform: none !important;
+  }
+}
+
+[string="spotlight"], [data-string="spotlight"] {
+  position: relative;
+}
+
+[string="progress"], [data-string="progress"] {
+  --st-progress: var(--progress, 0);
+}
+
+[string="parallax"], [data-string="parallax"] {
+  will-change: transform;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  [string="parallax"], [data-string="parallax"] {
+    transform: none !important;
+  }
+}
+
 @keyframes string-tune-rise {
   0% {
     transform: translateY(115%);

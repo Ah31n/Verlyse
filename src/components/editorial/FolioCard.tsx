@@ -129,6 +129,9 @@ export function FolioCard({
   return (
     <Link
       to={`/article/${article.id}`}
+      string="spotlight"
+      string-lerp="0.18"
+      string-id={`folio-card-${article.id}`}
       className={clsx(
         'group relative block h-full no-underline focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-gold',
         className
@@ -138,6 +141,7 @@ export function FolioCard({
     >
       <SpotlightCard
         theme="dark"
+        stringId={`folio-spotlight-${article.id}`}
         className="h-full flex flex-col justify-between border border-white/10 bg-[#25070F]/85 p-6 transition-all duration-500 hover:border-gold/60 hover:shadow-[0_20px_45px_rgba(0,0,0,0.6)]"
       >
         {/* Ghost Archival Folio Numeral */}
@@ -165,6 +169,8 @@ export function FolioCard({
           {showImage && article.cover && (
             <div className="relative aspect-[16/10] overflow-hidden border border-gold/25 bg-[#140307] mb-5">
               <motion.img
+                string="lazy"
+                string-lazy=""
                 src={article.cover}
                 alt={article.title}
                 className="h-full w-full object-cover transition-transform duration-700 ease-out group-hover:scale-105"

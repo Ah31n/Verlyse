@@ -1,21 +1,24 @@
 import React, { useRef, type ReactNode } from 'react'
 import { clsx } from 'clsx'
+import { isTouchDevice, isReducedMotion } from '../motion/StringTuneAdapter'
 
 export function SpotlightCard({
   children,
   className = '',
   theme = 'dark',
   borderHighlight = true,
+  stringId,
   ...props
 }: React.HTMLAttributes<HTMLDivElement> & {
   children: ReactNode
   theme?: 'dark' | 'paper'
   borderHighlight?: boolean
+  stringId?: string
 }) {
   const cardRef = useRef<HTMLDivElement>(null)
 
   const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
-    if (!cardRef.current) return
+    if (!cardRef.current || isTouchDevice() || isReducedMotion()) return
     const rect = cardRef.current.getBoundingClientRect()
     const x = e.clientX - rect.left
     const y = e.clientY - rect.top
@@ -32,6 +35,11 @@ export function SpotlightCard({
   return (
     <div
       ref={cardRef}
+      string="spotlight"
+      string-id={stringId}
+      string-lerp="0.2"
+      string-dist-max="320"
+      string-deadzone="4"
       onMouseMove={handleMouseMove}
       onMouseLeave={handleMouseLeave}
       className={clsx(

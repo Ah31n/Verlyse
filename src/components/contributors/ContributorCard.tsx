@@ -20,6 +20,10 @@ export function ContributorCard({
   return (
     <Link
       to={`/creator/${author.id}`}
+      string="tilt"
+      string-tilt-max="6"
+      string-tilt-tension="0.2"
+      string-id={`contributor-card-${author.id}`}
       className={clsx('block group no-underline focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-gold', className)}
       data-cursor="link"
       data-cursor-label="DOSSIER"

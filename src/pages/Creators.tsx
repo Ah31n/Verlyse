@@ -90,8 +90,12 @@ export default function Creators() {
       <div onKeyDown={onKeyDown} className="relative mx-auto max-w-[1440px] px-[clamp(1.25rem,4vw,4.75rem)] pb-[clamp(4rem,9vh,7rem)] pt-[clamp(7rem,15vh,9.5rem)]">
         {/* ——— MID · header — ghost CONTRIBUTORS + real subtitle ——— */}
         <div className="text-center">
-          <h1 className="relative font-serif text-[clamp(2.8rem,8vw,6.5rem)] font-light leading-[0.9] tracking-[-0.02em] text-ivory">
-                        <CrashZoom className="pointer-events-none absolute inset-x-0 top-1/2 -translate-y-1/2">
+          <h1
+            string="split"
+            string-id="creators-title"
+            className="relative font-serif text-[clamp(2.8rem,8vw,6.5rem)] font-light leading-[0.9] tracking-[-0.02em] text-ivory"
+          >
+            <CrashZoom className="pointer-events-none absolute inset-x-0 top-1/2 -translate-y-1/2">
               <span aria-hidden="true" className="block select-none font-serif text-[clamp(4rem,12vw,9.5rem)] font-semibold leading-none text-transparent [-webkit-text-stroke:1px_rgba(184,145,70,0.14)]">
                 CONTRIBUTORS
               </span>
@@ -115,6 +119,10 @@ export default function Creators() {
             {!resting && (
               <motion.article
                 key={selected.id}
+                string="tilt"
+                string-tilt-max="6"
+                string-tilt-tension="0.18"
+                string-id={`dossier-plate-${selected.id}`}
                 initial={reduced ? false : { opacity: 0, y: 18 }}
                 animate={{ opacity: 1, y: 0 }}
                 exit={reduced ? undefined : { opacity: 0, y: -12 }}
@@ -166,6 +174,8 @@ export default function Creators() {
                         className="group mt-5 flex items-center gap-4 border border-white/10 bg-[#F8F6F2]/[0.03] p-3 no-underline transition-colors duration-500 hover:border-gold/40 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-gold"
                       >
                         <img
+                          string="lazy"
+                          string-lazy=""
                           src={selectedFeature.thumbnail ?? selectedFeature.cover}
                           alt=""
                           loading="lazy"
@@ -187,9 +197,17 @@ export default function Creators() {
                     )}
 
                     <div className="mt-7 flex flex-wrap items-center gap-6">
-                      <Magnetic><Link to={`/creator/${selected.id}`} className="btn btn-gold">
-                        Open the dossier →
-                      </Link></Magnetic>
+                      <div
+                        string="magnetic"
+                        string-strength="0.25"
+                        string-radius="110"
+                        string-id="creator-dossier-cta"
+                        className="inline-block"
+                      >
+                        <Magnetic><Link to={`/creator/${selected.id}`} className="btn btn-gold">
+                          Open the dossier →
+                        </Link></Magnetic>
+                      </div>
                       <p className="font-mono text-[9px] uppercase tracking-[0.24em] text-white/45">
                         Record {String(recordNo).padStart(2, '0')} / {AUTHORS.length}
                       </p>
@@ -198,7 +216,12 @@ export default function Creators() {
 
                   {/* portrait / monogram plate */}
                   <Tilt3D>
-                  <div className="img-frame relative flex aspect-[3/4] w-full max-w-[210px] items-center justify-center overflow-hidden bg-[#22060D] border border-gold/40 p-2 shadow-[0_16px_36px_rgba(0,0,0,0.6)]">
+                  <div
+                    string="spotlight"
+                    string-lerp="0.2"
+                    string-id={`creator-portrait-${selected.id}`}
+                    className="img-frame relative flex aspect-[3/4] w-full max-w-[210px] items-center justify-center overflow-hidden bg-[#22060D] border border-gold/40 p-2 shadow-[0_16px_36px_rgba(0,0,0,0.6)]"
+                  >
                     {/* Archival corner registration marks */}
                     <span className="absolute top-2 left-2 font-mono text-[9px] text-gold/70 z-10 pointer-events-none">⌜</span>
                     <span className="absolute top-2 right-2 font-mono text-[9px] text-gold/70 z-10 pointer-events-none">⌝</span>
@@ -207,6 +230,8 @@ export default function Creators() {
 
                     {selected.portrait || selected.profilePhoto ? (
                       <img
+                        string="lazy"
+                        string-lazy=""
                         src={selected.profilePhoto ?? selected.portrait ?? authorPhoto(selected.id)}
                         alt={`${selected.name} — photograph`}
                         loading="lazy"

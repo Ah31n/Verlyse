@@ -314,7 +314,11 @@ export default function Room() {
             <p className="font-mono text-[12px] font-medium uppercase tracking-[0.32em] text-gold">
               Verlyse Media — A spatial archive of {count} voices
             </p>
-            <h1 className="mt-4 max-w-[10ch] font-serif text-[clamp(2.7rem,13vw,7.5rem)] font-semibold leading-[0.94] md:max-w-none">
+            <h1
+              string="split"
+              string-id="room-title"
+              className="mt-4 max-w-[10ch] font-serif text-[clamp(2.7rem,13vw,7.5rem)] font-semibold leading-[0.94] md:max-w-none"
+            >
               The Keeping<br />Room
             </h1>
             <p className="mt-6 max-w-xl font-serif text-[clamp(1.1rem,2vw,1.5rem)] italic leading-snug text-cream/90">

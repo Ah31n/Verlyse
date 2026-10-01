@@ -157,7 +157,11 @@ function Archive() {
             <p className="font-mono text-[10px] uppercase tracking-[0.34em] text-gold">
               The Archive — {LEDGER.features} features · {LEDGER.creators} creators · {LEDGER.departments} departments
             </p>
-            <h1 className="mt-4 font-serif text-[clamp(2.2rem,4.5vw,3.75rem)] font-light leading-[0.95] tracking-[-0.02em] text-ivory">
+            <h1
+              string="split"
+              string-id="articles-title"
+              className="mt-4 font-serif text-[clamp(2.2rem,4.5vw,3.75rem)] font-light leading-[0.95] tracking-[-0.02em] text-ivory"
+            >
               The <em className="italic text-gold">folio shelf</em>
             </h1>
           </div>

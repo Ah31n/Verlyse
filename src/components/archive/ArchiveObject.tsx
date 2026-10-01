@@ -46,6 +46,9 @@ export function ArchiveObject({
     >
       <Link
         to={`/article/${article.id}`}
+        string="spotlight"
+        string-lerp="0.18"
+        string-id={`archive-object-${article.id}`}
         className="group relative block h-full no-underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold focus-visible:ring-offset-2 focus-visible:ring-offset-[#1E0B12]"
         data-cursor="article"
         data-cursor-label="OPEN"

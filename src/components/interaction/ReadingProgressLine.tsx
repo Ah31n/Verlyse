@@ -1,7 +1,8 @@
 import { motion, useScroll, useSpring } from 'motion/react'
 
 /**
- * ReadingProgressLine — sticky 1px brass hairline measuring scroll progress.
+ * ReadingProgressLine — sticky 1.5px brass hairline measuring scroll progress.
+ * Integrates declarative StringTune progress attributes (`string="progress"`).
  */
 export function ReadingProgressLine({
   className = '',
@@ -17,6 +18,8 @@ export function ReadingProgressLine({
 
   return (
     <div
+      string="progress"
+      string-id="reading-progress-line"
       className={`fixed inset-x-0 top-0 z-[1200] h-[2px] bg-white/5 pointer-events-none ${className}`}
       aria-hidden="true"
     >

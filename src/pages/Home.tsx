@@ -173,6 +173,8 @@ function Cover({ selectedId, state }: { selectedId: string | null; state: Spatia
           Issue № {LEDGER.issueNo} — {LEDGER.features} folios · {LEDGER.creators} creators · {LEDGER.departments} departments
         </motion.p>
         <motion.h1
+          string="split"
+          string-id="home-main-headline"
           initial={reduce ? false : { opacity: 0, y: 26 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: D(1.2), delay: T.h1a, ease: E }}
@@ -219,6 +221,9 @@ function Cover({ selectedId, state }: { selectedId: string | null; state: Spatia
                 than one flat panel. ——— */}
           <Tilt3D>
           <motion.div
+            string="parallax"
+            string-parallax="0.12"
+            string-id="home-feature-plate"
             initial={reduce ? false : { opacity: 0, y: 22 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: D(1), delay: T.plate, ease: E }}
@@ -254,6 +259,8 @@ function Cover({ selectedId, state }: { selectedId: string | null; state: Spatia
               className="img-frame relative mt-4 aspect-[16/9] overflow-hidden border border-[#B89146]/50"
             >
               <img
+                string="lazy"
+                string-lazy=""
                 src={feature.cover}
                 alt={`Cover plate — “${feature.title}”`}
                 width={1280}
@@ -295,11 +302,19 @@ function Cover({ selectedId, state }: { selectedId: string | null; state: Spatia
             transition={{ duration: D(1), delay: T.cta, ease: E }}
             className="mt-8 flex flex-wrap items-center gap-7"
           >
-            <Magnetic>
-              <Link to="/articles" className="btn btn-gold">
-                Enter the archive →
-              </Link>
-            </Magnetic>
+            <div
+              string="magnetic"
+              string-strength="0.25"
+              string-radius="120"
+              string-id="home-primary-cta"
+              className="inline-block"
+            >
+              <Magnetic>
+                <Link to="/articles" className="btn btn-gold">
+                  Enter the archive →
+                </Link>
+              </Magnetic>
+            </div>
             <UnderlineLink to={`/article/${feature.id}`}>Read folio № 01</UnderlineLink>
           </motion.div>
 

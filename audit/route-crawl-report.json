@@ -6,7 +6,7 @@
       "httpStatus": 200,
       "title": "Where Vision Becomes A Voice — Verlyse Media",
       "h1Count": 1,
-      "h1Text": "“Where Vision Becomes A Voice”",
+      "h1Text": "“Where VisionBecomes A Voice”",
       "overflow": "NO OVERFLOW",
       "viewports": {
         "desktop-1440": false,
@@ -18,7 +18,9 @@
       },
       "canvases": 1,
       "scrollHeight": 21014,
-      "brokenImages": [],
+      "brokenImages": [
+        "http://127.0.0.1:5173/img/poster-3-13-3.webp"
+      ],
       "consoleErrors": [],
       "failedRequests": [],
       "passed": true
@@ -29,7 +31,7 @@
       "httpStatus": 200,
       "title": "Articles — Verlyse Media",
       "h1Count": 1,
-      "h1Text": "The folio shelf",
+      "h1Text": "The folio shelf",
       "overflow": "NO OVERFLOW",
       "viewports": {
         "desktop-1440": false,
@@ -52,7 +54,7 @@
       "httpStatus": 200,
       "title": "Categories — Verlyse Media",
       "h1Count": 1,
-      "h1Text": "WINGS The wings",
+      "h1Text": "WINGS The wings",
       "overflow": "NO OVERFLOW",
       "viewports": {
         "desktop-1440": false,
@@ -75,7 +77,7 @@
       "httpStatus": 200,
       "title": "Categories — Verlyse Media",
       "h1Count": 1,
-      "h1Text": "WINGS The wings",
+      "h1Text": "WINGS The wings",
       "overflow": "NO OVERFLOW",
       "viewports": {
         "desktop-1440": false,
@@ -98,7 +100,7 @@
       "httpStatus": 200,
       "title": "Featured Creators — Verlyse Media",
       "h1Count": 1,
-      "h1Text": "CONTRIBUTORS The wall of names",
+      "h1Text": "CONTRIBUTORS The wall of names",
       "overflow": "NO OVERFLOW",
       "viewports": {
         "desktop-1440": false,
@@ -204,7 +206,7 @@
       "httpStatus": 200,
       "title": "Submit — Verlyse Media",
       "h1Count": 1,
-      "h1Text": "THE EDITORIAL DESK The editorial desk",
+      "h1Text": "THE EDITORIAL DESK The editorial desk",
       "overflow": "NO OVERFLOW",
       "viewports": {
         "desktop-1440": false,
@@ -348,7 +350,7 @@
       "httpStatus": 200,
       "title": "The Arts Deserve Respect — Verlyse Media",
       "h1Count": 1,
-      "h1Text": "“The Arts Deserve Respect”",
+      "h1Text": "“The ArtsDeserve Respect”",
       "overflow": "NO OVERFLOW",
       "viewports": {
         "desktop-1440": false,
@@ -371,7 +373,7 @@
       "httpStatus": 200,
       "title": "Hope Becomes Mythology — Verlyse Media",
       "h1Count": 1,
-      "h1Text": "“Hope Becomes Mythology”",
+      "h1Text": "“Hope BecomesMythology”",
       "overflow": "NO OVERFLOW",
       "viewports": {
         "desktop-1440": false,
@@ -457,9 +459,7 @@
       },
       "canvases": 0,
       "scrollHeight": 11909,
-      "brokenImages": [
-        "http://127.0.0.1:5173/img/poster-3-13-1.webp"
-      ],
+      "brokenImages": [],
       "consoleErrors": [],
       "failedRequests": [],
       "passed": true
@@ -482,10 +482,7 @@
       },
       "canvases": 0,
       "scrollHeight": 8385,
-      "brokenImages": [
-        "http://127.0.0.1:5173/img/works/Dae6nNME5bg-1.webp",
-        "http://127.0.0.1:5173/img/works/Daw-mnAE_qe-1.webp"
-      ],
+      "brokenImages": [],
       "consoleErrors": [],
       "failedRequests": [],
       "passed": true
@@ -508,7 +505,9 @@
       },
       "canvases": 0,
       "scrollHeight": 9543,
-      "brokenImages": [],
+      "brokenImages": [
+        "http://127.0.0.1:5173/img/works/DaU7EU2E46N-1.webp"
+      ],
       "consoleErrors": [],
       "failedRequests": [],
       "passed": true
@@ -519,7 +518,7 @@
       "httpStatus": 200,
       "title": "If Hope Were a Feather — Verlyse Media",
       "h1Count": 1,
-      "h1Text": "“If Hope Were a Feather”",
+      "h1Text": "“If Hope Werea Feather”",
       "overflow": "NO OVERFLOW",
       "viewports": {
         "desktop-1440": false,
@@ -531,10 +530,7 @@
       },
       "canvases": 0,
       "scrollHeight": 8381,
-      "brokenImages": [
-        "http://127.0.0.1:5173/img/works/DaXQtNiEzeH-1.webp",
-        "http://127.0.0.1:5173/img/works/Daw-mnAE_qe-1.webp"
-      ],
+      "brokenImages": [],
       "consoleErrors": [],
       "failedRequests": [],
       "passed": true
@@ -545,7 +541,7 @@
       "httpStatus": 200,
       "title": "The Horrors of Child Sexual Abuse — Verlyse Media",
       "h1Count": 1,
-      "h1Text": "“The Horrors of Child Sexual Abuse”",
+      "h1Text": "“The Horrors ofChild Sexual Abuse”",
       "overflow": "NO OVERFLOW",
       "viewports": {
         "desktop-1440": false,
@@ -558,7 +554,6 @@
       "canvases": 0,
       "scrollHeight": 10711,
       "brokenImages": [
-        "http://127.0.0.1:5173/img/works/Dbf7jnBk3ho-1.webp",
         "http://127.0.0.1:5173/img/works/DciqQXTCilh-1.webp"
       ],
       "consoleErrors": [],
@@ -584,7 +579,6 @@
       "canvases": 0,
       "scrollHeight": 10786,
       "brokenImages": [
-        "http://127.0.0.1:5173/img/poster-3-13-1.webp",
         "http://127.0.0.1:5173/img/works/DbYa5WSE5wf-1.webp"
       ],
       "consoleErrors": [],
@@ -597,7 +591,7 @@
       "httpStatus": 200,
       "title": "Behind Every Headline — Verlyse Media",
       "h1Count": 1,
-      "h1Text": "“Behind Every Headline”",
+      "h1Text": "“Behind EveryHeadline”",
       "overflow": "NO OVERFLOW",
       "viewports": {
         "desktop-1440": false,
@@ -633,7 +627,6 @@
       "canvases": 0,
       "scrollHeight": 10531,
       "brokenImages": [
-        "http://127.0.0.1:5173/img/works/DaXQtNiEzeH-1.webp",
         "http://127.0.0.1:5173/img/works/Dae6nNME5bg-1.webp"
       ],
       "consoleErrors": [],
@@ -692,7 +685,7 @@
       "httpStatus": 200,
       "title": "The Garden Beyond My Tower — Verlyse Media",
       "h1Count": 1,
-      "h1Text": "“The Garden Beyond My Tower”",
+      "h1Text": "“The GardenBeyond My Tower”",
       "overflow": "NO OVERFLOW",
       "viewports": {
         "desktop-1440": false,
@@ -1109,7 +1102,7 @@
       "httpStatus": 200,
       "title": "Stories — Verlyse Media",
       "h1Count": 1,
-      "h1Text": "WINGS The wings",
+      "h1Text": "WINGS The wings",
       "overflow": "NO OVERFLOW",
       "viewports": {
         "desktop-1440": false,
@@ -1132,7 +1125,7 @@
       "httpStatus": 200,
       "title": "Poetry — Verlyse Media",
       "h1Count": 1,
-      "h1Text": "WINGS The wings",
+      "h1Text": "WINGS The wings",
       "overflow": "NO OVERFLOW",
       "viewports": {
         "desktop-1440": false,
@@ -1155,7 +1148,7 @@
       "httpStatus": 200,
       "title": "Essays — Verlyse Media",
       "h1Count": 1,
-      "h1Text": "WINGS The wings",
+      "h1Text": "WINGS The wings",
       "overflow": "NO OVERFLOW",
       "viewports": {
         "desktop-1440": false,
@@ -1178,7 +1171,7 @@
       "httpStatus": 200,
       "title": "Art — Verlyse Media",
       "h1Count": 1,
-      "h1Text": "WINGS The wings",
+      "h1Text": "WINGS The wings",
       "overflow": "NO OVERFLOW",
       "viewports": {
         "desktop-1440": false,
@@ -1201,7 +1194,7 @@
       "httpStatus": 200,
       "title": "Social Issues — Verlyse Media",
       "h1Count": 1,
-      "h1Text": "WINGS The wings",
+      "h1Text": "WINGS The wings",
       "overflow": "NO OVERFLOW",
       "viewports": {
         "desktop-1440": false,
@@ -1224,7 +1217,7 @@
       "httpStatus": 200,
       "title": "Lifestyle — Verlyse Media",
       "h1Count": 1,
-      "h1Text": "WINGS The wings",
+      "h1Text": "WINGS The wings",
       "overflow": "NO OVERFLOW",
       "viewports": {
         "desktop-1440": false,
@@ -1247,7 +1240,7 @@
       "httpStatus": 200,
       "title": "Horror — Verlyse Media",
       "h1Count": 1,
-      "h1Text": "WINGS The wings",
+      "h1Text": "WINGS The wings",
       "overflow": "NO OVERFLOW",
       "viewports": {
         "desktop-1440": false,

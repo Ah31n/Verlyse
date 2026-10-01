@@ -8,13 +8,15 @@ interface SplitTextProps {
   className?: string
   italicWord?: string
   delay?: number
+  string?: string
+  'string-id'?: string
 }
 
 /**
  * Masked word-by-word reveal — the signature headline entrance.
- * The `italicWord` fragment is rendered in gold italic serif.
+ * Integrates declarative StringTune split attributes.
  */
-export default function SplitText({ text, as = 'h2', className = '', italicWord, delay = 0 }: SplitTextProps) {
+export default function SplitText({ text, as = 'h2', className = '', italicWord, delay = 0, string = 'split', 'string-id': stringId }: SplitTextProps) {
   const ref = useRef<HTMLHeadingElement>(null)
   const inView = useInView(ref, { once: true, margin: '0px 0px -10% 0px' })
   const near = useNearViewport(ref)
@@ -31,7 +33,13 @@ export default function SplitText({ text, as = 'h2', className = '', italicWord,
   })
 
   return (
-    <Comp ref={ref} className={`display ${className}`} aria-label={text}>
+    <Comp
+      ref={ref}
+      string={string}
+      string-id={stringId}
+      className={`display ${className}`}
+      aria-label={text}
+    >
       {segments.map(({ word, isItalic, i }) => (
         <span key={i} className="inline-block overflow-hidden align-top pb-[0.12em] -mb-[0.12em]">
           <motion.span

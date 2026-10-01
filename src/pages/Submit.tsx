@@ -129,7 +129,11 @@ export default function Submit() {
         </div>
         <div className="relative mx-auto w-full max-w-page px-[clamp(1.25rem,4vw,4.75rem)]">
           <Reveal><p className="eyebrow">Submissions — open · writer → work → piece → desk</p></Reveal>
-          <h1 className="relative mt-8 font-serif text-[clamp(2.8rem,7.5vw,6rem)] font-light leading-[0.92] tracking-[-0.02em] text-ivory">
+          <h1
+            string="split"
+            string-id="submit-desk-heading"
+            className="relative mt-8 font-serif text-[clamp(2.8rem,7.5vw,6rem)] font-light leading-[0.92] tracking-[-0.02em] text-ivory"
+          >
             <CrashZoom className="pointer-events-none absolute inset-x-0 top-1/2 -translate-y-1/2">
               <span aria-hidden="true" className="block select-none whitespace-nowrap text-center font-serif text-[clamp(3.4rem,9vw,7.5rem)] font-semibold leading-none text-transparent [-webkit-text-stroke:1px_rgba(184,145,70,0.14)]">
                 THE EDITORIAL DESK
@@ -362,9 +366,17 @@ export default function Submit() {
 
                 {/* ——— the final action ——— */}
                 <div className="flex flex-col items-start gap-5 pt-4 border-t border-gold/20">
-                  <button type="submit" disabled={sending} aria-busy={sending} className="btn btn-gold self-start disabled:pointer-events-none disabled:opacity-60">
-                    {sending ? 'Sending the piece…' : 'Submit the piece'}
-                  </button>
+                  <div
+                    string="magnetic"
+                    string-strength="0.25"
+                    string-radius="110"
+                    string-id="submit-desk-action-cta"
+                    className="inline-block"
+                  >
+                    <button type="submit" disabled={sending} aria-busy={sending} className="btn btn-gold self-start disabled:pointer-events-none disabled:opacity-60">
+                      {sending ? 'Sending the piece…' : 'Submit the piece'}
+                    </button>
+                  </div>
                   <p aria-live="polite" className="max-w-[52ch] text-sm leading-[1.8] text-white/60">
                     {sending
                       ? 'The piece is crossing to the desk — one moment.'
