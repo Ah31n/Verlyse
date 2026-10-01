@@ -3,17 +3,11 @@ import { Link } from 'react-router-dom'
 import { motion, AnimatePresence, useReducedMotion } from 'motion/react'
 import { useSeo } from '../hooks/useSeo'
 import { ARTICLES, AUTHORS, LEDGER, authorPhoto, stampDate } from '../data/content'
+import { ArchivalMonogramSeal } from '../components/contributors/InteractivePortrait'
 
 /** The folios a creator holds in the archive — their own entries. */
 function foliosOf(authorId: string) {
   return ARTICLES.filter((a) => a.authorId === authorId)
-}
-
-/** The monogram — initials from the name (AJ for Alina Javed). */
-function monogram(name: string) {
-  const parts = name.split(/\s+/).filter(Boolean)
-  if (parts.length === 1) return parts[0].slice(0, 2).toUpperCase()
-  return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase()
 }
 
 /**
@@ -204,7 +198,13 @@ export default function Creators() {
 
                   {/* portrait / monogram plate */}
                   <Tilt3D>
-                  <div className="img-frame relative flex aspect-[3/4] w-full max-w-[190px] items-center justify-center overflow-hidden bg-[#F2EADA] p-3">
+                  <div className="img-frame relative flex aspect-[3/4] w-full max-w-[210px] items-center justify-center overflow-hidden bg-[#22060D] border border-gold/40 p-2 shadow-[0_16px_36px_rgba(0,0,0,0.6)]">
+                    {/* Archival corner registration marks */}
+                    <span className="absolute top-2 left-2 font-mono text-[9px] text-gold/70 z-10 pointer-events-none">⌜</span>
+                    <span className="absolute top-2 right-2 font-mono text-[9px] text-gold/70 z-10 pointer-events-none">⌝</span>
+                    <span className="absolute bottom-2 left-2 font-mono text-[9px] text-gold/70 z-10 pointer-events-none">⌞</span>
+                    <span className="absolute bottom-2 right-2 font-mono text-[9px] text-gold/70 z-10 pointer-events-none">⌟</span>
+
                     {selected.portrait || selected.profilePhoto ? (
                       <img
                         src={selected.profilePhoto ?? selected.portrait ?? authorPhoto(selected.id)}
@@ -215,13 +215,14 @@ export default function Creators() {
                         className="block max-h-[260px] w-full object-contain shadow-[0_4px_14px_rgba(0,0,0,0.3)]"
                       />
                     ) : (
-                      <span className="font-serif text-6xl font-semibold italic text-[#2A0F18]">
-                        {monogram(selected.name)}
-                      </span>
+                      <ArchivalMonogramSeal
+                        name={selected.name}
+                        role={selected.role}
+                        philosophy={selected.philosophy ?? selected.favoriteQuote}
+                      />
                     )}
-                    <span aria-hidden className="absolute inset-2 border border-gold/40" />
-                    <span className="absolute -bottom-3 left-1/2 -translate-x-1/2 whitespace-nowrap bg-[#1C0509] px-2 py-1 font-mono text-[8px] uppercase tracking-[0.24em] text-ivory">
-                      Portrait · Plate 01
+                    <span className="absolute -bottom-3 left-1/2 -translate-x-1/2 whitespace-nowrap bg-[#1C0509] px-2 py-0.5 font-mono text-[8px] uppercase tracking-[0.24em] text-gold border border-gold/30 z-20">
+                      {selected.portrait || selected.profilePhoto ? 'Portrait · Plate 01' : 'Archival Seal'}
                     </span>
                   </div>
                   </Tilt3D>

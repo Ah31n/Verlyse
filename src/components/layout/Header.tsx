@@ -158,8 +158,8 @@ export default function Header() {
             <button
               type="button"
               onClick={() => window.dispatchEvent(new CustomEvent('verlyse:saved'))}
-              aria-label={savedCount > 0 ? `Saved stories — ${savedCount} kept` : 'Saved stories'}
-              title="Saved stories"
+              aria-label="Saved stories"
+              title={savedCount > 0 ? `Saved stories — ${savedCount} kept` : 'Saved stories'}
               className="relative grid h-10 w-10 shrink-0 place-items-center border border-gold/40 text-ivory transition-all duration-400 hover:-translate-y-0.5 hover:border-gold hover:bg-gold hover:text-charcoal max-[479px]:h-9 max-[479px]:w-9"
             >
               <svg viewBox="0 0 24 24" aria-hidden="true" className="h-[17px] w-[17px] fill-none stroke-current [stroke-width:1.4]"><path d="M6 3.5h12v17L12 16.8 6 20.5z" /></svg>

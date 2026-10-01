@@ -16,6 +16,10 @@ import SaveButton from '../components/ui/SaveButton'
 import { ARTICLES, BRAND, CATEGORIES, LEDGER, getAuthor } from '../data/content'
 import { useWebGLSupport } from '../lib/three/useWebGLSupport'
 import { introSeen, onIntroResolved } from '../lib/intro'
+import { ArchivalSeal } from '../components/editorial/GenerativeGraphics'
+import { RoleBadge } from '../components/contributors/RoleBadge'
+import { SpatialLink } from '../components/spatial/SpatialLink'
+import { PullQuotePlate } from '../components/editorial/PullQuotePlate'
 // The spatial engine is loaded on demand so its heavy chunk (three) never
 // ships with the initial publication shell.
 const SpatialArchive = lazy(() => import('../components/spatial/SpatialArchive'))
@@ -62,15 +66,14 @@ function Cover({ selectedId, state }: { selectedId: string | null; state: Spatia
      hall — delays are already collapsed above; durations collapse here */
   const D = (base: number) => (instant ? 0.01 : base)
 
-  /* controlled parallax — a depth hierarchy: far planes lag the scroll the
-     most, near planes barely lag, and the feature plate drifts a touch faster
-     so it reads as coming toward the reader. Reduced motion collapses every
-     plane to stillness (same composition, no movement). */
+  /* controlled parallax — a depth hierarchy calibrated for material depth
+     without motion fatigue: far planes lag the scroll gently, near planes barely lag.
+     Reduced motion collapses every plane to stillness. */
   const { scrollY } = useScroll()
-  const pAtmo = useTransform(scrollY, (v) => (reduce ? 0 : Math.min(v, 900) * 0.36))
-  const pGhost = useTransform(scrollY, (v) => (reduce ? 0 : Math.min(v, 900) * 0.24))
-  const pFolio = useTransform(scrollY, (v) => (reduce ? 0 : Math.min(v, 900) * 0.11))
-  const pCopy = useTransform(scrollY, (v) => (reduce ? 0 : Math.min(v, 900) * 0.1))
+  const pAtmo = useTransform(scrollY, (v) => (reduce ? 0 : Math.min(v, 900) * 0.14))
+  const pGhost = useTransform(scrollY, (v) => (reduce ? 0 : Math.min(v, 900) * 0.09))
+  const pFolio = useTransform(scrollY, (v) => (reduce ? 0 : Math.min(v, 900) * 0.04))
+  const pCopy = useTransform(scrollY, (v) => (reduce ? 0 : Math.min(v, 900) * 0.04))
 
   /* ——— PENPOT BOARD: P27 / THE ENTRANCE — DESKTOP
        BACK  · wine architectural hall (pilasters, warm key-light, vignette)
@@ -159,7 +162,8 @@ function Cover({ selectedId, state }: { selectedId: string | null; state: Spatia
       {/* ——— MID · issue line + tagline — the editorial threshold, centred.
           Pinned by an explicit top so the threshold sits in the upper-middle
           of the hall (board ghost zone), independent of the flex stack. ——— */}
-      <motion.div style={{ y: pFolio }} className="absolute inset-x-0 top-[clamp(6.5rem,12vh,8.5rem)] z-[2] px-6 text-center">
+      <motion.div style={{ y: pFolio }} className="absolute inset-x-0 top-[clamp(5.5rem,10vh,7.5rem)] z-[2] px-6 text-center">
+        <ArchivalSeal size={42} className="mx-auto mb-3 opacity-60" />
         <motion.p
           initial={reduce ? false : { opacity: 0, y: 14 }}
           animate={{ opacity: 1, y: 0 }}
@@ -451,7 +455,10 @@ function StoryCard({
       </div>
 
       <div className="mt-5">
-        <MetaRow category={work.category} author={au?.name} readingTime={work.readingTime} date={work.date} />
+        <div className="flex flex-wrap items-center justify-between gap-2">
+          <MetaRow category={work.category} author={au?.name} readingTime={work.readingTime} date={work.date} />
+          {au && <RoleBadge role={au.role} className="hidden sm:inline-flex" />}
+        </div>
         <h3 className={`mt-3 font-serif font-normal leading-[1.12] text-ivory transition-all duration-700 group-hover:italic group-hover:text-[#E8D9A8] ${STORY_TITLE[size]}`}>
           {cover ? (
             <>
@@ -630,6 +637,17 @@ function FeatureSection({ feature, authorName }: { feature: (typeof ARTICLES)[nu
               <UnderlineLink to={`/article/${feature.id}`}>Read the full feature</UnderlineLink>
             </Reveal>
           </div>
+        </div>
+
+        {/* Typographic Interruption / Literary Pause */}
+        <div className="mt-20 border-t border-white/10 pt-12">
+          <PullQuotePlate
+            variant="wine"
+            quote="The arts are not a luxury of the comfortable; they are the record of our consciousness."
+            attribution="Shaza Fatima"
+            role="Essayist"
+            folioRef="FOLIO № 04 · ESSAYS"
+          />
         </div>
       </div>
     </section>
@@ -1094,6 +1112,12 @@ export default function Home() {
       <MotifDivider label="The invitation" motif="feather" />
       <Invitation />
       <Colophon />
+      {/* ——— SPATIAL ARCHIVE GATEWAY ——— */}
+      <section className="border-t border-white/10 py-16 bg-[#160408]">
+        <div className="mx-auto max-w-page px-[clamp(1.75rem,5.5vw,4.75rem)]">
+          <SpatialLink />
+        </div>
+      </section>
     </ImmersiveShell>
   )
 }

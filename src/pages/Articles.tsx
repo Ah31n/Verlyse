@@ -5,6 +5,8 @@ import { useSeo } from '../hooks/useSeo'
 import { getAuthor, ARTICLES, LEDGER, sortArticles, stampDate, isEditorsPick, SORTS, type SortKey } from '../data/content'
 import SaveButton from '../components/ui/SaveButton'
 import { ImmersiveShell, BrassThread } from '../components/immersive'
+import { ArchiveMatrix } from '../components/archive/ArchiveMatrix'
+import { IndexLedger } from '../components/archive/IndexLedger'
 
 /** keyword match — the title, the writer, the department, and the feature's
     own tags and excerpt: the archive answers to more than its headline. */
@@ -18,20 +20,6 @@ function matchesQuery(id: string, q: string): boolean {
 /**
  * THE ARCHIVE — the publication's physical archive, from the approved
  * Penpot board P27 / THE ARCHIVE.
- *
- * BACK  · wine hall with shelf depths (hairline shelf rows receding)
- * MID   · SEARCH THE ARCHIVE… + department rail (seven real rooms) + a
- *         quiet order rail (registry · latest · most read · most
- *         appreciated · editor's picks — honest rankings, each explained)
- * FRONT · the nineteen folios as shelf spines — each plate now carries its
- *         own cover strip, its date, its reading time and a save mark.
- *
- * States: REST · FOCUS (hover/keyboard lifts the folio) · SELECTED (№ NN
- * carries “SELECTED — OPEN FOLIO →”) · FILTERED (rail/search: matching
- * folios stay bright, the rest recede — never a conventional list) ·
- * SEARCH · RETURN (All / Esc restores the shelf).
- * Keyboard: ← → ↑ ↓ move selection · Home/End jump · Enter opens ·
- * Esc returns to REST. Every number under the shelf is the ledger's.
  */
 function Archive() {
   useSeo({
@@ -44,6 +32,7 @@ function Archive() {
   const [cat, setCat] = useState('All')
   const [sort, setSort] = useState<SortKey | 'registry'>('registry')
   const [selId, setSelId] = useState<string>(ARTICLES[0].id)
+  const [viewMode, setViewMode] = useState<'shelf' | 'matrix'>('shelf')
   const [busy, setBusy] = useState(false)
   const railRef = useRef<HTMLDivElement>(null)
 
@@ -244,9 +233,50 @@ function Archive() {
           </span>
         </div>
 
-        {/* ——— FRONT · the folios — solid ivory plates on the shelf.
+        {/* Live Index Ledger */}
+        <IndexLedger className="mt-8 mb-4" />
+
+        {/* View Mode Switcher */}
+        <div className="flex items-center justify-between border-b border-white/10 pb-4 mb-6">
+          <p className="font-mono text-[9px] uppercase tracking-[0.28em] text-white/50">
+            Archive presentation
+          </p>
+          <div className="flex items-center gap-1.5 border border-gold/30 bg-[#17050A] p-1">
+            <button
+              type="button"
+              onClick={() => setViewMode('shelf')}
+              aria-pressed={viewMode === 'shelf'}
+              className={`px-3 py-1 font-mono text-[9px] uppercase tracking-[0.22em] transition-all ${
+                viewMode === 'shelf'
+                  ? 'bg-gold text-charcoal font-semibold'
+                  : 'text-white/60 hover:text-ivory'
+              }`}
+            >
+              Folio Shelf
+            </button>
+            <button
+              type="button"
+              onClick={() => setViewMode('matrix')}
+              aria-pressed={viewMode === 'matrix'}
+              className={`px-3 py-1 font-mono text-[9px] uppercase tracking-[0.22em] transition-all ${
+                viewMode === 'matrix'
+                  ? 'bg-gold text-charcoal font-semibold'
+                  : 'text-white/60 hover:text-ivory'
+              }`}
+            >
+              Editorial Wall
+            </button>
+          </div>
+        </div>
+
+        {viewMode === 'matrix' ? (
+          <div className="my-8">
+            <ArchiveMatrix articles={ordered.filter((a) => visibleIds.includes(a.id))} />
+          </div>
+        ) : (
+        /* ——— FRONT · the folios — solid ivory plates on the shelf.
             Desktop follows P27's 7 + 7 + 5 shelf rhythm; mobile collapses
-            to one quiet column. ——— */}
+            to one quiet column. ——— */
         <div
           role="group"
           aria-label={`The archive — ${visibleIds.length} of ${LEDGER.features} folios shown`}
@@ -354,6 +384,7 @@ function Archive() {
             })}
           </div>
         </div>
+        )}
         {!filtered && (
           <div className="mt-10 border border-dashed border-white/15 px-6 py-14 text-center md:mt-16">
             <p className="font-serif text-2xl font-light italic text-white/65">

@@ -2,22 +2,22 @@ import { useRef, useState, type FormEvent, type ReactNode } from 'react'
 import { useSeo } from '../hooks/useSeo'
 import Reveal from '../components/ui/Reveal'
 import { BRAND, CATEGORIES } from '../data/content'
+import { CrashZoom, MaskReveal, Slate } from '../components/cinematic'
+import { ArchivalSeal } from '../components/editorial/GenerativeGraphics'
 
 /** A quiet field-level note — shown only when the line needs attention. */
 function FieldHint({ show, children }: { show: boolean; children: ReactNode }) {
   if (!show) return null
   return (
-    <p role="alert" className="font-serif text-sm italic leading-snug text-[#E8A2A2]">
+    <p role="alert" className="font-serif text-sm italic leading-snug text-[#E8A2A2] mt-1.5">
       {children}
     </p>
   )
 }
 
-import { CrashZoom , MaskReveal, Slate } from '../components/cinematic'
-
 export default function Submit() {
   useSeo({
-path: '/submit',
+    path: '/submit',
     title: 'Submit',
     description: 'Send your story to Verlyse Media. Every feature begins as a submission.',
   })
@@ -28,6 +28,9 @@ path: '/submit',
   const [viaBackend, setViaBackend] = useState(true)
   const [errors, setErrors] = useState<string[]>([])
   const [fileName, setFileName] = useState('')
+  const [workText, setWorkText] = useState('')
+
+  const wordCount = workText.trim() ? workText.trim().split(/\s+/).filter(Boolean).length : 0
 
   /** Deliver the piece to the desk — posts to the forwarding service so it
       arrives in the Verlyse Media inbox; if the network path fails, the
@@ -113,6 +116,7 @@ path: '/submit',
     setSent(false)
     setErrors([])
     setFileName('')
+    setWorkText('')
   }
 
   return (
@@ -126,7 +130,7 @@ path: '/submit',
         <div className="relative mx-auto w-full max-w-page px-[clamp(1.25rem,4vw,4.75rem)]">
           <Reveal><p className="eyebrow">Submissions — open · writer → work → piece → desk</p></Reveal>
           <h1 className="relative mt-8 font-serif text-[clamp(2.8rem,7.5vw,6rem)] font-light leading-[0.92] tracking-[-0.02em] text-ivory">
-                        <CrashZoom className="pointer-events-none absolute inset-x-0 top-1/2 -translate-y-1/2">
+            <CrashZoom className="pointer-events-none absolute inset-x-0 top-1/2 -translate-y-1/2">
               <span aria-hidden="true" className="block select-none whitespace-nowrap text-center font-serif text-[clamp(3.4rem,9vw,7.5rem)] font-semibold leading-none text-transparent [-webkit-text-stroke:1px_rgba(184,145,70,0.14)]">
                 THE EDITORIAL DESK
               </span>
@@ -165,14 +169,19 @@ path: '/submit',
         </div>
       </section>
 
-      <section className="relative border-t border-white/10 py-[clamp(6rem,14vh,11rem)]">
+      <section className="relative border-t border-white/10 py-[clamp(6rem,14vh,11rem)] bg-[#1A070E]">
         <div aria-hidden="true" className="pointer-events-none absolute inset-x-0 top-0 h-80 bg-[radial-gradient(60%_90%_at_50%_0%,rgba(232,217,168,0.07),transparent_70%)]" />
         <div className="mx-auto grid max-w-page grid-cols-1 gap-[clamp(3rem,6vw,7rem)] px-[clamp(1.75rem,5.5vw,4.75rem)] lg:grid-cols-[1.15fr_0.85fr]">
           {/* Form */}
           <form ref={formRef} onSubmit={onSubmit} className="flex max-w-[640px] flex-col gap-10" noValidate>
             {sent ? (
               /* ——— the acknowledgement — the piece has left the writer's hands ——— */
-              <div className="border-t border-gold/30 pt-10">
+              <div className="border border-gold/30 bg-[#25070F] p-8 md:p-10 relative">
+                <span className="absolute top-3 left-3 font-mono text-[9px] text-gold/60">⌜</span>
+                <span className="absolute top-3 right-3 font-mono text-[9px] text-gold/60">⌝</span>
+                <span className="absolute bottom-3 left-3 font-mono text-[9px] text-gold/60">⌞</span>
+                <span className="absolute bottom-3 right-3 font-mono text-[9px] text-gold/60">⌟</span>
+
                 <p className="kicker">Sent to the desk</p>
                 <h2 className="mt-5 font-serif text-[clamp(2rem,3.6vw,3rem)] font-light leading-[1.05] tracking-[-0.015em] text-ivory">
                   Your work is on the desk — <em className="italic text-gold">the desk writes back</em>
@@ -198,41 +207,53 @@ path: '/submit',
                 </button>
               </div>
             ) : (
-              <>
+              <div className="border border-white/10 bg-[#25070F]/70 p-6 md:p-8 space-y-10 relative">
+                {/* Archival Corner Marks */}
+                <span className="absolute top-3 left-3 font-mono text-[9px] text-gold/50">⌜</span>
+                <span className="absolute top-3 right-3 font-mono text-[9px] text-gold/50">⌝</span>
+                <span className="absolute bottom-3 left-3 font-mono text-[9px] text-gold/50">⌞</span>
+                <span className="absolute bottom-3 right-3 font-mono text-[9px] text-gold/50">⌟</span>
+
                 {/* ——— I · the writer ——— */}
                 <div>
-                  <p className="kicker">I — the writer</p>
-                  <div className="mt-6 grid grid-cols-1 gap-8 border-t border-white/10 pt-6 sm:grid-cols-2">
+                  <div className="flex items-center justify-between border-b border-white/10 pb-3">
+                    <p className="kicker mb-0">I — the writer</p>
+                    <span className="font-mono text-[8px] uppercase tracking-[0.24em] text-white/40">Letterhead Record</span>
+                  </div>
+                  <div className="mt-6 grid grid-cols-1 gap-8 sm:grid-cols-2">
                     <div className="field">
                       <label className="field-label" htmlFor="sf-name">Full name</label>
-                      <input className="field-input" id="sf-name" name="name" type="text" autoComplete="name" />
+                      <input className="field-input transition-colors focus:border-gold" id="sf-name" name="name" type="text" autoComplete="name" />
                       <FieldHint show={errors.includes('name')}>Please sign your name.</FieldHint>
                     </div>
                     <div className="field">
                       <label className="field-label" htmlFor="sf-email">Email</label>
-                      <input className="field-input" id="sf-email" name="email" type="email" autoComplete="email" />
+                      <input className="field-input transition-colors focus:border-gold" id="sf-email" name="email" type="email" autoComplete="email" />
                       <FieldHint show={errors.includes('email')}>An email is needed — the desk writes back.</FieldHint>
                     </div>
                     <div className="field sm:col-span-2">
                       <label className="field-label" htmlFor="sf-handle">Instagram / social handle <span className="text-white/40">— optional</span></label>
-                      <input className="field-input" id="sf-handle" name="handle" type="text" autoComplete="username" placeholder="@yourname" />
+                      <input className="field-input transition-colors focus:border-gold" id="sf-handle" name="handle" type="text" autoComplete="username" placeholder="@yourname" />
                     </div>
                   </div>
                 </div>
 
                 {/* ——— II · the work ——— */}
                 <div>
-                  <p className="kicker">II — the work</p>
-                  <div className="mt-6 grid grid-cols-1 gap-8 border-t border-white/10 pt-6 sm:grid-cols-2">
+                  <div className="flex items-center justify-between border-b border-white/10 pb-3">
+                    <p className="kicker mb-0">II — the work</p>
+                    <span className="font-mono text-[8px] uppercase tracking-[0.24em] text-white/40">Manuscript Spec</span>
+                  </div>
+                  <div className="mt-6 grid grid-cols-1 gap-8 sm:grid-cols-2">
                     <div className="field sm:col-span-2">
                       <label className="field-label" htmlFor="sf-title">Title of the work</label>
-                      <input className="field-input" id="sf-title" name="title" type="text" />
+                      <input className="field-input transition-colors focus:border-gold" id="sf-title" name="title" type="text" />
                       <FieldHint show={errors.includes('title')}>Every piece needs a title.</FieldHint>
                     </div>
                     <div className="field sm:col-span-2">
                       <label className="field-label" htmlFor="sf-cat">Category</label>
                       <div className="relative">
-                        <select className="field-input w-full cursor-pointer appearance-none pr-10" id="sf-cat" name="category" defaultValue="">
+                        <select className="field-input w-full cursor-pointer appearance-none pr-10 transition-colors focus:border-gold" id="sf-cat" name="category" defaultValue="">
                           <option value="" disabled>Choose a department…</option>
                           {CATEGORIES.map((c) => (
                             <option key={c.slug} value={c.name}>{c.name}</option>
@@ -248,7 +269,7 @@ path: '/submit',
                     <div className="field sm:col-span-2">
                       <label className="field-label" htmlFor="sf-desc">Short description / excerpt <span className="text-white/40">— optional</span></label>
                       <textarea
-                        className="field-input field-area !min-h-20"
+                        className="field-input field-area !min-h-20 transition-colors focus:border-gold"
                         id="sf-desc"
                         name="description"
                         rows={3}
@@ -260,22 +281,30 @@ path: '/submit',
 
                 {/* ——— III · the piece ——— */}
                 <div>
-                  <p className="kicker">III — the piece</p>
-                  <div className="mt-6 grid grid-cols-1 gap-8 border-t border-white/10 pt-6">
+                  <div className="flex items-center justify-between border-b border-white/10 pb-3">
+                    <p className="kicker mb-0">III — the piece</p>
+                    {/* Live Word Count Seal */}
+                    <span className="border border-gold/40 px-2.5 py-0.5 font-mono text-[9px] uppercase tracking-[0.24em] text-gold bg-[#1A070E]">
+                      WORDS: {wordCount}
+                    </span>
+                  </div>
+                  <div className="mt-6 grid grid-cols-1 gap-8 pt-2">
                     <div className="field">
                       <label className="field-label" htmlFor="sf-work">Full submission / article</label>
                       <textarea
-                        className="field-input field-area"
+                        className="field-input field-area transition-colors focus:border-gold"
                         id="sf-work"
                         name="work"
                         rows={10}
+                        value={workText}
+                        onChange={(e) => setWorkText(e.target.value)}
                         placeholder="Your story, in your words — or a note about the work you want featured."
                       />
                       <FieldHint show={errors.includes('work')}>The work itself is required.</FieldHint>
                     </div>
                     <div className="field">
                       <span className="field-label">Cover / supporting image <span className="text-white/40">— optional</span></span>
-                      <label className="mt-1 flex cursor-pointer items-center justify-between gap-4 border border-dashed border-gold/30 px-5 py-4 transition-colors duration-500 hover:border-gold/60">
+                      <label className="mt-1 flex cursor-pointer items-center justify-between gap-4 border border-dashed border-gold/30 px-5 py-4 transition-colors duration-500 hover:border-gold/60 bg-[#1F060D]">
                         <span className="min-w-0 truncate font-serif text-base italic text-white/70">
                           {fileName || 'Choose a file — a cover plate, a photograph, a scan'}
                         </span>
@@ -297,8 +326,11 @@ path: '/submit',
 
                 {/* ——— IV · the promise — rights, originality, the window ——— */}
                 <div>
-                  <p className="kicker">IV — the promise</p>
-                  <div className="mt-6 border-t border-white/10 pt-6">
+                  <div className="flex items-center justify-between border-b border-white/10 pb-3">
+                    <p className="kicker mb-0">IV — the promise</p>
+                    <span className="font-mono text-[8px] uppercase tracking-[0.24em] text-white/40">Ethical Charter</span>
+                  </div>
+                  <div className="mt-6 pt-2">
                     <label
                       htmlFor="sf-original"
                       className={`flex cursor-pointer items-start gap-4 border px-5 py-5 transition-colors duration-500 ${
@@ -329,7 +361,7 @@ path: '/submit',
                 </div>
 
                 {/* ——— the final action ——— */}
-                <div className="flex flex-col items-start gap-5">
+                <div className="flex flex-col items-start gap-5 pt-4 border-t border-gold/20">
                   <button type="submit" disabled={sending} aria-busy={sending} className="btn btn-gold self-start disabled:pointer-events-none disabled:opacity-60">
                     {sending ? 'Sending the piece…' : 'Submit the piece'}
                   </button>
@@ -342,38 +374,37 @@ path: '/submit',
                     Delivered to the desk · credited by name · answered by {BRAND.email}
                   </p>
                 </div>
-              </>
+              </div>
             )}
           </form>
 
           {/* Guidelines */}
-          <aside>
-            <Reveal><p className="kicker">Guidelines</p></Reveal>
-            <ol className="mt-8 border-t border-white/10">
-              {[
-                ['01', 'One piece at a time', 'Send the one you keep rereading — your best, not your most recent.'],
-                ['02', 'Credit is a rule', 'The writer is named on every feature, by name and handle. That is the magazine\'s first promise.'],
-                ['03', 'Transparency', 'If the presentation is designed with tools, the caption will say so. The writing stays yours.'],
-                ['04', 'A response', 'The desk reads everything. If the story belongs in the magazine, it becomes a feature.'],
-                ['05', 'Where to send it', BRAND.email + ' — or the submission form in the bio.'],
-              ].map(([n, t, d], i) => (
-                <Reveal key={n} delay={i * 0.08} as="li">
-                  <div className="grid grid-cols-[44px_1fr] gap-4 border-b border-white/10 py-6">
-                    <span className="pt-1 font-mono text-[10px] tracking-[0.28em] text-gold">{n}</span>
-                    <div>
-                      <p className="font-serif text-xl">{t}</p>
-                      <p className="mt-2 max-w-[44ch] text-sm leading-relaxed text-white/60">{d}</p>
+          <aside className="space-y-8">
+            <div className="border border-white/10 bg-[#25070F]/60 p-6 md:p-8">
+              <div className="flex items-center justify-between border-b border-white/10 pb-4 mb-6">
+                <p className="kicker mb-0">Guidelines</p>
+                <ArchivalSeal size={48} />
+              </div>
+              <ol className="divide-y divide-white/10">
+                {[
+                  ['01', 'One piece at a time', 'Send the one you keep rereading — your best, not your most recent.'],
+                  ['02', 'Credit is a rule', 'The writer is named on every feature, by name and handle. That is the magazine\'s first promise.'],
+                  ['03', 'Transparency', 'If the presentation is designed with tools, the caption will say so. The writing stays yours.'],
+                  ['04', 'A response', 'The desk reads everything. If the story belongs in the magazine, it becomes a feature.'],
+                  ['05', 'Where to send it', BRAND.email + ' — or the submission form in the bio.'],
+                ].map(([n, t, d], i) => (
+                  <Reveal key={n} delay={i * 0.05} as="li" className="py-4 first:pt-0 last:pb-0">
+                    <div className="flex items-baseline gap-4">
+                      <span className="font-mono text-[10px] text-gold">{n}</span>
+                      <div>
+                        <h4 className="font-serif text-lg text-ivory">{t}</h4>
+                        <p className="mt-1 font-serif text-xs italic text-white/60 leading-relaxed">{d}</p>
+                      </div>
                     </div>
-                  </div>
-                </Reveal>
-              ))}
-            </ol>
-            <Reveal delay={0.3} className="mt-10 border-l-2 border-gold pl-7">
-              <p className="font-serif text-xl font-light italic text-ivory/85">
-                “The next feature could be yours.”
-              </p>
-              <p className="mt-3 font-mono text-[10px] uppercase tracking-[0.28em] text-white/55">— The Verlyse Media desk</p>
-            </Reveal>
+                  </Reveal>
+                ))}
+              </ol>
+            </div>
           </aside>
         </div>
       </section>

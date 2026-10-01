@@ -20,6 +20,7 @@ const Ambassadors = lazy(() => import('./pages/Ambassadors'))
 const Creators = lazy(() => import('./pages/Creators'))
 const Contact = lazy(() => import('./pages/Contact'))
 const WriterProfilePage = lazy(() => import('./pages/WriterProfilePage'))
+const Lab = lazy(() => import('./pages/Lab'))
 /* Phase 19 — The Keeping Room: full-screen spatial archive, mounted outside
    the publication chrome; reading still hands off to /article/:id. */
 const RoomPage = lazy(() => import('./pages/Room'))
@@ -27,6 +28,7 @@ const RoomPage = lazy(() => import('./pages/Room'))
 /** Route-aware transition label — the "folio" the reader is moving toward,
  *  so every navigation reads like moving through the publication. */
 function thresholdLabel(pathname: string): string {
+  if (pathname === '/__lab') return 'Design Intelligence Lab'
   if (pathname.startsWith('/article/')) {
     const id = pathname.split('/article/')[1]
     const i = ARTICLES.findIndex((a) => a.id === id)
@@ -138,6 +140,7 @@ export default function App() {
           <Route path="/creators" element={<PageTransition label={threshold}><Creators /></PageTransition>} />
           <Route path="/contact" element={<PageTransition label={threshold}><Contact /></PageTransition>} />
           <Route path="/creator/:authorId" element={<PageTransition label={threshold}><WriterProfilePage /></PageTransition>} />
+          <Route path="/__lab" element={<PageTransition label={threshold}><Lab /></PageTransition>} />
           <Route path="*" element={<PageTransition label={threshold}><NotFound /></PageTransition>} />
         </Routes>
       </AnimatePresence>

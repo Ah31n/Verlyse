@@ -1,22 +1,38 @@
 import { useState, type ReactNode } from 'react'
+import { clsx } from 'clsx'
 
 /**
- * PASS ALONG — sharing as the magazine would: a stamped note rather than a
- * row of platform icons. Three gestures (X · Instagram · copy) set as small
- * type with the ✦ mark between them, like the colophon of an issue.
+ * ArchivalBookplateShare — pass along as a library plate / marginalia colophon.
+ * Materiality: Cotton rag stamp notation, 1px gold boundary, and tactile copy confirmation.
  */
-
-function StampBtn({ label, onClick, children }: { label: string; onClick: () => void; children: ReactNode }) {
+function BookplateButton({
+  label,
+  onClick,
+  children,
+  active = false,
+}: {
+  label: string
+  onClick: () => void
+  children: ReactNode
+  active?: boolean
+}) {
   return (
     <button
       type="button"
       onClick={onClick}
       aria-label={label}
       title={label}
-      className="group inline-flex items-center gap-2 border-b border-gold/40 pb-1 font-mono text-[10px] uppercase tracking-[0.28em] text-ivory/75 transition-colors duration-500 hover:border-gold hover:text-gold max-[767px]:py-2"
+      className={clsx(
+        'group inline-flex items-center gap-2 border border-gold/30 bg-[#25070F]/50 px-3 py-1.5 font-mono text-[9px] uppercase tracking-[0.24em] transition-all duration-300',
+        active
+          ? 'border-gold bg-gold text-[#1E0B12] font-semibold'
+          : 'text-ivory/80 hover:border-gold hover:text-gold hover:bg-gold/10'
+      )}
     >
-      <span aria-hidden="true" className="text-gold transition-transform duration-500 group-hover:-translate-y-0.5">{children}</span>
-      {label}
+      <span aria-hidden="true" className={clsx('transition-transform duration-300 group-hover:-translate-y-0.5', active ? 'text-[#1E0B12]' : 'text-gold')}>
+        {children}
+      </span>
+      <span>{label}</span>
     </button>
   )
 }
@@ -59,18 +75,19 @@ export default function ShareButtons({ title }: { title: string }) {
   }
 
   return (
-    <div className="flex flex-wrap items-center gap-x-5 gap-y-2">
-      <StampBtn label="On X" onClick={() => share('x')}>
+    <div className="my-6 inline-flex flex-wrap items-center gap-3 border-y border-white/10 py-3" aria-label="Pass along this folio">
+      <span className="font-mono text-[8px] uppercase tracking-[0.3em] text-white/40 mr-1">
+        Colophon Dispatch
+      </span>
+      <BookplateButton label="Dispatch on X" onClick={() => share('x')}>
         <span aria-hidden="true">✕</span>
-      </StampBtn>
-      <i aria-hidden="true" className="text-[0.6em] not-italic text-gold">✦</i>
-      <StampBtn label="On Instagram" onClick={() => share('ig')}>
+      </BookplateButton>
+      <BookplateButton label="Instagram" onClick={() => share('ig')}>
         <span aria-hidden="true">◉</span>
-      </StampBtn>
-      <i aria-hidden="true" className="text-[0.6em] not-italic text-gold">✦</i>
-      <StampBtn label={copied ? 'Copied' : 'Copy the link'} onClick={copy}>
+      </BookplateButton>
+      <BookplateButton label={copied ? 'Copied to Ledger' : 'Copy Citation'} onClick={copy} active={copied}>
         <span aria-hidden="true">{copied ? '✓' : '☍'}</span>
-      </StampBtn>
+      </BookplateButton>
     </div>
   )
 }

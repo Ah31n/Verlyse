@@ -7,6 +7,8 @@ import SearchOverlay from './SearchOverlay'
 import SavedDrawer from './SavedDrawer'
 import PageProgress from '../ui/PageProgress'
 import { useReadingMode } from '../ui/ReadingMode'
+import { EditorialCursor } from '../interaction/EditorialCursor'
+import { StringTuneProvider } from '../motion/StringTuneProvider'
 
 /** Site chrome: preloader, header, search, saved drawer, dock, footer. */
 export default function Layout({ children }: { children: ReactNode }) {
@@ -26,7 +28,8 @@ export default function Layout({ children }: { children: ReactNode }) {
   }, [])
 
   return (
-    <>
+    <StringTuneProvider>
+      <EditorialCursor />
       <Preloader />
       <a href="#main" className="skip-link">Skip to content</a>
       {/* Reading progress — a quiet hairline of leaves along the top edge.
@@ -47,6 +50,6 @@ export default function Layout({ children }: { children: ReactNode }) {
         </div>
         <Dock />
       </div>
-    </>
+    </StringTuneProvider>
   )
 }

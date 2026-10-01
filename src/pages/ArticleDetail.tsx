@@ -6,7 +6,7 @@ import Reveal from '../components/ui/Reveal'
 import SplitText from '../components/ui/SplitText'
 import { MetaRow } from '../components/ui/primitives'
 import ShareButtons from '../components/ui/ShareButtons'
-import { getArticle, getAuthor, relatedArticles, type Vibe , AUTHORS , authorPhoto } from '../data/content'
+import { getArticle, getAuthor, relatedArticles, type Vibe , AUTHORS , authorPhoto, ARTICLES } from '../data/content'
 import { AuthorPhoto } from '../components/ui/AuthorFrame'
 import { ArticleEnding, MotifDivider, Signature, WritersNoteClosing } from '../components/ui/ArticleClosing'
 import { MARGINALIA } from '../components/ui/Motifs'
@@ -15,6 +15,9 @@ import { WorldTexture, worldBodyClass } from '../components/ui/ArticleWorld'
 import { ReflectionLine } from '../components/ui/ScrollBeat'
 import { InkSpread, EditorialWipe } from '../components/ui/MotionMoves'
 import ArticleSignature from '../components/ui/ArticleSignature'
+import { BreadcrumbFolio, FolioPagination } from '../components/navigation/BreadcrumbFolio'
+import { AuthorColophon } from '../components/article/ReadingCanvas'
+import { ChapterDivider } from '../components/editorial/GenerativeGraphics'
 // The story-ending spatial atmosphere is loaded on demand (three is heavy).
 const StoryEnding3D = lazy(() => import('../components/spatial/StoryEnding3D'))
 import { isSaved, toggleSaved } from '../components/layout/SavedDrawer'
@@ -346,6 +349,7 @@ export default function ArticleDetail() {
           <WorldTexture world={article.world} />
           <div aria-hidden="true" className="pointer-events-none absolute inset-x-0 top-0 h-72 bg-[radial-gradient(62%_55%_at_50%_6%,rgba(184,145,70,0.05),transparent_74%)]" />
           <div className="relative z-[2] mx-auto w-full max-w-page px-[clamp(1.75rem,5.5vw,4.75rem)] pb-16">
+            <BreadcrumbFolio category={article.category} folioNumber={ARTICLES.findIndex(a => a.id === article.id) + 1} className="mb-6" />
             <Reveal><p className="kicker">Verlyse Media presents — a submission by {author?.name}</p></Reveal>
             <InkSpread className={`${vibe.titleClass} inline-block`} origin="50% 80%">
               <SplitText as="h1" text={`“${article.title}”`} className="mt-6 max-w-[18ch] text-[clamp(3rem,8vw,7.5rem)]" />
@@ -369,6 +373,7 @@ export default function ArticleDetail() {
           <WorldTexture world={article.world} />
           <div aria-hidden="true" className="pointer-events-none absolute inset-x-0 top-0 h-72 bg-[radial-gradient(62%_55%_at_50%_6%,rgba(184,145,70,0.05),transparent_74%)]" />
           <div className="relative z-[2] mx-auto flex w-full max-w-page flex-col items-center px-[clamp(1.75rem,5.5vw,4.75rem)] pb-14 text-center">
+            <BreadcrumbFolio category={article.category} folioNumber={ARTICLES.findIndex(a => a.id === article.id) + 1} className="mb-6 justify-center" />
             <div className="w-full max-w-[820px]">
               <Reveal>
                 <p className="mb-6 flex items-center justify-center gap-4 font-mono text-[9px] uppercase tracking-[0.30em] text-gold">
@@ -450,6 +455,7 @@ export default function ArticleDetail() {
           <div aria-hidden="true" className={`absolute inset-0 ${vibe.overlay}`} />
           <VibeAmbient vibe={article.vibe ?? 'solemn'} section="hero" />
           <div className="relative z-[2] mx-auto w-full max-w-page px-[clamp(1.75rem,5.5vw,4.75rem)] pb-12">
+            <BreadcrumbFolio category={article.category} folioNumber={ARTICLES.findIndex(a => a.id === article.id) + 1} className="mb-6" />
             <Reveal><p className="kicker">Verlyse Media presents — a submission by {author?.name}</p></Reveal>
             <InkSpread className={`${vibe.titleClass} inline-block`} origin="50% 80%">
               <SplitText as="h1" text={`“${article.title}”`} className="mt-6 max-w-[20ch] text-[clamp(2.8rem,7vw,6.6rem)]" />
@@ -623,8 +629,15 @@ export default function ArticleDetail() {
             </div>
           </Reveal>
 
+          {/* Author Colophon */}
+          {author && (
+            <Reveal className="mt-12">
+              <AuthorColophon author={author} date={article.date} readingTime={article.readingTime} />
+            </Reveal>
+          )}
+
           {/* Save + Share — a quiet hairline block */}
-          <Reveal className="mt-14">
+          <Reveal className="mt-10">
             <div className="flex flex-wrap items-center justify-between gap-5 border-t border-white/10 pt-6">
               <div className="flex flex-wrap items-center gap-4">
                 <span className="font-mono text-[10px] uppercase tracking-[0.28em] text-white/55">Save this story</span>
@@ -636,10 +649,28 @@ export default function ArticleDetail() {
               </div>
             </div>
           </Reveal>
+
+          {/* Folio Pagination (Prev / Next) */}
+          {(() => {
+            const cIdx = ARTICLES.findIndex((a) => a.id === article.id)
+            const prevA = cIdx > 0 ? {
+              id: ARTICLES[cIdx - 1].id,
+              title: ARTICLES[cIdx - 1].title,
+              category: ARTICLES[cIdx - 1].category,
+              folio: cIdx,
+            } : null
+            const nextA = cIdx < ARTICLES.length - 1 ? {
+              id: ARTICLES[cIdx + 1].id,
+              title: ARTICLES[cIdx + 1].title,
+              category: ARTICLES[cIdx + 1].category,
+              folio: cIdx + 2,
+            } : null
+            return <FolioPagination prevArticle={prevA} nextArticle={nextA} />
+          })()}
         </div>
       </section>
 
-      {/* the moment of reflection before the ending */}
+          {/* the moment of reflection before the ending */}
       {article.reflection && (
         <section aria-hidden="true" className="relative py-[clamp(5rem,10vh,8rem)]">
           <div className="mx-auto max-w-[640px] px-[clamp(1.75rem,5.5vw,4.75rem)] text-center">
@@ -651,6 +682,9 @@ export default function ArticleDetail() {
           </div>
         </section>
       )}
+
+      {/* Chapter Divider */}
+      <ChapterDivider />
 
       {/* ---------- The ending — the story closes, the credits follow ---------- */}
       <MotifDivider label="The ending" motif={article.motif} />

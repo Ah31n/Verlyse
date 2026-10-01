@@ -2,11 +2,11 @@
   "home|desktop": {
     "title": "Where Vision Becomes A Voice — Verlyse Media",
     "h1": "“Where Vision Becomes A Voice”",
-    "scrollHeight": 15201,
-    "footerTop": 13922,
-    "footerBottom": 15201,
+    "scrollHeight": 15998,
+    "footerTop": 14720,
+    "footerBottom": 15998,
     "footerAtBottom": true,
-    "footerIsFixedOffset": 0.28125,
+    "footerIsFixedOffset": 0.3125,
     "overflowX": false,
     "scrollWidth": 1440,
     "innerWidth": 1440,
@@ -18,11 +18,11 @@
   "articles|desktop": {
     "title": "Articles — Verlyse Media",
     "h1": "The folio shelf",
-    "scrollHeight": 2252,
-    "footerTop": 973,
-    "footerBottom": 2252,
+    "scrollHeight": 2689,
+    "footerTop": 1410,
+    "footerBottom": 2689,
     "footerAtBottom": true,
-    "footerIsFixedOffset": 0.109375,
+    "footerIsFixedOffset": 0.46875,
     "overflowX": false,
     "scrollWidth": 1440,
     "innerWidth": 1440,
@@ -34,9 +34,9 @@
   "categories|desktop": {
     "title": "Categories — Verlyse Media",
     "h1": "WINGSThe wings",
-    "scrollHeight": 2759,
-    "footerTop": 1462,
-    "footerBottom": 2741,
+    "scrollHeight": 2785,
+    "footerTop": 1488,
+    "footerBottom": 2767,
     "footerAtBottom": false,
     "footerIsFixedOffset": 18.234375,
     "overflowX": false,
@@ -50,11 +50,11 @@
   "creators|desktop": {
     "title": "Featured Creators — Verlyse Media",
     "h1": "CONTRIBUTORSThe wall of names",
-    "scrollHeight": 2731,
-    "footerTop": 1452,
-    "footerBottom": 2731,
+    "scrollHeight": 3021,
+    "footerTop": 1742,
+    "footerBottom": 3021,
     "footerAtBottom": true,
-    "footerIsFixedOffset": 0.4375,
+    "footerIsFixedOffset": 0.015625,
     "overflowX": false,
     "scrollWidth": 1440,
     "innerWidth": 1440,
@@ -66,11 +66,11 @@
   "community|desktop": {
     "title": "Community — Verlyse Media",
     "h1": "COMMONSThe commons",
-    "scrollHeight": 3474,
-    "footerTop": 2195,
-    "footerBottom": 3474,
+    "scrollHeight": 3908,
+    "footerTop": 2629,
+    "footerBottom": 3908,
     "footerAtBottom": true,
-    "footerIsFixedOffset": 0.03125,
+    "footerIsFixedOffset": 0.015625,
     "overflowX": false,
     "scrollWidth": 1440,
     "innerWidth": 1440,
@@ -82,11 +82,11 @@
   "ambassadors|desktop": {
     "title": "Brand Ambassador — Verlyse Media",
     "h1": "PEOPLEThe people in the room",
-    "scrollHeight": 4184,
-    "footerTop": 2905,
-    "footerBottom": 4184,
+    "scrollHeight": 4219,
+    "footerTop": 2940,
+    "footerBottom": 4219,
     "footerAtBottom": true,
-    "footerIsFixedOffset": 0.265625,
+    "footerIsFixedOffset": 0.03125,
     "overflowX": false,
     "scrollWidth": 1440,
     "innerWidth": 1440,
@@ -98,11 +98,11 @@
   "about|desktop": {
     "title": "About — Verlyse Media",
     "h1": "COLOPHONThe colophon",
-    "scrollHeight": 3599,
-    "footerTop": 2320,
-    "footerBottom": 3599,
+    "scrollHeight": 4377,
+    "footerTop": 3098,
+    "footerBottom": 4377,
     "footerAtBottom": true,
-    "footerIsFixedOffset": 0.09375,
+    "footerIsFixedOffset": 0.015625,
     "overflowX": false,
     "scrollWidth": 1440,
     "innerWidth": 1440,
@@ -114,11 +114,11 @@
   "submit|desktop": {
     "title": "Submit — Verlyse Media",
     "h1": "THE EDITORIAL DESKThe editorial desk",
-    "scrollHeight": 3646,
-    "footerTop": 2367,
-    "footerBottom": 3646,
+    "scrollHeight": 4242,
+    "footerTop": 2963,
+    "footerBottom": 4242,
     "footerAtBottom": true,
-    "footerIsFixedOffset": 0.0625,
+    "footerIsFixedOffset": 0.296875,
     "overflowX": false,
     "scrollWidth": 1440,
     "innerWidth": 1440,
@@ -130,11 +130,11 @@
   "contact|desktop": {
     "title": "Contact — Verlyse Media",
     "h1": "THE CORRESPONDENCE DESKThe correspondence desk",
-    "scrollHeight": 3098,
-    "footerTop": 1820,
-    "footerBottom": 3098,
+    "scrollHeight": 3099,
+    "footerTop": 1821,
+    "footerBottom": 3099,
     "footerAtBottom": true,
-    "footerIsFixedOffset": 0.453125,
+    "footerIsFixedOffset": 0.375,
     "overflowX": false,
     "scrollWidth": 1440,
     "innerWidth": 1440,
@@ -146,9 +146,9 @@
   "categories-room-Stories|desktop": {
     "title": "Categories — Verlyse Media",
     "h1": "WINGSThe wings",
-    "scrollHeight": 2759,
-    "footerTop": 1462,
-    "footerBottom": 2741,
+    "scrollHeight": 2785,
+    "footerTop": 1488,
+    "footerBottom": 2767,
     "footerAtBottom": false,
     "footerIsFixedOffset": 18.234375,
     "overflowX": false,
@@ -162,9 +162,9 @@
   "categories-room-Poetry|desktop": {
     "title": "Categories — Verlyse Media",
     "h1": "WINGSThe wings",
-    "scrollHeight": 2759,
-    "footerTop": 1462,
-    "footerBottom": 2741,
+    "scrollHeight": 2785,
+    "footerTop": 1488,
+    "footerBottom": 2767,
     "footerAtBottom": false,
     "footerIsFixedOffset": 18.234375,
     "overflowX": false,
@@ -178,9 +178,9 @@
   "categories-room-Essays|desktop": {
     "title": "Categories — Verlyse Media",
     "h1": "WINGSThe wings",
-    "scrollHeight": 2759,
-    "footerTop": 1462,
-    "footerBottom": 2741,
+    "scrollHeight": 2785,
+    "footerTop": 1488,
+    "footerBottom": 2767,
     "footerAtBottom": false,
     "footerIsFixedOffset": 18.234375,
     "overflowX": false,
@@ -194,9 +194,9 @@
   "categories-room-Art|desktop": {
     "title": "Categories — Verlyse Media",
     "h1": "WINGSThe wings",
-    "scrollHeight": 2759,
-    "footerTop": 1462,
-    "footerBottom": 2741,
+    "scrollHeight": 2785,
+    "footerTop": 1488,
+    "footerBottom": 2767,
     "footerAtBottom": false,
     "footerIsFixedOffset": 18.234375,
     "overflowX": false,
@@ -210,9 +210,9 @@
   "categories-room-Social-20Issues|desktop": {
     "title": "Categories — Verlyse Media",
     "h1": "WINGSThe wings",
-    "scrollHeight": 2759,
-    "footerTop": 1462,
-    "footerBottom": 2741,
+    "scrollHeight": 2785,
+    "footerTop": 1488,
+    "footerBottom": 2767,
     "footerAtBottom": false,
     "footerIsFixedOffset": 18.234375,
     "overflowX": false,
@@ -226,9 +226,9 @@
   "categories-room-Lifestyle|desktop": {
     "title": "Categories — Verlyse Media",
     "h1": "WINGSThe wings",
-    "scrollHeight": 2759,
-    "footerTop": 1462,
-    "footerBottom": 2741,
+    "scrollHeight": 2785,
+    "footerTop": 1488,
+    "footerBottom": 2767,
     "footerAtBottom": false,
     "footerIsFixedOffset": 18.234375,
     "overflowX": false,
@@ -242,9 +242,9 @@
   "categories-room-Horror|desktop": {
     "title": "Categories — Verlyse Media",
     "h1": "WINGSThe wings",
-    "scrollHeight": 2759,
-    "footerTop": 1462,
-    "footerBottom": 2741,
+    "scrollHeight": 2785,
+    "footerTop": 1488,
+    "footerBottom": 2767,
     "footerAtBottom": false,
     "footerIsFixedOffset": 18.234375,
     "overflowX": false,
@@ -316,7 +316,7 @@
     "innerWidth": 1440,
     "route": "/article/the-arts-deserve-respect",
     "viewport": "desktop",
-    "recordStart": 2,
+    "recordStart": 0,
     "issues": []
   },
   "article-hope-becomes-mythology|desktop": {
@@ -332,7 +332,7 @@
     "innerWidth": 1440,
     "route": "/article/hope-becomes-mythology",
     "viewport": "desktop",
-    "recordStart": 2,
+    "recordStart": 0,
     "issues": []
   },
   "article-a-students-worth|desktop": {
@@ -348,7 +348,7 @@
     "innerWidth": 1440,
     "route": "/article/a-students-worth",
     "viewport": "desktop",
-    "recordStart": 2,
+    "recordStart": 0,
     "issues": []
   },
   "article-tasbih-e-fatima|desktop": {
@@ -364,7 +364,7 @@
     "innerWidth": 1440,
     "route": "/article/tasbih-e-fatima",
     "viewport": "desktop",
-    "recordStart": 2,
+    "recordStart": 0,
     "issues": []
   },
   "article-intellect-lost-to-code|desktop": {
@@ -380,7 +380,7 @@
     "innerWidth": 1440,
     "route": "/article/intellect-lost-to-code",
     "viewport": "desktop",
-    "recordStart": 2,
+    "recordStart": 0,
     "issues": []
   },
   "article-forgive-me-mother|desktop": {
@@ -396,7 +396,7 @@
     "innerWidth": 1440,
     "route": "/article/forgive-me-mother",
     "viewport": "desktop",
-    "recordStart": 4,
+    "recordStart": 0,
     "issues": []
   },
   "article-water-cat|desktop": {
@@ -412,7 +412,7 @@
     "innerWidth": 1440,
     "route": "/article/water-cat",
     "viewport": "desktop",
-    "recordStart": 4,
+    "recordStart": 0,
     "issues": []
   },
   "article-if-hope-were-a-feather|desktop": {
@@ -428,7 +428,7 @@
     "innerWidth": 1440,
     "route": "/article/if-hope-were-a-feather",
     "viewport": "desktop",
-    "recordStart": 4,
+    "recordStart": 0,
     "issues": []
   },
   "article-the-horrors-of-child-sexual-abuse|desktop": {
@@ -444,7 +444,7 @@
     "innerWidth": 1440,
     "route": "/article/the-horrors-of-child-sexual-abuse",
     "viewport": "desktop",
-    "recordStart": 4,
+    "recordStart": 0,
     "issues": []
   },
   "article-khageena|desktop": {
@@ -460,7 +460,7 @@
     "innerWidth": 1440,
     "route": "/article/khageena",
     "viewport": "desktop",
-    "recordStart": 4,
+    "recordStart": 0,
     "issues": []
   },
   "article-behind-every-headline|desktop": {
@@ -476,7 +476,7 @@
     "innerWidth": 1440,
     "route": "/article/behind-every-headline",
     "viewport": "desktop",
-    "recordStart": 4,
+    "recordStart": 0,
     "issues": []
   },
   "article-jaldi|desktop": {
@@ -492,7 +492,7 @@
     "innerWidth": 1440,
     "route": "/article/jaldi",
     "viewport": "desktop",
-    "recordStart": 4,
+    "recordStart": 0,
     "issues": []
   },
   "article-failure|desktop": {
@@ -508,7 +508,7 @@
     "innerWidth": 1440,
     "route": "/article/failure",
     "viewport": "desktop",
-    "recordStart": 4,
+    "recordStart": 0,
     "issues": []
   },
   "article-my-last-breath|desktop": {
@@ -524,7 +524,7 @@
     "innerWidth": 1440,
     "route": "/article/my-last-breath",
     "viewport": "desktop",
-    "recordStart": 4,
+    "recordStart": 0,
     "issues": []
   },
   "article-the-garden-beyond-my-tower|desktop": {
@@ -540,7 +540,7 @@
     "innerWidth": 1440,
     "route": "/article/the-garden-beyond-my-tower",
     "viewport": "desktop",
-    "recordStart": 4,
+    "recordStart": 0,
     "issues": []
   },
   "article-mir-raza-ali|desktop": {
@@ -556,7 +556,7 @@
     "innerWidth": 1440,
     "route": "/article/mir-raza-ali",
     "viewport": "desktop",
-    "recordStart": 4,
+    "recordStart": 0,
     "issues": []
   },
   "creator-alina-javed|desktop": {
@@ -572,7 +572,7 @@
     "innerWidth": 1440,
     "route": "/creator/alina-javed",
     "viewport": "desktop",
-    "recordStart": 4,
+    "recordStart": 0,
     "issues": []
   },
   "creator-anshujit-singh|desktop": {
@@ -588,7 +588,7 @@
     "innerWidth": 1440,
     "route": "/creator/anshujit-singh",
     "viewport": "desktop",
-    "recordStart": 4,
+    "recordStart": 0,
     "issues": []
   },
   "creator-haieqa-wahab|desktop": {
@@ -604,7 +604,7 @@
     "innerWidth": 1440,
     "route": "/creator/haieqa-wahab",
     "viewport": "desktop",
-    "recordStart": 4,
+    "recordStart": 0,
     "issues": []
   },
   "creator-shaza-fatima|desktop": {
@@ -620,7 +620,7 @@
     "innerWidth": 1440,
     "route": "/creator/shaza-fatima",
     "viewport": "desktop",
-    "recordStart": 4,
+    "recordStart": 0,
     "issues": []
   },
   "creator-adeena-irfan|desktop": {
@@ -636,7 +636,7 @@
     "innerWidth": 1440,
     "route": "/creator/adeena-irfan",
     "viewport": "desktop",
-    "recordStart": 4,
+    "recordStart": 0,
     "issues": []
   },
   "creator-craft-with-bro|desktop": {
@@ -652,7 +652,7 @@
     "innerWidth": 1440,
     "route": "/creator/craft-with-bro",
     "viewport": "desktop",
-    "recordStart": 4,
+    "recordStart": 0,
     "issues": []
   },
   "creator-munkashay-javed|desktop": {
@@ -668,7 +668,7 @@
     "innerWidth": 1440,
     "route": "/creator/munkashay-javed",
     "viewport": "desktop",
-    "recordStart": 4,
+    "recordStart": 0,
     "issues": []
   },
   "creator-abheesha-ghosh|desktop": {
@@ -684,7 +684,7 @@
     "innerWidth": 1440,
     "route": "/creator/abheesha-ghosh",
     "viewport": "desktop",
-    "recordStart": 4,
+    "recordStart": 0,
     "issues": []
   },
   "creator-kenza-imene|desktop": {
@@ -700,7 +700,7 @@
     "innerWidth": 1440,
     "route": "/creator/kenza-imene",
     "viewport": "desktop",
-    "recordStart": 4,
+    "recordStart": 0,
     "issues": []
   },
   "creator-hadia-raza|desktop": {
@@ -716,7 +716,7 @@
     "innerWidth": 1440,
     "route": "/creator/hadia-raza",
     "viewport": "desktop",
-    "recordStart": 4,
+    "recordStart": 0,
     "issues": []
   },
   "creator-zuha-farhan|desktop": {
@@ -732,7 +732,7 @@
     "innerWidth": 1440,
     "route": "/creator/zuha-farhan",
     "viewport": "desktop",
-    "recordStart": 4,
+    "recordStart": 0,
     "issues": []
   },
   "creator-haiqa-nafees|desktop": {
@@ -748,7 +748,7 @@
     "innerWidth": 1440,
     "route": "/creator/haiqa-nafees",
     "viewport": "desktop",
-    "recordStart": 4,
+    "recordStart": 0,
     "issues": []
   },
   "creator-syeda-tasbeeha-noman|desktop": {
@@ -764,7 +764,7 @@
     "innerWidth": 1440,
     "route": "/creator/syeda-tasbeeha-noman",
     "viewport": "desktop",
-    "recordStart": 4,
+    "recordStart": 0,
     "issues": []
   },
   "creator-kazi-fatimataz-zahra|desktop": {
@@ -780,7 +780,7 @@
     "innerWidth": 1440,
     "route": "/creator/kazi-fatimataz-zahra",
     "viewport": "desktop",
-    "recordStart": 4,
+    "recordStart": 0,
     "issues": []
   },
   "creator-mochjixx|desktop": {
@@ -796,7 +796,7 @@
     "innerWidth": 1440,
     "route": "/creator/mochjixx",
     "viewport": "desktop",
-    "recordStart": 4,
+    "recordStart": 0,
     "issues": []
   },
   "creator-verlyse-media|desktop": {
@@ -812,7 +812,7 @@
     "innerWidth": 1440,
     "route": "/creator/verlyse-media",
     "viewport": "desktop",
-    "recordStart": 4,
+    "recordStart": 0,
     "issues": []
   }
 }
