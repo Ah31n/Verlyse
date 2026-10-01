@@ -4,6 +4,7 @@ import { motion } from 'motion/react'
 import { useSeo } from '../hooks/useSeo'
 import { getAuthor, ARTICLES, CATEGORIES, LEDGER } from '../data/content'
 import { ImmersiveShell, BrassThread } from '../components/immersive'
+import { DepartmentDoor } from '../components/editorial'
 
 /**
  * THE WINGS — the department doors of the publication, from the approved
@@ -151,8 +152,6 @@ export default function Categories() {
         <div className="mt-[clamp(3rem,8vh,5rem)] grid grid-cols-2 items-start gap-x-4 gap-y-10 md:grid-cols-4 xl:grid-cols-7 xl:[perspective:1500px]" onKeyDown={onKeyDown}>
           {CATEGORIES.map((c, i) => {
             const isActive = active === c.name
-            /* the ivory plate: the selected wing's door — or the first door at
-               rest, as the board keeps the first wing standing forward */
             const isPlate = isActive || (!active && i === 0)
             const isFocused = focusIdx === i && !active
             return (
@@ -165,127 +164,45 @@ export default function Categories() {
                 className={isPlate ? 'col-span-2 md:col-span-1' : ''}
               >
                 <div className={`flex flex-col items-center transition-all duration-700 ${active && !isActive ? 'opacity-25 md:opacity-30' : 'opacity-100'}`}>
-                <button
-                  type="button"
-                  string="spotlight"
-                  string-lerp="0.2"
-                  string-id={`category-door-${c.slug}`}
-                  onClick={() => select(c.name)}
-                  onFocus={() => !active && setFocusIdx(i)}
-                  aria-pressed={isActive}
-                  className={`group relative flex w-full flex-col items-center px-2 pb-2 pt-6 text-center outline-none transition-all duration-700 ${
-                    isPlate
-                      ? /* the standing wing steps forward out of the corridor:
-                           a longer shadow, a small lift and scale, and a raised
-                           stacking order so it sits cleanly above the doors it
-                           overlaps. Depth is gated to md and xl — on mobile the
-                           door keeps its current composition exactly, so nothing
-                           is forced into perspective where it would cost
-                           readability. The selection is still carried by the
-                           ivory plate, the brass arch and aria-pressed, so it
-                           reads without any of this movement. */
-                        'z-[2] min-h-[clamp(10rem,22vh,13rem)] max-w-none bg-[#F8F6F2] shadow-[0_18px_44px_rgba(0,0,0,0.45)] md:-translate-y-1.5 md:min-h-[clamp(17rem,40vh,24rem)] md:max-w-[180px] md:scale-[1.02] xl:-translate-y-3 xl:scale-[1.045] xl:shadow-[0_28px_60px_rgba(0,0,0,0.55)]'
-                      : /* the other wings stay in the wall — a slight recession
-                           in depth only, never extra opacity, so the existing
-                           recede keeps carrying exactly one meaning */
-                        'max-w-[150px] cursor-pointer xl:scale-[0.985]'
-                  }`}
-                >
-                  {/* the arch — a solid ivory plate for the standing wing, gold ghost otherwise.
-                      The wing's own accent tints the ghost once — one hue, low alpha, never a
-                      neon sign: the rooms are siblings, not rivals. */}
-                  <span
-                    aria-hidden="true"
-                    className={`pointer-events-none absolute inset-0 rounded-t-full border transition-colors duration-500 ${
-                      isPlate
-                        ? 'border-[#B89146]'
-                        : isFocused
-                          ? 'border-gold/70 bg-gold/[0.04]'
-                          : 'border-white/20 group-hover:border-gold/50'
-                    }`}
-                    style={isPlate ? undefined : { backgroundColor: `${c.accent}0F` }}
+                  <DepartmentDoor
+                    category={c}
+                    index={i}
+                    isActive={isActive}
+                    isFocused={isFocused}
+                    onClick={() => select(c.name)}
                   />
-                  {/* the plate's inner hairline — brass thread inside the ivory door */}
-                  <span
-                    aria-hidden="true"
-                    className={`pointer-events-none absolute inset-1 rounded-t-full border transition-colors duration-500 ${
-                      isPlate
-                        ? 'border-[#D9B978]/50'
-                        : 'border-transparent'
-                    }`}
-                  />
-                  {/* the recess — a darker opening inside the arch */}
-                  <span
-                    aria-hidden="true"
-                    className={`pointer-events-none absolute inset-x-[18%] top-[9%] bottom-[4%] rounded-t-full border transition-colors duration-500 ${
-                      isPlate ? 'border-[#B89146]/25' : 'border-white/10 group-hover:border-gold/25'
-                    }`}
-                  />
-                  <span
-                    className={`relative font-mono text-[8px] uppercase tracking-[0.3em] ${
-                      isPlate ? 'text-[#7C6338]' : 'text-gold'
-                    }`}
-                  >
-                    Wing {['I', 'II', 'III', 'IV', 'V', 'VI', 'VII'][i]}
-                  </span>
-                  {/* the wing's own mark — small, typographic, in the accent */}
-                  <span aria-hidden="true" className="relative mt-2 text-lg leading-none" style={{ color: isPlate ? '#7C6338' : c.accent }}>
-                    {c.motif}
-                  </span>
-                  <span
-                    className={`relative mt-3 font-serif font-normal leading-[1.05] transition-colors duration-500 ${
-                      isPlate
-                        ? 'italic text-[#1E0B12]'
-                        : 'text-ivory group-hover:text-gold'
-                    } ${c.name === 'Stories' ? 'text-[clamp(1.4rem,1.7vw,1.7rem)]' : 'text-[clamp(1.05rem,1.3vw,1.3rem)]'}`}
-                  >
-                    {c.name}
-                  </span>
-                  <span
-                    className={`relative mt-2 font-mono text-[8px] uppercase tracking-[0.28em] ${
-                      isPlate ? 'text-[#2A0F18]/70' : 'text-white/55'
-                    }`}
-                  >
-                    {c.count} folio{c.count === 1 ? '' : 's'}
-                  </span>
-                  {isActive && (
-                    <span className="relative mt-3 font-mono text-[8px] uppercase tracking-[0.28em] text-[#7C6338]">
-                      Showing ↓
-                    </span>
-                  )}
-                </button>
 
-                {/* ——— FRONT · the wing's folios — the selected wing's stories step forward ——— */}
-                <ul
-                  className={`mt-4 w-full space-y-3 border-l-2 pl-4 transition-colors duration-700 ${
-                    isActive ? 'border-gold/60' : active ? 'border-white/10' : 'border-gold/20'
-                  }`}
-                  aria-label={`Folios in the ${c.name} wing`}
-                >
-                  {foliosOf(c.name).map(({ a, i }) => {
-                    const author = getAuthor(a.authorId)
-                    const folio = String(i + 1).padStart(2, '0')
-                    const ghosted = !!active && !isActive
-                    return (
-                      <li key={a.id} className={`transition-opacity duration-700 ${ghosted ? 'opacity-10' : 'opacity-100'}`}>
-                        <Link
-                          to={ghosted ? '#' : `/article/${a.id}`}
-                          onClick={(e) => { if (ghosted) e.preventDefault() }}
-                          aria-label={`Folio ${folio} — ${a.title}, ${c.name}`}
-                          className="group block no-underline focus-visible:outline focus-visible:outline-2 focus-visible:outline-gold/70"
-                        >
-                          <span className="font-mono text-[8px] uppercase tracking-[0.28em] text-gold/90">№ {folio}</span>
-                          <span className="mt-1 block font-serif text-sm leading-[1.25] text-ivory/90 transition-all duration-300 group-hover:text-gold">
-                            {a.title}
-                          </span>
-                          <span className="mt-1 block font-mono text-[8px] uppercase tracking-[0.24em] text-white/50">
-                            {c.name} · {author?.name}
-                          </span>
-                        </Link>
-                      </li>
-                    )
-                  })}
-                </ul>
+                  {/* ——— FRONT · the wing's folios — the selected wing's stories step forward ——— */}
+                  <ul
+                    className={`mt-4 w-full space-y-3 border-l-2 pl-4 transition-colors duration-700 ${
+                      isActive ? 'border-gold/60' : active ? 'border-white/10' : 'border-gold/20'
+                    }`}
+                    aria-label={`Folios in the ${c.name} wing`}
+                  >
+                    {foliosOf(c.name).map(({ a, i: fIdx }) => {
+                      const author = getAuthor(a.authorId)
+                      const folio = String(fIdx + 1).padStart(2, '0')
+                      const ghosted = !!active && !isActive
+                      return (
+                        <li key={a.id} className={`transition-opacity duration-700 ${ghosted ? 'opacity-10' : 'opacity-100'}`}>
+                          <Link
+                            to={ghosted ? '#' : `/article/${a.id}`}
+                            onClick={(e) => { if (ghosted) e.preventDefault() }}
+                            aria-label={`Folio ${folio} — ${a.title}, ${c.name}`}
+                            className="group block no-underline focus-visible:outline focus-visible:outline-2 focus-visible:outline-gold/70"
+                          >
+                            <span className="font-mono text-[8px] uppercase tracking-[0.28em] text-gold/90">№ {folio}</span>
+                            <span className="mt-1 block font-serif text-sm leading-[1.25] text-ivory/90 transition-all duration-300 group-hover:text-gold">
+                              {a.title}
+                            </span>
+                            <span className="mt-1 block font-mono text-[8px] uppercase tracking-[0.24em] text-white/50">
+                              {c.name} · {author?.name}
+                            </span>
+                          </Link>
+                        </li>
+                      )
+                    })}
+                  </ul>
                 </div>
               </motion.div>
             )

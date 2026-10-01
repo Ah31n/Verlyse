@@ -18,8 +18,7 @@ import { useWebGLSupport } from '../lib/three/useWebGLSupport'
 import { introSeen, onIntroResolved } from '../lib/intro'
 import { ArchivalSeal } from '../components/editorial/GenerativeGraphics'
 import { RoleBadge } from '../components/contributors/RoleBadge'
-import { SpatialLink } from '../components/spatial/SpatialLink'
-import { PullQuotePlate } from '../components/editorial/PullQuotePlate'
+import { SpatialHandoff, PullQuotePlate } from '../components/editorial'
 // The spatial engine is loaded on demand so its heavy chunk (three) never
 // ships with the initial publication shell.
 const SpatialArchive = lazy(() => import('../components/spatial/SpatialArchive'))
@@ -1141,7 +1140,11 @@ export default function Home() {
       {/* ——— SPATIAL ARCHIVE GATEWAY ——— */}
       <section className="border-t border-white/10 py-16 bg-[#160408]">
         <div className="mx-auto max-w-page px-[clamp(1.75rem,5.5vw,4.75rem)]">
-          <SpatialLink />
+          <SpatialHandoff
+            label="Enter The Keeping Room"
+            sublabel="A 3D spatial archive of living works · Three.js & CSS 3D"
+            destination="/room"
+          />
         </div>
       </section>
     </ImmersiveShell>
