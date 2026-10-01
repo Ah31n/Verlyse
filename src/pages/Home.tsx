@@ -193,11 +193,10 @@ function Cover({ selectedId, state }: { selectedId: string | null; state: Spatia
       </motion.div>
 
       {/* ——— The spatial archive — a bounded three.js layer behind the threshold.
-          A threshold-only atmosphere: it holds the feature “selected” until the
-          reader first engages the selector below, then keeps the chosen folio
-          raised while the hall reads. Recedes entirely under reduced-motion /
-          no-WebGL, where the layered gradients above remain the fallback. ——— */}
-      <div className="pointer-events-none absolute inset-0 z-[1] [&_canvas]:mix-blend-lighten" aria-hidden="true">
+          Desktop-only atmosphere: on mobile and reduced-motion, the layered
+          gradients remain the lightweight fallback so Three.js is never
+          downloaded on initial mobile pageview. ——— */}
+      <div className="pointer-events-none absolute inset-0 z-[1] hidden lg:block [&_canvas]:mix-blend-lighten" aria-hidden="true">
         <SpatialBoundary>
           <Suspense fallback={null}>
             <SpatialArchive selectedId={selectedId} state={state} />

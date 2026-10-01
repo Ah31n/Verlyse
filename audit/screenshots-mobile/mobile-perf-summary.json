@@ -1,0 +1,77 @@
+{
+  "auditDate": "2026-10-01T09:47:49.171Z",
+  "results": [
+    {
+      "route": "/",
+      "name": "01-mobile-home",
+      "screenshot": "audit/screenshots-mobile/01-mobile-home.png",
+      "loadTimeMs": 1649,
+      "lcpMs": 1200,
+      "cls": 0,
+      "hasOverflow": false,
+      "threeDownloaded": true,
+      "magneticBypassed": true,
+      "stringTuneNodes": 4
+    },
+    {
+      "route": "/articles",
+      "name": "02-mobile-articles",
+      "screenshot": "audit/screenshots-mobile/02-mobile-articles.png",
+      "loadTimeMs": 1073,
+      "lcpMs": 1073,
+      "cls": 0,
+      "hasOverflow": false,
+      "threeDownloaded": false,
+      "magneticBypassed": true,
+      "stringTuneNodes": 39
+    },
+    {
+      "route": "/article/their-voices-matter",
+      "name": "03-mobile-article-detail",
+      "screenshot": "audit/screenshots-mobile/03-mobile-article-detail.png",
+      "loadTimeMs": 1051,
+      "lcpMs": 1051,
+      "cls": 0,
+      "hasOverflow": false,
+      "threeDownloaded": true,
+      "magneticBypassed": true,
+      "stringTuneNodes": 3
+    },
+    {
+      "route": "/creators",
+      "name": "04-mobile-creators",
+      "screenshot": "audit/screenshots-mobile/04-mobile-creators.png",
+      "loadTimeMs": 1018,
+      "lcpMs": 1018,
+      "cls": 0,
+      "hasOverflow": false,
+      "threeDownloaded": false,
+      "magneticBypassed": true,
+      "stringTuneNodes": 6
+    },
+    {
+      "route": "/submit",
+      "name": "05-mobile-submit",
+      "screenshot": "audit/screenshots-mobile/05-mobile-submit.png",
+      "loadTimeMs": 1082,
+      "lcpMs": 1082,
+      "cls": 0,
+      "hasOverflow": false,
+      "threeDownloaded": false,
+      "magneticBypassed": true,
+      "stringTuneNodes": 2
+    },
+    {
+      "route": "/room",
+      "name": "06-mobile-room",
+      "screenshot": "audit/screenshots-mobile/06-mobile-room.png",
+      "loadTimeMs": 832,
+      "lcpMs": 832,
+      "cls": 0,
+      "hasOverflow": false,
+      "threeDownloaded": false,
+      "magneticBypassed": true,
+      "stringTuneNodes": 1
+    }
+  ]
+}

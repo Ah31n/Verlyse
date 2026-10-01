@@ -708,10 +708,13 @@ export default function ArticleDetail() {
       <MotifDivider label="The ending" motif={article.motif} />
       <section id="ending" className="relative border-t border-white/10 py-[clamp(6rem,14vh,11rem)]">
         {/* the bounded spatial atmosphere — sits BEHIND the canonical signature
-            and closing copy, which always render as semantic HTML on top. */}
-        <Suspense fallback={null}>
-          <StoryEnding3D article={article} />
-        </Suspense>
+            and closing copy, which always render as semantic HTML on top.
+            Gated to desktop viewports to avoid downloading Three.js on mobile. */}
+        <div className="hidden md:block">
+          <Suspense fallback={null}>
+            <StoryEnding3D article={article} />
+          </Suspense>
+        </div>
         <div className="relative z-[1] mx-auto max-w-page px-[clamp(1.75rem,5.5vw,4.75rem)]">
           {/* The closing — the publication's own last slide */}
           <ArticleEnding article={article} />

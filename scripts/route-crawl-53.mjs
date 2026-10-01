@@ -159,7 +159,6 @@ async function run() {
     const viewportOverflows = {}
     for (const vp of VIEWPORTS) {
       await page.setViewport(vp)
-      await new Promise((r) => setTimeout(r, 60))
       const hasOverflow = await page.evaluate(() => document.documentElement.scrollWidth > window.innerWidth)
       viewportOverflows[vp.name] = hasOverflow
     }
@@ -202,25 +201,25 @@ async function run() {
   console.log('\nRunning specialized fallback checks...')
   await page.emulateMediaFeatures([{ name: 'prefers-reduced-motion', value: 'reduce' }])
   await page.goto(`${BASE_URL}/`, { waitUntil: 'domcontentloaded' })
-  await new Promise((r) => setTimeout(r, 300))
+  await new Promise((r) => setTimeout(r, 900))
   const reducedHome = await page.evaluate(() => ({
-    h1: document.querySelector('h1')?.innerText?.replace(/\n/g, ' '),
+    h1: document.querySelector('h1')?.textContent?.trim(),
     overflow: document.documentElement.scrollWidth > window.innerWidth,
   }))
   console.log(`  Reduced-Motion /: H1 present=${!!reducedHome.h1}, overflow=${reducedHome.overflow}`)
 
   await page.goto(`${BASE_URL}/article/their-voices-matter`, { waitUntil: 'domcontentloaded' })
-  await new Promise((r) => setTimeout(r, 300))
+  await new Promise((r) => setTimeout(r, 900))
   const reducedArticle = await page.evaluate(() => ({
-    h1: document.querySelector('h1')?.innerText?.replace(/\n/g, ' '),
+    h1: document.querySelector('h1')?.textContent?.trim(),
     overflow: document.documentElement.scrollWidth > window.innerWidth,
   }))
   console.log(`  Reduced-Motion /article: H1 present=${!!reducedArticle.h1}, overflow=${reducedArticle.overflow}`)
 
   await page.goto(`${BASE_URL}/room`, { waitUntil: 'domcontentloaded' })
-  await new Promise((r) => setTimeout(r, 300))
+  await new Promise((r) => setTimeout(r, 900))
   const reducedRoom = await page.evaluate(() => ({
-    h1: document.querySelector('h1')?.innerText?.replace(/\n/g, ' '),
+    h1: document.querySelector('h1')?.textContent?.trim(),
     overflow: document.documentElement.scrollWidth > window.innerWidth,
   }))
   console.log(`  Reduced-Motion /room: H1 present=${!!reducedRoom.h1}, overflow=${reducedRoom.overflow}`)

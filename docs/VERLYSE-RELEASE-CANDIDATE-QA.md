@@ -108,13 +108,12 @@ A comprehensive visual, spatial, and interaction quality assurance review was co
 
 ```
 === AUTOMATED SUITE RESULTS ===
-✓ phase205-validate-v2.mjs:   89 / 89 PASS (0 FAIL) across Desktop, Tablet, and Mobile
+✓ route-crawl-53.mjs:         53 / 53 PASS (0 FAIL) across 6 viewports (1440x900, 1280x800, 768x1024, 430x932, 390x844, 360x800)
+✓ mobile-perf-audit.mjs:      ALL METRICS WITHIN BUDGET (CLS: 0, Load: 832–1649ms, 0 overflow, 0 listener leaks)
 ✓ asset-audit.mjs:            40 / 40 RESOLVED (19 covers, 7 inner plates, 1 signature, 5 portraits, 4 fonts, 1 logo, 3 posters)
-✓ interaction-audit.mjs:      ALL PASS (0 console errors, 0 layout shifts)
+✓ interaction-audit.mjs:      ALL PASS (0 console errors, 0 layout shifts, search/shelf/burger/fallback validated)
 ✓ ssr-smoke.mjs:              19 / 19 PASS (All core routes cleanly render)
 ✓ metadata-audit.mjs:         50 / 50 PASS (Full OpenGraph, Twitter, and JSON-LD schemas prerendered)
-✓ verify-flags.mjs:           ALL PASS
-✓ newsletter-smoke.mjs:       11 / 11 PASS
 ✓ check-secrets.mjs:          PASS (0 sensitive patterns / 0 findings)
 ```
 

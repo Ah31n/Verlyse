@@ -17,6 +17,7 @@
     "test:newsletter": "node scripts/newsletter-smoke.mjs",
     "test:smoke": "node scripts/ssr-smoke.mjs",
     "test:crawl": "node scripts/route-crawl-53.mjs",
+    "test:mobile-perf": "node scripts/mobile-perf-audit.mjs",
     "asset-audit": "node scripts/asset-audit.mjs"
   },
   "dependencies": {
