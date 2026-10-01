@@ -89,7 +89,11 @@ export default function Ambassadors() {
           <div className="absolute inset-0 bg-[radial-gradient(120%_90%_at_50%_0%,rgba(92,18,36,0.38),transparent_62%),radial-gradient(90%_70%_at_90%_100%,rgba(184,145,70,0.10),transparent_60%),linear-gradient(170deg,#4A1120_0%,#3B0D17_52%,#1A070E_100%)]" />
         </div>
         <div className="relative mx-auto w-full max-w-page px-[clamp(1.25rem,4vw,4.75rem)] text-center">
-          <h1 className="relative font-serif text-[clamp(2.8rem,8vw,6.5rem)] font-light leading-[0.9] tracking-[-0.02em] text-ivory">
+          <h1
+            string="split"
+            string-id="ambassadors-title"
+            className="relative font-serif text-[clamp(2.8rem,8vw,6.5rem)] font-light leading-[0.9] tracking-[-0.02em] text-ivory"
+          >
                         <CrashZoom className="pointer-events-none absolute inset-x-0 top-1/2 -translate-y-1/2">
               <span aria-hidden="true" className="block select-none font-serif text-[clamp(4rem,12vw,9.5rem)] font-semibold leading-none text-transparent [-webkit-text-stroke:1px_rgba(184,145,70,0.14)]">
                 PEOPLE

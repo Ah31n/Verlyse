@@ -167,6 +167,9 @@ export default function Categories() {
                 <div className={`flex flex-col items-center transition-all duration-700 ${active && !isActive ? 'opacity-25 md:opacity-30' : 'opacity-100'}`}>
                 <button
                   type="button"
+                  string="spotlight"
+                  string-lerp="0.2"
+                  string-id={`category-door-${c.slug}`}
                   onClick={() => select(c.name)}
                   onFocus={() => !active && setFocusIdx(i)}
                   aria-pressed={isActive}

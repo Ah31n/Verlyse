@@ -18,9 +18,7 @@
       },
       "canvases": 1,
       "scrollHeight": 21014,
-      "brokenImages": [
-        "http://127.0.0.1:5173/img/poster-3-13-3.webp"
-      ],
+      "brokenImages": [],
       "consoleErrors": [],
       "failedRequests": [],
       "passed": true
@@ -123,7 +121,7 @@
       "httpStatus": 200,
       "title": "Community — Verlyse Media",
       "h1Count": 1,
-      "h1Text": "COMMONS The commons",
+      "h1Text": "COMMONS The commons",
       "overflow": "NO OVERFLOW",
       "viewports": {
         "desktop-1440": false,
@@ -160,7 +158,7 @@
       "httpStatus": 200,
       "title": "Brand Ambassador — Verlyse Media",
       "h1Count": 1,
-      "h1Text": "PEOPLE The people in the room",
+      "h1Text": "PEOPLE The people in the room",
       "overflow": "NO OVERFLOW",
       "viewports": {
         "desktop-1440": false,
@@ -183,7 +181,7 @@
       "httpStatus": 200,
       "title": "About — Verlyse Media",
       "h1Count": 1,
-      "h1Text": "COLOPHON The colophon",
+      "h1Text": "COLOPHON The colophon",
       "overflow": "NO OVERFLOW",
       "viewports": {
         "desktop-1440": false,
@@ -229,7 +227,7 @@
       "httpStatus": 200,
       "title": "Contact — Verlyse Media",
       "h1Count": 1,
-      "h1Text": "THE CORRESPONDENCE DESK The correspondence desk",
+      "h1Text": "THE CORRESPONDENCE DESK The correspondence desk",
       "overflow": "NO OVERFLOW",
       "viewports": {
         "desktop-1440": false,
@@ -288,6 +286,7 @@
       "canvases": 0,
       "scrollHeight": 11229,
       "brokenImages": [
+        "http://127.0.0.1:5173/img/signatures/tvm-hero.webp",
         "http://127.0.0.1:5173/img/works/Dbf7jnBk3ho-1.webp",
         "http://127.0.0.1:5173/img/works/DciqQXTCilh-1.webp"
       ],
@@ -459,7 +458,9 @@
       },
       "canvases": 0,
       "scrollHeight": 11909,
-      "brokenImages": [],
+      "brokenImages": [
+        "http://127.0.0.1:5173/img/poster-3-13-1.webp"
+      ],
       "consoleErrors": [],
       "failedRequests": [],
       "passed": true
@@ -482,7 +483,10 @@
       },
       "canvases": 0,
       "scrollHeight": 8385,
-      "brokenImages": [],
+      "brokenImages": [
+        "http://127.0.0.1:5173/img/works/Dae6nNME5bg-1.webp",
+        "http://127.0.0.1:5173/img/works/Daw-mnAE_qe-1.webp"
+      ],
       "consoleErrors": [],
       "failedRequests": [],
       "passed": true
@@ -505,9 +509,7 @@
       },
       "canvases": 0,
       "scrollHeight": 9543,
-      "brokenImages": [
-        "http://127.0.0.1:5173/img/works/DaU7EU2E46N-1.webp"
-      ],
+      "brokenImages": [],
       "consoleErrors": [],
       "failedRequests": [],
       "passed": true
@@ -530,7 +532,9 @@
       },
       "canvases": 0,
       "scrollHeight": 8381,
-      "brokenImages": [],
+      "brokenImages": [
+        "http://127.0.0.1:5173/img/works/DaXQtNiEzeH-1.webp"
+      ],
       "consoleErrors": [],
       "failedRequests": [],
       "passed": true
@@ -554,6 +558,7 @@
       "canvases": 0,
       "scrollHeight": 10711,
       "brokenImages": [
+        "http://127.0.0.1:5173/img/works/Dbf7jnBk3ho-1.webp",
         "http://127.0.0.1:5173/img/works/DciqQXTCilh-1.webp"
       ],
       "consoleErrors": [],
@@ -627,6 +632,7 @@
       "canvases": 0,
       "scrollHeight": 10531,
       "brokenImages": [
+        "http://127.0.0.1:5173/img/works/DaXQtNiEzeH-1.webp",
         "http://127.0.0.1:5173/img/works/Dae6nNME5bg-1.webp"
       ],
       "consoleErrors": [],
@@ -734,7 +740,7 @@
       "httpStatus": 200,
       "title": "Alina Javed — Writer — Verlyse Media",
       "h1Count": 1,
-      "h1Text": "Alina Javed",
+      "h1Text": "Alina Javed",
       "overflow": "NO OVERFLOW",
       "viewports": {
         "desktop-1440": false,
@@ -757,7 +763,7 @@
       "httpStatus": 200,
       "title": "Anshujit Singh — Writer — Verlyse Media",
       "h1Count": 1,
-      "h1Text": "Anshujit Singh",
+      "h1Text": "Anshujit Singh",
       "overflow": "NO OVERFLOW",
       "viewports": {
         "desktop-1440": false,
@@ -780,7 +786,7 @@
       "httpStatus": 200,
       "title": "Haieqa Wahab — Writer — Verlyse Media",
       "h1Count": 1,
-      "h1Text": "Haieqa Wahab",
+      "h1Text": "Haieqa Wahab",
       "overflow": "NO OVERFLOW",
       "viewports": {
         "desktop-1440": false,
@@ -803,7 +809,7 @@
       "httpStatus": 200,
       "title": "Shaza Fatima — Writer — Verlyse Media",
       "h1Count": 1,
-      "h1Text": "Shaza Fatima",
+      "h1Text": "Shaza Fatima",
       "overflow": "NO OVERFLOW",
       "viewports": {
         "desktop-1440": false,
@@ -826,7 +832,7 @@
       "httpStatus": 200,
       "title": "Adeena Irfan — Writer — Verlyse Media",
       "h1Count": 1,
-      "h1Text": "Adeena Irfan",
+      "h1Text": "Adeena Irfan",
       "overflow": "NO OVERFLOW",
       "viewports": {
         "desktop-1440": false,
@@ -849,7 +855,7 @@
       "httpStatus": 200,
       "title": "Craft with Bro — Writer — Verlyse Media",
       "h1Count": 1,
-      "h1Text": "Craft with Bro",
+      "h1Text": "Craft with Bro",
       "overflow": "NO OVERFLOW",
       "viewports": {
         "desktop-1440": false,
@@ -872,7 +878,7 @@
       "httpStatus": 200,
       "title": "Munkashay Javed — Writer — Verlyse Media",
       "h1Count": 1,
-      "h1Text": "Munkashay Javed",
+      "h1Text": "Munkashay Javed",
       "overflow": "NO OVERFLOW",
       "viewports": {
         "desktop-1440": false,
@@ -895,7 +901,7 @@
       "httpStatus": 200,
       "title": "Abheesha Ghosh — Writer — Verlyse Media",
       "h1Count": 1,
-      "h1Text": "Abheesha Ghosh",
+      "h1Text": "Abheesha Ghosh",
       "overflow": "NO OVERFLOW",
       "viewports": {
         "desktop-1440": false,
@@ -918,7 +924,7 @@
       "httpStatus": 200,
       "title": "Kenza Imene — Writer — Verlyse Media",
       "h1Count": 1,
-      "h1Text": "Kenza Imene",
+      "h1Text": "Kenza Imene",
       "overflow": "NO OVERFLOW",
       "viewports": {
         "desktop-1440": false,
@@ -941,7 +947,7 @@
       "httpStatus": 200,
       "title": "Hadia Raza — Writer — Verlyse Media",
       "h1Count": 1,
-      "h1Text": "Hadia Raza",
+      "h1Text": "Hadia Raza",
       "overflow": "NO OVERFLOW",
       "viewports": {
         "desktop-1440": false,
@@ -964,7 +970,7 @@
       "httpStatus": 200,
       "title": "Zuha Farhan — Writer — Verlyse Media",
       "h1Count": 1,
-      "h1Text": "Zuha Farhan",
+      "h1Text": "Zuha Farhan",
       "overflow": "NO OVERFLOW",
       "viewports": {
         "desktop-1440": false,
@@ -987,7 +993,7 @@
       "httpStatus": 200,
       "title": "Haiqa Nafees — Writer — Verlyse Media",
       "h1Count": 1,
-      "h1Text": "Haiqa Nafees",
+      "h1Text": "Haiqa Nafees",
       "overflow": "NO OVERFLOW",
       "viewports": {
         "desktop-1440": false,
@@ -1010,7 +1016,7 @@
       "httpStatus": 200,
       "title": "Syeda Tasbeeha Noman — Writer — Verlyse Media",
       "h1Count": 1,
-      "h1Text": "Syeda Tasbeeha Noman",
+      "h1Text": "Syeda Tasbeeha Noman",
       "overflow": "NO OVERFLOW",
       "viewports": {
         "desktop-1440": false,
@@ -1033,7 +1039,7 @@
       "httpStatus": 200,
       "title": "Kazi Fatimataz Zahra — Writer — Verlyse Media",
       "h1Count": 1,
-      "h1Text": "Kazi Fatimataz Zahra",
+      "h1Text": "Kazi Fatimataz Zahra",
       "overflow": "NO OVERFLOW",
       "viewports": {
         "desktop-1440": false,
@@ -1079,7 +1085,7 @@
       "httpStatus": 200,
       "title": "Verlyse Media — Writer — Verlyse Media",
       "h1Count": 1,
-      "h1Text": "Verlyse Media",
+      "h1Text": "Verlyse Media",
       "overflow": "NO OVERFLOW",
       "viewports": {
         "desktop-1440": false,

@@ -122,7 +122,11 @@ path: '/contact',
         </div>
         <div className="relative mx-auto w-full max-w-page px-[clamp(1.25rem,4vw,4.75rem)] text-center">
           <Reveal><p className="eyebrow">Verlyse Media — the desk</p></Reveal>
-          <h1 className="relative mt-8 font-serif text-[clamp(2.6rem,7vw,5.5rem)] font-light leading-[0.92] tracking-[-0.02em] text-ivory">
+          <h1
+            string="split"
+            string-id="contact-title"
+            className="relative mt-8 font-serif text-[clamp(2.6rem,7vw,5.5rem)] font-light leading-[0.92] tracking-[-0.02em] text-ivory"
+          >
                         <CrashZoom className="pointer-events-none absolute inset-x-0 top-1/2 -translate-y-1/2">
               <span aria-hidden="true" className="block select-none whitespace-nowrap font-serif text-[clamp(3.2rem,8.5vw,7rem)] font-semibold leading-none text-transparent [-webkit-text-stroke:1px_rgba(184,145,70,0.13)]">
                 THE CORRESPONDENCE DESK
@@ -287,9 +291,17 @@ path: '/contact',
                         <p className="mt-2 font-mono text-[8px] uppercase tracking-[0.30em] text-wine/70">Signs itself as you write</p>
                       </div>
                       <div className="flex flex-col items-start gap-4">
-                        <button type="submit" disabled={sending} aria-busy={sending} className="btn btn-seal disabled:pointer-events-none disabled:opacity-60">
-                          {sending ? 'Sealing the letter…' : 'Seal the letter — send'}
-                        </button>
+                        <div
+                          string="magnetic"
+                          string-strength="0.25"
+                          string-radius="110"
+                          string-id="contact-send-cta"
+                          className="inline-block"
+                        >
+                          <button type="submit" disabled={sending} aria-busy={sending} className="btn btn-seal disabled:pointer-events-none disabled:opacity-60">
+                            {sending ? 'Sealing the letter…' : 'Seal the letter — send'}
+                          </button>
+                        </div>
                         {errors.length > 0 && (
                           <p role="status" className="font-mono text-[10px] uppercase tracking-[0.28em] text-[#B33A3A]">
                             A few lines remain — the desk has marked them.

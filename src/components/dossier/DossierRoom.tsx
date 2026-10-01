@@ -129,7 +129,11 @@ export default function DossierRoom({ author }: { author: Author }) {
             <div aria-hidden="true" className="mt-4 h-0.5 w-[180px] bg-[#B89146]" />
 
             {/* the name — a printed editorial object, not a website heading */}
-            <h1 className="mt-8 font-serif text-[clamp(3.2rem,8.5vw,6.5rem)] font-semibold leading-[0.95] tracking-[-0.01em] text-[#241D18]">
+            <h1
+              string="split"
+              string-id={`dossier-name-${author.id}`}
+              className="mt-8 font-serif text-[clamp(3.2rem,8.5vw,6.5rem)] font-semibold leading-[0.95] tracking-[-0.01em] text-[#241D18]"
+            >
               {author.name}
             </h1>
             <p className="mt-4 font-mono text-[11px] font-medium uppercase tracking-[0.18em] text-[#7C6338]">

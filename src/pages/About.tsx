@@ -50,7 +50,11 @@ export default function About() {
       <div className="relative mx-auto max-w-[1080px] px-[clamp(1.25rem,4vw,4.75rem)] pb-[clamp(4rem,9vh,7rem)] pt-[clamp(7rem,15vh,9.5rem)]">
         {/* ——— header — ghost COLOPHON, quiet ——— */}
         <div className="text-center">
-          <h1 className="relative font-serif text-[clamp(2.6rem,7vw,5.5rem)] font-light leading-[0.92] tracking-[-0.02em] text-ivory">
+          <h1
+            string="split"
+            string-id="about-title"
+            className="relative font-serif text-[clamp(2.6rem,7vw,5.5rem)] font-light leading-[0.92] tracking-[-0.02em] text-ivory"
+          >
             {/* Beat 1 — CRASH ZOOM. The ghost imprint dollies through the lens
                 and dissolves as the visitor scrolls. GSAP owns this wrapper's
                 transform only; the h1's real text is untouched. */}
@@ -159,6 +163,8 @@ export default function About() {
               <figure className="relative m-0">
                 <span aria-hidden="true" className="absolute inset-0 translate-x-2 translate-y-2 border border-gold/25" />
                 <img
+                  string="lazy"
+                  string-lazy=""
                   src="/img/founder-alina.webp"
                   alt="Alina Javed, founder of Verlyse Media"
                   width={640}

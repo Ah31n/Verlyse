@@ -320,6 +320,9 @@ function Archive() {
                   <span className="group/plate relative block" style={{ opacity: inner }}>
                     <Link
                       id={`folio-${a.id}`}
+                      string="spotlight"
+                      string-lerp="0.18"
+                      string-id={`shelf-plate-${a.id}`}
                       to={isMatch ? `/article/${a.id}` : '#'}
                       onClick={(e) => { if (!isMatch) e.preventDefault() }}
                       aria-label={`Folio ${folio} — ${a.title}, ${a.category}, ${author?.name}. ${a.readingTime}, published ${a.date}.`}
@@ -336,6 +339,8 @@ function Archive() {
                           so the shelf reads as filed photographs, not text rows */}
                       <span className="plate-thumb block w-full">
                         <img
+                          string="lazy"
+                          string-lazy=""
                           src={a.thumbnail ?? a.cover}
                           alt=""
                           loading="lazy"

@@ -1,0 +1,279 @@
+{
+  "generatedAt": "2026-10-01T09:26:53.527Z",
+  "evidence": [
+    {
+      "route": "/",
+      "name": "01-home-cover",
+      "screenshot": "audit/screenshots-evidence/01-home-cover.png",
+      "stringTuneCount": 4,
+      "sampleElements": [
+        {
+          "tag": "h1",
+          "string": "split",
+          "stringId": "home-main-headline",
+          "hasInited": true
+        },
+        {
+          "tag": "div",
+          "string": "parallax",
+          "stringId": "home-feature-plate",
+          "hasInited": true
+        },
+        {
+          "tag": "img",
+          "string": "lazy",
+          "stringId": "string-3",
+          "hasInited": true
+        },
+        {
+          "tag": "div",
+          "string": "magnetic",
+          "stringId": "home-primary-cta",
+          "hasInited": true
+        }
+      ]
+    },
+    {
+      "route": "/articles",
+      "name": "02-articles-archive",
+      "screenshot": "audit/screenshots-evidence/02-articles-archive.png",
+      "stringTuneCount": 39,
+      "sampleElements": [
+        {
+          "tag": "h1",
+          "string": "split",
+          "stringId": "articles-title",
+          "hasInited": true
+        },
+        {
+          "tag": "a",
+          "string": "spotlight",
+          "stringId": "shelf-plate-their-voices-matter",
+          "hasInited": true
+        },
+        {
+          "tag": "img",
+          "string": "lazy",
+          "stringId": "string-3",
+          "hasInited": true
+        },
+        {
+          "tag": "a",
+          "string": "spotlight",
+          "stringId": "shelf-plate-3-13",
+          "hasInited": true
+        },
+        {
+          "tag": "img",
+          "string": "lazy",
+          "stringId": "string-5",
+          "hasInited": true
+        }
+      ]
+    },
+    {
+      "route": "/article/their-voices-matter",
+      "name": "03-article-detail",
+      "screenshot": "audit/screenshots-evidence/03-article-detail.png",
+      "stringTuneCount": 3,
+      "sampleElements": [
+        {
+          "tag": "section",
+          "string": "parallax",
+          "stringId": "article-hero-their-voices-matter",
+          "hasInited": true
+        },
+        {
+          "tag": "h1",
+          "string": "split",
+          "stringId": "title-their-voices-matter",
+          "hasInited": true
+        },
+        {
+          "tag": "img",
+          "string": "lazy",
+          "stringId": "string-3",
+          "hasInited": true
+        }
+      ]
+    },
+    {
+      "route": "/categories/stories",
+      "name": "04-category-stories",
+      "screenshot": "audit/screenshots-evidence/04-category-stories.png",
+      "stringTuneCount": 8,
+      "sampleElements": [
+        {
+          "tag": "h1",
+          "string": "split",
+          "stringId": "categories-title",
+          "hasInited": true
+        },
+        {
+          "tag": "button",
+          "string": "spotlight",
+          "stringId": "category-door-stories",
+          "hasInited": true
+        },
+        {
+          "tag": "button",
+          "string": "spotlight",
+          "stringId": "category-door-poetry",
+          "hasInited": true
+        },
+        {
+          "tag": "button",
+          "string": "spotlight",
+          "stringId": "category-door-essays",
+          "hasInited": true
+        },
+        {
+          "tag": "button",
+          "string": "spotlight",
+          "stringId": "category-door-art",
+          "hasInited": true
+        }
+      ]
+    },
+    {
+      "route": "/creators",
+      "name": "05-creators-wall",
+      "screenshot": "audit/screenshots-evidence/05-creators-wall.png",
+      "stringTuneCount": 6,
+      "sampleElements": [
+        {
+          "tag": "h1",
+          "string": "split",
+          "stringId": "creators-title",
+          "hasInited": true
+        },
+        {
+          "tag": "article",
+          "string": "tilt",
+          "stringId": "dossier-plate-alina-javed",
+          "hasInited": true
+        },
+        {
+          "tag": "img",
+          "string": "lazy",
+          "stringId": "string-3",
+          "hasInited": true
+        },
+        {
+          "tag": "div",
+          "string": "magnetic",
+          "stringId": "creator-dossier-cta",
+          "hasInited": true
+        },
+        {
+          "tag": "div",
+          "string": "spotlight",
+          "stringId": "creator-portrait-alina-javed",
+          "hasInited": true
+        }
+      ]
+    },
+    {
+      "route": "/creator/alina-javed",
+      "name": "06-creator-dossier",
+      "screenshot": "audit/screenshots-evidence/06-creator-dossier.png",
+      "stringTuneCount": 1,
+      "sampleElements": [
+        {
+          "tag": "h1",
+          "string": "split",
+          "stringId": "dossier-name-alina-javed",
+          "hasInited": true
+        }
+      ]
+    },
+    {
+      "route": "/submit",
+      "name": "07-submit-desk",
+      "screenshot": "audit/screenshots-evidence/07-submit-desk.png",
+      "stringTuneCount": 2,
+      "sampleElements": [
+        {
+          "tag": "h1",
+          "string": "split",
+          "stringId": "submit-desk-heading",
+          "hasInited": true
+        },
+        {
+          "tag": "div",
+          "string": "magnetic",
+          "stringId": "submit-desk-action-cta",
+          "hasInited": true
+        }
+      ]
+    },
+    {
+      "route": "/about",
+      "name": "08-about-colophon",
+      "screenshot": "audit/screenshots-evidence/08-about-colophon.png",
+      "stringTuneCount": 2,
+      "sampleElements": [
+        {
+          "tag": "h1",
+          "string": "split",
+          "stringId": "about-title",
+          "hasInited": true
+        },
+        {
+          "tag": "img",
+          "string": "lazy",
+          "stringId": "string-2",
+          "hasInited": true
+        }
+      ]
+    },
+    {
+      "route": "/community",
+      "name": "09-community-commons",
+      "screenshot": "audit/screenshots-evidence/09-community-commons.png",
+      "stringTuneCount": 1,
+      "sampleElements": [
+        {
+          "tag": "h1",
+          "string": "split",
+          "stringId": "community-title",
+          "hasInited": true
+        }
+      ]
+    },
+    {
+      "route": "/contact",
+      "name": "10-contact-correspondence",
+      "screenshot": "audit/screenshots-evidence/10-contact-correspondence.png",
+      "stringTuneCount": 2,
+      "sampleElements": [
+        {
+          "tag": "h1",
+          "string": "split",
+          "stringId": "contact-title",
+          "hasInited": true
+        },
+        {
+          "tag": "div",
+          "string": "magnetic",
+          "stringId": "contact-send-cta",
+          "hasInited": true
+        }
+      ]
+    },
+    {
+      "route": "/room",
+      "name": "11-spatial-room",
+      "screenshot": "audit/screenshots-evidence/11-spatial-room.png",
+      "stringTuneCount": 1,
+      "sampleElements": [
+        {
+          "tag": "h1",
+          "string": "split",
+          "stringId": "room-title",
+          "hasInited": false
+        }
+      ]
+    }
+  ]
+}
