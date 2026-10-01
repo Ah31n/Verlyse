@@ -50,6 +50,16 @@ function Cover({ selectedId, state }: { selectedId: string | null; state: Spatia
   const feature = ARTICLES[0]
   const author = getAuthor(feature.authorId)!
   const E = [0.22, 1, 0.36, 1] as const
+  const [isDesktop, setIsDesktop] = useState(false)
+
+  useEffect(() => {
+    if (typeof window === 'undefined') return
+    const mq = window.matchMedia('(min-width: 1024px)')
+    setIsDesktop(mq.matches)
+    const handler = (e: MediaQueryListEvent) => setIsDesktop(e.matches)
+    mq.addEventListener('change', handler)
+    return () => mq.removeEventListener('change', handler)
+  }, [])
   /* The entrance rides the preloader curtain: the cover's own elements
      begin as the curtain starts to lift (1.85s), so the whole opening —
      curtain in, threshold up, plate landed — stays inside ~2.7 seconds.
@@ -196,13 +206,15 @@ function Cover({ selectedId, state }: { selectedId: string | null; state: Spatia
           Desktop-only atmosphere: on mobile and reduced-motion, the layered
           gradients remain the lightweight fallback so Three.js is never
           downloaded on initial mobile pageview. ——— */}
-      <div className="pointer-events-none absolute inset-0 z-[1] hidden lg:block [&_canvas]:mix-blend-lighten" aria-hidden="true">
-        <SpatialBoundary>
-          <Suspense fallback={null}>
-            <SpatialArchive selectedId={selectedId} state={state} />
-          </Suspense>
-        </SpatialBoundary>
-      </div>
+      {isDesktop && !reduce && (
+        <div className="pointer-events-none absolute inset-0 z-[1] hidden lg:block [&_canvas]:mix-blend-lighten" aria-hidden="true">
+          <SpatialBoundary>
+            <Suspense fallback={null}>
+              <SpatialArchive selectedId={selectedId} state={state} />
+            </Suspense>
+          </SpatialBoundary>
+        </div>
+      )}
 
       {/* ——— FRONT · the feature plate — registry №01, left-of-centre on
           desktop, centred on tablet, single column on mobile.

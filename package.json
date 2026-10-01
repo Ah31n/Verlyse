@@ -18,6 +18,7 @@
     "test:smoke": "node scripts/ssr-smoke.mjs",
     "test:crawl": "node scripts/route-crawl-53.mjs",
     "test:mobile-perf": "node scripts/mobile-perf-audit.mjs",
+    "test:mobile-audit": "node scripts/full-mobile-perf-suite.mjs",
     "asset-audit": "node scripts/asset-audit.mjs"
   },
   "dependencies": {

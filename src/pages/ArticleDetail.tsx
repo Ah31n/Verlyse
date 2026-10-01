@@ -1,6 +1,6 @@
 import { Link, useParams } from 'react-router-dom'
 import { useEffect, useState, lazy, Suspense } from 'react'
-import { motion } from 'motion/react'
+import { motion, useReducedMotion } from 'motion/react'
 import { useArticleSeo } from '../hooks/useSeo'
 import Reveal from '../components/ui/Reveal'
 import SplitText from '../components/ui/SplitText'
@@ -223,6 +223,17 @@ function CreditLine({ credit }: { credit: string }) {
 export default function ArticleDetail() {
   const { id } = useParams<{ id: string }>()
   const { on: reading, toggle: toggleReading, off: offReading } = useReadingMode()
+  const reduce = useReducedMotion()
+  const [isDesktop, setIsDesktop] = useState(false)
+
+  useEffect(() => {
+    if (typeof window === 'undefined') return
+    const mq = window.matchMedia('(min-width: 768px)')
+    setIsDesktop(mq.matches)
+    const handler = (e: MediaQueryListEvent) => setIsDesktop(e.matches)
+    mq.addEventListener('change', handler)
+    return () => mq.removeEventListener('change', handler)
+  }, [])
 
   useEffect(() => {
     if (!reading) return
@@ -710,11 +721,13 @@ export default function ArticleDetail() {
         {/* the bounded spatial atmosphere — sits BEHIND the canonical signature
             and closing copy, which always render as semantic HTML on top.
             Gated to desktop viewports to avoid downloading Three.js on mobile. */}
-        <div className="hidden md:block">
-          <Suspense fallback={null}>
-            <StoryEnding3D article={article} />
-          </Suspense>
-        </div>
+        {isDesktop && !reduce && (
+          <div className="hidden md:block">
+            <Suspense fallback={null}>
+              <StoryEnding3D article={article} />
+            </Suspense>
+          </div>
+        )}
         <div className="relative z-[1] mx-auto max-w-page px-[clamp(1.75rem,5.5vw,4.75rem)]">
           {/* The closing — the publication's own last slide */}
           <ArticleEnding article={article} />
