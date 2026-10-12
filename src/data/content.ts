@@ -1194,6 +1194,7 @@ export const ARTICLES: Article[] = [
       'A LIFE WAS LOST. A FAMILY WAS LEFT WITH QUESTIONS. AND A COUNTRY IS WATCHING. Mir Raza’s story should not become another trending topic that disappears in a week. His family has continued demanding a transparent investigation, while questions surrounding the handling of the case have led to further legal scrutiny. We don’t need to know every answer to demand the most basic one: WHO IS RESPONSIBLE AND WILL JUSTICE BE served? If we call ourselves a nation that values its young people, then their lives cannot become statistics. If we celebrate Pakistani entrepreneurs, then we must also demand a Pakistan where they can live, build and dream safely. Don’t let Mir Raza’s name fade. Speak. Share. Ask questions. Demand a fair investigation. #JusticeForMirRazaAli',
     ],
     likes: 0, /* the source reported this post’s likes as unavailable (scraper value −1); not asserted elsewhere */
+    likesCountRaw: -1,
     comments: 9,
     shortCode: 'DciqQXTCilh',
     world: 'newsprint',
@@ -1404,7 +1405,12 @@ const _creatorCount = _primaryAuthorIds.size
 /* human writers only — the masthead is the platform, not a guest writer */
 const _humanCreators = ARTICLES.map((a) => a.authorId).filter((id) => id !== 'verlyse-media')
 const _humanCreatorCount = new Set(_humanCreators).size
-const _appreciations = ARTICLES.reduce((s, a) => s + a.likes, 0)
+/** True when the source dataset recorded a verified non-negative appreciation count (never when likesCountRaw === -1). */
+export function hasKnownLikes(a: Pick<Article, 'likes' | 'likesCountRaw'>): boolean {
+  return a.likesCountRaw !== -1 && a.likes > 0
+}
+
+const _appreciations = ARTICLES.reduce((s, a) => s + (hasKnownLikes(a) ? a.likes : 0), 0)
 /* Canonical UI vocabulary: the 585 metric is “conversations” everywhere —
    the comments beneath the features, all of them read. `Article.comments`
    stays the name of the underlying data field. */
@@ -1473,13 +1479,14 @@ export const SORTS: { key: SortKey; label: string; note: string }[] = [
 ]
 export function sortArticles(key: SortKey): Article[] {
   const list = [...ARTICLES]
+  const rankLikes = (a: Article) => (hasKnownLikes(a) ? a.likes : -1)
   switch (key) {
     case 'latest':
-      return list.sort((a, b) => b.date.localeCompare(a.date) || b.likes - a.likes)
+      return list.sort((a, b) => b.date.localeCompare(a.date) || rankLikes(b) - rankLikes(a))
     case 'most-discussed':
-      return list.sort((a, b) => b.comments - a.comments || b.likes - a.likes)
+      return list.sort((a, b) => b.comments - a.comments || rankLikes(b) - rankLikes(a))
     case 'most-appreciated':
-      return list.sort((a, b) => b.likes - a.likes || b.comments - a.comments)
+      return list.sort((a, b) => rankLikes(b) - rankLikes(a) || b.comments - a.comments || b.date.localeCompare(a.date))
     case 'editors-picks': {
       const picks = new Set(EDITORS_PICKS)
       return list

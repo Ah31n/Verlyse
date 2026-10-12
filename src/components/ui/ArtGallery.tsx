@@ -28,16 +28,31 @@ export default function ArtGallery({ article }: { article: Article }) {
   useBodyScrollLock(open !== null)
 
   useEffect(() => {
+    setOpen(null)
+  }, [article.id])
+
+  useEffect(() => {
     if (open === null) return undefined
-    const bgNodes = [
-      ...(galleryContentRef.current ? [galleryContentRef.current] : []),
-      ...Array.from(
-        document.querySelectorAll<HTMLElement>('header, footer, main > div > a, main > div > button'),
-      ),
-    ]
-    bgNodes.forEach((el) => el.setAttribute('inert', ''))
+    const rootEl = document.getElementById('root')
+    const bgNodes = rootEl
+      ? [rootEl]
+      : [
+          ...(galleryContentRef.current ? [galleryContentRef.current] : []),
+          ...Array.from(
+            document.querySelectorAll<HTMLElement>(
+              'header, footer, nav[aria-label="Primary mobile"], main a, main button',
+            ),
+          ).filter((el) => !dialogRef.current?.contains(el)),
+        ]
+    bgNodes.forEach((el) => {
+      el.setAttribute('inert', '')
+      el.setAttribute('aria-hidden', 'true')
+    })
     return () => {
-      bgNodes.forEach((el) => el.removeAttribute('inert'))
+      bgNodes.forEach((el) => {
+        el.removeAttribute('inert')
+        el.removeAttribute('aria-hidden')
+      })
     }
   }, [open])
 
@@ -111,7 +126,7 @@ export default function ArtGallery({ article }: { article: Article }) {
             ? 'mx-auto max-w-[680px]'
             : slides.length === 2
               ? 'grid-cols-1 sm:grid-cols-2'
-              : 'grid-cols-1 sm:grid-cols-2 xl:grid-cols-3'
+              : 'grid-cols-1 sm:grid-cols-2 min-[1400px]:grid-cols-3'
         }`}
       >
         {slides.map((src, i) => {

@@ -2,7 +2,7 @@ import { useMemo, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { motion, AnimatePresence, useReducedMotion } from 'motion/react'
 import { useSeo } from '../hooks/useSeo'
-import { ARTICLES, AUTHORS, LEDGER, authorPhoto, coCreditedWorks, folioNoOf, stampDate } from '../data/content'
+import { ARTICLES, AUTHORS, LEDGER, authorPhoto, coCreditedWorks, folioNoOf, hasKnownLikes, stampDate } from '../data/content'
 import { handleImgError } from '../lib/imgFallback'
 
 /** The folios a creator holds in the archive — their own entries. */
@@ -62,7 +62,15 @@ export default function Creators() {
     [folios, coCredits],
   )
   const selectedFeature = useMemo(
-    () => folios.length ? [...folios].sort((a, b) => b.likes - a.likes)[0] : undefined,
+    () =>
+      folios.length
+        ? [...folios].sort(
+            (a, b) =>
+              (hasKnownLikes(b) ? b.likes : -1) - (hasKnownLikes(a) ? a.likes : -1) ||
+              b.comments - a.comments ||
+              b.date.localeCompare(a.date),
+          )[0]
+        : undefined,
     [folios],
   )
 

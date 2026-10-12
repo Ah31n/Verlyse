@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom'
-import { ARTICLES, getAuthor, coCreditedWorks, type Author , authorPhoto } from '../../data/content'
+import { ARTICLES, getAuthor, coCreditedWorks, hasKnownLikes, type Author , authorPhoto } from '../../data/content'
 import { AuthorFrame, AuthorPhoto } from './AuthorFrame'
 import Reveal from './Reveal'
 import { Signature } from './ArticleClosing'
@@ -190,7 +190,7 @@ export default function WriterProfile({ author }: { author: Author }) {
                     <p className="mt-1 font-mono text-[9px] uppercase tracking-[0.30em] text-white/60">
                       {isCoCredit
                         ? `Co-credited · ${a.date.split('-').reverse().join('.')}`
-                        : a.likes > 0
+                        : hasKnownLikes(a)
                           ? `${a.date.split('-').reverse().join('.')} · ${a.likes} appreciations`
                           : `${a.date.split('-').reverse().join('.')} · appreciations not tallied in the ledger`}
                     </p>

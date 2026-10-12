@@ -420,7 +420,7 @@ export default function ArticleDetail() {
         </section>
       ) : article.heroMode === 'gallery' ? (
         /* ——— GALLERY: the artwork itself is the hero — the plate, framed ——— */
-        <section className="relative flex min-h-[80svh] items-end overflow-hidden border-b border-white/10 bg-wine-deep pt-36">
+        <section className="relative flex items-end overflow-hidden border-b border-white/10 bg-wine-deep pt-12 md:min-h-[80svh] md:pt-36">
           <WorldTexture world={article.world} />
           <div className="relative z-[2] mx-auto w-full max-w-page px-[clamp(1.75rem,5.5vw,4.75rem)] pb-16">
             <div className="grid grid-cols-1 items-end gap-10 lg:grid-cols-[1fr_auto] lg:pr-[256px]">

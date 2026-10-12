@@ -149,9 +149,9 @@ export default function ReadingRoom({ children }: { children: ReactNode }) {
         <div className="mt-6 flex items-end">
           {/* thread stub — the reading thread's stub, hanging from the rule */}
           <span aria-hidden="true" className="block h-[3.25rem] w-px bg-gradient-to-b from-[#D9B978]/45 to-transparent" />
-          {/* the small ghost folio — the numeral of the folio in hand */}
+          {/* the small ghost folio — the numeral of the folio in hand, inset from the fixed reading-mode button */}
           {folio && (
-            <span aria-hidden="true" className="ml-auto block select-none font-serif text-[2.4rem] font-semibold leading-none text-transparent [-webkit-text-stroke:1px_rgba(184,145,70,0.28)]">
+            <span aria-hidden="true" className="ml-auto mr-14 block select-none font-serif text-[2.4rem] font-semibold leading-none text-transparent [-webkit-text-stroke:1px_rgba(184,145,70,0.28)]">
               № {folio}
             </span>
           )}

@@ -20,7 +20,7 @@ import ArtGallery from '../src/components/ui/ArtGallery'
 import WriterProfile, { formatQuotedNote } from '../src/components/ui/WriterProfile'
 import Submit from '../src/pages/Submit'
 import Contact from '../src/pages/Contact'
-import { ARTICLES, AUTHORS } from '../src/data/content'
+import { ARTICLES, AUTHORS, hasKnownLikes, sortArticles } from '../src/data/content'
 
 interface Result { name: string; ok: boolean; detail: string }
 const results: Result[] = []
@@ -136,6 +136,12 @@ export async function run() {
   /* ---- ART GALLERY LIGHTBOX: focus trap, Escape, focus restore, no assetPath leak ---- */
   await check('art gallery: hides internal asset paths and traps focus inside lightbox', async () => {
     const qg = ARTICLES.find((a) => a.id === 'the-quiet-grief')!
+    assert(qg.likesCountRaw === -1 && !hasKnownLikes(qg), 'the-quiet-grief must treat likesCountRaw=-1 as unknown')
+    const mostAppreciated = sortArticles('most-appreciated')
+    assert(
+      mostAppreciated.findIndex((a) => a.id === 'the-quiet-grief') >= mostAppreciated.length - 2,
+      'unknown likesCountRaw=-1 article should sort after known-likes articles in most-appreciated',
+    )
     wrap(<ArtGallery article={qg} />)
 
     assert(!document.body.textContent?.includes('/img/works/DeUZFPTCjPU-1.webp'), 'public gallery leaked internal assetPath')
