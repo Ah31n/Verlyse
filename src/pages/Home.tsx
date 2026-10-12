@@ -9,6 +9,7 @@ import VoiceCarousel from '../components/ui/VoiceCarousel'
 import { MotifDivider } from '../components/ui/ArticleClosing'
 import { AnticipatedTitle, ReflectionLine } from '../components/ui/ScrollBeat'
 import { LibraryCard, HiddenQuote } from '../components/ui/EasterEggs'
+import HiringMarquee from '../components/ui/HiringMarquee'
 import { MetaRow, SectionHead, UnderlineLink } from '../components/ui/primitives'
 import { ImmersiveShell, BrassThread } from '../components/immersive'
 import { Magnetic, MaskReveal, Tilt3D, Slate } from '../components/cinematic'
@@ -1104,6 +1105,7 @@ export default function Home() {
       <VoiceCarousel />
       <MotifDivider label="The invitation" motif="feather" />
       <Invitation />
+      <HiringMarquee />
       <Colophon />
     </ImmersiveShell>
   )

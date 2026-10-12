@@ -643,6 +643,30 @@
     transition-delay: calc(var(--word-index, 0) * 28ms);
   }
 
+  /* ---- Editorial hiring marquee ("THE NEXT BYLINE") ----
+     Pure CSS continuous translation from 0 to -50% over two identical
+     visual segments so the loop is mathematically seamless and works
+     even without JS animation. Pauses on hover/focus and collapses to a
+     static centered layout under prefers-reduced-motion. */
+  @keyframes vm-marquee-scroll {
+    0% {
+      transform: translate3d(0, 0, 0);
+    }
+    100% {
+      transform: translate3d(-50%, 0, 0);
+    }
+  }
+  .vm-marquee-track {
+    display: flex;
+    width: max-content;
+    will-change: transform;
+    animation: vm-marquee-scroll 34s linear infinite;
+  }
+  .vm-marquee-band:hover .vm-marquee-track,
+  .vm-marquee-band:focus-within .vm-marquee-track {
+    animation-play-state: paused;
+  }
+
   /* Reduced motion and no-pointer devices get the composition at rest. */
   @media (prefers-reduced-motion: reduce) {
     .st-measure { transform: none; }
@@ -653,6 +677,13 @@
       transition-delay: 0ms;
     }
     .st-spotlit::after { opacity: 0; }
+    .vm-marquee-track {
+      animation: none !important;
+      transform: none !important;
+      width: 100%;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
   }
   @media (hover: none), (max-width: 1023px) {
     .st-spotlit::after { opacity: 0; }

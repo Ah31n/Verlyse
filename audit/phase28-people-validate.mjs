@@ -14,7 +14,8 @@ const pass = (n, d = '') => { PASS++; checks.push({ name: n, status: 'PASS', det
 const fail = (n, d = '') => { FAIL++; checks.push({ name: n, status: 'FAIL', detail: d }) }
 const info = (n, d = '') => { INFO++; checks.push({ name: n, status: 'INFO', detail: d }) }
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms))
-const TEAM = ['Ana Fatima', 'Hooria Maqsood', 'Haidar Ali', 'Liba Adeel', 'Zainab Faisal Rao', 'Amna Rao', 'Haiqa Nafees', 'Zuha Farhan', 'Javeria Karim', 'Manha', 'Ahsan Ashfaq', 'Zainab Khan']
+const TEAM = ['Ana Fatima', 'Hooria Maqsood', 'Haidar Ali', 'Liba Adeel', 'Zainab Faisal Rao', 'Amna Rao', 'Zuha Farhan', 'Javeria Karim', 'Ahsan Ashfaq', 'Zainab Khan']
+const REMOVED_TEAM = ['Haiqa Nafees', 'Manha']
 async function launch(viewport, opts = {}) {
   const browser = await puppeteer.launch({ headless: 'new', args: ['--no-sandbox', '--disable-setuid-sandbox', '--disable-dev-shm-usage', '--use-gl=swiftshader'] })
   const page = await browser.newPage()
@@ -33,7 +34,8 @@ async function launch(viewport, opts = {}) {
   const body = await page.evaluate(() => document.body.innerText)
   const hasT = (s) => body.toLowerCase().includes(s.toLowerCase())
   const names = TEAM.filter((t) => hasT(t.toLowerCase()))
-  names.length === 12 ? pass('all twelve real team records') : fail('twelve records', `missing ${TEAM.filter((t) => !hasT(t.toLowerCase()))}`)
+  names.length === 10 ? pass('all ten real team records') : fail('ten records', `missing ${TEAM.filter((t) => !hasT(t.toLowerCase()))}`)
+  REMOVED_TEAM.every((t) => !hasT(t.toLowerCase())) ? pass('removed team records absent (Haiqa Nafees, Manha)') : fail('removed records present')
   hasT('i — leadership') && hasT('ii — editorial & creative') && hasT('iii — programs & craft')
     ? pass('three Penpot clusters — Leadership · Editorial & Creative · Programs & Craft')
     : fail('three clusters')
@@ -43,7 +45,7 @@ async function launch(viewport, opts = {}) {
   formHref && formHref.startsWith('https://docs.google.com/forms') ? pass('open seat → real ambassador form') : fail('open seat form', String(formHref))
   // numbered medallions
   const medallions = await page.evaluate(() => [...document.querySelectorAll('button')].filter((b) => /№\d{2}/.test(b.innerText)).length)
-  medallions >= 12 ? pass('numbered medallions present', `${medallions} buttons with №`) : fail('numbered medallions', `${medallions}`)
+  medallions >= 10 ? pass('numbered medallions present', `${medallions} buttons with №`) : fail('numbered medallions', `${medallions}`)
   // select Ana Fatima → record dialog
   await page.evaluate(() => { const el = [...document.querySelectorAll('button')].find((b) => b.innerText.includes('Ana Fatima')); el?.focus(); el?.click() })
   await sleep(700)
@@ -90,7 +92,7 @@ async function launch(viewport, opts = {}) {
   const { browser, page, errors } = await launch({ width: 768, height: 1024 })
   const body = await page.evaluate(() => document.body.innerText)
   const hasT = (s) => body.toLowerCase().includes(s.toLowerCase())
-  TEAM.filter((t) => hasT(t.toLowerCase())).length === 12 ? pass('tablet — all twelve records') : fail('tablet — records')
+  TEAM.filter((t) => hasT(t.toLowerCase())).length === 10 ? pass('tablet — all ten records') : fail('tablet — records')
   const overflow = await page.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth)
   overflow <= 1 ? pass('tablet — no overflow') : fail('tablet — overflow', `${overflow}px`)
   errors.length === 0 ? pass('tablet — zero console errors') : fail('tablet — console', errors.slice(0, 2).join(' | '))
@@ -103,7 +105,7 @@ async function launch(viewport, opts = {}) {
   const { browser, page, errors } = await launch({ width: 390, height: 844 })
   const body = await page.evaluate(() => document.body.innerText)
   const hasT = (s) => body.toLowerCase().includes(s.toLowerCase())
-  TEAM.filter((t) => hasT(t.toLowerCase())).length === 12 ? pass('mobile — all twelve records (single column)') : fail('mobile — records')
+  TEAM.filter((t) => hasT(t.toLowerCase())).length === 10 ? pass('mobile — all ten records (single column)') : fail('mobile — records')
   hasT('the open seat') ? pass('mobile — open seat present') : fail('mobile — open seat')
   const overflow = await page.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth)
   overflow <= 1 ? pass('mobile — no overflow') : fail('mobile — overflow', `${overflow}px`)
@@ -117,7 +119,7 @@ async function launch(viewport, opts = {}) {
   const { browser, page, errors } = await launch({ width: 1440, height: 900 }, { reduced: true })
   const body = await page.evaluate(() => document.body.innerText)
   const hasT = (s) => body.toLowerCase().includes(s.toLowerCase())
-  TEAM.filter((t) => hasT(t.toLowerCase())).length === 12 ? pass('reduced — full gallery present (static)') : fail('reduced — records')
+  TEAM.filter((t) => hasT(t.toLowerCase())).length === 10 ? pass('reduced — full gallery present (static)') : fail('reduced — records')
   const overflow = await page.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth)
   overflow <= 1 ? pass('reduced — no overflow') : fail('reduced — overflow', `${overflow}px`)
   errors.length === 0 ? pass('reduced — zero console errors') : fail('reduced — console', errors.slice(0, 2).join(' | '))

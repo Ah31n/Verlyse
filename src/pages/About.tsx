@@ -3,6 +3,7 @@ import { useSeo } from '../hooks/useSeo'
 import { Link } from 'react-router-dom'
 import { BRAND, COMMUNITY_STATS, LEDGER } from '../data/content'
 import BrassRule from '../components/ui/BrassRule'
+import HiringMarquee from '../components/ui/HiringMarquee'
 import { LibraryCard } from '../components/ui/EasterEggs'
 import { CrashZoom, DepthStage, DepthLayer, OrbitalDrift, PushIn , MaskReveal, Slate } from '../components/cinematic'
 import { handleImgError } from '../lib/imgFallback'
@@ -240,6 +241,7 @@ export default function About() {
         </motion.section>
         </PushIn>
       </div>
+      <HiringMarquee />
     </div>
   )
 }

@@ -17,10 +17,12 @@ import SearchOverlay, { } from '../src/components/layout/SearchOverlay'
 import SavedDrawer from '../src/components/layout/SavedDrawer'
 import SaveButton from '../src/components/ui/SaveButton'
 import ArtGallery from '../src/components/ui/ArtGallery'
+import HiringMarquee from '../src/components/ui/HiringMarquee'
 import WriterProfile, { formatQuotedNote } from '../src/components/ui/WriterProfile'
+import Ambassadors from '../src/pages/Ambassadors'
 import Submit from '../src/pages/Submit'
 import Contact from '../src/pages/Contact'
-import { ARTICLES, AUTHORS, hasKnownLikes, sortArticles } from '../src/data/content'
+import { ARTICLES, AUTHORS, BRAND, hasKnownLikes, sortArticles } from '../src/data/content'
 
 interface Result { name: string; ok: boolean; detail: string }
 const results: Result[] = []
@@ -229,6 +231,39 @@ export async function run() {
       assert(!text.includes('““') && !text.includes('””'), `doubled quotation marks rendered for ${author.id}`)
       cleanup()
     }
+  })
+
+  cleanup()
+
+  /* ---- HIRING MARQUEE ("THE NEXT BYLINE") & TEAM ROSTER UPDATE --------- */
+  await check('hiring marquee & team roster: exact Google Form URL, 3 roles, a11y deduplication, and Haiqa/Manha removed from team', async () => {
+    const exactFormUrl =
+      'https://docs.google.com/forms/d/e/1FAIpQLScbXxbyw22YM4Mlid81RoyckzgwvpBC9h8siWff3hMp6tcBwg/viewform?usp=publish-editor'
+    assert(BRAND.hiringForm === exactFormUrl, 'BRAND.hiringForm does not match official Google Forms URL')
+    assert(BRAND.team.length === 10, `expected 10 team members in BRAND.team, got ${BRAND.team.length}`)
+    assert(
+      !BRAND.team.some((m) => /haiqa|manha/i.test(m.name)),
+      'Haiqa Nafees or Manha still present in BRAND.team',
+    )
+
+    wrap(<HiringMarquee />)
+    const text = document.body.textContent ?? ''
+    assert(text.includes('VERLYSE MEDIA / OPEN CALL 2026'), 'missing hiring kicker')
+    assert(text.includes('The next voice could be yours.'), 'missing hiring headline')
+    assert(text.includes('Researcher') && text.includes('Palette Designer') && text.includes('Content Writer'), 'missing one or more open roles')
+    assert(text.includes('Previous experience isn’t essential'), 'missing beginner-friendly experience note')
+
+    const cta = screen.getByRole('link', { name: /Explore the roles and apply to Verlyse Media/i })
+    assert(cta.getAttribute('href') === exactFormUrl, `hiring CTA href mismatch: ${cta.getAttribute('href')}`)
+    assert(cta.getAttribute('target') === '_blank', 'hiring CTA missing target="_blank"')
+    assert(cta.getAttribute('rel')?.includes('noopener') && cta.getAttribute('rel')?.includes('noreferrer'), 'hiring CTA missing rel="noopener noreferrer"')
+    cleanup()
+
+    wrap(<Ambassadors />)
+    const ambText = document.body.textContent ?? ''
+    assert(!ambText.includes('Haiqa Nafees') && !ambText.includes('HAIQA NAFEES'), 'Haiqa Nafees still rendered on /ambassadors')
+    assert(!ambText.includes('Manha') && !ambText.includes('MANHA'), 'Manha still rendered on /ambassadors')
+    cleanup()
   })
 
   const failed = results.filter((r) => !r.ok)

@@ -404,11 +404,11 @@ export function Rise3D({
     const rise = window.innerWidth < 768 ? 36 : 70
     gsap.fromTo(
       el,
-      { rotationX: 16, y: rise, autoAlpha: 0, transformOrigin: '50% 0%' },
+      { rotationX: 16, y: rise, opacity: 0, transformOrigin: '50% 0%' },
       {
         rotationX: 0,
         y: 0,
-        autoAlpha: 1,
+        opacity: 1,
         duration: 1.05,
         delay,
         ease: 'power3.out',
@@ -458,11 +458,11 @@ export function DollyIn({
     if (!el) return
     gsap.fromTo(
       el,
-      { scale: 0.94, y: 26, autoAlpha: 0 },
+      { scale: 0.94, y: 26, opacity: 0 },
       {
         scale: 1,
         y: 0,
-        autoAlpha: 1,
+        opacity: 1,
         duration: 1.2,
         ease: 'power3.out',
         scrollTrigger: { trigger: root, start: 'top 86%' },

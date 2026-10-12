@@ -271,9 +271,9 @@ export const AUTHORS: Author[] = [
     id: 'haiqa-nafees',
     name: 'Haiqa Nafees',
     handle: '@maddu__0',
-    role: 'Writer · Associate Editor',
-    bio: 'Associate editor of Verlyse Media. She shared her go-to Khageena recipe — simple ingredients, 10 minutes, zero stress — made specially for students (presented 24 July 2026).',
-    confirmed: true,    philosophy: 'Associate editor and poet — she writes the small, true things: recipes for tired students, and the word “jaldi” that stands between parents and children.',
+    role: 'Writer · Poet',
+    bio: 'Shared her go-to Khageena recipe — simple ingredients, 10 minutes, zero stress — made specially for students (presented 24 July 2026), and wrote the poem “Jaldi” (presented 29 July 2026).',
+    confirmed: true,    philosophy: 'Writer and poet — she writes the small, true things: recipes for tired students, and the word “jaldi” that stands between parents and children.',
     favoriteQuote: 'A break from continuous working helps the mind work better.',
 
   },
@@ -1562,6 +1562,42 @@ export const BRAND = {
   },
   disclosure:
     'When a post is created with design tools, the caption says so — as the platform replied to a commenter: “microsoft designer is used to create this post.” The writing remains the writer’s.',
+  hiringForm:
+    'https://docs.google.com/forms/d/e/1FAIpQLScbXxbyw22YM4Mlid81RoyckzgwvpBC9h8siWff3hMp6tcBwg/viewform?usp=publish-editor',
+  hiring: {
+    kicker: 'VERLYSE MEDIA / OPEN CALL 2026',
+    concept: 'The Next Byline',
+    headline: 'The next voice could be yours.',
+    subcopy:
+      'We’re inviting curious minds, thoughtful researchers, and creative storytellers to help shape what Verlyse publishes next.',
+    experienceNote:
+      'Previous experience isn’t essential. Curiosity, creativity, and a willingness to learn matter.',
+    ctaLabel: 'Explore the roles & apply ↗',
+    rolesMicrocopy: 'Researcher · Palette Designer · Content Writer',
+    roles: [
+      {
+        index: '01',
+        title: 'Researcher',
+        focus: 'Investigation & Source Evaluation',
+        summary:
+          'Reliable information gathering, topic exploration, and organized research — distinguishing credible sources from misinformation to support editorial features.',
+      },
+      {
+        index: '02',
+        title: 'Palette Designer',
+        focus: 'Color & Visual Direction',
+        summary:
+          'Color palettes, visual moods, and color theory — translating each topic’s atmosphere into consistent visual direction and editorial storytelling.',
+      },
+      {
+        index: '03',
+        title: 'Content Writer',
+        focus: 'Editorial Storytelling',
+        summary:
+          'Engaging, original, well-researched articles, opinion pieces, reviews, and captions — adapting writing style with clarity and creative voice.',
+      },
+    ],
+  },
   team: [
     { role: 'Director of Operations', name: 'Ana Fatima', description: 'Oversees operations and helps keep Verlyse Media’s growing team and initiatives moving smoothly.' },
     { role: 'Strategy Director', name: 'Hooria Maqsood', description: 'Guides strategic decisions and helps shape the long-term direction of Verlyse Media.' },
@@ -1569,10 +1605,8 @@ export const BRAND = {
     { role: 'Communication Director', name: 'Liba Adeel', description: 'Shapes Verlyse Media’s communication and helps keep its voice clear, consistent, and connected.' },
     { role: 'Editorial Director', name: 'Zainab Faisal Rao', description: 'Leads the editorial vision and helps develop the standards and direction of Verlyse Media’s written work.' },
     { role: 'Creative Director', name: 'Amna Rao', description: 'Shapes Verlyse Media’s creative vision and helps define the visual and artistic direction of its work.' },
-    { role: 'Associate Editor', name: 'Haiqa Nafees', handle: '@maddu__0', description: 'Supports the editorial team in refining, developing, and strengthening Verlyse Media’s written work.' },
     { role: 'Associate Creative Director', name: 'Zuha Farhan', handle: '@zvhxx__', description: 'Helps shape Verlyse Media’s creative direction and contributes to its visual storytelling.' },
     { role: 'Head of Brand Ambassador', name: 'Javeria Karim', description: 'Leads the Brand Ambassador program, guiding ambassadors and building meaningful engagement around Verlyse Media.' },
-    { role: 'Graphic Designer', name: 'Manha', description: 'Develops visual assets that support Verlyse Media’s identity, storytelling, and editorial presentation.' },
     { role: 'Technology & Digital Experience Lead', name: 'Ahsan Ashfaq', description: 'Leads the digital development of Verlyse Media, building and maintaining its website and shaping its online experience.' },
     { role: 'Head of Research Department', name: 'Zainab Khan', description: 'Leads the research department at Verlyse Media.' },
   ],
@@ -1670,7 +1704,7 @@ export function getAuthor(id: string): Author | undefined {
  * metadata previously did on all sixteen dossiers — is not a styling choice,
  * it is a miscrediting. The role is real data; this reads it.
  *
- * Compound roles ("Writer · Associate Editor", "Founder · prose poet") are
+ * Compound roles ("Writer · Poet", "Founder · prose poet") are
  * reduced to their first segment for a page title, where brevity matters;
  * every other surface keeps the full role string.
  */

@@ -44,6 +44,10 @@
       "status": "PASS",
       "detail": "submitA11y=true, creatorQuotesOk=true"
     },
+    "hiring-marquee-and-roster-removal": {
+      "status": "PASS",
+      "detail": "{\"ctaPresent\":true,\"targetBlank\":true,\"relSafe\":true,\"noRemovedTeam\":true,\"hasRoles\":true,\"hasHeadline\":true}"
+    },
     "mobile-375px-no-overflow": {
       "status": "PASS",
       "detail": "/:375/375, /articles:375/375, /article/the-quiet-grief:375/375, /room:375/375 + 11 viewports clean"

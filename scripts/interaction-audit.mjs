@@ -149,6 +149,36 @@ async function run() {
   })
   pass('forms-and-profile-a11y', submitA11y && creatorQuotesOk, `submitA11y=${submitA11y}, creatorQuotesOk=${creatorQuotesOk}`)
 
+  // ---- HIRING EXPERIENCE ("THE NEXT BYLINE") & TEAM ROSTER REMOVAL ----
+  await page.goto(BASE + '/ambassadors', { waitUntil: 'networkidle' })
+  await page.waitForTimeout(500)
+  const rosterAndHiring = await page.evaluate(() => {
+    const txt = document.body.innerText || ''
+    const exactHref = 'https://docs.google.com/forms/d/e/1FAIpQLScbXxbyw22YM4Mlid81RoyckzgwvpBC9h8siWff3hMp6tcBwg/viewform?usp=publish-editor'
+    const cta = document.querySelector(`a[href="${exactHref}"]`)
+    const noRemovedTeam = !/haiqa nafees|\bmanha\b/i.test(txt)
+    const hasRoles = txt.includes('Researcher') && txt.includes('Palette Designer') && txt.includes('Content Writer')
+    const hasHeadline = txt.includes('The next voice could be yours.')
+    return {
+      ctaPresent: !!cta,
+      targetBlank: cta?.getAttribute('target') === '_blank',
+      relSafe: (cta?.getAttribute('rel') || '').includes('noopener'),
+      noRemovedTeam,
+      hasRoles,
+      hasHeadline,
+    }
+  })
+  pass(
+    'hiring-marquee-and-roster-removal',
+    rosterAndHiring.ctaPresent &&
+      rosterAndHiring.targetBlank &&
+      rosterAndHiring.relSafe &&
+      rosterAndHiring.noRemovedTeam &&
+      rosterAndHiring.hasRoles &&
+      rosterAndHiring.hasHeadline,
+    JSON.stringify(rosterAndHiring),
+  )
+
   // ---- 11-VIEWPORT MATRIX & 375PX MOBILE VIEWPORT CHECK ----
   const m375 = await browser.newContext({ viewport: { width: 375, height: 812 } })
   const p375 = await m375.newPage()
