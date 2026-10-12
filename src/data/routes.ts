@@ -196,12 +196,13 @@ export function buildRouteRegistry(origin: string = DEFAULT_ORIGIN): RouteRecord
   for (const article of ARTICLES) {
     const author = getAuthor(article.authorId)
     const path = `/article/${article.id}`
+    const socialImage = article.cover.startsWith('data:') ? FALLBACK_IMAGE : article.cover
     routes.push({
       path,
       kind: 'article',
       title: `${article.title} — Verlyse Media`,
       description: article.excerpt,
-      image: article.cover,
+      image: socialImage,
       ogType: 'article',
       jsonLd: {
         '@type': 'Article',
@@ -210,10 +211,13 @@ export function buildRouteRegistry(origin: string = DEFAULT_ORIGIN): RouteRecord
         datePublished: article.date,
         timeRequired: article.readingTime,
         articleSection: article.category,
-        author: { '@type': 'Person', name: author?.name ?? article.authorId },
+        author: {
+          '@type': article.authorId === 'verlyse-media' ? 'Organization' : 'Person',
+          name: author?.name ?? article.authorId,
+        },
         publisher: { '@type': 'Organization', name: 'Verlyse Media' },
         keywords: article.tags?.join(', '),
-        image: `${origin}${article.cover}`,
+        image: `${origin}${socialImage}`,
         mainEntityOfPage: canonicalUrl(path, origin),
       },
       changefreq: 'yearly',

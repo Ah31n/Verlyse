@@ -506,7 +506,7 @@ function WorksStrip() {
               </AnticipatedTitle>
             </div>
             <div className="text-right">
-              <p className="font-mono text-[9px] uppercase tracking-[0.30em] text-white/55">The eight newest folios · June–August 2026</p>
+              <p className="font-mono text-[9px] uppercase tracking-[0.30em] text-white/55">The eight newest folios · June–October 2026</p>
               <p className="mt-2 font-mono text-[9px] uppercase tracking-[0.30em] text-white/55">{LEDGER.features} features · {LEDGER.creators} creators · {LEDGER.appreciations.toLocaleString('en-US')} appreciations</p>
               <p className="mt-3 max-w-[30ch] font-serif text-base font-light italic leading-[1.6] text-ivory/70">
                 The next issue could begin with your name.
@@ -666,7 +666,7 @@ function Pulse() {
               Every post on the feed — from the founder’s call for women’s rights to the Mir Raza Ali memorial.
             </p>
             <p className="mt-6 font-mono text-[9px] uppercase leading-[2] tracking-[0.26em] text-white/40">
-              Archive data — read from the published feed of June–August 2026. Not live counts.
+              Archive data — read from the published feed of June–October 2026. Not live counts.
             </p>
           </Reveal>
           <div className="border-t border-white/15">

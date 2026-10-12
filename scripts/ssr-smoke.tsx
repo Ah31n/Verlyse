@@ -44,6 +44,7 @@ const routes: [string, ReactNode][] = [
   ['/article (first)', shell(<Routes><Route path="/article/:id" element={<ArticleDetail />} /></Routes>, '/article/their-voices-matter')],
   ['/article (horror)', shell(<Routes><Route path="/article/:id" element={<ArticleDetail />} /></Routes>, '/article/3-13')],
   ['/article (gallery)', shell(<Routes><Route path="/article/:id" element={<ArticleDetail />} /></Routes>, '/article/water-cat')],
+  ['/article (the-quiet-grief)', shell(<Routes><Route path="/article/:id" element={<ArticleDetail />} /></Routes>, '/article/the-quiet-grief')],
   ['/article (quiet)', shell(<Routes><Route path="/article/:id" element={<ArticleDetail />} /></Routes>, '/article/jaldi')],
   ['/article (missing)', shell(<Routes><Route path="/article/:id" element={<ArticleDetail />} /></Routes>, '/article/not-a-folio')],
   ['/creator (writer)', shell(<Routes><Route path="/creator/:authorId" element={<WriterProfilePage />} /></Routes>, '/creator/alina-javed')],

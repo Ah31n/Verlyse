@@ -40,7 +40,7 @@ async function run() {
   const hadSave = (await saveBtn.count()) > 0
   if (hadSave) await saveBtn.click()
   await page.waitForTimeout(400)
-  await page.locator('button[aria-label="Saved stories"]').click()
+  await page.locator('button[aria-label^="Saved stories"]').click()
   await page.waitForTimeout(500)
   const shelfOpen = await page.evaluate(() => document.body.textContent.includes('The bookmarks'))
   const shelfHasItem = await page.evaluate(() => document.body.textContent.includes('Their Voices Matter'))
@@ -74,7 +74,7 @@ async function run() {
   // and the `fin.` mark appears after the scene settles (~6s — wait for it
   // instead of sampling early; fixes the known "Their Voices Matter" flake).
   const endings = {}
-  for (const slug of ['their-voices-matter', '3-13']) {
+  for (const slug of ['their-voices-matter', '3-13', 'the-quiet-grief']) {
     await page.goto(BASE + '/article/' + slug, { waitUntil: 'networkidle' })
     let fin = false
     const deadline = Date.now() + 8000
@@ -89,6 +89,54 @@ async function run() {
   }
   pass('ending-voices', endings['their-voices-matter'].hasSig && endings['their-voices-matter'].scene?.includes('their-voices-matter'), JSON.stringify(endings['their-voices-matter']))
   pass('ending-wait', endings['3-13'].hasSig && endings['3-13'].scene?.includes('3-13'), JSON.stringify(endings['3-13']))
+  pass('ending-quiet-grief', endings['the-quiet-grief'].hasSig && endings['the-quiet-grief'].scene?.includes('the-quiet-grief'), JSON.stringify(endings['the-quiet-grief']))
+
+  // ---- THE QUIET GRIEF GALLERY & PROVENANCE ----
+  await page.goto(BASE + '/article/the-quiet-grief', { waitUntil: 'networkidle' })
+  await page.waitForTimeout(800)
+  const plate1Btn = page.locator('button[aria-label*="Inspect Plate 01 of 05: Ballet shoes"]')
+  const hasPlate1 = (await plate1Btn.count()) === 1
+  if (hasPlate1) await plate1Btn.click()
+  await page.waitForTimeout(300)
+  const lightboxOpen = (await page.locator('[role="dialog"][aria-label*="The Quiet Grief"]').count()) === 1
+  await page.keyboard.press('ArrowRight')
+  await page.waitForTimeout(250)
+  const lightboxPlate2 = await page.evaluate(() => document.body.textContent.includes('Plate 02 / 05 — A camera'))
+  await page.keyboard.press('Escape')
+  await page.waitForTimeout(500)
+  const lightboxClosed = (await page.locator('[role="dialog"][aria-label*="The Quiet Grief"]').count()) === 0
+  const verbatimOk = await page.evaluate(() => {
+    const txt = document.body.textContent || ''
+    return (
+      txt.includes('#verlysemedia #TheQuietGrief #LostPassions #ArtAndWords CreativeExpression') &&
+      !txt.includes('-1 appreciations')
+    )
+  })
+  pass(
+    'quiet-grief-gallery-and-caption',
+    hasPlate1 && lightboxOpen && lightboxPlate2 && lightboxClosed && verbatimOk,
+    `plate1=${hasPlate1}, lightbox=${lightboxOpen}, plate2=${lightboxPlate2}, closed=${lightboxClosed}, verbatim=${verbatimOk}`,
+  )
+
+  // ---- 375PX MOBILE VIEWPORT CHECK ----
+  const m375 = await browser.newContext({ viewport: { width: 375, height: 812 } })
+  const p375 = await m375.newPage()
+  const routes375 = ['/', '/articles', '/article/the-quiet-grief', '/room']
+  let ok375 = true
+  const details375 = []
+  for (const r of routes375) {
+    await p375.goto(BASE + r, { waitUntil: 'networkidle' })
+    await p375.waitForTimeout(600)
+    const m = await p375.evaluate(() => ({
+      sw: document.documentElement.scrollWidth,
+      iw: window.innerWidth,
+      h1: !!document.querySelector('h1'),
+    }))
+    if (m.sw > m.iw + 1 || !m.h1) ok375 = false
+    details375.push(`${r}:${m.sw}/${m.iw}`)
+  }
+  pass('mobile-375px-no-overflow', ok375, details375.join(', '))
+  await m375.close()
 
   // ---- REDUCED MOTION ----
   const rctx = await browser.newContext({ viewport: { width: 1440, height: 900 }, reducedMotion: 'reduce' })

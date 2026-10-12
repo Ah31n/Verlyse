@@ -32,6 +32,18 @@
       "status": "PASS",
       "detail": "{\"hasSig\":true,\"scene\":\"ending-3-13\"}"
     },
+    "ending-quiet-grief": {
+      "status": "PASS",
+      "detail": "{\"hasSig\":true,\"scene\":\"ending-the-quiet-grief\"}"
+    },
+    "quiet-grief-gallery-and-caption": {
+      "status": "PASS",
+      "detail": "plate1=true, lightbox=true, plate2=true, closed=true, verbatim=true"
+    },
+    "mobile-375px-no-overflow": {
+      "status": "PASS",
+      "detail": "/:375/375, /articles:375/375, /article/the-quiet-grief:375/375, /room:375/375"
+    },
     "reduced-motion-preserves": {
       "status": "PASS",
       "detail": "reduced motion: h1 present, no overflow"

@@ -221,6 +221,26 @@ export function MotifGlyph({ type, className = 'text-gold' }: { type: string; cl
         </svg>
       )
 
+    /* The Quiet Grief — five remembered objects resting along a quiet shelf */
+    case 'reach':
+      return (
+        <svg viewBox="0 0 96 26" className={`h-6 w-20 ${className}`} aria-hidden="true">
+          <path d="M8 21h80" {...S} strokeWidth={1} />
+          {[18, 33, 48, 63, 78].map((x, i) => (
+            <circle
+              key={x}
+              cx={x}
+              cy={12 - (i % 2) * 2}
+              r={2.2}
+              {...S}
+              strokeWidth={1.1}
+              className="animate-vm-breathe"
+              style={{ animationDelay: `${i * 0.25}s` }}
+            />
+          ))}
+        </svg>
+      )
+
     default:
       return (
         <span aria-hidden="true" className={`text-gold ${className}`}>✦</span>
@@ -236,6 +256,7 @@ export const MARGINALIA: Record<string, string> = {
   cycle: 'back into the earth',
   garden: "i'll pray for her",
   code: '// the machine replies',
+  reach: 'the colours never faded',
 }
 
 /* — the glyphs above are the only ambient; nothing drifts through reading */

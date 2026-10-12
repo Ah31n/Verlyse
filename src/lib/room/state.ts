@@ -33,12 +33,12 @@ export const STATE_LABEL: Record<RoomState, string> = {
 
 export const STATE_HINT: Record<RoomState, string> = {
   arrival: 'The threshold. The archive waits in the dark.',
-  discovery: 'Nineteen plates on a brass thread. Attention chooses one.',
+  discovery: 'Twenty plates on a brass thread. Attention chooses one.',
   focus: 'One plate comes forward; the room dims around it.',
   settle: 'The plate settles face-on. Enter, or return.',
   entry: 'The plate becomes the article. Reading begins.',
   ending: 'The story closes. The room reforms behind the page.',
-  next: 'The thread offers the newest voice — folio №19.',
+  next: 'The thread offers the newest voice — folio №20.',
   return: 'Back among the plates. Nothing is lost; one is read.',
   category: 'A category along the thread — the room never becomes a list.',
   dossier: 'A contributor record. The canonical creator page holds the rest.',

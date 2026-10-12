@@ -51,9 +51,22 @@ async function run() {
   await page.goto(BASE + '/', { waitUntil: 'networkidle' })
   await page.waitForTimeout(2000)
   await page.goto(BASE + '/article/their-voices-matter', { waitUntil: 'networkidle' })
-  await page.waitForTimeout(4000)
+  await page.waitForTimeout(2000)
+  await page.goto(BASE + '/article/the-quiet-grief', { waitUntil: 'networkidle' })
+  await page.waitForTimeout(2000)
 
-  fs.writeFileSync(path.join(OUT, 'asset-audit.json'), JSON.stringify({ findings, liveRequests: [...new Set(reqs)], failedAll }, null, 2))
+  const pendingSourceAssets = [
+    '/img/works/DeUZFPTCjPU-1.webp',
+    '/img/works/DeUZFPTCjPU-2.webp',
+    '/img/works/DeUZFPTCjPU-3.webp',
+    '/img/works/DeUZFPTCjPU-4.webp',
+    '/img/works/DeUZFPTCjPU-5.webp',
+  ]
+
+  fs.writeFileSync(
+    path.join(OUT, 'asset-audit.json'),
+    JSON.stringify({ findings, pendingSourceAssets, liveRequests: [...new Set(reqs)], failedAll }, null, 2),
+  )
   await browser.close()
 
   console.log('=== ASSET AUDIT ===')

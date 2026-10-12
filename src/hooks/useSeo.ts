@@ -83,15 +83,16 @@ export function useArticleSeo(article: { title: string; excerpt: string; date: s
       const el = document.head.querySelector<HTMLMetaElement>(selector)
       if (el) el.setAttribute(attr, value)
     }
+    const socialImage = article.cover.startsWith('data:') ? '/img/og-default.jpg' : article.cover
     setMeta('meta[name="description"]', 'content', desc)
     setMeta('meta[property="og:title"]', 'content', `${article.title} — Verlyse Media`)
     setMeta('meta[property="og:description"]', 'content', desc)
-    setMeta('meta[property="og:image"]', 'content', `${window.location.origin}${article.cover}`)
+    setMeta('meta[property="og:image"]', 'content', `${window.location.origin}${socialImage}`)
     setMeta('meta[property="og:type"]', 'content', 'article')
     setMeta('meta[name="twitter:card"]', 'content', 'summary_large_image')
     setMeta('meta[name="twitter:title"]', 'content', `${article.title} — Verlyse Media`)
     setMeta('meta[name="twitter:description"]', 'content', desc)
-    setMeta('meta[name="twitter:image"]', 'content', `${window.location.origin}${article.cover}`)
+    setMeta('meta[name="twitter:image"]', 'content', `${window.location.origin}${socialImage}`)
 
     let canon = document.head.querySelector<HTMLLinkElement>('link[rel="canonical"]')
     if (!canon) {
@@ -129,7 +130,7 @@ export function useArticleSeo(article: { title: string; excerpt: string; date: s
           author: { '@type': 'Person', name: article.author },
           publisher: { '@type': 'Organization', name: 'Verlyse Media' },
           keywords: article.tags.join(', '),
-          image: `${window.location.origin}${article.cover}`,
+          image: `${window.location.origin}${socialImage}`,
           mainEntityOfPage: url,
         },
       ],

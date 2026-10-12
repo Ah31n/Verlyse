@@ -151,7 +151,7 @@ export default function Community() {
             </MaskReveal>
           </h1>
           <p className="mt-4 font-mono text-[10px] uppercase tracking-[0.34em] text-gold/85">
-            The feed in pictures — all nineteen covers, held not driven
+            The feed in pictures — all {LEDGER.features} covers, held not driven
           </p>
           <Slate move="crash zoom" className="mt-5" />
         </div>

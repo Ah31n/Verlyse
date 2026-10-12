@@ -11,6 +11,8 @@
    of its feature (About Us card, writer's note, or unique ending).
    ========================================================================== */
 
+import { plateSrc } from '../lib/imgFallback'
+
 export interface Author {
   id: string
   name: string
@@ -57,6 +59,14 @@ export interface WorkFigure {
   caption: string
 }
 
+export interface SlideDescription {
+  plate: string
+  subject: string
+  note: string
+  assetPath: string
+  status: 'verified' | 'pending-source-binary'
+}
+
 export interface Article {
   id: string
   title: string
@@ -77,8 +87,22 @@ export interface Article {
   description?: string
   body: string[]
   likes: number
+  /** raw scraper likesCount when negative/unavailable (e.g. -1), preserved for provenance */
+  likesCountRaw?: number
   comments: number
   shortCode: string
+  /** canonical Instagram post URL when verified */
+  sourceUrl?: string
+  /** verbatim unmodified source caption, including original hashtag tokens */
+  sourceCaption?: string
+  /** normalized hashtag list stored separately from the verbatim caption */
+  normalizedHashtags?: string[]
+  /** flexible editorial format classification */
+  editorialFormat?: 'article' | 'visual-essay' | 'gallery-feature' | 'poetry-entry' | 'carousel-feature'
+  /** explicit publication status for newly ingested or provisional entries */
+  publicationStatus?: 'published' | 'provisional'
+  /** per-plate subject descriptions and binary asset status for carousel works */
+  slideDescriptions?: SlideDescription[]
   voices: Voice[]
   /** the closing of the post — the final slide, designed and in motion */
   closing?: Closing
@@ -286,13 +310,14 @@ export const AUTHORS: Author[] = [
     name: 'Verlyse Media',
     handle: '@verlyse.media',
     role: 'The platform',
-    bio: 'The masthead behind the magazine — posts the platform’s own dispatches, including “Mir Raza Ali,” a memorial and a demand for justice (presented 27 August 2026).',
+    bio: 'The masthead behind the magazine — posts the platform’s own dispatches and visual features, including “Mir Raza Ali,” a memorial and a demand for justice (presented 27 August 2026), and “The Quiet Grief,” a five-plate visual reflection on remembered passions (presented 10 October 2026).',
     confirmed: true,
+    favoriteQuote: 'The colours never faded. We just stopped reaching for them.',
   },
 ]
 
 /* ------------------------------------------------------------------ */
-/* ARTICLES — the full feed, 19 folios                                  */
+/* ARTICLES — the full feed, 20 folios                                  */
 /* ------------------------------------------------------------------ */
 export const ARTICLES: Article[] = [
   {
@@ -1190,6 +1215,133 @@ export const ARTICLES: Article[] = [
       { handle: "lilpicklejuiceee", text: "There is no justice in Pakistan", post: "DciqQXTCilh" },
     ],
   },
+  {
+    id: 'the-quiet-grief',
+    title: 'The Quiet Grief',
+    authorId: 'verlyse-media',
+    category: 'Art',
+    excerpt: 'Somewhere along the way, we stopped reaching for the things that once made us feel alive.',
+    readingTime: '5 plates',
+    date: '2026-10-10',
+    cover: plateSrc(
+      '/img/works/DeUZFPTCjPU-1.webp',
+      'The Quiet Grief — Plate 01 · Ballet shoes',
+      '20 · 01',
+      'PLATE 01 / 05 · BALLET SHOES · DeUZFPTCjPU',
+    ),
+    slides: [
+      plateSrc(
+        '/img/works/DeUZFPTCjPU-1.webp',
+        'The Quiet Grief — Plate 01 · Ballet shoes',
+        '20 · 01',
+        'PLATE 01 / 05 · BALLET SHOES · DeUZFPTCjPU',
+      ),
+      plateSrc(
+        '/img/works/DeUZFPTCjPU-2.webp',
+        'The Quiet Grief — Plate 02 · A camera',
+        '20 · 02',
+        'PLATE 02 / 05 · A CAMERA · DeUZFPTCjPU',
+      ),
+      plateSrc(
+        '/img/works/DeUZFPTCjPU-3.webp',
+        'The Quiet Grief — Plate 03 · Books',
+        '20 · 03',
+        'PLATE 03 / 05 · BOOKS · DeUZFPTCjPU',
+      ),
+      plateSrc(
+        '/img/works/DeUZFPTCjPU-4.webp',
+        'The Quiet Grief — Plate 04 · Vanity objects',
+        '20 · 04',
+        'PLATE 04 / 05 · VANITY OBJECTS · DeUZFPTCjPU',
+      ),
+      plateSrc(
+        '/img/works/DeUZFPTCjPU-5.webp',
+        'The Quiet Grief — Plate 05 · Pink technology (2000s)',
+        '20 · 05',
+        'PLATE 05 / 05 · PINK TECHNOLOGY (2000S) · DeUZFPTCjPU',
+      ),
+    ],
+    tags: ['Art', 'TheQuietGrief', 'LostPassions', 'ArtAndWords', 'CreativeExpression'],
+    normalizedHashtags: ['#verlysemedia', '#TheQuietGrief', '#LostPassions', '#ArtAndWords', '#CreativeExpression'],
+    sourceUrl: 'https://www.instagram.com/p/DeUZFPTCjPU/',
+    sourceCaption: [
+      'Somewhere along the way, we stopped reaching for the things that once made us feel alive.',
+      'Not because we stopped loving them, but because life got louder, time grew scarce, and the dreams we once held so close slowly became memories we revisited instead of realities we lived.',
+      'Perhaps the saddest part of growing up is watching a passion become a stranger to us.',
+      'The colours never faded. We just stopped reaching for them.',
+      '— Verlyse Media',
+      '#verlysemedia #TheQuietGrief #LostPassions #ArtAndWords CreativeExpression',
+    ].join('\n\n'),
+    editorialFormat: 'carousel-feature',
+    publicationStatus: 'provisional',
+    slideDescriptions: [
+      {
+        plate: '01',
+        subject: 'Ballet shoes',
+        note: 'Warm oil-painting-style still life of satin ballet slippers resting in quiet light.',
+        assetPath: '/img/works/DeUZFPTCjPU-1.webp',
+        status: 'pending-source-binary',
+      },
+      {
+        plate: '02',
+        subject: 'A camera',
+        note: 'Warm oil-painting-style still life of a cherished camera set down between moments.',
+        assetPath: '/img/works/DeUZFPTCjPU-2.webp',
+        status: 'pending-source-binary',
+      },
+      {
+        plate: '03',
+        subject: 'Books',
+        note: 'Warm oil-painting-style still life of stacked volumes waiting to be opened again.',
+        assetPath: '/img/works/DeUZFPTCjPU-3.webp',
+        status: 'pending-source-binary',
+      },
+      {
+        plate: '04',
+        subject: 'Vanity objects',
+        note: 'Warm oil-painting-style still life of personal vanity pieces arranged on a dressing surface.',
+        assetPath: '/img/works/DeUZFPTCjPU-4.webp',
+        status: 'pending-source-binary',
+      },
+      {
+        plate: '05',
+        subject: 'Pink technology (2000s)',
+        note: 'Warm oil-painting-style still life of early-2000s blush-pink personal technology.',
+        assetPath: '/img/works/DeUZFPTCjPU-5.webp',
+        status: 'pending-source-binary',
+      },
+    ],
+    description: 'A five-plate visual feature from Verlyse Media on remembered passions — ballet shoes, a camera, books, vanity objects, and early-2000s pink technology.',
+    body: [
+      'Somewhere along the way, we stopped reaching for the things that once made us feel alive.',
+      'Not because we stopped loving them, but because life got louder, time grew scarce, and the dreams we once held so close slowly became memories we revisited instead of realities we lived.',
+      'Perhaps the saddest part of growing up is watching a passion become a stranger to us.',
+      'The colours never faded. We just stopped reaching for them.',
+    ],
+    likes: 0, /* source dataset reported likesCount: -1 (unknown/unavailable); never displayed as a real count */
+    likesCountRaw: -1,
+    comments: 0,
+    shortCode: 'DeUZFPTCjPU',
+    motif: 'reach',
+    world: 'gallery',
+    heroMode: 'gallery',
+    gallery: true,
+    vibe: 'warm',
+    reflection: 'The colours never faded. We just stopped reaching for them.',
+    closing: {
+      kind: 'artwork',
+      kicker: 'From the source caption',
+      title: 'The colours never faded',
+      paragraphs: [
+        'Somewhere along the way, we stopped reaching for the things that once made us feel alive.',
+        'Not because we stopped loving them, but because life got louder, time grew scarce, and the dreams we once held so close slowly became memories we revisited instead of realities we lived.',
+        'Perhaps the saddest part of growing up is watching a passion become a stranger to us.',
+        'The colours never faded. We just stopped reaching for them.',
+      ],
+      signoff: '— Verlyse Media',
+    },
+    voices: [],
+  },
 ]
 
 /* ------------------------------------------------------------------ */
@@ -1435,8 +1587,12 @@ export function articleSearchText(a: Article): string {
     author?.handle ?? '',
     a.credit ?? '',
     a.tags.join(' '),
+    (a.normalizedHashtags ?? []).join(' '),
+    a.shortCode,
     a.excerpt,
     a.description ?? '',
+    a.sourceCaption ?? '',
+    ...(a.slideDescriptions?.map((s) => `${s.subject} ${s.note}`) ?? []),
   ].join(' ').toLowerCase()
 }
 export function searchArticles(query: string): Article[] {

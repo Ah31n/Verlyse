@@ -22,6 +22,7 @@ import SaveButton from '../components/ui/SaveButton'
 import { useReadingMode } from '../components/ui/ReadingMode'
 import { ImmersiveShell, BrassThread, ReadingMeasure } from '../components/immersive'
 import { progress } from '../lib/stringTune/attrs'
+import ArtGallery from '../components/ui/ArtGallery'
 
 /* ------------------------------------------------------------------ */
 /* Every feature carries its own temperament — motion and finish      */
@@ -422,7 +423,7 @@ export default function ArticleDetail() {
         <section className="relative flex min-h-[80svh] items-end overflow-hidden border-b border-white/10 bg-wine-deep pt-36">
           <WorldTexture world={article.world} />
           <div className="relative z-[2] mx-auto w-full max-w-page px-[clamp(1.75rem,5.5vw,4.75rem)] pb-16">
-            <div className="grid grid-cols-1 items-end gap-10 lg:grid-cols-[1fr_auto]">
+            <div className="grid grid-cols-1 items-end gap-10 lg:grid-cols-[1fr_auto] lg:pr-[256px]">
               <div>
                 <Reveal><HeroKicker article={article} author={author} /></Reveal>
                 <div className={`${vibe.titleClass} inline-block`}>
@@ -480,6 +481,9 @@ export default function ArticleDetail() {
         </section>
       )}
 
+      {/* ---------- Gallery viewing room — plate sequence & lightbox ---------- */}
+      {article.gallery && <ArtGallery article={article} />}
+
 {/* ---------- Body — inside the publication's world ---------- */}
       <section className={`relative border-t border-white/10 py-[clamp(6rem,14vh,11rem)] transition-colors duration-1000 ${worldBodyClass(article.world)} ${vibe.bodyClass} ${reading ? 'bg-wine-deep' : ''}`}>
         <WorldTexture world={article.world} />
@@ -527,7 +531,7 @@ export default function ArticleDetail() {
                   to={`/creator/${author.id}`}
                   className="mt-5 inline-flex items-center gap-2 border-b border-gold/50 pb-1 font-mono text-[10px] uppercase tracking-[0.28em] text-gold no-underline transition-colors hover:text-ivory max-[767px]:py-2"
                 >
-                  About the {primaryRole(author).toLowerCase()} <span aria-hidden="true">→</span>
+                  About the {primaryRole(author).toLowerCase().replace(/^the\s+/i, '')} <span aria-hidden="true">→</span>
                 </Link>
               )}
               {/* a second creator, credited by the caption itself */}
@@ -643,6 +647,44 @@ export default function ArticleDetail() {
               ))}
             </div>
           </Reveal>
+
+          {/* Verbatim source caption & provenance colophon (when preserved from source dataset) */}
+          {article.sourceCaption && (
+            <Reveal className="mt-14">
+              <div className="border border-gold/30 bg-wine-deep/55 p-6 md:p-8">
+                <div className="flex flex-wrap items-center justify-between gap-3 border-b border-white/10 pb-4">
+                  <p className="font-mono text-[10px] uppercase tracking-[0.26em] text-gold">
+                    Source Caption — Verbatim Record
+                  </p>
+                  <span className="font-mono text-[9px] uppercase tracking-[0.22em] text-white/60">
+                    {article.publicationStatus === 'provisional' ? 'Provisional entry · ' : ''}
+                    {article.editorialFormat === 'carousel-feature' ? '5-slide Sidecar · ' : ''}
+                    {article.shortCode}
+                  </span>
+                </div>
+                <pre className="mt-5 whitespace-pre-wrap font-serif text-[15px] italic leading-[1.75] text-ivory/88">
+                  {article.sourceCaption}
+                </pre>
+                {article.normalizedHashtags && article.normalizedHashtags.length > 0 && (
+                  <div className="mt-6 border-t border-white/10 pt-4">
+                    <p className="font-mono text-[9px] uppercase tracking-[0.24em] text-white/55">
+                      Normalized hashtags (stored separately from verbatim caption)
+                    </p>
+                    <div className="mt-2.5 flex flex-wrap gap-2">
+                      {article.normalizedHashtags.map((tag) => (
+                        <span
+                          key={tag}
+                          className="border border-gold/25 px-2.5 py-1 font-mono text-[9px] tracking-[0.16em] text-gold"
+                        >
+                          {tag}
+                        </span>
+                      ))}
+                    </div>
+                  </div>
+                )}
+              </div>
+            </Reveal>
+          )}
 
           {/* Save + Share — a quiet hairline block */}
           <Reveal className="mt-14">

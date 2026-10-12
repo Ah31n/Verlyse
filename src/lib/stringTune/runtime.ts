@@ -90,7 +90,9 @@ export async function startStringTune(): Promise<Tune | null> {
  * picked up explicitly.
  */
 export function rescanStringTune(): void {
-  instance?.onRebuild()
+  if (!instance) return
+  instance.onRebuild()
+  instance.onResize(true)
 }
 
 export function stopStringTune(): void {

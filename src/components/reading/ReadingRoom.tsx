@@ -80,7 +80,7 @@ export default function ReadingRoom({ children }: { children: ReactNode }) {
         </span>
         {/* right index — where this folio sits in the issue */}
         <span className="absolute right-[clamp(1.75rem,5.5vw,4.75rem)] top-[46%] [writing-mode:vertical-rl] font-mono text-[9px] uppercase tracking-[0.34em] text-white/30">
-          {article ? `${article.category.toUpperCase()} · № ${folio} / 19` : 'VERLYSE MEDIA'}
+          {article ? `${article.category.toUpperCase()} · № ${folio} / ${String(ARTICLES.length).padStart(2, '0')}` : 'VERLYSE MEDIA'}
         </span>
         {/* corner registration ticks — the plate is held inside this field */}
         <span className="absolute left-[clamp(1.75rem,5.5vw,4.75rem)] top-24 h-3 w-px bg-[#D9B978]/35" />

@@ -19,18 +19,18 @@ Everything enumerable is derived from `src/data/content.ts`. Four consumers read
 
 Node-side consumers load it through `scripts/lib/load-registry.mjs`, which bundles the TypeScript via Vite SSR — the same mechanism `ssr-smoke.mjs` uses, so build scripts and application resolve modules identically.
 
-### The 52 routes
+### The 53 routes
 
 | Kind | Pattern | Count | Derived from |
 |---|---|---|---|
 | core | `/`, `/articles`, `/categories`, `/creators`, `/community`, `/ambassadors`, `/about`, `/submit`, `/contact` | 9 | static |
 | spatial | `/room` | 1 | static |
 | category | `/categories/:slug` | 7 | `CATEGORIES` |
-| article | `/article/:id` | 19 | `ARTICLES` |
+| article | `/article/:id` | 20 | `ARTICLES` |
 | creator | `/creator/:authorId` | 16 | `AUTHORS` |
 | fallback | `*` | — | renders `NotFound` |
 
-All 52 ship a prerendered metadata shell and appear in `sitemap.xml`.
+All 53 ship a prerendered metadata shell and appear in `sitemap.xml`.
 
 ### Canonical URL form
 
@@ -133,15 +133,12 @@ One layer owns each surface. Nothing is animated by two systems.
 
 | System | Owns | Scope |
 |---|---|---|
-| **CSS / Tailwind** | Hover, focus-visible, colour and opacity transitions, the global `prefers-reduced-motion` clamp (`index.css:69-76`) | sitewide |
-| **motion (v13)** | Route transitions (`PageTransition`), `AnimatePresence`, overlays, reveals, scroll-linked `useScroll` in 5 components | sitewide, 44 import sites |
-| **GSAP (3.15)** | `components/cinematic/primitives.tsx` only — 10 `gsap.fromTo` timelines, most ScrollTrigger-scrubbed, plus `quickTo` in `Magnetic` | 3 import sites |
-| **Anime.js (4.5)** | `components/ui/BrassRule.tsx` only — one SVG line-draw | 1 import site, rendered once on `/about` |
-| **R3F / three** | `SpatialArchive` (Home), `StoryEnding3D` (articles), `components/room/*` (`/room`) | lazy; gated on WebGL support, reduced motion and tab visibility |
+| **CSS / Tailwind** | Hover, focus-visible, colour and opacity transitions, `@property` custom-property defaults, the global `prefers-reduced-motion` clamp (`index.css`) | sitewide |
+| **StringTune (`@fiddle-digital/string-tune@1.2.5`)** | Scroll progress (`--progress`), plate glide (`string="glide[]"`), shallow desktop parallax (`string="parallax[]"`), fine-pointer spotlight (`--spotlight-angle`, `--spotlight-distance`) | lazy-loaded via `src/lib/stringTune/boot.ts`; disabled under `prefers-reduced-motion: reduce` |
+| **motion (v13)** | Route transitions (`PageTransition`), `AnimatePresence`, overlays/drawers/lightboxes, reveals, `components/cinematic/*`, scroll-linked `useScroll` | sitewide |
+| **R3F / three** | `SpatialArchive` (Home), `StoryEnding3D` (articles) | lazy; gated on WebGL support, reduced motion and tab visibility |
 
-**Scroll owner: the browser.** There is no smooth-scroll engine. GSAP ScrollTrigger and motion's `useScroll` both *read* native scroll; neither drives it.
-
-**Known overlap risk:** GSAP and motion both animate transforms, on different elements today. Any new effect must state which layer owns the element. The standing recommendation (see `docs/3D-IMMERSIVE-PLAN.md` §3) is to retire GSAP and Anime.js onto motion + StringTune.
+**Scroll owner: the browser.** There is no smooth-scroll engine (`tune.scrollDesktopMode = 'default'` and `tune.scrollMobileMode = 'default'`). Both StringTune and `motion`'s `useScroll` only *read* native scroll; neither drives it. `gsap` and `animejs` have been retired and removed from `package.json`.
 
 ---
 

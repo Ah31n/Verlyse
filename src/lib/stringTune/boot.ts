@@ -33,6 +33,7 @@ export interface TuneHandle {
   start: (fps: number) => void
   destroy: () => void
   onRebuild: () => void
+  onResize: (force?: boolean) => void
   scrollDesktopMode: string
   scrollMobileMode: string
 }

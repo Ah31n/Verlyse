@@ -13,7 +13,7 @@
 /* (reduced motion, no JS, failed chunk).                               */
 /* ------------------------------------------------------------------ */
 
-import { DRIFT, GLIDE, INTENSITY, MAGNETIC, type Intensity } from './tokens'
+import { DISTANCE, DRIFT, GLIDE, INTENSITY, MAGNETIC, type Intensity } from './tokens'
 
 type Attrs = Record<string, string>
 
@@ -72,12 +72,16 @@ export function magnetic(strength: number = MAGNETIC.strength): Attrs {
 
 /** Cursor-following light. Publishes `--spotlight-angle` / `-distance`. */
 export function spotlight(): Attrs {
-  return { string: 'spotlight' }
+  return { string: 'spotlight', 'string-dist-max': String(DISTANCE.spotlightMax) }
 }
 
 /** Combine: a plate that both catches the light and lags the scroll. */
 export function spotlitGlide(intensity: Intensity = 'restrained'): Attrs {
-  return { string: 'glide[]|spotlight', 'string-glide': String(GLIDE[intensity]) }
+  return {
+    string: 'glide[]|spotlight',
+    'string-glide': String(GLIDE[intensity]),
+    'string-dist-max': String(DISTANCE.spotlightMax),
+  }
 }
 
 export { INTENSITY }

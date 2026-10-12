@@ -10,11 +10,12 @@ Pick the lowest tier that does the job. Moving *up* a tier requires a reason wri
 
 | Tier | Engine | Use for | Do not use for |
 |---|---|---|---|
-| 1 | **CSS / Tailwind** | hover, focus-visible, colour, opacity, simple transitions, static states | anything needing presence/exit |
-| 2 | **motion (v13)** | React presence (`AnimatePresence`), layout animation, controlled reveals, scroll-linked DOM | raw timelines with many chained steps |
-| 3 | **GSAP** | a genuine multi-step timeline or scrubbed system | hover effects, single-property tweens |
-| 4 | **Anime.js** | an isolated SVG/DOM *draw* | anything a CSS transition can do |
-| 5 | **R3F / three** | true spatial rendering | 2D decoration |
+| 1 | **CSS / Tailwind** | hover, focus-visible, colour, opacity, simple transitions, static states, `@property` custom-property interpolation | anything needing presence/exit |
+| 2 | **StringTune (`@fiddle-digital/string-tune`)** | declarative scroll progress (`--progress`), gentle scroll-lag glide (`string="glide[]"`), shallow desktop parallax (`string="parallax[]"`), fine-pointer brass spotlight (`--spotlight-angle` / `--spotlight-distance`) | scroll-jacking (`scrollDesktopMode` and `scrollMobileMode` stay `'default'`) |
+| 3 | **motion (v13)** | React presence (`AnimatePresence`), layout animation, controlled reveals (`Reveal`, `SplitText`), scroll-linked DOM (`useScroll`) | continuous unthrottled decorative loops |
+| 4 | **R3F / three** | true spatial rendering (`SpatialArchive`, `StoryEnding3D`) | 2D decoration |
+
+> **Retired packages:** `gsap` and `animejs` have been retired and removed from `package.json`. Former GSAP primitives (`src/components/cinematic/primitives.tsx`) and `BrassRule` (`src/components/ui/BrassRule.tsx`) now run on `motion/react` + CSS / SVG stroke transitions.
 
 ---
 
@@ -30,9 +31,10 @@ Pick the lowest tier that does the job. Moving *up* a tier requires a reason wri
 | Reveals (`Reveal`, `RevealImage`, `SplitText`) | **motion** | `useInView`, `once: true` |
 | Scroll progress bar, header condense | **CSS**, driven by a passive listener in `Layout` | reads `window.scrollY`; writes class names only |
 | Home scroll transforms, `ImmersiveShell`, `DossierRoom`, `ScrollBeat` | **motion** `useScroll` | read-only on scroll |
-| `components/cinematic/*` (`CrashZoom`, `MaskReveal`, `Slate`, `Magnetic`, `Tilt3D`, …) | **GSAP** | 10 `gsap.fromTo`, most ScrollTrigger-scrubbed. 40 call sites. Scheduled for retirement — see §6 |
-| `BrassRule` SVG draw | **Anime.js** | one component, one page (`/about`) |
-| `SpatialArchive` (Home), `StoryEnding3D` (articles), `components/room/*` | **R3F** | lazy; gated on WebGL + reduced motion + tab visibility |
+| `components/cinematic/*` (`CrashZoom`, `MaskReveal`, `Slate`, `Magnetic`, `Tilt3D`, …) | **motion** | migrated off GSAP onto `motion/react` (`useScroll`, `useSpring`, `useMotionValue`) |
+| `BrassRule` SVG draw | **motion / CSS** | migrated off Anime.js |
+| Reading measure (`.st-measure`), archive/gallery plate spotlight & glide (`.st-spotlit`), cover drift | **StringTune** | lazy-loaded via `src/lib/stringTune/boot.ts`; skipped completely under `prefers-reduced-motion: reduce` |
+| `SpatialArchive` (Home), `StoryEnding3D` (articles), `components/room/*` | **R3F / motion** | lazy; gated on WebGL + reduced motion + tab visibility |
 
 ### Scroll ownership
 

@@ -162,7 +162,7 @@ function Archive() {
   }
 
   const activeSortNote = sort === 'registry'
-    ? 'Registry order — as the archive files them, № 01 to № 19.'
+    ? `Registry order — as the archive files them, № 01 to № ${String(LEDGER.features).padStart(2, '0')}.`
     : SORTS.find((s) => s.key === sort)?.note ?? ''
 
   return (

@@ -29,6 +29,7 @@ credentials.*
 secrets.json
 secrets.*
 *token*
+!src/lib/stringTune/tokens.ts
 *oauth*
 *credential*
 
