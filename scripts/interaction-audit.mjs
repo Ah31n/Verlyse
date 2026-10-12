@@ -91,20 +91,32 @@ async function run() {
   pass('ending-wait', endings['3-13'].hasSig && endings['3-13'].scene?.includes('3-13'), JSON.stringify(endings['3-13']))
   pass('ending-quiet-grief', endings['the-quiet-grief'].hasSig && endings['the-quiet-grief'].scene?.includes('the-quiet-grief'), JSON.stringify(endings['the-quiet-grief']))
 
-  // ---- THE QUIET GRIEF GALLERY & PROVENANCE ----
+  // ---- THE QUIET GRIEF GALLERY, FOCUS TRAP & PROVENANCE ----
   await page.goto(BASE + '/article/the-quiet-grief', { waitUntil: 'networkidle' })
   await page.waitForTimeout(800)
+  const noAssetLeak = await page.evaluate(() => {
+    const txt = document.body.textContent || ''
+    return !txt.includes('/img/works/DeUZFPTCjPU-1.webp') && !txt.includes('pending source binary')
+  })
   const plate1Btn = page.locator('button[aria-label*="Inspect Plate 01 of 05: Ballet shoes"]')
   const hasPlate1 = (await plate1Btn.count()) === 1
   if (hasPlate1) await plate1Btn.click()
   await page.waitForTimeout(300)
   const lightboxOpen = (await page.locator('[role="dialog"][aria-label*="The Quiet Grief"]').count()) === 1
+  // Verify Tab / Shift+Tab stays trapped inside the lightbox dialog
+  await page.keyboard.press('Shift+Tab')
+  const shiftTabTrapped = await page.evaluate(() => !!document.activeElement?.closest('[role="dialog"]'))
+  await page.keyboard.press('Tab')
+  const tabTrapped = await page.evaluate(() => !!document.activeElement?.closest('[role="dialog"]'))
   await page.keyboard.press('ArrowRight')
   await page.waitForTimeout(250)
   const lightboxPlate2 = await page.evaluate(() => document.body.textContent.includes('Plate 02 / 05 — A camera'))
   await page.keyboard.press('Escape')
   await page.waitForTimeout(500)
   const lightboxClosed = (await page.locator('[role="dialog"][aria-label*="The Quiet Grief"]').count()) === 0
+  const focusRestored = await page.evaluate(() =>
+    document.activeElement?.getAttribute('aria-label')?.includes('Inspect Plate 01 of 05'),
+  )
   const verbatimOk = await page.evaluate(() => {
     const txt = document.body.textContent || ''
     return (
@@ -114,11 +126,30 @@ async function run() {
   })
   pass(
     'quiet-grief-gallery-and-caption',
-    hasPlate1 && lightboxOpen && lightboxPlate2 && lightboxClosed && verbatimOk,
-    `plate1=${hasPlate1}, lightbox=${lightboxOpen}, plate2=${lightboxPlate2}, closed=${lightboxClosed}, verbatim=${verbatimOk}`,
+    hasPlate1 && noAssetLeak && lightboxOpen && shiftTabTrapped && tabTrapped && lightboxPlate2 && lightboxClosed && focusRestored && verbatimOk,
+    `plate1=${hasPlate1}, noLeak=${noAssetLeak}, lightbox=${lightboxOpen}, trap=${shiftTabTrapped && tabTrapped}, plate2=${lightboxPlate2}, closed=${lightboxClosed}, focusRestored=${focusRestored}, verbatim=${verbatimOk}`,
   )
 
-  // ---- 375PX MOBILE VIEWPORT CHECK ----
+  // ---- SUBMIT & CONTACT ACCESSIBLE VALIDATION & WRITER PROFILE QUOTES ----
+  await page.goto(BASE + '/submit', { waitUntil: 'networkidle' })
+  await page.getByRole('button', { name: 'Submit the piece' }).click()
+  const submitA11y = await page.evaluate(() => {
+    const name = document.querySelector('#sf-name')
+    const alerts = document.querySelectorAll('[role="alert"]')
+    return (
+      name?.getAttribute('aria-invalid') === 'true' &&
+      name?.getAttribute('aria-describedby') === 'sf-name-err' &&
+      alerts.length === 1
+    )
+  })
+  await page.goto(BASE + '/creator/alina-javed', { waitUntil: 'networkidle' })
+  const creatorQuotesOk = await page.evaluate(() => {
+    const txt = document.body.textContent || ''
+    return !txt.includes('““') && !txt.includes('””')
+  })
+  pass('forms-and-profile-a11y', submitA11y && creatorQuotesOk, `submitA11y=${submitA11y}, creatorQuotesOk=${creatorQuotesOk}`)
+
+  // ---- 11-VIEWPORT MATRIX & 375PX MOBILE VIEWPORT CHECK ----
   const m375 = await browser.newContext({ viewport: { width: 375, height: 812 } })
   const p375 = await m375.newPage()
   const routes375 = ['/', '/articles', '/article/the-quiet-grief', '/room']
@@ -126,7 +157,7 @@ async function run() {
   const details375 = []
   for (const r of routes375) {
     await p375.goto(BASE + r, { waitUntil: 'networkidle' })
-    await p375.waitForTimeout(600)
+    await p375.waitForTimeout(400)
     const m = await p375.evaluate(() => ({
       sw: document.documentElement.scrollWidth,
       iw: window.innerWidth,
@@ -135,7 +166,19 @@ async function run() {
     if (m.sw > m.iw + 1 || !m.h1) ok375 = false
     details375.push(`${r}:${m.sw}/${m.iw}`)
   }
-  pass('mobile-375px-no-overflow', ok375, details375.join(', '))
+  const vps11 = [
+    [320, 720], [360, 800], [390, 844], [430, 932],
+    [768, 1024], [834, 1194], [1024, 768], [1280, 800],
+    [1366, 768], [1440, 900], [1920, 1080],
+  ]
+  await p375.goto(BASE + '/article/the-quiet-grief', { waitUntil: 'networkidle' })
+  for (const [vw, vh] of vps11) {
+    await p375.setViewportSize({ width: vw, height: vh })
+    await p375.waitForTimeout(60)
+    const sw = await p375.evaluate(() => document.documentElement.scrollWidth)
+    if (sw > vw + 1) ok375 = false
+  }
+  pass('mobile-375px-no-overflow', ok375, details375.join(', ') + ' + 11 viewports clean')
   await m375.close()
 
   // ---- REDUCED MOTION ----

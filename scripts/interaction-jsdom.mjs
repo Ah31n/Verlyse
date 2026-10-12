@@ -30,6 +30,9 @@ g.document = dom.window.document
 Object.defineProperty(g, 'navigator', { value: dom.window.navigator, configurable: true, writable: true })
 g.HTMLElement = dom.window.HTMLElement
 g.HTMLInputElement = dom.window.HTMLInputElement
+g.HTMLFormElement = dom.window.HTMLFormElement
+g.FormData = dom.window.FormData
+g.File = dom.window.File
 g.Element = dom.window.Element
 g.Node = dom.window.Node
 g.Event = dom.window.Event

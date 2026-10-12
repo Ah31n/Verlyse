@@ -32,7 +32,10 @@ export default function Layout({ children }: { children: ReactNode }) {
       {/* Reading progress — a quiet hairline of leaves along the top edge.
           Text-free: the wordmark and folio were removed so nothing ever
           overlays the navigation below. */}
-      <div className={`fixed inset-x-0 top-0 z-[1110] flex items-center justify-between border-b border-white/5 px-6 py-1 transition-all duration-1000 ${reading ? 'translate-y-[-100%] opacity-0' : scrolled ? 'translate-y-0 opacity-100' : 'translate-y-0 opacity-0'}`}>
+      <div
+        aria-hidden="true"
+        className={`pointer-events-none fixed inset-x-0 top-0 z-[1110] flex items-center justify-between border-b border-white/5 px-6 py-1 transition-all duration-1000 ${reading ? 'translate-y-[-100%] opacity-0' : scrolled ? 'translate-y-0 opacity-100' : 'translate-y-0 opacity-0'}`}
+      >
         <PageProgress progress={progress} />
       </div>
       <div className={`transition-all duration-1000 ${reading ? 'pointer-events-none opacity-0' : 'opacity-100'}`}>

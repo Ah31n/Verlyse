@@ -16,7 +16,11 @@ import { act, cleanup, fireEvent, render, screen, waitFor } from '@testing-libra
 import SearchOverlay, { } from '../src/components/layout/SearchOverlay'
 import SavedDrawer from '../src/components/layout/SavedDrawer'
 import SaveButton from '../src/components/ui/SaveButton'
-import { ARTICLES } from '../src/data/content'
+import ArtGallery from '../src/components/ui/ArtGallery'
+import WriterProfile, { formatQuotedNote } from '../src/components/ui/WriterProfile'
+import Submit from '../src/pages/Submit'
+import Contact from '../src/pages/Contact'
+import { ARTICLES, AUTHORS } from '../src/data/content'
 
 interface Result { name: string; ok: boolean; detail: string }
 const results: Result[] = []
@@ -128,6 +132,98 @@ export async function run() {
   })
 
   cleanup()
+
+  /* ---- ART GALLERY LIGHTBOX: focus trap, Escape, focus restore, no assetPath leak ---- */
+  await check('art gallery: hides internal asset paths and traps focus inside lightbox', async () => {
+    const qg = ARTICLES.find((a) => a.id === 'the-quiet-grief')!
+    wrap(<ArtGallery article={qg} />)
+
+    assert(!document.body.textContent?.includes('/img/works/DeUZFPTCjPU-1.webp'), 'public gallery leaked internal assetPath')
+    assert(!document.body.textContent?.includes('pending source binary'), 'public gallery leaked internal status text')
+
+    const trigger = screen.getByRole('button', { name: /Inspect Plate 01 of 05/i })
+    trigger.focus()
+    await act(async () => { fireEvent.click(trigger) })
+
+    const dialog = await screen.findByRole('dialog')
+    assert(dialog.getAttribute('aria-modal') === 'true', 'lightbox is not aria-modal')
+    assert(document.body.style.overflow === 'hidden', 'lightbox did not lock body scroll')
+
+    const closeBtn = screen.getByRole('button', { name: /Close lightbox/i })
+    const nextBtn = screen.getByRole('button', { name: /Next plate/i })
+    closeBtn.focus()
+    await act(async () => { fireEvent.keyDown(document, { key: 'Tab', shiftKey: true }) })
+    assert(document.activeElement === nextBtn, 'Shift+Tab from first control did not wrap to last control in lightbox')
+
+    await act(async () => { fireEvent.keyDown(document, { key: 'Tab', shiftKey: false }) })
+    assert(document.activeElement === closeBtn, 'Tab from last control did not wrap to first control in lightbox')
+
+    await act(async () => { fireEvent.keyDown(window, { key: 'Escape' }) })
+    await waitFor(() => {
+      assert(screen.queryByRole('dialog') === null, 'lightbox still open after Escape')
+      assert(document.activeElement === trigger, 'focus was not restored to trigger button after closing lightbox')
+    })
+  })
+
+  cleanup()
+  document.body.style.overflow = ''
+
+  /* ---- SUBMIT & CONTACT FORMS: aria-invalid, aria-describedby, single alert, cover honesty ---- */
+  await check('submit & contact forms: accessible validation and truthful cover filename handling', async () => {
+    wrap(<Submit />)
+    const nameInput = screen.getByLabelText(/Full name/i)
+    assert(nameInput.getAttribute('aria-invalid') === null, 'untouched valid field should not have aria-invalid')
+
+    const submitBtn = screen.getByRole('button', { name: /Submit the piece/i })
+    await act(async () => { fireEvent.click(submitBtn) })
+
+    assert(nameInput.getAttribute('aria-invalid') === 'true', 'invalid field missing aria-invalid="true"')
+    assert(nameInput.getAttribute('aria-describedby') === 'sf-name-err', 'invalid field missing aria-describedby')
+    const alerts = screen.getAllByRole('alert')
+    assert(alerts.length === 1, `expected a single form-level role="alert", got ${alerts.length}`)
+
+    const fileInput = document.querySelector<HTMLInputElement>('#sf-cover')!
+    const file = new File(['dummy'], 'painting.webp', { type: 'image/webp' })
+    await act(async () => {
+      fireEvent.change(fileInput, { target: { files: [file] } })
+    })
+    assert(document.body.textContent?.includes('not uploaded'), 'selected cover file did not clearly state it is not uploaded')
+
+    await act(async () => {
+      fireEvent.input(nameInput, { target: { value: 'Alina' } })
+    })
+    assert(nameInput.getAttribute('aria-invalid') === null, 'correcting field did not clear aria-invalid')
+  })
+
+  cleanup()
+
+  await check('contact form: accessible validation and single role="alert"', async () => {
+    wrap(<Contact />)
+    const sendBtn = screen.getByRole('button', { name: /Seal the letter/i })
+    await act(async () => { fireEvent.click(sendBtn) })
+    const alerts = screen.getAllByRole('alert')
+    assert(alerts.length === 1, `expected 1 alert on Contact form, got ${alerts.length}`)
+    const emailInput = screen.getByLabelText(/Email/i)
+    assert(emailInput.getAttribute('aria-invalid') === 'true', 'Contact email missing aria-invalid="true"')
+    assert(emailInput.getAttribute('aria-describedby') === 'cf-email-err', 'Contact email missing aria-describedby')
+  })
+
+  cleanup()
+
+  /* ---- WRITER PROFILE: no doubled quotes or empty quote blocks --------- */
+  await check('writer profile: never doubles quotation marks or renders empty quote blocks', async () => {
+    assert(formatQuotedNote('“Hello world.”') === '“Hello world.”', 'doubled outer curly quotes')
+    assert(formatQuotedNote('““Hello world.””') === '“Hello world.”', 'failed to collapse doubled quotes')
+    assert(formatQuotedNote('“A note.” — Abheesha') === '“A note.” — Abheesha', 'corrupted attributed note')
+    assert(formatQuotedNote('') === '', 'non-empty output for empty note')
+
+    for (const author of AUTHORS) {
+      wrap(<WriterProfile author={author} />)
+      const text = document.body.textContent ?? ''
+      assert(!text.includes('““') && !text.includes('””'), `doubled quotation marks rendered for ${author.id}`)
+      cleanup()
+    }
+  })
 
   const failed = results.filter((r) => !r.ok)
   const lines = results.map((r) => `${r.ok ? '✓' : '✗'} ${r.name}${r.detail ? ` — ${r.detail}` : ''}`)

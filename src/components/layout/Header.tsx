@@ -106,7 +106,7 @@ export default function Header() {
             : 'border-transparent bg-transparent'
         }`}
       >
-        <div className={`mx-auto flex max-w-page items-center justify-between gap-4 px-[clamp(1.75rem,5.5vw,4.75rem)] transition-all duration-500 max-[479px]:gap-3 max-[479px]:px-5 lg:gap-4 lg:px-4 xl:gap-3 xl:px-6 2xl:gap-6 2xl:px-[clamp(1.75rem,5.5vw,4.75rem)] ${scrolled ? 'h-[68px]' : 'h-[86px]'}`}>
+        <div className={`mx-auto flex max-w-page items-center justify-between gap-4 px-[clamp(1.75rem,5.5vw,4.75rem)] transition-[height] duration-500 max-[479px]:gap-2.5 max-[479px]:px-4 lg:gap-4 lg:px-4 xl:gap-3 xl:px-5 2xl:gap-6 2xl:px-[clamp(1.75rem,5.5vw,4.75rem)] ${scrolled ? 'h-[68px]' : 'h-[86px]'}`}>
           <Link to="/" className="flex shrink-0 items-center gap-3 text-ivory no-underline max-[479px]:gap-2" aria-label="Verlyse Media — home">
             <svg viewBox="0 0 40 40" aria-hidden="true" className="h-[30px] w-[30px] text-gold transition-transform duration-700 ease-out hover:rotate-90">
               <circle cx="20" cy="20" r="18.5" fill="none" stroke="currentColor" strokeWidth="1" />
@@ -121,7 +121,7 @@ export default function Header() {
           {/* Full navigation row appears only where the whole row fits cleanly
               (≥1200px). Below that, the burger menu takes over — a proper
               responsive breakpoint, never overlapping/wrapped labels. */}
-          <nav aria-label="Primary" className="hidden shrink-0 items-center min-[1200px]:flex min-[1200px]:gap-x-3 min-[1200px]:text-[11px] min-[1200px]:tracking-[0.17em] xl:gap-x-3 xl:text-xs xl:tracking-[0.2em] 2xl:gap-x-6">
+          <nav aria-label="Primary" className="hidden shrink-0 items-center min-[1200px]:flex min-[1200px]:gap-x-2.5 min-[1200px]:text-[10px] min-[1200px]:tracking-[0.12em] min-[1360px]:gap-x-3.5 min-[1360px]:text-[11px] min-[1360px]:tracking-[0.16em] 2xl:gap-x-6 2xl:text-xs 2xl:tracking-[0.2em]">
             {NAV_LINKS.map((l, i) => {
               // segment-aware matching: /article/:id highlights Articles,
               // /creator/:id highlights Featured Creators, top routes exact.
@@ -182,10 +182,10 @@ export default function Header() {
             >
               {SearchIcon}
             </button>
-            <Magnetic>
+            <Magnetic className="hidden md:block">
               <Link
                 to="/submit"
-                className="btn btn-ghost hidden min-w-[150px] justify-center whitespace-nowrap !px-6 !py-3.5 md:inline-flex xl:min-w-[170px] 2xl:!px-12"
+                className="btn btn-ghost inline-flex justify-center whitespace-nowrap !px-4 !py-2.5 !text-[10px] min-[1360px]:!px-5 min-[1360px]:!py-3 2xl:min-w-[170px] 2xl:!px-10 2xl:!py-3.5"
               >
                 Send your work
               </Link>

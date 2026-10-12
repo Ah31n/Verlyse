@@ -47,9 +47,13 @@ AddDefaultCharset UTF-8
   Header always set Content-Security-Policy "default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self'; connect-src 'self' https://verlyse-react.vercel.app https://formsubmit.co; frame-ancestors 'self'; base-uri 'self'; form-action 'self' https://formsubmit.co; object-src 'none'; upgrade-insecure-requests"
 
   # ---- Caching -----------------------------------------------------------
-  # Hashed build assets are immutable; HTML shells must always revalidate.
-  <FilesMatch "\.(js|css|woff2|woff|webp|avif|png|jpe?g|gif|svg|ico)$">
+  # Hashed build assets and fonts are immutable; non-hashed images revalidate
+  # gracefully; HTML shells must always revalidate.
+  <FilesMatch "\.(js|css|woff2|woff)$">
     Header set Cache-Control "public, max-age=31536000, immutable"
+  </FilesMatch>
+  <FilesMatch "\.(webp|avif|png|jpe?g|gif|svg|ico)$">
+    Header set Cache-Control "public, max-age=86400, stale-while-revalidate=604800"
   </FilesMatch>
   <FilesMatch "\.html$">
     Header set Cache-Control "no-cache, must-revalidate"

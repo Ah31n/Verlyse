@@ -402,7 +402,7 @@ export default function ArticleDetail() {
                       the title and metadata stay the focal point. */}
                   <img
                     src={article.cover}
-                    alt=""
+                    alt={article.slideDescriptions?.[0]?.alt ?? coverAlt(article)}
                     className="aspect-[4/5] w-full object-contain"
                     loading="lazy"
                     decoding="async"
@@ -461,7 +461,7 @@ export default function ArticleDetail() {
       ) : (
         /* ——— CINEMATIC: the default full-bleed ——— */
         <section className="relative flex min-h-[92svh] items-end overflow-hidden pt-36">
-          <div aria-hidden="true" className="absolute inset-0">
+          <div className="pointer-events-none absolute inset-0">
             <img src={article.cover} alt={coverAlt(article)} className="h-full w-full object-cover" decoding="async" onError={(e) => handleImgError(e, article.title, folio)} />
           </div>
           <div aria-hidden="true" className={`absolute inset-0 ${vibe.overlay}`} />
@@ -667,17 +667,17 @@ export default function ArticleDetail() {
                   </p>
                   <span className="font-mono text-[9px] uppercase tracking-[0.22em] text-white/60">
                     {article.publicationStatus === 'provisional' ? 'Provisional entry · ' : ''}
-                    {article.editorialFormat === 'carousel-feature' ? '5-slide Sidecar · ' : ''}
+                    {article.editorialFormat === 'carousel-feature' ? 'Five-plate sequence · ' : ''}
                     {article.shortCode}
                   </span>
                 </div>
-                <pre className="mt-5 whitespace-pre-wrap font-serif text-[15px] italic leading-[1.75] text-ivory/88">
+                <pre className="mt-5 whitespace-pre-wrap break-words font-serif text-[15px] italic leading-[1.75] text-ivory/88">
                   {article.sourceCaption}
                 </pre>
                 {article.normalizedHashtags && article.normalizedHashtags.length > 0 && (
                   <div className="mt-6 border-t border-white/10 pt-4">
                     <p className="font-mono text-[9px] uppercase tracking-[0.24em] text-white/55">
-                      Normalized hashtags (stored separately from verbatim caption)
+                      Archival index tags
                     </p>
                     <div className="mt-2.5 flex flex-wrap gap-2">
                       {article.normalizedHashtags.map((tag) => (

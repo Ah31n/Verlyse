@@ -4,11 +4,13 @@ import { useSeo } from '../hooks/useSeo'
 import Reveal from '../components/ui/Reveal'
 import { BRAND } from '../data/content'
 
-/** A quiet note beneath a letter-line — shown only when the line needs attention. */
-function LetterHint({ show, children }: { show: boolean; children: ReactNode }) {
+/** A quiet note beneath a letter-line — shown only when the line needs attention.
+    Linked to its input via aria-describedby; the form's single status region
+    announces validation state without duplicate role="alert" spam. */
+function LetterHint({ id, show, children }: { id: string; show: boolean; children: ReactNode }) {
   if (!show) return null
   return (
-    <p role="alert" className="mt-2 font-serif text-sm italic leading-snug text-[#B33A3A]">
+    <p id={id} className="mt-2 font-serif text-sm italic leading-snug text-[#B33A3A]">
       {children}
     </p>
   )
@@ -36,6 +38,11 @@ path: '/contact',
   const [sealed, setSealed] = useState(false)
   const [sending, setSending] = useState(false)
   const [viaBackend, setViaBackend] = useState(true)
+
+  const clearFieldError = (field: string) => {
+    setErrors((prev) => (prev.includes(field) ? prev.filter((k) => k !== field) : prev))
+    formRef.current?.querySelector<HTMLElement>(`[name="${field}"]`)?.classList.remove('is-invalid')
+  }
 
   /** Deliver the letter to the desk — posts to the forwarding service so it
       arrives in the Verlyse Media inbox; if the network path fails, the
@@ -67,6 +74,7 @@ path: '/contact',
 
   const onSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault()
+    if (sending || sealed) return
     const form = e.currentTarget
     const data = new FormData(form)
     const fields: Array<[string, string]> = [
@@ -250,19 +258,43 @@ path: '/contact',
                           autoComplete="name"
                           placeholder="your name"
                           value={name}
-                          onChange={(e) => setName(e.target.value)}
+                          aria-invalid={errors.includes('name') ? 'true' : undefined}
+                          aria-describedby={errors.includes('name') ? 'cf-name-err' : undefined}
+                          onChange={(e) => {
+                            setName(e.target.value)
+                            clearFieldError('name')
+                          }}
                         />
-                        <LetterHint show={errors.includes('name')}>Please sign your name.</LetterHint>
+                        <LetterHint id="cf-name-err" show={errors.includes('name')}>Please sign your name.</LetterHint>
                       </div>
                       <div className="field">
                         <label className="field-label !text-wine/80" htmlFor="cf-email">Email</label>
-                        <input className="letter-input" id="cf-email" name="email" type="email" autoComplete="email" placeholder="your@email.com" />
-                        <LetterHint show={errors.includes('email')}>An email is needed for the reply.</LetterHint>
+                        <input
+                          className="letter-input"
+                          id="cf-email"
+                          name="email"
+                          type="email"
+                          autoComplete="email"
+                          placeholder="your@email.com"
+                          aria-invalid={errors.includes('email') ? 'true' : undefined}
+                          aria-describedby={errors.includes('email') ? 'cf-email-err' : undefined}
+                          onInput={() => clearFieldError('email')}
+                        />
+                        <LetterHint id="cf-email-err" show={errors.includes('email')}>An email is needed for the reply.</LetterHint>
                       </div>
                       <div className="field sm:col-span-2">
                         <label className="field-label !text-wine/80" htmlFor="cf-subject">Subject</label>
-                        <input className="letter-input" id="cf-subject" name="subject" type="text" placeholder="what the letter is about" />
-                        <LetterHint show={errors.includes('subject')}>A subject helps the desk sort the post.</LetterHint>
+                        <input
+                          className="letter-input"
+                          id="cf-subject"
+                          name="subject"
+                          type="text"
+                          placeholder="what the letter is about"
+                          aria-invalid={errors.includes('subject') ? 'true' : undefined}
+                          aria-describedby={errors.includes('subject') ? 'cf-subject-err' : undefined}
+                          onInput={() => clearFieldError('subject')}
+                        />
+                        <LetterHint id="cf-subject-err" show={errors.includes('subject')}>A subject helps the desk sort the post.</LetterHint>
                       </div>
                       <div className="field sm:col-span-2">
                         <label className="field-label !text-wine/80" htmlFor="cf-msg">The letter itself</label>
@@ -272,8 +304,11 @@ path: '/contact',
                           name="message"
                           rows={6}
                           placeholder="Write it as you would to a reader, not a form —"
+                          aria-invalid={errors.includes('message') ? 'true' : undefined}
+                          aria-describedby={errors.includes('message') ? 'cf-msg-err' : undefined}
+                          onInput={() => clearFieldError('message')}
                         />
-                        <LetterHint show={errors.includes('message')}>The letter itself is empty.</LetterHint>
+                        <LetterHint id="cf-msg-err" show={errors.includes('message')}>The letter itself is empty.</LetterHint>
                       </div>
                     </div>
 
@@ -291,8 +326,8 @@ path: '/contact',
                           {sending ? 'Sealing the letter…' : 'Seal the letter — send'}
                         </button>
                         {errors.length > 0 && (
-                          <p role="status" className="font-mono text-[10px] uppercase tracking-[0.28em] text-[#B33A3A]">
-                            A few lines remain — the desk has marked them.
+                          <p role="alert" className="font-mono text-[10px] uppercase tracking-[0.28em] text-[#B33A3A]">
+                            A few lines remain — the desk has marked them ({errors.length} {errors.length === 1 ? 'field' : 'fields'}).
                           </p>
                         )}
                       </div>

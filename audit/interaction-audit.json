@@ -38,11 +38,15 @@
     },
     "quiet-grief-gallery-and-caption": {
       "status": "PASS",
-      "detail": "plate1=true, lightbox=true, plate2=true, closed=true, verbatim=true"
+      "detail": "plate1=true, noLeak=true, lightbox=true, trap=true, plate2=true, closed=true, focusRestored=true, verbatim=true"
+    },
+    "forms-and-profile-a11y": {
+      "status": "PASS",
+      "detail": "submitA11y=true, creatorQuotesOk=true"
     },
     "mobile-375px-no-overflow": {
       "status": "PASS",
-      "detail": "/:375/375, /articles:375/375, /article/the-quiet-grief:375/375, /room:375/375"
+      "detail": "/:375/375, /articles:375/375, /article/the-quiet-grief:375/375, /room:375/375 + 11 viewports clean"
     },
     "reduced-motion-preserves": {
       "status": "PASS",
