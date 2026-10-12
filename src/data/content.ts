@@ -59,6 +59,7 @@ export interface WorkFigure {
 
 export interface Article {
   id: string
+  publicationStatus: 'published' | 'draft'
   title: string
   authorId: string
   category: string
@@ -70,14 +71,26 @@ export interface Article {
       the article page hero and all other surfaces keep using `cover` */
   thumbnail?: string
   slides: string[]
+  /** Original source dimensions let the gallery preserve each artwork without cropping. */
+  slideDimensions?: Array<{ width: number; height: number }>
+  /** Source-faithful descriptive alternatives for slides with embedded lettering. */
+  slideAlts?: string[]
+  /** Child-post shortcodes in the exact order of the source carousel. */
+  sourceSlideShortCodes?: string[]
   tags: string[]
+  /** Exact source caption; normalized archive tags remain in `tags`. */
+  originalCaption?: string
+  /** Original publisher post used for editorial provenance. */
+  sourceUrl?: string
+  /** Exact source timestamp when the original record supplies one. */
+  sourceTimestamp?: string
   /** the creator's own note — quoted from the caption or the note slide */
   note?: string
   /** the platform's descriptive text from the caption */
   description?: string
   body: string[]
-  likes: number
-  comments: number
+  likes: number | null
+  comments: number | null
   shortCode: string
   voices: Voice[]
   /** the closing of the post — the final slide, designed and in motion */
@@ -292,10 +305,11 @@ export const AUTHORS: Author[] = [
 ]
 
 /* ------------------------------------------------------------------ */
-/* ARTICLES — the full feed, 19 folios                                  */
+/* ARTICLE REGISTRY — published folios plus explicitly staged drafts.   */
 /* ------------------------------------------------------------------ */
-export const ARTICLES: Article[] = [
+const ARTICLE_RECORDS: Article[] = [
   {
+    publicationStatus: 'published',
     id: 'their-voices-matter',
     title: 'Their Voices Matter',
     authorId: 'alina-javed',
@@ -345,6 +359,7 @@ export const ARTICLES: Article[] = [
     ],
   },
   {
+    publicationStatus: 'published',
     id: '3-13',
     title: '3:13',
     authorId: 'anshujit-singh',
@@ -397,6 +412,7 @@ export const ARTICLES: Article[] = [
     voices: [{ handle: "imnotseerat", text: "Why yall using ai tho:(", post: "Da2RHY5ChOT" }, { handle: "mhdx4x", text: "oh my oh my", post: "Da2RHY5ChOT" }, { handle: "lina_.jved", text: "@anshujit.singh THIS IS SO GOOD", post: "Da2RHY5ChOT" }, { handle: "verlyse.media", text: "microsoft designer is used to create this post.", post: "Da2RHY5ChOT" }],
   },
   {
+    publicationStatus: 'published',
     id: 'the-empty-waltz',
     title: 'The Empty Waltz',
     authorId: 'haieqa-wahab',
@@ -461,6 +477,7 @@ export const ARTICLES: Article[] = [
     voices: [{ handle: "_exotic_faisal", text: "Such a nice thing to read👏", post: "DbYa5WSE5wf" }, { handle: "zvhxx__", text: "The writing is so perfect omg", post: "DbYa5WSE5wf" }, { handle: "jojokibachi", text: "This is soooo beautifull broo💖💖", post: "DbYa5WSE5wf" }, { handle: "anab3rry", text: "SO BEAUTIFUL", post: "DbYa5WSE5wf" }],
   },
   {
+    publicationStatus: 'published',
     id: 'the-arts-deserve-respect',
     title: 'The Arts Deserve Respect',
     authorId: 'shaza-fatima',
@@ -504,6 +521,7 @@ export const ARTICLES: Article[] = [
     voices: [{ handle: "sabahat_2009", text: "Beautifully articulated!", post: "DaMui9Ekrmy" }, { handle: "a.a1raahh", text: "Felt something heal inside reading this", post: "DaMui9Ekrmy" }, { handle: "omg_em4an4567", text: "I am ur biggest fann ❤️", post: "DaMui9Ekrmy" }, { handle: "zznbkkh", text: "i love this post", post: "DaMui9Ekrmy" }],
   },
   {
+    publicationStatus: 'published',
     id: 'hope-becomes-mythology',
     title: 'Hope Becomes Mythology',
     authorId: 'alina-javed',
@@ -547,6 +565,7 @@ export const ARTICLES: Article[] = [
     voices: [{ handle: "yura_archives", text: "WE LOVE U ALINA KEEP GOIN", post: "DaSLuZek5Uj" }, { handle: "shanzayy__k", text: "Wowww", post: "DaSLuZek5Uj" }, { handle: "verlyse.media", text: "@jojokibachi head of brand ambassador approved this🤏🏻", post: "DaSLuZek5Uj" }, { handle: "omg_em4an4567", text: "Loved it❤️", post: "DaSLuZek5Uj" }],
   },
   {
+    publicationStatus: 'published',
     id: 'a-students-worth',
     title: "A Student's Worth",
     authorId: 'adeena-irfan',
@@ -593,6 +612,7 @@ export const ARTICLES: Article[] = [
     voices: [{ handle: "r3ptillia", text: "this is what lifes all abtttt", post: "DaPbjVRE3nA" }, { handle: "jojokibachi", text: "Insane art 👏💙", post: "DaPbjVRE3nA" }, { handle: "sposhiewoshie", text: "OMG ADEENA IM SO PROUD OF YOU", post: "DaPbjVRE3nA" }, { handle: "eishal.usmani", text: "WOWOWWWW", post: "DaPbjVRE3nA" }],
   },
   {
+    publicationStatus: 'published',
     id: 'tasbih-e-fatima',
     title: 'Tasbih-e-Fatima',
     authorId: 'craft-with-bro',
@@ -634,6 +654,7 @@ export const ARTICLES: Article[] = [
     voices: [{ handle: "zohaa._.rao", text: "Precious 💞", post: "DaU7EU2E46N" }, { handle: "zohaa._.rao", text: "Mashallah", post: "DaU7EU2E46N" }, { handle: "lycheyee", text: "Mashallah", post: "DaU7EU2E46N" }, { handle: "crisp._.x26", text: "❤️❤️", post: "DaU7EU2E46N" }],
   },
   {
+    publicationStatus: 'published',
     id: 'intellect-lost-to-code',
     title: 'Intellect Lost to Code',
     authorId: 'munkashay-javed',
@@ -684,6 +705,7 @@ export const ARTICLES: Article[] = [
     voices: [{ handle: "arhama.nadir", text: "Very well written 👏", post: "DacRGIOE9Sg" }, { handle: "aleeha_faraz", text: "So proud of you lesss gooo champ 💗", post: "DacRGIOE9Sg" }, { handle: "miffy.wrld", text: "ate so hard", post: "DacRGIOE9Sg" }, { handle: "sarahimrann_", text: "@nothingjustaninchident91 such a beautiful piece of writing 😍", post: "DacRGIOE9Sg" }],
   },
   {
+    publicationStatus: 'published',
     id: 'forgive-me-mother',
     title: 'Forgive Me, Mother',
     authorId: 'abheesha-ghosh',
@@ -725,6 +747,7 @@ export const ARTICLES: Article[] = [
     voices: [{ handle: "r3ptillia", text: "so beautifulllll", post: "DaXQtNiEzeH" }, { handle: "anshujit.singh", text: "@abheesha_21 THE POEM WRITER GOAT ❤️🙌", post: "DaXQtNiEzeH" }, { handle: "omg_em4an4567", text: "Can’t took eyes out of from it ❤️", post: "DaXQtNiEzeH" }],
   },
   {
+    publicationStatus: 'published',
     id: 'water-cat',
     title: 'Water Cat',
     authorId: 'kenza-imene',
@@ -764,6 +787,7 @@ export const ARTICLES: Article[] = [
     voices: [{ handle: "maggotsforbrains1", text: "I ALWAYS LOVED BLACK CATS SO MUCH I HATE HOW THEYRE ACCUSED OF RANDOM THINGS AND BAD LUCK THEYRE SOOOL CUTEEEEEEE", post: "DakDJF9Ez1l" }, { handle: "lycheyee", text: "THIS IS GENUINELY SO CUTE", post: "DakDJF9Ez1l" }, { handle: "ana.maynaa", text: "the cat and the art 😍😍", post: "DakDJF9Ez1l" }, { handle: "r3ptillia", text: "the detailinggg", post: "DakDJF9Ez1l" }],
   },
   {
+    publicationStatus: 'published',
     id: 'if-hope-were-a-feather',
     title: 'If Hope Were a Feather',
     authorId: 'hadia-raza',
@@ -804,6 +828,7 @@ export const ARTICLES: Article[] = [
     voices: [{ handle: "fariha_sharf005", text: "Beautiful ❤️❤️", post: "Dae6nNME5bg" }, { handle: "lina_.jved", text: "Next time before making ai accusations do ur research properly 🤍🤍🤍🤍", post: "Dae6nNME5bg" }, { handle: "salee23rd", text: "Alright buddy 😭", post: "Dae6nNME5bg" }],
   },
   {
+    publicationStatus: 'published',
     id: 'the-horrors-of-child-sexual-abuse',
     title: 'The Horrors of Child Sexual Abuse',
     authorId: 'zuha-farhan',
@@ -846,6 +871,7 @@ export const ARTICLES: Article[] = [
     voices: [{ handle: "maggotsforbrains1", text: "THIS SHUD BE SPOKEN ABOUT MORE", post: "Dar3wIXk02U" }, { handle: "marziaontop", text: "yet the society doesn’t change, thank you for speaking up about this!", post: "Dar3wIXk02U" }, { handle: "zohaa._.rao", text: "This world needs discipline", post: "Dar3wIXk02U" }, { handle: "verlyse.media", text: "@nothingjustaninchident91 📢", post: "Dar3wIXk02U" }],
   },
   {
+    publicationStatus: 'published',
     id: 'khageena',
     title: 'Khageena',
     authorId: 'haiqa-nafees',
@@ -882,6 +908,7 @@ export const ARTICLES: Article[] = [
     voices: [{ handle: "ana._dumps", text: "my next meal😛😛😛", post: "DbKynTxk_6F" }, { handle: "fatima_jannattt", text: "My inner chef is so happy", post: "DbKynTxk_6F" }, { handle: "maddu__0", text: "@fatima_jannattt YESSS GORDON RAMSEY", post: "DbKynTxk_6F" }],
   },
   {
+    publicationStatus: 'published',
     id: 'behind-every-headline',
     title: 'Behind Every Headline',
     authorId: 'zuha-farhan',
@@ -923,6 +950,7 @@ export const ARTICLES: Article[] = [
     voices: [{ handle: "marziaontop", text: "having to protest for your own basic rights is just so sad.", post: "Dbf7jnBk3ho" }, { handle: "notsooptimistic_", text: "literally was waiting for this", post: "Dbf7jnBk3ho" }, { handle: "lycheyee", text: "This was needed", post: "Dbf7jnBk3ho" }, { handle: "libssyy", text: "Sad reality", post: "Dbf7jnBk3ho" }],
   },
   {
+    publicationStatus: 'published',
     id: 'jaldi',
     title: 'Jaldi',
     authorId: 'haiqa-nafees',
@@ -1016,6 +1044,7 @@ export const ARTICLES: Article[] = [
     ],
   },
   {
+    publicationStatus: 'published',
     id: 'failure',
     title: 'Failure',
     authorId: 'kazi-fatimataz-zahra',
@@ -1055,6 +1084,7 @@ export const ARTICLES: Article[] = [
     ],
   },
   {
+    publicationStatus: 'published',
     id: 'my-last-breath',
     title: 'My Last Breath',
     authorId: 'abheesha-ghosh',
@@ -1096,6 +1126,7 @@ export const ARTICLES: Article[] = [
     ],
   },
   {
+    publicationStatus: 'published',
     id: 'the-garden-beyond-my-tower',
     title: 'The Garden Beyond My Tower',
     authorId: 'syeda-tasbeeha-noman',
@@ -1148,6 +1179,7 @@ export const ARTICLES: Article[] = [
     ],
   },
   {
+    publicationStatus: 'published',
     id: 'mir-raza-ali',
     title: 'Mir Raza Ali',
     authorId: 'verlyse-media',
@@ -1164,7 +1196,7 @@ export const ARTICLES: Article[] = [
       'WAFFLIX WAS MORE THAN A BUSINESS. IT WAS A DREAM. There was no fancy outlet. No huge team. No perfect business plan. There was simply Mir Raza, a small cart, and an idea. He started Wafflix by pushing his cart himself, experimenting with recipes, serving customers and slowly turning an idea into a brand. People doubted the idea of selling waffles from a cart. But people started lining up. Over the years, that little cart grew into a recognised Karachi dessert brand eventually reaching multiple outlets, including fine-dining spaces. His journey wasn’t about waiting until everything was perfect. It was about starting anyway. He didn’t just build Wafflix. He built proof that a young Pakistani could start with almost nothing and create something meaningful.',
       'A LIFE WAS LOST. A FAMILY WAS LEFT WITH QUESTIONS. AND A COUNTRY IS WATCHING. Mir Raza’s story should not become another trending topic that disappears in a week. His family has continued demanding a transparent investigation, while questions surrounding the handling of the case have led to further legal scrutiny. We don’t need to know every answer to demand the most basic one: WHO IS RESPONSIBLE AND WILL JUSTICE BE served? If we call ourselves a nation that values its young people, then their lives cannot become statistics. If we celebrate Pakistani entrepreneurs, then we must also demand a Pakistan where they can live, build and dream safely. Don’t let Mir Raza’s name fade. Speak. Share. Ask questions. Demand a fair investigation. #JusticeForMirRazaAli',
     ],
-    likes: 0, /* the source reported this post’s likes as unavailable (scraper value −1); not asserted elsewhere */
+    likes: null, /* the source reported this post’s likes as unavailable (scraper value −1). */
     comments: 9,
     shortCode: 'DciqQXTCilh',
     world: 'newsprint',
@@ -1192,6 +1224,11 @@ export const ARTICLES: Article[] = [
   },
 ]
 
+/** The public archive and every derived count/search surface contain published folios only. */
+export const ARTICLES: Article[] = ARTICLE_RECORDS.filter(
+  (article) => article.publicationStatus === 'published',
+)
+
 /* ------------------------------------------------------------------ */
 /* CATEGORIES — from the captions and hashtags                          */
 /* ------------------------------------------------------------------ */
@@ -1218,11 +1255,11 @@ const _creatorCount = _primaryAuthorIds.size
 /* human writers only — the masthead is the platform, not a guest writer */
 const _humanCreators = ARTICLES.map((a) => a.authorId).filter((id) => id !== 'verlyse-media')
 const _humanCreatorCount = new Set(_humanCreators).size
-const _appreciations = ARTICLES.reduce((s, a) => s + a.likes, 0)
+const _appreciations = ARTICLES.reduce((s, a) => s + (a.likes ?? 0), 0)
 /* Canonical UI vocabulary: the 585 metric is “conversations” everywhere —
    the comments beneath the features, all of them read. `Article.comments`
    stays the name of the underlying data field. */
-const _conversations = ARTICLES.reduce((s, a) => s + a.comments, 0)
+const _conversations = ARTICLES.reduce((s, a) => s + (a.comments ?? 0), 0)
 const _openedOn = [...ARTICLES].map((a) => a.date).sort()[0]
 const _latestOn = [...ARTICLES].map((a) => a.date).sort().slice(-1)[0]
 
@@ -1285,11 +1322,11 @@ export function sortArticles(key: SortKey): Article[] {
   const list = [...ARTICLES]
   switch (key) {
     case 'latest':
-      return list.sort((a, b) => b.date.localeCompare(a.date) || b.likes - a.likes)
+      return list.sort((a, b) => b.date.localeCompare(a.date) || (b.likes ?? 0) - (a.likes ?? 0))
     case 'most-read':
-      return list.sort((a, b) => b.comments - a.comments || b.likes - a.likes)
+      return list.sort((a, b) => (b.comments ?? 0) - (a.comments ?? 0) || (b.likes ?? 0) - (a.likes ?? 0))
     case 'most-appreciated':
-      return list.sort((a, b) => b.likes - a.likes || b.comments - a.comments)
+      return list.sort((a, b) => (b.likes ?? 0) - (a.likes ?? 0) || (b.comments ?? 0) - (a.comments ?? 0))
     case 'editors-picks': {
       const picks = new Set(EDITORS_PICKS)
       return list
@@ -1449,7 +1486,8 @@ export function worksBy(authorId: string): Article[] {
 }
 /** Registry folio number of an article as a zero-padded string (01…19). */
 export function folioNoOf(articleId: string): string {
-  return String(ARTICLES.findIndex((x) => x.id === articleId) + 1).padStart(2, '0')
+  const index = ARTICLES.findIndex((x) => x.id === articleId)
+  return index < 0 ? '—' : String(index + 1).padStart(2, '0')
 }
 /** Folios that name the author in a secondary credit line (the poem
     written beside a painting). This is how a record with zero primary

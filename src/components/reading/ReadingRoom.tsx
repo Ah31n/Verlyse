@@ -1,4 +1,4 @@
-import { Link, useParams } from 'react-router-dom'
+import { Link, useParams, useSearchParams } from 'react-router-dom'
 import type { ReactNode } from 'react'
 import { motion, useReducedMotion, useScroll, useTransform } from 'motion/react'
 import { ARTICLES, getAuthor } from '../../data/content'
@@ -23,6 +23,8 @@ import { ARTICLES, getAuthor } from '../../data/content'
  */
 export default function ReadingRoom({ children }: { children: ReactNode }) {
   const { id } = useParams<{ id: string }>()
+  const [searchParams] = useSearchParams()
+  const isDraftPreview = import.meta.env.DEV && id === 'the-quiet-grief' && searchParams.get('preview') === 'draft'
   const reduce = useReducedMotion() === true
   const idx = ARTICLES.findIndex((a) => a.id === id)
   const folio = idx >= 0 ? String(idx + 1).padStart(2, '0') : null
@@ -76,11 +78,11 @@ export default function ReadingRoom({ children }: { children: ReactNode }) {
       >
         {/* left ledger — the room's name and this folio's number, vertical */}
         <span className="absolute left-[clamp(1.75rem,5.5vw,4.75rem)] top-32 [writing-mode:vertical-rl] font-mono text-[10px] uppercase tracking-[0.34em] text-gold/50">
-          THE READING ROOM — FOLIO № {folio ?? '—'}
+          {isDraftPreview ? 'THE READING ROOM — DEVELOPMENT PREVIEW' : `THE READING ROOM — FOLIO № ${folio ?? '—'}`}
         </span>
         {/* right index — where this folio sits in the issue */}
         <span className="absolute right-[clamp(1.75rem,5.5vw,4.75rem)] top-[46%] [writing-mode:vertical-rl] font-mono text-[9px] uppercase tracking-[0.34em] text-white/30">
-          {article ? `${article.category.toUpperCase()} · № ${folio} / 19` : 'VERLYSE MEDIA'}
+          {article ? `${article.category.toUpperCase()} · № ${folio} / 19` : isDraftPreview ? 'UNPUBLISHED · UNFILED' : 'VERLYSE MEDIA'}
         </span>
         {/* corner registration ticks — the plate is held inside this field */}
         <span className="absolute left-[clamp(1.75rem,5.5vw,4.75rem)] top-24 h-3 w-px bg-[#D9B978]/35" />

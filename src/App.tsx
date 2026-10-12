@@ -26,12 +26,15 @@ const RoomPage = lazy(() => import('./pages/Room'))
 
 /** Route-aware transition label — the "folio" the reader is moving toward,
  *  so every navigation reads like moving through the publication. */
-function thresholdLabel(pathname: string): string {
+function thresholdLabel(pathname: string, search = ''): string {
   if (pathname.startsWith('/article/')) {
     const id = pathname.split('/article/')[1]
+    if (import.meta.env.DEV && id === 'the-quiet-grief' && new URLSearchParams(search).get('preview') === 'draft') {
+      return 'Development preview · unpublished'
+    }
     const i = ARTICLES.findIndex((a) => a.id === id)
-    const folio = i >= 0 ? String(i + 1).padStart(2, '0') : '—'
-    return `Folio ${folio} · Reading`
+    if (i < 0) return 'Not in the archive'
+    return `Folio ${String(i + 1).padStart(2, '0')} · Reading`
   }
   if (pathname.startsWith('/creator/')) return 'A contributor dossier'
   switch (pathname) {
@@ -108,7 +111,7 @@ function ScrollToTop() {
 
 export default function App() {
   const location = useLocation()
-  const threshold = thresholdLabel(location.pathname)
+  const threshold = thresholdLabel(location.pathname, location.search)
 
   const isRoom = location.pathname.startsWith('/room')
 

@@ -1,5 +1,5 @@
-import { Link, useParams } from 'react-router-dom'
-import { useEffect, lazy, Suspense } from 'react'
+import { Link, useParams, useSearchParams } from 'react-router-dom'
+import { useEffect, lazy, Suspense, useState } from 'react'
 import { motion } from 'motion/react'
 import { useArticleSeo } from '../hooks/useSeo'
 import Reveal from '../components/ui/Reveal'
@@ -21,6 +21,8 @@ const StoryEnding3D = lazy(() => import('../components/spatial/StoryEnding3D'))
 import SaveButton from '../components/ui/SaveButton'
 import { useReadingMode } from '../components/ui/ReadingMode'
 import { ImmersiveShell, BrassThread, ReadingMeasure } from '../components/immersive'
+
+const ArtGallery = lazy(() => import('../components/ui/ArtGallery'))
 
 /* ------------------------------------------------------------------ */
 /* Every feature carries its own temperament — motion and finish      */
@@ -187,7 +189,7 @@ function HeroKicker({ article, author }: { article: Article; author?: Author }) 
       <Link to={`/categories/${catSlug}`} className={linkCls}>{article.category}</Link>
       <span aria-hidden="true"> — </span>
       <span>Verlyse Media presents</span>
-      {author && (
+      {author && article.authorId !== 'verlyse-media' && (
         <>
           <span aria-hidden="true"> — a submission by </span>
           <Link to={`/creator/${author.id}`} className={linkCls}>{author.name}</Link>
@@ -222,6 +224,10 @@ function CreditLine({ credit }: { credit: string }) {
 
 export default function ArticleDetail() {
   const { id } = useParams<{ id: string }>()
+  const [searchParams] = useSearchParams()
+  const draftRequested = import.meta.env.DEV && id === 'the-quiet-grief' && searchParams.get('preview') === 'draft'
+  const [draftArticle, setDraftArticle] = useState<Article | undefined>()
+  const [draftLoading, setDraftLoading] = useState(draftRequested)
   const { on: reading, toggle: toggleReading, off: offReading } = useReadingMode()
 
   useEffect(() => {
@@ -232,7 +238,31 @@ export default function ArticleDetail() {
     window.addEventListener('keydown', onKey)
     return () => window.removeEventListener('keydown', onKey)
   }, [reading, offReading])
-  const article = id ? getArticle(id) : undefined
+  useEffect(() => {
+    let cancelled = false
+    if (!import.meta.env.DEV || !draftRequested) {
+      setDraftArticle(undefined)
+      setDraftLoading(false)
+      return () => { cancelled = true }
+    }
+
+    setDraftLoading(true)
+    import('../data/drafts/the-quiet-grief')
+      .then(({ quietGriefDraft }) => {
+        if (!cancelled) setDraftArticle(quietGriefDraft)
+      })
+      .catch(() => {
+        if (!cancelled) setDraftArticle(undefined)
+      })
+      .finally(() => {
+        if (!cancelled) setDraftLoading(false)
+      })
+    return () => { cancelled = true }
+  }, [draftRequested])
+
+  const article = id
+    ? getArticle(id) ?? (draftRequested ? draftArticle : undefined)
+    : undefined
 
   useArticleSeo(
     article
@@ -245,11 +275,19 @@ export default function ArticleDetail() {
           author: getAuthor(article.authorId)?.name ?? '',
           tags: article.tags,
           cover: article.cover,
+          publicationStatus: article.publicationStatus,
         }
-      : { title: 'Not found', excerpt: '', date: '', readingTime: '', category: '', author: '', tags: [], cover: '/img/poster-3-13-1.webp' },
+      : { title: 'Not found', excerpt: '', date: '', readingTime: '', category: '', author: '', tags: [], cover: '/img/poster-3-13-1.webp', publicationStatus: 'not-found' },
   )
 
   if (!article) {
+    if (draftRequested && draftLoading) {
+      return (
+        <section aria-live="polite" className="flex min-h-[70vh] items-center justify-center px-6 text-center">
+          <p className="font-mono text-[10px] uppercase tracking-[0.28em] text-gold">Preparing the local editorial preview…</p>
+        </section>
+      )
+    }
     return (
       <section className="flex min-h-[70vh] items-center justify-center px-6 text-center">
         <div>
@@ -267,7 +305,8 @@ export default function ArticleDetail() {
   }
 
   const author = getAuthor(article.authorId)
-  const related = relatedArticles(article)
+  const isDraft = article.publicationStatus === 'draft'
+  const related = isDraft ? [] : relatedArticles(article)
   const folio = folioNoOf(article.id)
   const vibe = VIBES[article.vibe ?? 'solemn']
   const v = REVEAL_VARIANTS[vibe.reveal]
@@ -418,11 +457,16 @@ export default function ArticleDetail() {
         </section>
       ) : article.heroMode === 'gallery' ? (
         /* ——— GALLERY: the artwork itself is the hero — the plate, framed ——— */
-        <section className="relative flex min-h-[80svh] items-end overflow-hidden border-b border-white/10 bg-wine-deep pt-36">
+        <section className="relative flex min-h-[80svh] items-end overflow-hidden border-b border-white/10 bg-wine-deep pt-36 max-[767px]:min-h-[78svh] max-[767px]:pt-0">
           <WorldTexture world={article.world} />
           <div className="relative z-[2] mx-auto w-full max-w-page px-[clamp(1.75rem,5.5vw,4.75rem)] pb-16">
-            <div className="grid grid-cols-1 items-end gap-10 lg:grid-cols-[1fr_auto]">
+            <div className="grid grid-cols-1 items-end gap-10 max-[767px]:gap-6 lg:grid-cols-[1fr_auto]">
               <div>
+                {isDraft && (
+                  <p className="mb-6 inline-flex border border-gold/35 px-3 py-2 font-mono text-[9px] uppercase tracking-[0.24em] text-gold">
+                    Development preview · working title · provisional classification · not published
+                  </p>
+                )}
                 <Reveal><HeroKicker article={article} author={author} /></Reveal>
                 <div className={`${vibe.titleClass} inline-block`}>
                   <SplitText as="h1" text={`“${article.title}”`} className="mt-5 max-w-[18ch] text-[clamp(2.8rem,7vw,6.6rem)]" />
@@ -434,8 +478,20 @@ export default function ArticleDetail() {
               <Reveal delay={0.25}>
                 <figure className="relative w-full max-w-[300px]">
                   <div aria-hidden="true" className="absolute -inset-3 translate-x-3 translate-y-3 border border-gold/35" />
-                  <div className="img-frame relative overflow-hidden border border-gold/25">
-                    <img src={article.cover} alt="" className="aspect-[4/5] w-full object-cover" loading="lazy" decoding="async" onError={(e) => handleImgError(e, article.title, folio)} />
+                  <div
+                    className={`img-frame relative overflow-hidden border border-gold/25 ${article.slideDimensions?.[0] ? '' : 'aspect-[4/5]'}`}
+                    style={article.slideDimensions?.[0] ? { aspectRatio: `${article.slideDimensions[0].width} / ${article.slideDimensions[0].height}` } : undefined}
+                  >
+                    <img
+                      src={article.cover}
+                      alt=""
+                      width={article.slideDimensions?.[0]?.width}
+                      height={article.slideDimensions?.[0]?.height}
+                      className={`w-full ${article.slideDimensions?.[0] ? 'h-full object-contain' : 'aspect-[4/5] object-cover'}`}
+                      loading="lazy"
+                      decoding="async"
+                      onError={(e) => handleImgError(e, article.title, folio)}
+                    />
                     <span aria-hidden="true" className="absolute inset-2 border border-gold/40" />
                   </div>
                   <figcaption className="mt-3 flex items-center justify-between font-mono text-[9px] uppercase tracking-[0.30em] text-white/50">
@@ -520,13 +576,13 @@ export default function ArticleDetail() {
                   <p className="mt-1.5 font-mono text-[10px] uppercase tracking-[0.28em] text-white/50">{author?.handle} · {author?.role}</p>
                 </div>
               </motion.div>
-              {author && <Signature name={author.name} delay={0.3} />}
+              {author && author.id !== 'verlyse-media' && <Signature name={author.name} delay={0.3} />}
               {author && (
                 <Link
-                  to={`/creator/${author.id}`}
+                  to={author.id === 'verlyse-media' ? '/about' : `/creator/${author.id}`}
                   className="mt-5 inline-flex items-center gap-2 border-b border-gold/50 pb-1 font-mono text-[10px] uppercase tracking-[0.28em] text-gold no-underline transition-colors hover:text-ivory max-[767px]:py-2"
                 >
-                  About the writer <span aria-hidden="true">→</span>
+                  {author.id === 'verlyse-media' ? 'About the publication' : 'About the writer'} <span aria-hidden="true">→</span>
                 </Link>
               )}
               {/* a second creator, credited by the caption itself */}
@@ -622,6 +678,35 @@ export default function ArticleDetail() {
             </>
           )}
 
+          {article.slides && article.slides.length > 0 && (
+            <section aria-labelledby="article-slides-heading" className="mt-[clamp(4rem,10vh,7rem)] border-t border-gold/25 pt-8">
+              <div className="mb-8">
+                <p className="kicker">{isDraft ? 'The original carousel' : 'Artwork sequence'}</p>
+                <h2 id="article-slides-heading" className="sr-only">{article.title} — original carousel plates</h2>
+              </div>
+              <Suspense fallback={<p className="font-mono text-[10px] uppercase tracking-[0.28em] text-white/55">Preparing the plates…</p>}>
+                <ArtGallery article={article} />
+              </Suspense>
+            </section>
+          )}
+
+          {article.originalCaption && (
+            <Reveal className="mt-[clamp(4rem,9vh,6rem)]">
+              <section aria-labelledby="source-caption-heading" className="border-y border-white/15 py-8 md:py-10">
+                <p className="kicker">Source text · reproduced verbatim</p>
+                <h2 id="source-caption-heading" className="sr-only">Original Instagram caption</h2>
+                <blockquote className="mt-5 max-w-[62ch] whitespace-pre-line font-serif text-[clamp(1.1rem,1.55vw,1.35rem)] font-light leading-[1.9] text-ivory/88">
+                  {article.originalCaption}
+                </blockquote>
+                {article.sourceUrl && (
+                  <a href={article.sourceUrl} target="_blank" rel="noopener noreferrer" className="mt-7 inline-flex min-h-11 items-center border-b border-gold/50 font-mono text-[9px] uppercase tracking-[0.28em] text-gold no-underline transition-colors hover:text-ivory focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-gold">
+                    Original post ↗
+                  </a>
+                )}
+              </section>
+            </Reveal>
+          )}
+
           {/* Tags */}
           <Reveal className="mt-14">
             <div className="flex flex-wrap gap-3">
@@ -632,7 +717,7 @@ export default function ArticleDetail() {
           </Reveal>
 
           {/* Save + Share — a quiet hairline block */}
-          <Reveal className="mt-14">
+          {!isDraft && <Reveal className="mt-14">
             <div className="flex flex-wrap items-center justify-between gap-5 border-t border-white/10 pt-6">
               <div className="flex flex-wrap items-center gap-4">
                 <span className="font-mono text-[10px] uppercase tracking-[0.28em] text-white/55">Save this story</span>
@@ -643,10 +728,12 @@ export default function ArticleDetail() {
                 <ShareButtons title={`“${article.title}”`} />
               </div>
             </div>
-          </Reveal>
+          </Reveal>}
         </div>
       </section>
 
+      {!isDraft && (
+      <>
       {/* the moment of reflection before the ending */}
       {article.reflection && (
         <section aria-hidden="true" className="relative py-[clamp(5rem,10vh,8rem)]">
@@ -803,6 +890,8 @@ export default function ArticleDetail() {
           )}
         </div>
       </section>
+      </>
+      )}
     </>
     </ImmersiveShell>
   )

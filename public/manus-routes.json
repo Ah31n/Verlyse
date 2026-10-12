@@ -1,0 +1,17 @@
+{
+  "routes": [
+    { "path": "/", "title": "Home" },
+    { "path": "/about", "title": "About Verlyse" },
+    { "path": "/articles", "title": "Article Archive" },
+    { "path": "/article/:id", "title": "Editorial Feature" },
+    { "path": "/categories", "title": "Categories" },
+    { "path": "/categories/:slug", "title": "Category Archive" },
+    { "path": "/community", "title": "Community" },
+    { "path": "/submit", "title": "Submit Work" },
+    { "path": "/ambassadors", "title": "Ambassadors" },
+    { "path": "/creators", "title": "Creators" },
+    { "path": "/contact", "title": "Contact" },
+    { "path": "/creator/:authorId", "title": "Creator Profile" },
+    { "path": "/room", "title": "Reading Room" }
+  ]
+}

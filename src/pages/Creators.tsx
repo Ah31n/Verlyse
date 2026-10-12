@@ -61,7 +61,7 @@ export default function Creators() {
     [folios, coCredits],
   )
   const selectedFeature = useMemo(
-    () => folios.length ? [...folios].sort((a, b) => b.likes - a.likes)[0] : undefined,
+    () => folios.length ? [...folios].sort((a, b) => (b.likes ?? 0) - (a.likes ?? 0))[0] : undefined,
     [folios],
   )
 
