@@ -40,7 +40,8 @@ async function run() {
   const hadSave = (await saveBtn.count()) > 0
   if (hadSave) await saveBtn.click()
   await page.waitForTimeout(400)
-  await page.locator('button[aria-label="Saved stories"]').click()
+  // Header appends the live saved-item count after a successful save.
+  await page.locator('button[aria-label^="Saved stories"]').click()
   await page.waitForTimeout(500)
   const shelfOpen = await page.evaluate(() => document.body.textContent.includes('The bookmarks'))
   const shelfHasItem = await page.evaluate(() => document.body.textContent.includes('Their Voices Matter'))

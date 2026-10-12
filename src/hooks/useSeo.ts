@@ -73,10 +73,11 @@ export function useSeo({ title, description, path = '/', image = '/img/poster-3-
 }
 
 /** Article-level structured data */
-export function useArticleSeo(article: { title: string; excerpt: string; date: string; readingTime: string; category: string; author: string; tags: string[]; cover: string }) {
+export function useArticleSeo(article: { title: string; excerpt: string; date: string; readingTime: string; category: string; author: string; tags: string[]; cover: string; publicationStatus: 'published' | 'draft' | 'not-found' }) {
   useEffect(() => {
     if (!article) return
     const url = window.location.href.split('?')[0]
+    const isPublished = article.publicationStatus === 'published'
     document.title = `${article.title} — Verlyse Media`
     const desc = article.excerpt.length > 158 ? article.excerpt.slice(0, 155).trimEnd() + '…' : article.excerpt
     const setMeta = (selector: string, attr: string, value: string) => {
@@ -93,15 +94,31 @@ export function useArticleSeo(article: { title: string; excerpt: string; date: s
     setMeta('meta[name="twitter:description"]', 'content', desc)
     setMeta('meta[name="twitter:image"]', 'content', `${window.location.origin}${article.cover}`)
 
+    let robots = document.head.querySelector<HTMLMetaElement>('meta[name="robots"]')
+    if (!robots) {
+      robots = document.createElement('meta')
+      robots.name = 'robots'
+      document.head.appendChild(robots)
+    }
+    robots.content = isPublished ? 'index,follow' : 'noindex,nofollow,noarchive'
+
     let canon = document.head.querySelector<HTMLLinkElement>('link[rel="canonical"]')
-    if (!canon) {
+    if (!isPublished) {
+      canon?.remove()
+    } else {
+      if (!canon) {
       canon = document.createElement('link')
       canon.rel = 'canonical'
       document.head.appendChild(canon)
+      }
+      canon.href = url
     }
-    canon.href = url
 
     let ld = document.getElementById('ld-article') as HTMLScriptElement | null
+    if (!isPublished) {
+      ld?.remove()
+      return
+    }
     if (!ld) {
       ld = document.createElement('script')
       ld.id = 'ld-article'

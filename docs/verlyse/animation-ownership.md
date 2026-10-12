@@ -5,11 +5,12 @@ Rule in force: one visual property = one animation owner. No two systems animate
 
 | Motion context | Owner | Animated properties | Notes |
 |---|---|---|---|
-| Route transitions, page-enter sweep (`App.tsx` `PageTransition`) | Framer Motion | `opacity`, `y`, `scaleX` | existing; unchanged |
-| Hero masthead / headline / ink / ledger reveals (`Home.tsx`) | Framer Motion | `opacity`, `y`, `pathLength`, `clipPath` | existing; unchanged |
-| Scroll-linked reveals (`ScrollBeat`, `Reveal`, `MotionMoves`, `ArtGallery`, `CountUp`) | Framer Motion (`useScroll`, `useInView`, `useTransform`) | `opacity`, `y`, `scale`, `rotate`, `pathLength` | existing; untouched |
-| Overlays/sheets (Search, Shelf, mobile menu) | Framer Motion | `opacity`, `x`, `y`, `filter` | existing; untouched |
-| Signature scenes (`ArticleSignature.tsx`) | CSS keyframes + Framer | `transform`, `opacity` | existing semantic endings; unchanged |
+| Route transitions, page-enter sweep (`App.tsx` `PageTransition`) | Motion (`motion/react`) | `opacity`, `y`, `scaleX` | existing; draft threshold label is explicitly unpublished and unnumbered |
+| Hero masthead / headline / ink / ledger reveals (`Home.tsx`) | Motion (`motion/react`) | `opacity`, `y`, `pathLength`, `clipPath` | existing; unchanged |
+| Scroll-linked reveals (`ScrollBeat`, `Reveal`, `MotionMoves`, `ArtGallery`, `CountUp`) | Motion (`useScroll`, `useInView`, `useTransform`) | `opacity`, `y`, `scale`, `rotate`, `pathLength` | existing; reduced-motion supported |
+| Editorial gallery modal (`ArtGallery.tsx`) | Motion (`motion/react`) + native DOM focus/portal behavior | `opacity`, `scale`; focus, keyboard and scroll lock | Lazy gallery; source-ratio plates; Escape/arrows; inert app root; focus restore |
+| Overlays/sheets (Search, Shelf, mobile menu) | Motion (`motion/react`) | `opacity`, `x`, `y`, `filter` | existing; untouched |
+| Signature scenes (`ArticleSignature.tsx`) | CSS keyframes + Motion | `transform`, `opacity` | existing semantic endings; unchanged |
 | **Spatial archive scene (HELP hero)** | **three / react-three-fiber** (inside the Canvas only) | **camera position, mesh transforms, material light** | NEW. Only ever inside the `<Canvas>`; it never touches DOM `transform`/`opacity`. |
 | **Story-ending atmosphere (article)** | **three / react-three-fiber** | **camera, points rotation, orbit rotation, fog** | NEW. Behind the semantic signature; DOM untouched. |
 | CSS (static layout, hover/focus, ken-burns, breathing) | CSS | layout, static transforms, fallback states | unchanged |
@@ -17,11 +18,10 @@ Rule in force: one visual property = one animation owner. No two systems animate
 ## Ownership of the spatial layer
 - `three + @react-three/fiber` own **only** the WebGL scene graph (camera, meshes, materials,
   points, fog). It never drives DOM-animated properties.
-- Framer Motion continues to own all React/DOM choreography. This is why **GSAP, anime.js, and
-  `motion` were intentionally NOT added** — the spatial layer is fully served by three/r3f, and
-  adding GSAP/anime would create competing owners on the same scroll/micro-motion properties that
-  Framer already handles. Per the blueprint's "do not add a package unless there is a real
-  production responsibility," they were omitted.
+- `motion/react` owns React/DOM choreography; GSAP ScrollTrigger and Anime.js each retain their
+  separately documented, isolated surfaces, and Three/R3F owns only its Canvas scenes. The
+  editorial feature adds no competing runtime. StringTune was evaluated but not installed because
+  its shared scroll/runtime layer is unnecessary for the existing Motion-based reveal and gallery.
 
 > **Currency note.** The sentence above describes the *spatial layer*, and it still holds there.
 > Repo-wide it is now out of date: `motion/react` is the DOM choreography engine (44 files),

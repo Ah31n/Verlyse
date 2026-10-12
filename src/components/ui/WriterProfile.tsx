@@ -170,7 +170,7 @@ export default function WriterProfile({ author }: { author: Author }) {
                     <p className="mt-1 font-mono text-[9px] uppercase tracking-[0.30em] text-white/60">
                       {isCoCredit
                         ? `Co-credited · ${a.date.split('-').reverse().join('.')}`
-                        : a.likes > 0
+                        : a.likes != null && a.likes > 0
                           ? `${a.date.split('-').reverse().join('.')} · ${a.likes} appreciations`
                           : `${a.date.split('-').reverse().join('.')} · appreciations not tallied in the ledger`}
                     </p>
