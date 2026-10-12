@@ -437,7 +437,16 @@ export default function ArticleDetail() {
                 <figure className="relative w-full max-w-[300px]">
                   <div aria-hidden="true" className="absolute -inset-3 translate-x-3 translate-y-3 border border-gold/35" />
                   <div className="img-frame relative overflow-hidden border border-gold/25">
-                    <img src={article.cover} alt={coverAlt(article)} className="aspect-[4/5] w-full object-cover" loading="lazy" decoding="async" onError={(e) => handleImgError(e, article.title, folio)} />
+                    <img
+                      src={article.cover}
+                      alt={article.slideDescriptions?.[0]?.alt ?? coverAlt(article)}
+                      width={article.slideDescriptions?.[0]?.width}
+                      height={article.slideDescriptions?.[0]?.height}
+                      className={article.slideDescriptions?.[0]?.width ? 'w-full object-contain' : 'aspect-[4/5] w-full object-cover'}
+                      loading="lazy"
+                      decoding="async"
+                      onError={(e) => handleImgError(e, article.title, folio)}
+                    />
                     <span aria-hidden="true" className="absolute inset-2 border border-gold/40" />
                   </div>
                   <figcaption className="mt-3 flex items-center justify-between font-mono text-[9px] uppercase tracking-[0.30em] text-white/50">

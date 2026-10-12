@@ -16,6 +16,8 @@ const expected = {
     '/img/works/Dae6nNME5bg-1.webp', '/img/works/Dbf7jnBk3ho-1.webp', '/img/works/Daw-mnAE_qe-1.webp',
     '/img/works/DbaNAZTk5X9-1.webp', '/img/works/DaSLuZek5Uj-1.webp', '/img/works/DaU7EU2E46N-1.webp',
     '/img/works/DciqQXTCilh-1.webp',
+    '/img/works/DeUZFPTCjPU-1.webp', '/img/works/DeUZFPTCjPU-2.webp', '/img/works/DeUZFPTCjPU-3.webp',
+    '/img/works/DeUZFPTCjPU-4.webp', '/img/works/DeUZFPTCjPU-5.webp',
   ],
   inner: ['/img/inner/afghanistan-photo.webp', '/img/inner/balochistan-photo.webp', '/img/inner/kashmir-photo.webp', '/img/inner/khageena-dish.webp', '/img/inner/students-painting.webp', '/img/inner/tasbih-calligraphy.webp', '/img/inner/water-cat-art.webp'],
   signature: ['/img/signatures/tvm-hero.webp'],
@@ -55,13 +57,7 @@ async function run() {
   await page.goto(BASE + '/article/the-quiet-grief', { waitUntil: 'networkidle' })
   await page.waitForTimeout(2000)
 
-  const pendingSourceAssets = [
-    '/img/works/DeUZFPTCjPU-1.webp',
-    '/img/works/DeUZFPTCjPU-2.webp',
-    '/img/works/DeUZFPTCjPU-3.webp',
-    '/img/works/DeUZFPTCjPU-4.webp',
-    '/img/works/DeUZFPTCjPU-5.webp',
-  ]
+  const pendingSourceAssets = []
 
   fs.writeFileSync(
     path.join(OUT, 'asset-audit.json'),

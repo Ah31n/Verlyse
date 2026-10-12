@@ -63,7 +63,11 @@ export interface SlideDescription {
   plate: string
   subject: string
   note: string
+  alt?: string
   assetPath: string
+  sourceSlideShortCode?: string
+  width?: number
+  height?: number
   status: 'verified' | 'pending-source-binary'
 }
 
@@ -1278,37 +1282,57 @@ export const ARTICLES: Article[] = [
       {
         plate: '01',
         subject: 'Ballet shoes',
-        note: 'Warm oil-painting-style still life of satin ballet slippers resting in quiet light.',
+        note: 'Warm oil-painting-style still life of pink satin ballet slippers on an ochre ground.',
+        alt: 'A painted pair of pink ballet flats on an ochre ground; the pale banner reads “Once it was the thing i ran towards”.',
         assetPath: '/img/works/DeUZFPTCjPU-1.webp',
-        status: 'pending-source-binary',
+        sourceSlideShortCode: 'DeUZAdGKvqt',
+        width: 603,
+        height: 619,
+        status: 'verified',
       },
       {
         plate: '02',
         subject: 'A camera',
-        note: 'Warm oil-painting-style still life of a cherished camera set down between moments.',
+        note: 'Warm oil-painting-style portrait of hands raising a camera into a burst of golden light.',
+        alt: 'A painted figure holding a camera toward a bright light; the pale banner reads “Then, somewhere along the way, the joy became an obligation”.',
         assetPath: '/img/works/DeUZFPTCjPU-2.webp',
-        status: 'pending-source-binary',
+        sourceSlideShortCode: 'DeUZAc0K-DS',
+        width: 1080,
+        height: 1108,
+        status: 'verified',
       },
       {
         plate: '03',
         subject: 'Books',
-        note: 'Warm oil-painting-style still life of stacked volumes waiting to be opened again.',
+        note: 'Warm oil-painting-style still life of black eyeglasses resting atop three stacked volumes against sage.',
+        alt: 'Black eyeglasses rest on stacked books against a sage ground; the pale banner reads “Until the things i loved became, the things I no longer had time for”.',
         assetPath: '/img/works/DeUZFPTCjPU-3.webp',
-        status: 'pending-source-binary',
+        sourceSlideShortCode: 'DeUZAgrKhxG',
+        width: 1200,
+        height: 1231,
+        status: 'verified',
       },
       {
         plate: '04',
         subject: 'Vanity objects',
-        note: 'Warm oil-painting-style still life of personal vanity pieces arranged on a dressing surface.',
+        note: 'Warm oil-painting-style flat lay of perfume, cosmetics, brush, and gold jewelry on cream canvas.',
+        alt: 'Painted cosmetics, perfume and jewelry on a cream ground; the pale banner reads “And So, i became a stranger to the very thing that once made me feel alive”.',
         assetPath: '/img/works/DeUZFPTCjPU-4.webp',
-        status: 'pending-source-binary',
+        sourceSlideShortCode: 'DeUZAnkqU5G',
+        width: 1080,
+        height: 1108,
+        status: 'verified',
       },
       {
         plate: '05',
         subject: 'Pink technology (2000s)',
-        note: 'Warm oil-painting-style still life of early-2000s blush-pink personal technology.',
+        note: 'Warm oil-painting-style still life of early-2000s blush-pink personal technology — compact camera, flip phone, and music player.',
+        alt: 'Pink flip-phone, compact camera, and music player with earbuds; the pale banner reads “Nobody talks about grieving a version of youself that you had to leave behind”.',
         assetPath: '/img/works/DeUZFPTCjPU-5.webp',
-        status: 'pending-source-binary',
+        sourceSlideShortCode: 'DeUZArjqUA8',
+        width: 585,
+        height: 600,
+        status: 'verified',
       },
     ],
     description: 'A five-plate visual feature from Verlyse Media on remembered passions — ballet shoes, a camera, books, vanity objects, and early-2000s pink technology.',

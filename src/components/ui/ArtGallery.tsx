@@ -102,18 +102,25 @@ export default function ArtGallery({ article }: { article: Article }) {
                   {...spotlitGlide('restrained')}
                   className="st-spotlit relative block w-full overflow-hidden border border-gold/30 bg-wine-deep/60 p-3 text-left transition-all duration-700 hover:border-gold hover:shadow-[0_24px_70px_-20px_rgba(0,0,0,0.8)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-gold"
                 >
-                  <div className="img-frame aspect-[4/5] overflow-hidden bg-charcoal">
+                  <div
+                    className={`img-frame overflow-hidden bg-charcoal ${desc?.width && desc?.height ? '' : 'aspect-[4/5]'}`}
+                    style={desc?.width && desc?.height ? { aspectRatio: `${desc.width} / ${desc.height}` } : undefined}
+                  >
                     <img
                       src={src}
                       alt={
-                        desc
-                          ? `${article.title} — Plate ${plateNum}: ${desc.subject}`
-                          : `${article.title} — plate ${i + 1} of ${slides.length}`
+                        desc?.alt
+                          ? desc.alt
+                          : desc
+                            ? `${article.title} — Plate ${plateNum}: ${desc.subject}`
+                            : `${article.title} — plate ${i + 1} of ${slides.length}`
                       }
+                      width={desc?.width}
+                      height={desc?.height}
                       loading="lazy"
                       decoding="async"
                       onError={(e) => handleImgError(e, `${article.title} — Plate ${plateNum}`, `${folio} · ${plateNum}`)}
-                      className="h-full w-full object-cover transition-transform duration-[1400ms] ease-out group-hover:scale-[1.03]"
+                      className={`h-full w-full ${desc?.width && desc?.height ? 'object-contain' : 'object-cover'} transition-transform duration-[1400ms] ease-out group-hover:scale-[1.02]`}
                     />
                   </div>
                 </button>
@@ -208,10 +215,14 @@ export default function ArtGallery({ article }: { article: Article }) {
               <img
                 src={slides[open]}
                 alt={
-                  activeDesc
-                    ? `${article.title} — Plate ${activeDesc.plate}: ${activeDesc.subject}`
-                    : `${article.title} — plate ${open + 1}`
+                  activeDesc?.alt
+                    ? activeDesc.alt
+                    : activeDesc
+                      ? `${article.title} — Plate ${activeDesc.plate}: ${activeDesc.subject}`
+                      : `${article.title} — plate ${open + 1}`
                 }
+                width={activeDesc?.width}
+                height={activeDesc?.height}
                 decoding="async"
                 onError={(e) =>
                   handleImgError(e, `${article.title} — Plate ${String(open + 1).padStart(2, '0')}`, folio)

@@ -41,19 +41,19 @@ The colours never faded. We just stopped reaching for them.
 - **Likes (`likesCount: -1`):** The source dataset reported `likesCount: -1` (unknown/unavailable). In `src/data/content.ts`, `likes` is set to `0` (so `LEDGER.appreciations` remains `1,281` and never subtracts `1`) and `likesCountRaw: -1` records the raw scraper sentinel. Because `ArticleDetail.tsx` guards appreciation display with `article.likes > 0`, neither `-1` nor `0` is ever displayed as a count.
 - **Comments (`commentsCount: 5`):** The external scraper file `dataset_instagram-scraper_2026-10-12_09-04-14-145.json` was not attached to the sandbox filesystem (`/home/user/Verlyse` or `/home/user/uploads`), and direct Instagram requests from the sandbox return HTTP 403. In accordance with Section 04 (*never fabricate comment records; do not import scraped comment usernames or avatar URLs into the public UI*), `voices` is `[]` and `comments` is `0`.
 
-### 1.4 Five-Slide Asset Architecture & Pending Binary Disclosure
-The post is a 5-slide carousel of warm oil-painting-style still lifes with embedded serif typography:
+### 1.4 Five-Slide Self-Hosted Original Artwork Mapping
+All five original paintings from `DeUZFPTCjPU` are self-hosted in `public/img/works/` at their verified intrinsic dimensions (`1,229,906` bytes total), without cropping, recoloring, or duplicating their hand-lettered banners as visible HTML text:
 
-| Plate | Subject | Canonical Asset Path | Current Status |
-|---|---|---|---|
-| `01 / 05` | Ballet shoes | `/img/works/DeUZFPTCjPU-1.webp` | `pending-source-binary` (guarded by `PENDING_SOURCE_ASSETS` in `src/lib/imgFallback.ts`) |
-| `02 / 05` | A camera | `/img/works/DeUZFPTCjPU-2.webp` | `pending-source-binary` (guarded by `PENDING_SOURCE_ASSETS` in `src/lib/imgFallback.ts`) |
-| `03 / 05` | Books | `/img/works/DeUZFPTCjPU-3.webp` | `pending-source-binary` (guarded by `PENDING_SOURCE_ASSETS` in `src/lib/imgFallback.ts`) |
-| `04 / 05` | Vanity objects | `/img/works/DeUZFPTCjPU-4.webp` | `pending-source-binary` (guarded by `PENDING_SOURCE_ASSETS` in `src/lib/imgFallback.ts`) |
-| `05 / 05` | Pink technology (2000s) | `/img/works/DeUZFPTCjPU-5.webp` | `pending-source-binary` (guarded by `PENDING_SOURCE_ASSETS` in `src/lib/imgFallback.ts`) |
+| Plate | Child Shortcode | Subject | Canonical Asset Path | Dimensions | Bytes | Status |
+|---|---|---|---|---|---|---|
+| `01 / 05` | `DeUZAdGKvqt` | Ballet shoes | `/img/works/DeUZFPTCjPU-1.webp` | `603 × 619` | `86,416` | `verified` |
+| `02 / 05` | `DeUZAc0K-DS` | A camera | `/img/works/DeUZFPTCjPU-2.webp` | `1080 × 1108` | `221,156` | `verified` |
+| `03 / 05` | `DeUZAgrKhxG` | Books | `/img/works/DeUZFPTCjPU-3.webp` | `1200 × 1231` | `422,726` | `verified` |
+| `04 / 05` | `DeUZAnkqU5G` | Vanity objects | `/img/works/DeUZFPTCjPU-4.webp` | `1080 × 1108` | `370,472` | `verified` |
+| `05 / 05` | `DeUZArjqUA8` | Pink technology (2000s) | `/img/works/DeUZFPTCjPU-5.webp` | `585 × 600` | `129,136` | `verified` |
 
-- **No fabricated or AI-generated imagery:** While the five binary `.webp` files from `dataset_instagram-scraper_2026-10-12_09-04-14-145.json` are pending attachment, `plateSrc(path, title, folioNo, subtitle)` in `src/lib/imgFallback.ts` resolves each path in `PENDING_SOURCE_ASSETS` to Verlyse's typographic wine-and-brass archival SVG plate (`plateFallback`).
-- **Drop-in binary activation:** As soon as the five original images are exported to `public/img/works/DeUZFPTCjPU-1.webp`..`-5.webp` and removed from `PENDING_SOURCE_ASSETS`, `plateSrc` returns the `.webp` paths directly across all surfaces (`/`, `/articles`, `/article/the-quiet-grief`, `/categories/art`, `/creator/verlyse-media`, `/community`, and `/room`) without any component edits.
+- **Zero cropping of embedded lettering:** Both `ArticleDetail.tsx` (`heroMode === 'gallery'`) and `ArtGallery.tsx` preserve each slide's native near-square aspect ratio (`object-contain` + intrinsic `width`/`height`) so the painted canvas and embedded banner text are never cropped.
+- **Screen-reader fidelity without visible duplication:** The embedded banner text on each painting is provided in the `alt` attribute (`SlideDescription.alt`) for assistive technology while never being rendered as visible HTML text over or beneath the paintings.
 
 ### 1.5 Reclassifying the Editorial Format Later
 `Article` in `src/data/content.ts` carries optional fields:
@@ -108,5 +108,5 @@ To reclassify “The Quiet Grief” from a provisional carousel-led feature in `
 6. `npm run check:secrets` (`node scripts/check-secrets.mjs`)
    - **Result:** Passed (`Security check passed: no sensitive filenames or obvious secret patterns found`).
 
-### 3.2 Remaining External Dependency
-- `dataset_instagram-scraper_2026-10-12_09-04-14-145.json` and the five original binary slide images (`/img/works/DeUZFPTCjPU-1.webp`..`-5.webp`) were not present in the sandbox workspace and Instagram blocked direct scraping (`HTTP 403`). Once those five `.webp` binaries are placed in `public/img/works/` and removed from `PENDING_SOURCE_ASSETS` in `src/lib/imgFallback.ts`, the original paintings will render automatically across all surfaces.
+### 3.2 External Asset Resolution
+- All five original binary slide images (`/img/works/DeUZFPTCjPU-1.webp`..`-5.webp`, `1,229,906` bytes total) are self-hosted in `public/img/works/` and verified HTTP 200 (`45/45` static assets resolved, `0` missing).

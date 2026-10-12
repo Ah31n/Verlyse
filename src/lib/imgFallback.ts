@@ -10,17 +10,11 @@ const esc = (s: string) =>
 
 /**
  * Canonical asset paths for verified editorial entries whose original binary
- * image files are awaiting external dataset attachment (`DeUZFPTCjPU`).
- * While listed here, `plateSrc` serves the typographic archival plate rather
- * than issuing a failing network request or substituting generated imagery.
+ * image files are awaiting external dataset attachment.
+ * All five original WebP slides for `DeUZFPTCjPU` ("The Quiet Grief") are now
+ * self-hosted under `public/img/works/DeUZFPTCjPU-1.webp`..`-5.webp`.
  */
-export const PENDING_SOURCE_ASSETS: ReadonlySet<string> = new Set([
-  '/img/works/DeUZFPTCjPU-1.webp',
-  '/img/works/DeUZFPTCjPU-2.webp',
-  '/img/works/DeUZFPTCjPU-3.webp',
-  '/img/works/DeUZFPTCjPU-4.webp',
-  '/img/works/DeUZFPTCjPU-5.webp',
-])
+export const PENDING_SOURCE_ASSETS: ReadonlySet<string> = new Set([])
 
 export function isPendingSourceAsset(path: string): boolean {
   return PENDING_SOURCE_ASSETS.has(path)
