@@ -11,6 +11,8 @@
    of its feature (About Us card, writer's note, or unique ending).
    ========================================================================== */
 
+import { plateSrc } from '../lib/imgFallback'
+
 export interface Author {
   id: string
   name: string
@@ -57,6 +59,18 @@ export interface WorkFigure {
   caption: string
 }
 
+export interface SlideDescription {
+  plate: string
+  subject: string
+  note: string
+  alt?: string
+  assetPath: string
+  sourceSlideShortCode?: string
+  width?: number
+  height?: number
+  status: 'verified' | 'pending-source-binary'
+}
+
 export interface Article {
   id: string
   title: string
@@ -77,8 +91,22 @@ export interface Article {
   description?: string
   body: string[]
   likes: number
+  /** raw scraper likesCount when negative/unavailable (e.g. -1), preserved for provenance */
+  likesCountRaw?: number
   comments: number
   shortCode: string
+  /** canonical Instagram post URL when verified */
+  sourceUrl?: string
+  /** verbatim unmodified source caption, including original hashtag tokens */
+  sourceCaption?: string
+  /** normalized hashtag list stored separately from the verbatim caption */
+  normalizedHashtags?: string[]
+  /** flexible editorial format classification */
+  editorialFormat?: 'article' | 'visual-essay' | 'gallery-feature' | 'poetry-entry' | 'carousel-feature'
+  /** explicit publication status for newly ingested or provisional entries */
+  publicationStatus?: 'published' | 'provisional'
+  /** per-plate subject descriptions and binary asset status for carousel works */
+  slideDescriptions?: SlideDescription[]
   voices: Voice[]
   /** the closing of the post — the final slide, designed and in motion */
   closing?: Closing
@@ -286,13 +314,14 @@ export const AUTHORS: Author[] = [
     name: 'Verlyse Media',
     handle: '@verlyse.media',
     role: 'The platform',
-    bio: 'The masthead behind the magazine — posts the platform’s own dispatches, including “Mir Raza Ali,” a memorial and a demand for justice (presented 27 August 2026).',
+    bio: 'The masthead behind the magazine — posts the platform’s own dispatches and visual features, including “Mir Raza Ali,” a memorial and a demand for justice (presented 27 August 2026), and “The Quiet Grief,” a five-plate visual reflection on remembered passions (presented 10 October 2026).',
     confirmed: true,
+    favoriteQuote: 'The colours never faded. We just stopped reaching for them.',
   },
 ]
 
 /* ------------------------------------------------------------------ */
-/* ARTICLES — the full feed, 19 folios                                  */
+/* ARTICLES — the full feed, 20 folios                                  */
 /* ------------------------------------------------------------------ */
 export const ARTICLES: Article[] = [
   {
@@ -1165,6 +1194,7 @@ export const ARTICLES: Article[] = [
       'A LIFE WAS LOST. A FAMILY WAS LEFT WITH QUESTIONS. AND A COUNTRY IS WATCHING. Mir Raza’s story should not become another trending topic that disappears in a week. His family has continued demanding a transparent investigation, while questions surrounding the handling of the case have led to further legal scrutiny. We don’t need to know every answer to demand the most basic one: WHO IS RESPONSIBLE AND WILL JUSTICE BE served? If we call ourselves a nation that values its young people, then their lives cannot become statistics. If we celebrate Pakistani entrepreneurs, then we must also demand a Pakistan where they can live, build and dream safely. Don’t let Mir Raza’s name fade. Speak. Share. Ask questions. Demand a fair investigation. #JusticeForMirRazaAli',
     ],
     likes: 0, /* the source reported this post’s likes as unavailable (scraper value −1); not asserted elsewhere */
+    likesCountRaw: -1,
     comments: 9,
     shortCode: 'DciqQXTCilh',
     world: 'newsprint',
@@ -1190,20 +1220,177 @@ export const ARTICLES: Article[] = [
       { handle: "lilpicklejuiceee", text: "There is no justice in Pakistan", post: "DciqQXTCilh" },
     ],
   },
+  {
+    id: 'the-quiet-grief',
+    title: 'The Quiet Grief',
+    authorId: 'verlyse-media',
+    category: 'Art',
+    excerpt: 'Somewhere along the way, we stopped reaching for the things that once made us feel alive.',
+    readingTime: '5 plates',
+    date: '2026-10-10',
+    cover: plateSrc(
+      '/img/works/DeUZFPTCjPU-1.webp',
+      'The Quiet Grief — Plate 01 · Ballet shoes',
+      '20 · 01',
+      'PLATE 01 / 05 · BALLET SHOES',
+    ),
+    slides: [
+      plateSrc(
+        '/img/works/DeUZFPTCjPU-1.webp',
+        'The Quiet Grief — Plate 01 · Ballet shoes',
+        '20 · 01',
+        'PLATE 01 / 05 · BALLET SHOES',
+      ),
+      plateSrc(
+        '/img/works/DeUZFPTCjPU-2.webp',
+        'The Quiet Grief — Plate 02 · A camera',
+        '20 · 02',
+        'PLATE 02 / 05 · A CAMERA',
+      ),
+      plateSrc(
+        '/img/works/DeUZFPTCjPU-3.webp',
+        'The Quiet Grief — Plate 03 · Books',
+        '20 · 03',
+        'PLATE 03 / 05 · BOOKS',
+      ),
+      plateSrc(
+        '/img/works/DeUZFPTCjPU-4.webp',
+        'The Quiet Grief — Plate 04 · Vanity objects',
+        '20 · 04',
+        'PLATE 04 / 05 · VANITY OBJECTS',
+      ),
+      plateSrc(
+        '/img/works/DeUZFPTCjPU-5.webp',
+        'The Quiet Grief — Plate 05 · Pink technology (2000s)',
+        '20 · 05',
+        'PLATE 05 / 05 · PINK TECHNOLOGY (2000S)',
+      ),
+    ],
+    tags: ['Art', 'TheQuietGrief', 'LostPassions', 'ArtAndWords', 'CreativeExpression'],
+    normalizedHashtags: ['#verlysemedia', '#TheQuietGrief', '#LostPassions', '#ArtAndWords', '#CreativeExpression'],
+    sourceUrl: 'https://www.instagram.com/p/DeUZFPTCjPU/',
+    sourceCaption: [
+      'Somewhere along the way, we stopped reaching for the things that once made us feel alive.',
+      'Not because we stopped loving them, but because life got louder, time grew scarce, and the dreams we once held so close slowly became memories we revisited instead of realities we lived.',
+      'Perhaps the saddest part of growing up is watching a passion become a stranger to us.',
+      'The colours never faded. We just stopped reaching for them.',
+      '— Verlyse Media',
+      '#verlysemedia #TheQuietGrief #LostPassions #ArtAndWords CreativeExpression',
+    ].join('\n\n'),
+    editorialFormat: 'carousel-feature',
+    publicationStatus: 'provisional',
+    slideDescriptions: [
+      {
+        plate: '01',
+        subject: 'Ballet shoes',
+        note: 'Warm oil-painting-style still life of pink satin ballet slippers on an ochre ground.',
+        alt: 'A painted pair of pink ballet flats on an ochre ground; the pale banner reads “Once it was the thing i ran towards”.',
+        assetPath: '/img/works/DeUZFPTCjPU-1.webp',
+        sourceSlideShortCode: 'DeUZAdGKvqt',
+        width: 603,
+        height: 619,
+        status: 'verified',
+      },
+      {
+        plate: '02',
+        subject: 'A camera',
+        note: 'Warm oil-painting-style portrait of hands raising a camera into a burst of golden light.',
+        alt: 'A painted figure holding a camera toward a bright light; the pale banner reads “Then, somewhere along the way, the joy became an obligation”.',
+        assetPath: '/img/works/DeUZFPTCjPU-2.webp',
+        sourceSlideShortCode: 'DeUZAc0K-DS',
+        width: 1080,
+        height: 1108,
+        status: 'verified',
+      },
+      {
+        plate: '03',
+        subject: 'Books',
+        note: 'Warm oil-painting-style still life of black eyeglasses resting atop three stacked volumes against sage.',
+        alt: 'Black eyeglasses rest on stacked books against a sage ground; the pale banner reads “Until the things i loved became, the things I no longer had time for”.',
+        assetPath: '/img/works/DeUZFPTCjPU-3.webp',
+        sourceSlideShortCode: 'DeUZAgrKhxG',
+        width: 1200,
+        height: 1231,
+        status: 'verified',
+      },
+      {
+        plate: '04',
+        subject: 'Vanity objects',
+        note: 'Warm oil-painting-style flat lay of perfume, cosmetics, brush, and gold jewelry on cream canvas.',
+        alt: 'Painted cosmetics, perfume and jewelry on a cream ground; the pale banner reads “And So, i became a stranger to the very thing that once made me feel alive”.',
+        assetPath: '/img/works/DeUZFPTCjPU-4.webp',
+        sourceSlideShortCode: 'DeUZAnkqU5G',
+        width: 1080,
+        height: 1108,
+        status: 'verified',
+      },
+      {
+        plate: '05',
+        subject: 'Pink technology (2000s)',
+        note: 'Warm oil-painting-style still life of early-2000s blush-pink personal technology — compact camera, flip phone, and music player.',
+        alt: 'Pink flip-phone, compact camera, and music player with earbuds; the pale banner reads “Nobody talks about grieving a version of youself that you had to leave behind”.',
+        assetPath: '/img/works/DeUZFPTCjPU-5.webp',
+        sourceSlideShortCode: 'DeUZArjqUA8',
+        width: 585,
+        height: 600,
+        status: 'verified',
+      },
+    ],
+    description: 'A five-plate visual feature from Verlyse Media on remembered passions — ballet shoes, a camera, books, vanity objects, and early-2000s pink technology.',
+    body: [
+      'Somewhere along the way, we stopped reaching for the things that once made us feel alive.',
+      'Not because we stopped loving them, but because life got louder, time grew scarce, and the dreams we once held so close slowly became memories we revisited instead of realities we lived.',
+      'Perhaps the saddest part of growing up is watching a passion become a stranger to us.',
+      'The colours never faded. We just stopped reaching for them.',
+    ],
+    likes: 0, /* source dataset reported likesCount: -1 (unknown/unavailable); never displayed as a real count */
+    likesCountRaw: -1,
+    comments: 0,
+    shortCode: 'DeUZFPTCjPU',
+    motif: 'reach',
+    world: 'gallery',
+    heroMode: 'gallery',
+    gallery: true,
+    vibe: 'warm',
+    reflection: 'The colours never faded. We just stopped reaching for them.',
+    closing: {
+      kind: 'artwork',
+      kicker: 'From the source caption',
+      title: 'The colours never faded',
+      paragraphs: [
+        'Somewhere along the way, we stopped reaching for the things that once made us feel alive.',
+        'Not because we stopped loving them, but because life got louder, time grew scarce, and the dreams we once held so close slowly became memories we revisited instead of realities we lived.',
+        'Perhaps the saddest part of growing up is watching a passion become a stranger to us.',
+        'The colours never faded. We just stopped reaching for them.',
+      ],
+      signoff: '— Verlyse Media',
+    },
+    voices: [],
+  },
 ]
 
 /* ------------------------------------------------------------------ */
 /* CATEGORIES — from the captions and hashtags                          */
+/*                                                                      */
+/* The seven wings are editorial facts; their counts are not. A count   */
+/* typed by hand is a number that can disagree with the shelf, so each  */
+/* wing derives its own from ARTICLES. Add a folio and the wing, the    */
+/* ledger and the category page all move together.                      */
 /* ------------------------------------------------------------------ */
-export const CATEGORIES: Category[] = [
-  { slug: 'stories', name: 'Stories', blurb: 'Stories told in the writer’s own voice — from ballrooms to 3:13 in the morning.', count: 1, accent: '#C9A85C', motif: '❦' },
-  { slug: 'poetry', name: 'Poetry', blurb: 'Poems and prose poems — hope, grief, forgiveness, jaldi, and the fragile line between love and idealization.', count: 7, accent: '#9FA9BC', motif: '✧' },
-  { slug: 'essays', name: 'Essays', blurb: 'First arguments with the world — the arts, the humanities, and the quiet cost of technology.', count: 2, accent: '#B8785A', motif: '¶' },
-  { slug: 'art', name: 'Art', blurb: 'Paintings, calligraphy and illustration — creativity that needs no AI to be beautiful.', count: 3, accent: '#7E9E8B', motif: '◈' },
-  { slug: 'social-issues', name: 'Social Issues', blurb: 'Thought-provoking pieces on the topics that matter — child protection, women’s rights, human rights, and dignity.', count: 4, accent: '#C06A7D', motif: '✱' },
-  { slug: 'lifestyle', name: 'Lifestyle', blurb: 'The everyday, made shareable — a student’s 10-minute Khageena.', count: 1, accent: '#C49A6C', motif: '◍' },
-  { slug: 'horror', name: 'Horror', blurb: 'Psychological, modern, and told from inside a ringing phone.', count: 1, accent: '#6E4153', motif: '✕' },
+const _CATEGORY_DEFS: Omit<Category, 'count'>[] = [
+  { slug: 'stories', name: 'Stories', blurb: 'Stories told in the writer’s own voice — from ballrooms to 3:13 in the morning.', accent: '#C9A85C', motif: '❦' },
+  { slug: 'poetry', name: 'Poetry', blurb: 'Poems and prose poems — hope, grief, forgiveness, jaldi, and the fragile line between love and idealization.', accent: '#9FA9BC', motif: '✧' },
+  { slug: 'essays', name: 'Essays', blurb: 'First arguments with the world — the arts, the humanities, and the quiet cost of technology.', accent: '#B8785A', motif: '¶' },
+  { slug: 'art', name: 'Art', blurb: 'Paintings, calligraphy and illustration — creativity that needs no AI to be beautiful.', accent: '#7E9E8B', motif: '◈' },
+  { slug: 'social-issues', name: 'Social Issues', blurb: 'Thought-provoking pieces on the topics that matter — child protection, women’s rights, human rights, and dignity.', accent: '#C06A7D', motif: '✱' },
+  { slug: 'lifestyle', name: 'Lifestyle', blurb: 'The everyday, made shareable — a student’s 10-minute Khageena.', accent: '#C49A6C', motif: '◍' },
+  { slug: 'horror', name: 'Horror', blurb: 'Psychological, modern, and told from inside a ringing phone.', accent: '#6E4153', motif: '✕' },
 ]
+
+export const CATEGORIES: Category[] = _CATEGORY_DEFS.map((wing) => ({
+  ...wing,
+  count: ARTICLES.filter((a) => a.category === wing.name).length,
+}))
 
 /* ------------------------------------------------------------------ */
 /* THE LEDGER — every published total on the site, derived from the    */
@@ -1218,7 +1405,12 @@ const _creatorCount = _primaryAuthorIds.size
 /* human writers only — the masthead is the platform, not a guest writer */
 const _humanCreators = ARTICLES.map((a) => a.authorId).filter((id) => id !== 'verlyse-media')
 const _humanCreatorCount = new Set(_humanCreators).size
-const _appreciations = ARTICLES.reduce((s, a) => s + a.likes, 0)
+/** True when the source dataset recorded a verified non-negative appreciation count (never when likesCountRaw === -1). */
+export function hasKnownLikes(a: Pick<Article, 'likes' | 'likesCountRaw'>): boolean {
+  return a.likesCountRaw !== -1 && a.likes > 0
+}
+
+const _appreciations = ARTICLES.reduce((s, a) => s + (hasKnownLikes(a) ? a.likes : 0), 0)
 /* Canonical UI vocabulary: the 585 metric is “conversations” everywhere —
    the comments beneath the features, all of them read. `Article.comments`
    stays the name of the underlying data field. */
@@ -1274,22 +1466,27 @@ export function isEditorsPick(id: string): boolean {
 /** A single ordered view of the feed for a sort key — honest rankings, all
     four are computed from the registry's recorded archive data (dates, the
     feed's like counts, its comment counts) or from the desk's own picks. */
-export type SortKey = 'latest' | 'most-read' | 'most-appreciated' | 'editors-picks'
+/* 'most-discussed' was named 'most-read' internally while the UI
+   correctly said "Most discussed". The desk keeps no read analytics, so
+   the code no longer claims any either. Articles.tsx still accepts the old
+   value in ?order= so existing shared links keep working. */
+export type SortKey = 'latest' | 'most-discussed' | 'most-appreciated' | 'editors-picks'
 export const SORTS: { key: SortKey; label: string; note: string }[] = [
   { key: 'latest', label: 'Latest', note: 'Newest folio first — the registry by date of publication.' },
-  { key: 'most-read', label: 'Most discussed', note: 'Ranked by the conversations each feature drew beneath it — the desk keeps no read-count analytics.' },
+  { key: 'most-discussed', label: 'Most discussed', note: 'Ranked by the conversations each feature drew beneath it — the desk keeps no read-count analytics.' },
   { key: 'most-appreciated', label: 'Most appreciated', note: 'Ranked by the appreciations the feed recorded.' },
   { key: 'editors-picks', label: 'Editor’s picks', note: 'Five folios the desk keeps recommending — chosen, not counted.' },
 ]
 export function sortArticles(key: SortKey): Article[] {
   const list = [...ARTICLES]
+  const rankLikes = (a: Article) => (hasKnownLikes(a) ? a.likes : -1)
   switch (key) {
     case 'latest':
-      return list.sort((a, b) => b.date.localeCompare(a.date) || b.likes - a.likes)
-    case 'most-read':
-      return list.sort((a, b) => b.comments - a.comments || b.likes - a.likes)
+      return list.sort((a, b) => b.date.localeCompare(a.date) || rankLikes(b) - rankLikes(a))
+    case 'most-discussed':
+      return list.sort((a, b) => b.comments - a.comments || rankLikes(b) - rankLikes(a))
     case 'most-appreciated':
-      return list.sort((a, b) => b.likes - a.likes || b.comments - a.comments)
+      return list.sort((a, b) => rankLikes(b) - rankLikes(a) || b.comments - a.comments || b.date.localeCompare(a.date))
     case 'editors-picks': {
       const picks = new Set(EDITORS_PICKS)
       return list
@@ -1306,7 +1503,9 @@ export const COMMUNITY_STATS: { value: string; label: string; note: string }[] =
   { value: String(LEDGER.features), label: 'Features presented', note: 'Every post on the feed — from the founder’s call for women’s rights to the Mir Raza Ali memorial.' },
   { value: LEDGER.appreciations.toLocaleString('en-US'), label: 'Appreciations', note: 'Total likes across the feed — each of them an answer to a writer.' },
   { value: String(LEDGER.conversations), label: 'Conversations', note: 'Conversations beneath the features — all of them read.' },
-  { value: String(LEDGER.creators), label: 'Creators credited', note: 'Fourteen named writers plus the masthead’s own dispatch — every feature credited.' },
+  /* The count is derived, so the sentence describing it must be too — a
+     spelled-out "Fourteen" would quietly go wrong the day a writer is added. */
+  { value: String(LEDGER.creators), label: 'Creators credited', note: `${LEDGER.humanCreators} named writers plus the masthead’s own dispatch — every feature credited.` },
 ]
 
 export const COMMUNITY_VOICES: Voice[] = [
@@ -1363,6 +1562,39 @@ export const BRAND = {
   },
   disclosure:
     'When a post is created with design tools, the caption says so — as the platform replied to a commenter: “microsoft designer is used to create this post.” The writing remains the writer’s.',
+  hiringForm:
+    'https://docs.google.com/forms/d/e/1FAIpQLScbXxbyw22YM4Mlid81RoyckzgwvpBC9h8siWff3hMp6tcBwg/viewform?usp=publish-editor',
+  hiring: {
+    kicker: 'VERLYSE MEDIA / OPEN CALL 2026',
+    concept: 'The Next Byline',
+    headline: 'The next voice could be yours.',
+    subcopy:
+      'We’re inviting curious minds, thoughtful researchers, and creative storytellers to help shape what Verlyse publishes next.',
+    experienceNote:
+      'Previous experience isn’t essential. Curiosity, creativity, and a willingness to learn matter.',
+    ctaLabel: 'Explore the roles & apply ↗',
+    rolesMicrocopy: 'Researcher · Palette Designer · Content Writer',
+    roles: [
+      {
+        title: 'Researcher',
+        focus: 'Investigation & Source Evaluation',
+        summary:
+          'Reliable information gathering, topic exploration, and organized research — distinguishing credible sources from misinformation to support editorial features.',
+      },
+      {
+        title: 'Palette Designer',
+        focus: 'Color & Visual Direction',
+        summary:
+          'Color palettes, visual moods, and color theory — translating each topic’s atmosphere into consistent visual direction and editorial storytelling.',
+      },
+      {
+        title: 'Content Writer',
+        focus: 'Editorial Storytelling',
+        summary:
+          'Engaging, original, well-researched articles, opinion pieces, reviews, and captions — adapting writing style with clarity and creative voice.',
+      },
+    ],
+  },
   team: [
     { role: 'Director of Operations', name: 'Ana Fatima', description: 'Oversees operations and helps keep Verlyse Media’s growing team and initiatives moving smoothly.' },
     { role: 'Strategy Director', name: 'Hooria Maqsood', description: 'Guides strategic decisions and helps shape the long-term direction of Verlyse Media.' },
@@ -1370,10 +1602,8 @@ export const BRAND = {
     { role: 'Communication Director', name: 'Liba Adeel', description: 'Shapes Verlyse Media’s communication and helps keep its voice clear, consistent, and connected.' },
     { role: 'Editorial Director', name: 'Zainab Faisal Rao', description: 'Leads the editorial vision and helps develop the standards and direction of Verlyse Media’s written work.' },
     { role: 'Creative Director', name: 'Amna Rao', description: 'Shapes Verlyse Media’s creative vision and helps define the visual and artistic direction of its work.' },
-    { role: 'Associate Editor', name: 'Haiqa Nafees', handle: '@maddu__0', description: 'Supports the editorial team in refining, developing, and strengthening Verlyse Media’s written work.' },
     { role: 'Associate Creative Director', name: 'Zuha Farhan', handle: '@zvhxx__', description: 'Helps shape Verlyse Media’s creative direction and contributes to its visual storytelling.' },
     { role: 'Head of Brand Ambassador', name: 'Javeria Karim', description: 'Leads the Brand Ambassador program, guiding ambassadors and building meaningful engagement around Verlyse Media.' },
-    { role: 'Graphic Designer', name: 'Manha', description: 'Develops visual assets that support Verlyse Media’s identity, storytelling, and editorial presentation.' },
     { role: 'Technology & Digital Experience Lead', name: 'Ahsan Ashfaq', description: 'Leads the digital development of Verlyse Media, building and maintaining its website and shaping its online experience.' },
     { role: 'Head of Research Department', name: 'Zainab Khan', description: 'Leads the research department at Verlyse Media.' },
   ],
@@ -1419,14 +1649,33 @@ export function articleSearchText(a: Article): string {
     author?.handle ?? '',
     a.credit ?? '',
     a.tags.join(' '),
+    (a.normalizedHashtags ?? []).join(' '),
+    a.shortCode,
     a.excerpt,
     a.description ?? '',
+    a.sourceCaption ?? '',
+    ...(a.slideDescriptions?.map((s) => `${s.subject} ${s.note}`) ?? []),
   ].join(' ').toLowerCase()
 }
 export function searchArticles(query: string): Article[] {
   const q = query.trim().toLowerCase()
   if (!q) return []
   return ARTICLES.filter((a) => articleSearchText(a).includes(q))
+}
+
+/**
+ * Alt text for a feature's cover plate.
+ *
+ * On an Art folio the plate IS the published work — a painting, a
+ * calligraphy set, an illustration — so it must be described. Elsewhere the
+ * plate is a designed title card sitting directly beside the same title and
+ * byline in text, so an empty alt is correct and avoids making a screen
+ * reader hear the headline twice.
+ */
+export function coverAlt(a: Article): string {
+  if (a.category !== 'Art') return ''
+  const author = getAuthor(a.authorId)
+  return author ? `“${a.title}” — ${a.category.toLowerCase()} by ${author.name}` : `“${a.title}”`
 }
 
 export function getArticle(id: string): Article | undefined {
@@ -1443,13 +1692,44 @@ export function authorPhoto(id: string): string {
 export function getAuthor(id: string): Author | undefined {
   return AUTHORS.find((a) => a.id === id)
 }
+
+/**
+ * The contributor's own role, for titles, descriptions and structured data.
+ *
+ * The archive credits poets, painters, calligraphers, essayists, an artist,
+ * two editors and the platform itself. Calling all of them "Writer" — as the
+ * metadata previously did on all sixteen dossiers — is not a styling choice,
+ * it is a miscrediting. The role is real data; this reads it.
+ *
+ * Compound roles ("Writer · Associate Editor", "Founder · prose poet") are
+ * reduced to their first segment for a page title, where brevity matters;
+ * every other surface keeps the full role string.
+ */
+export function primaryRole(author: Author): string {
+  const first = author.role.split('·')[0]?.trim()
+  if (first && first.length) return first
+  const whole = author.role.trim()
+  /* The generic fallback is "Contributor". The archive holds poets,
+     painters, a calligrapher, an artist and the platform itself; none of
+     them is a "Writer" by default. */
+  return whole.length ? whole : 'Contributor'
+}
+
+/** Role phrased to sit inside a sentence: "— a poet on Verlyse Media." */
+export function roleInSentence(author: Author): string {
+  const role = primaryRole(author)
+  // "The platform" is a thing, not a person; it reads wrong with an article.
+  if (/^the\b/i.test(role)) return role.toLowerCase()
+  return `${/^[aeiou]/i.test(role) ? 'an' : 'a'} ${role.toLowerCase()}`
+}
 /** Folios where the author is the primary byline. */
 export function worksBy(authorId: string): Article[] {
   return ARTICLES.filter((a) => a.authorId === authorId)
 }
-/** Registry folio number of an article as a zero-padded string (01…19). */
+/** Registry folio number of an article as a zero-padded string (01…20). */
 export function folioNoOf(articleId: string): string {
-  return String(ARTICLES.findIndex((x) => x.id === articleId) + 1).padStart(2, '0')
+  const idx = ARTICLES.findIndex((x) => x.id === articleId)
+  return idx >= 0 ? String(idx + 1).padStart(2, '0') : ''
 }
 /** Folios that name the author in a secondary credit line (the poem
     written beside a painting). This is how a record with zero primary

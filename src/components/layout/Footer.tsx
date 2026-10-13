@@ -83,9 +83,24 @@ function Newsletter() {
             <p className={`font-mono text-[10px] uppercase tracking-[0.28em] ${status.kind === 'err' ? 'text-[#E8A2A2]' : 'text-[#A8C9A2]'}`}>
               {status.text}
             </p>
-            {status.kind !== 'err' && (
+            {status.kind !== 'err' ? (
               <p className="font-serif text-sm italic leading-snug text-ivory/70">
                 We&rsquo;ll send the next letter when there&rsquo;s something worth saying.
+              </p>
+            ) : (
+              /* The list lives behind a serverless function that the static
+                 primary host may not be able to reach. If the request fails
+                 for any reason, the desk is still reachable — never leave a
+                 reader believing they subscribed when they did not. */
+              <p className="font-serif text-sm italic leading-snug text-ivory/70">
+                You can also write to{' '}
+                <a
+                  href={`mailto:${BRAND.email}?subject=${encodeURIComponent('The Verlyse Letter')}&body=${encodeURIComponent('Please add this address to the letter list.')}`}
+                  className="border-b border-gold/50 text-gold no-underline transition-colors hover:text-ivory"
+                >
+                  {BRAND.email}
+                </a>{' '}
+                and the desk will add you by hand.
               </p>
             )}
           </div>

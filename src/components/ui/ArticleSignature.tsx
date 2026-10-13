@@ -682,6 +682,57 @@ function SceneMirRaza({ anim }: { anim: boolean }) {
   )
 }
 
+/* ================================================================== */
+/* 20 · THE QUIET GRIEF — five remembered still lifes on a quiet      */
+/* shelf: ballet slippers, a camera, stacked books, vanity pieces,    */
+/* and a small 2000s player. Above each, the warm colour remains.     */
+/* ================================================================== */
+function SceneQuietGrief({ anim }: { anim: boolean }) {
+  const { ref, show } = useShow(anim)
+  return (
+    <Stage label="the colours never faded">
+      <div ref={ref} className="flex flex-col items-center gap-8">
+        <svg viewBox="0 0 380 210" className="h-[clamp(180px,28vh,300px)] w-auto" aria-hidden="true">
+          {/* the shelf rule */}
+          <line x1="36" y1="158" x2="344" y2="158" stroke="rgba(184,145,70,0.45)" strokeWidth="1.2" />
+          {/* 1 · ballet shoes */}
+          <path d="M58 158 C58 140, 78 140, 78 158 Z" fill="none" stroke="rgba(248,246,242,0.55)" strokeWidth="1.3" />
+          <path d="M68 140 C64 126, 72 126, 68 116" fill="none" stroke="rgba(184,145,70,0.55)" strokeWidth="1.1" />
+          {/* 2 · camera */}
+          <rect x="116" y="132" width="36" height="26" rx="2" fill="none" stroke="rgba(248,246,242,0.55)" strokeWidth="1.3" />
+          <circle cx="134" cy="145" r="7" fill="none" stroke="rgba(184,145,70,0.65)" strokeWidth="1.2" />
+          {/* 3 · stacked books */}
+          <rect x="172" y="148" width="38" height="10" fill="none" stroke="rgba(248,246,242,0.55)" strokeWidth="1.3" />
+          <rect x="175" y="138" width="34" height="10" fill="none" stroke="rgba(248,246,242,0.5)" strokeWidth="1.2" />
+          <rect x="178" y="128" width="30" height="10" fill="none" stroke="rgba(184,145,70,0.55)" strokeWidth="1.2" />
+          {/* 4 · vanity object */}
+          <ellipse cx="248" cy="136" rx="11" ry="14" fill="none" stroke="rgba(248,246,242,0.55)" strokeWidth="1.3" />
+          <line x1="248" y1="150" x2="248" y2="158" stroke="rgba(184,145,70,0.55)" strokeWidth="1.3" />
+          {/* 5 · 2000s pocket tech */}
+          <rect x="292" y="126" width="24" height="32" rx="4" fill="none" stroke="rgba(248,246,242,0.55)" strokeWidth="1.3" />
+          <circle cx="304" cy="147" r="5" fill="none" stroke="rgba(184,145,70,0.6)" strokeWidth="1.1" />
+          {/* Five warm colour notes that never faded */}
+          {[68, 134, 191, 248, 304].map((x, i) => (
+            <motion.circle
+              key={x}
+              cx={x}
+              cy={88}
+              r="4"
+              fill="#D4B06A"
+              initial={anim ? { opacity: 0.25 } : false}
+              animate={show ? { opacity: 0.9 } : undefined}
+              transition={{ delay: 0.6 + i * 0.45, duration: 1.4, ease: 'easeOut' }}
+            />
+          ))}
+        </svg>
+        <p aria-hidden="true" className="max-w-[42ch] text-center font-serif text-lg font-light italic leading-[1.6] text-ivory/75">
+          “The colours never faded. We just stopped reaching for them.”
+        </p>
+      </div>
+    </Stage>
+  )
+}
+
 const SIGNATURES: Record<string, { name: string; ownFin?: boolean; scene: (anim: boolean) => ReactNode }> = {
   'their-voices-matter': { name: 'the voice', ownFin: true, scene: (anim) => <SceneVoices anim={anim} /> },
   '3-13': { name: 'the wait', scene: () => <SceneClock /> },
@@ -702,6 +753,7 @@ const SIGNATURES: Record<string, { name: string; ownFin?: boolean; scene: (anim:
   'my-last-breath': { name: 'the cycle', scene: () => <SceneCycle /> },
   'the-garden-beyond-my-tower': { name: 'she prays', scene: () => <SceneGarden /> },
   'mir-raza-ali': { name: 'the cart', scene: (anim) => <SceneMirRaza anim={anim} /> },
+  'the-quiet-grief': { name: 'the colours never faded', scene: (anim) => <SceneQuietGrief anim={anim} /> },
 }
 
 export default function ArticleSignature({ article }: { article: Article }) {

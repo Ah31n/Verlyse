@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { Link, useSearchParams } from 'react-router-dom'
+import { spotlitGlide } from '../lib/stringTune/attrs'
 import { motion } from 'motion/react'
 import { useSeo } from '../hooks/useSeo'
 import { getAuthor, ARTICLES, LEDGER, sortArticles, stampDate, isEditorsPick, folioNoOf, articleSearchText, SORTS, type SortKey } from '../data/content'
@@ -10,7 +11,15 @@ import { ImmersiveShell, BrassThread } from '../components/immersive'
 const ROOM_PARAM = 'room'
 const QUERY_PARAM = 'q'
 const ORDER_PARAM = 'order'
-const SORT_KEYS = new Set<SortKey | 'registry'>(['registry', 'latest', 'most-read', 'most-appreciated', 'editors-picks'])
+const SORT_KEYS = new Set<SortKey | 'registry'>(['registry', 'latest', 'most-discussed', 'most-appreciated', 'editors-picks'])
+/* Links shared before the key was renamed still carry ?order=most-read.
+   They must keep resolving to the same view. */
+const LEGACY_ORDER: Record<string, SortKey> = { 'most-read': 'most-discussed' }
+const normaliseOrder = (raw: string | null): SortKey | 'registry' => {
+  if (!raw) return 'registry'
+  const mapped = LEGACY_ORDER[raw] ?? raw
+  return SORT_KEYS.has(mapped as SortKey | 'registry') ? (mapped as SortKey | 'registry') : 'registry'
+}
 
 /** keyword match — the title, the writer (name AND handle), the department,
     secondary credits, tags, excerpt and description: the archive answers to
@@ -52,7 +61,7 @@ function Archive() {
      rest of the publication */
   const [searchParams, setSearchParams] = useSearchParams()
   const validCats = useMemo(() => ['All', ...new Set(ARTICLES.map((a) => a.category))], [])
-  const initialSort = (searchParams.get(ORDER_PARAM) ?? 'registry') as SortKey | 'registry'
+  const initialSort = normaliseOrder(searchParams.get(ORDER_PARAM))
   const [query, setQuery] = useState(searchParams.get(QUERY_PARAM) ?? '')
   const [cat, setCat] = useState(
     validCats.includes(searchParams.get(ROOM_PARAM) ?? '') ? (searchParams.get(ROOM_PARAM) as string) : 'All',
@@ -153,7 +162,7 @@ function Archive() {
   }
 
   const activeSortNote = sort === 'registry'
-    ? 'Registry order — as the archive files them, № 01 to № 19.'
+    ? `Registry order — as the archive files them, № 01 to № ${String(LEDGER.features).padStart(2, '0')}.`
     : SORTS.find((s) => s.key === sort)?.note ?? ''
 
   return (
@@ -334,7 +343,10 @@ function Archive() {
                     >
                       {/* the cover strip — the feature's own plate, cropped wide
                           so the shelf reads as filed photographs, not text rows */}
-                      <span className="plate-thumb block w-full">
+                      <span
+                        className="plate-thumb st-spotlit block w-full"
+                        {...spotlitGlide('restrained')}
+                      >
                         <img
                           src={a.thumbnail ?? a.cover}
                           alt=""
@@ -420,7 +432,7 @@ function Archive() {
                 Esc · return to the full shelf
               </button>
             )}
-            {cat === 'All' && !query && sort === 'registry' && <span className="text-white/40">State · rest — the shelf holds all {LEDGER.features}</span>}
+            {cat === 'All' && !query && sort === 'registry' && <span className="text-white/40">Issue № {LEDGER.issueNo} — all {LEDGER.features} folios in registry order</span>}
           </span>
         </div>
       </div>

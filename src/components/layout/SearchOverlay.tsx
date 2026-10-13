@@ -3,6 +3,7 @@ import { Link, useLocation, useNavigate } from 'react-router-dom'
 import { AnimatePresence, motion, useReducedMotion } from 'motion/react'
 import { ARTICLES, getAuthor, searchArticles } from '../../data/content'
 import { trapFocus } from '../../lib/focus'
+import { useBodyScrollLock } from '../../hooks/useBodyScrollLock'
 
 /** Where the search was opened from — the page context preserved beneath. */
 function contextLabel(path: string): string {
@@ -36,6 +37,11 @@ export default function SearchOverlay() {
   const inputRef = useRef<HTMLInputElement | null>(null)
   const listRef = useRef<HTMLUListElement | null>(null)
   const panelRef = useRef<HTMLDivElement | null>(null)
+
+  /* R08/D4: hold the page still behind the dialog. */
+
+  useBodyScrollLock(open)
+
 
   useEffect(() => {
     const onOpen = () => {

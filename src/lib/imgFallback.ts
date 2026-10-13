@@ -1,65 +1,77 @@
-/* ------------------------------------------------------------------ */
-/* Typographic plate fallback — if a cover ever fails to resolve,     */
-/* the reserved box never shows a broken-image icon: it becomes a     */
-/* designed wine plate set in the house type (gold rule, folio №,      */
-/* title, wordmark). Same dimensions as the missing image, so there    */
-/* is zero layout shift. Decorative by construction — the surrounding */
-/* link/card already carries the accessible name.                      */
-/* ------------------------------------------------------------------ */
+/**
+ * Image fallback helper — swaps a failed `<img>` source to an inline
+ * wine-and-brass SVG plate carrying the piece's title and folio number,
+ * and resolves pending external source assets to the same archival plate
+ * without fabricating replacement artwork or triggering HTTP 404s.
+ */
 
-function wrapLines(text: string, max: number, maxLines: number): string[] {
-  const words = text.replace(/\s+/g, ' ').trim().split(' ')
-  const lines: string[] = []
-  let line = ''
-  for (const w of words) {
-    const next = line ? `${line} ${w}` : w
-    if (next.length > max && line) {
-      lines.push(line)
-      line = w
-      if (lines.length === maxLines - 1) break
-    } else {
-      line = next
-    }
-  }
-  if (lines.length < maxLines && line) lines.push(line)
-  if (lines.length === maxLines) {
-    const used = lines.join(' ').split(' ').length
-    const rest = words.slice(used).join(' ')
-    if (rest) lines[maxLines - 1] = `${lines[maxLines - 1]}…`
-  }
-  return lines
+const esc = (s: string) =>
+  s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;')
+
+/**
+ * Canonical asset paths for verified editorial entries whose original binary
+ * image files are awaiting external dataset attachment.
+ * All five original WebP slides for `DeUZFPTCjPU` ("The Quiet Grief") are now
+ * self-hosted under `public/img/works/DeUZFPTCjPU-1.webp`..`-5.webp`.
+ */
+export const PENDING_SOURCE_ASSETS: ReadonlySet<string> = new Set([])
+
+export function isPendingSourceAsset(path: string): boolean {
+  return PENDING_SOURCE_ASSETS.has(path)
 }
 
-const esc = (s: string) => s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
-
-export function plateFallback(label: string, folio = ''): string {
-  const lines = wrapLines(label.replace(/^“|”$/g, ''), 26, 4)
-  const startY = 500 - (lines.length - 1) * 44
-  const tspans = lines
-    .map((l, i) => `<text x='400' y='${startY + i * 76}' text-anchor='middle' font-family='Georgia, serif' font-style='italic' font-size='52' fill='#F8F6F2'>${esc(l)}</text>`)
-    .join('')
-  const folioLine = folio
-    ? `<text x='400' y='300' text-anchor='middle' font-family='monospace' font-size='26' letter-spacing='8' fill='#D9B978'>№ ${folio}</text>`
-    : ''
-  const svg = `<svg xmlns='http://www.w3.org/2000/svg' width='800' height='1000' viewBox='0 0 800 1000'>
-<defs><linearGradient id='g' x1='0' y1='0' x2='0' y2='1'><stop offset='0' stop-color='#3B0D17'/><stop offset='1' stop-color='#1B0610'/></linearGradient></defs>
-<rect width='800' height='1000' fill='url(#g)'/>
-<rect x='40' y='40' width='720' height='920' fill='none' stroke='#B89146' stroke-width='2'/>
-<rect x='56' y='56' width='688' height='888' fill='none' stroke='#B89146' stroke-opacity='0.35'/>
-${folioLine}
-<line x1='300' y1='360' x2='500' y2='360' stroke='#D9B978' stroke-width='2'/>
-${tspans}
-<text x='400' y='820' text-anchor='middle' font-family='monospace' font-size='24' letter-spacing='10' fill='#D9B978'>VERLYSE MEDIA</text>
-<text x='400' y='860' text-anchor='middle' font-family='monospace' font-size='18' letter-spacing='6' fill='#F8F6F2' fill-opacity='0.55'>WHERE VISION BECOMES A VOICE</text>
-</svg>`
+export function plateFallback(title?: string, folioNo?: string, subtitle?: string): string {
+  const safeTitle = esc((title || 'Verlyse Media').slice(0, 64))
+  const validFolio = folioNo && folioNo !== '0' && folioNo !== '00' ? folioNo : ''
+  const safeFolio = esc(validFolio ? `FOLIO № ${validFolio}` : 'VERLYSE MEDIA · ARCHIVE')
+  const safeSub = subtitle ? esc(subtitle.slice(0, 64)) : ''
+  const svg = `<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 800 1000' width='800' height='1000'>
+    <defs>
+      <radialGradient id='g' cx='50%' cy='42%' r='70%'>
+        <stop offset='0%' stop-color='#471323'/>
+        <stop offset='65%' stop-color='#260913'/>
+        <stop offset='100%' stop-color='#120409'/>
+      </radialGradient>
+    </defs>
+    <rect width='800' height='1000' fill='url(#g)'/>
+    <rect x='36' y='36' width='728' height='928' fill='none' stroke='#B89146' stroke-opacity='0.38' stroke-width='1'/>
+    <rect x='52' y='52' width='696' height='896' fill='none' stroke='#B89146' stroke-opacity='0.18' stroke-width='1'/>
+    <line x1='120' y1='180' x2='680' y2='180' stroke='#B89146' stroke-opacity='0.35' stroke-width='1'/>
+    <line x1='120' y1='820' x2='680' y2='820' stroke='#B89146' stroke-opacity='0.35' stroke-width='1'/>
+    <text x='400' y='148' text-anchor='middle' fill='#D4B06A' font-family='monospace' font-size='15' letter-spacing='6'>${safeFolio}</text>
+    <circle cx='400' cy='430' r='54' fill='none' stroke='#B89146' stroke-opacity='0.45' stroke-width='1.2'/>
+    <circle cx='400' cy='430' r='4' fill='#D4B06A'/>
+    <text x='400' y='560' text-anchor='middle' fill='#F7F2EA' font-family='Georgia, serif' font-style='italic' font-size='27'>${safeTitle}</text>
+    ${safeSub ? `<text x='400' y='612' text-anchor='middle' fill='#D4B06A' fill-opacity='0.82' font-family='monospace' font-size='13' letter-spacing='3'>${safeSub}</text>` : ''}
+    <text x='400' y='866' text-anchor='middle' fill='#B89146' fill-opacity='0.75' font-family='monospace' font-size='12' letter-spacing='5'>WHERE VISION BECOMES A VOICE</text>
+  </svg>`
   return `data:image/svg+xml;utf8,${encodeURIComponent(svg)}`
 }
 
-/** onError handler for <img>: swap once to the typographic plate. */
-export function handleImgError(e: React.SyntheticEvent<HTMLImageElement>, label: string, folio = '') {
+/**
+ * Resolves a canonical plate path: returns the path itself when the binary
+ * is present in the build, or the typographic wine-and-brass archival SVG
+ * plate when the path is registered in `PENDING_SOURCE_ASSETS`.
+ */
+export function plateSrc(
+  path: string,
+  title?: string,
+  folioNo?: string,
+  subtitle?: string,
+): string {
+  if (PENDING_SOURCE_ASSETS.has(path)) {
+    return plateFallback(title, folioNo, subtitle)
+  }
+  return path
+}
+
+export function handleImgError(
+  e: { currentTarget: HTMLImageElement },
+  title?: string,
+  folioNo?: string,
+): void {
   const img = e.currentTarget
-  if (img.dataset.fallbackApplied) return
-  img.dataset.fallbackApplied = '1'
-  img.setAttribute('data-img-fallback', '1')
-  img.src = plateFallback(label, folio)
+  if (img.dataset.fallbackApplied === 'true') return
+  img.dataset.fallbackApplied = 'true'
+  img.src = plateFallback(title || img.alt, folioNo)
 }

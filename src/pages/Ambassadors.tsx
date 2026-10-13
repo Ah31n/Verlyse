@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom'
 import { motion, AnimatePresence, useReducedMotion } from 'motion/react'
 import { useSeo } from '../hooks/useSeo'
 import Reveal from '../components/ui/Reveal'
+import HiringMarquee from '../components/ui/HiringMarquee'
 import { SectionHead } from '../components/ui/primitives'
 import { BRAND } from '../data/content'
 
@@ -21,13 +22,13 @@ const CLUSTERS: { label: string; caption: string; members: Member[] }[] = [
   },
   {
     label: 'II — Editorial & Creative',
-    caption: 'ZAINAB FAISAL RAO · AMNA RAO · HAIQA NAFEES · ZUHA FARHAN',
-    members: [T('Zainab Faisal Rao'), T('Amna Rao'), T('Haiqa Nafees'), T('Zuha Farhan')],
+    caption: 'ZAINAB FAISAL RAO · AMNA RAO · ZUHA FARHAN',
+    members: [T('Zainab Faisal Rao'), T('Amna Rao'), T('Zuha Farhan')],
   },
   {
     label: 'III — Programs & Craft',
-    caption: 'JAVERIA KARIM · MANHA · AHSAN ASHFAQ · ZAINAB KHAN',
-    members: [T('Javeria Karim'), T('Manha'), T('Ahsan Ashfaq'), T('Zainab Khan')],
+    caption: 'JAVERIA KARIM · AHSAN ASHFAQ · ZAINAB KHAN',
+    members: [T('Javeria Karim'), T('Ahsan Ashfaq'), T('Zainab Khan')],
   },
 ]
 
@@ -41,7 +42,7 @@ const initialsOf = (n: string) => n.split(' ').map((p) => p[0]).join('').slice(0
  * focuses it and opens the person's record. The thirteenth seat is drawn open,
  * waiting for the first ambassador the program brings.
  */
-import { CrashZoom , MaskReveal, Magnetic, Rise3D, Slate } from '../components/cinematic'
+import { CrashZoom , MaskReveal, Magnetic, Rise3D } from '../components/cinematic'
 
 export default function Ambassadors() {
   useSeo({
@@ -102,10 +103,9 @@ export default function Ambassadors() {
           <p className="mt-4 font-mono text-[10px] uppercase tracking-[0.34em] text-gold/85">
             The people — ambassadors · team · the open seat
           </p>
-          <Slate move="crash zoom" className="mt-5" />
           <Reveal delay={0.2}>
             <p className="mx-auto mt-6 max-w-[52ch] text-lg leading-[1.8] text-white/70">
-              Twelve credited in the room today, each a numbered medallion. Choose one to open the record. The thirteenth diamond is drawn open, waiting for the ambassador the program brings.
+              Ten credited in the room today, each a numbered medallion. Choose one to open the record. The eleventh diamond is drawn open, waiting for the ambassador the program brings.
             </p>
           </Reveal>
         </div>
@@ -123,7 +123,7 @@ export default function Ambassadors() {
               </div>
               </Rise3D>
 
-              <div className="grid grid-cols-2 gap-5 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5">
+              <div className="grid grid-cols-2 gap-5 sm:grid-cols-3 md:grid-cols-4">
                 {cluster.members.map((m) => {
                   const no = ALL_MEMBERS.findIndex((x) => x.name === m.name) + 1
                   const isSel = selectedId === m.name
@@ -172,8 +172,10 @@ export default function Ambassadors() {
             <div className="flex flex-col items-start gap-6 md:flex-row md:items-center">
               <span aria-hidden="true" className="relative grid h-[104px] w-[104px] shrink-0 place-items-center">
                 <span className="absolute inset-0 rotate-45 border border-dashed border-gold/60" />
-                <span className="relative font-serif text-2xl italic text-gold/70">13</span>
-                <span className="absolute -bottom-1 left-1/2 -translate-x-1/2 bg-[#2A0F18] px-1.5 font-mono text-[9px] tracking-[0.2em] text-gold">№13</span>
+                <span className="relative font-serif text-2xl italic text-gold/70">{ALL_MEMBERS.length + 1}</span>
+                <span className="absolute -bottom-1 left-1/2 -translate-x-1/2 bg-[#2A0F18] px-1.5 font-mono text-[9px] tracking-[0.2em] text-gold">
+                  №{String(ALL_MEMBERS.length + 1).padStart(2, '0')}
+                </span>
               </span>
               <div className="flex-1">
                 <p className="font-mono text-[10px] uppercase tracking-[0.28em] text-gold">The open seat</p>
@@ -195,6 +197,9 @@ export default function Ambassadors() {
           </Reveal>
         </div>
       </section>
+
+      {/* THE NEXT BYLINE — Founder-requested editorial hiring experience */}
+      <HiringMarquee />
 
       {/* the focused record — a person's dossier, opened from a medallion */}
       <AnimatePresence>
@@ -264,7 +269,7 @@ export default function Ambassadors() {
           from the programme's own form; nothing is invented */}
       <section className="border-t border-white/10 py-[clamp(5rem,10vh,8rem)]" aria-labelledby="programme-title">
         <div className="mx-auto max-w-page px-[clamp(1.75rem,5.5vw,4.75rem)]">
-          <SectionHead eyebrow="The programme" page="P. 02" ghost="02" />
+          <SectionHead eyebrow="The programme" />
 
           <div className="grid grid-cols-1 gap-[clamp(2.5rem,5vw,5rem)] lg:grid-cols-[1.02fr_0.98fr]">
             {/* LEFT — the role, exactly as the form states it */}

@@ -18,7 +18,7 @@ const CORE = ['/', '/articles', '/categories', '/creators', '/community', '/amba
 const CATEGORY_ROOMS = [
   'Stories', 'Poetry', 'Essays', 'Art', 'Social%20Issues', 'Lifestyle', 'Horror',
 ].map((c) => `/categories?room=${c}`)
-/* Registry-driven slugs (Phase 31) — 19 articles / 16 author records.
+/* Registry-driven slugs — 20 articles / 16 author records.
    The registry `src/data/content.ts` is the ground truth; keep this list in sync. */
 const ARTICLE_SLUGS = [
   'their-voices-matter', '3-13', 'the-empty-waltz', 'the-arts-deserve-respect',
@@ -26,7 +26,7 @@ const ARTICLE_SLUGS = [
   'intellect-lost-to-code', 'forgive-me-mother', 'water-cat',
   'if-hope-were-a-feather', 'the-horrors-of-child-sexual-abuse', 'khageena',
   'behind-every-headline', 'jaldi', 'failure', 'my-last-breath',
-  'the-garden-beyond-my-tower', 'mir-raza-ali',
+  'the-garden-beyond-my-tower', 'mir-raza-ali', 'the-quiet-grief',
 ]
 const CREATOR_SLUGS = [
   'alina-javed', 'anshujit-singh', 'haieqa-wahab', 'shaza-fatima', 'adeena-irfan',

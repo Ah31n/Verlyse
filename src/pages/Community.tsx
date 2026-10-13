@@ -65,7 +65,7 @@ function FilmFrame({ article, folio }: { article: Article; folio: string }) {
  * States: HABITAT · READ · RETURN. Reduced motion: reel stays still and
  * fully present.
  */
-import { CrashZoom , MaskReveal, Magnetic, Tilt3D, Slate } from '../components/cinematic'
+import { CrashZoom , MaskReveal, Magnetic, Tilt3D } from '../components/cinematic'
 
 export default function Community() {
   useSeo({
@@ -151,9 +151,8 @@ export default function Community() {
             </MaskReveal>
           </h1>
           <p className="mt-4 font-mono text-[10px] uppercase tracking-[0.34em] text-gold/85">
-            The feed in pictures — all nineteen covers, held not driven
+            The feed in pictures — all {LEDGER.features} covers, held not driven
           </p>
-          <Slate move="crash zoom" className="mt-5" />
         </div>
 
         {/* ——— MID · the film strip — all nineteen real covers, in order ——— */}

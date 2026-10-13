@@ -53,6 +53,8 @@ Creator portraits are contributor photographs in an editorial magazine — never
 | My Last Breath | Abheesha Ghosh @abheesha_21 | Poetry | 26.07 |
 | The Garden Beyond My Tower | Syeda Tasbeeha Noman @syeda._tasbeeha | Poetry | 30.07 |
 | Their Voices Matter | Alina Javed @lina_.jved | Social Issues | 26.06 |
+| Mir Raza Ali | Verlyse Media @verlyse.media | Social Issues | 27.08 |
+| The Quiet Grief | Verlyse Media @verlyse.media | Art (carousel-led feature) | 10.10 |
 
 ## Pages (dataset-only content)
 

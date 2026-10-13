@@ -1,17 +1,35 @@
 import { Link } from 'react-router-dom'
-import { ARTICLES, getAuthor, coCreditedWorks, type Author , authorPhoto } from '../../data/content'
+import { ARTICLES, getAuthor, coCreditedWorks, hasKnownLikes, type Author , authorPhoto } from '../../data/content'
 import { AuthorFrame, AuthorPhoto } from './AuthorFrame'
 import Reveal from './Reveal'
 import { Signature } from './ArticleClosing'
 import { MetaRow } from './primitives'
 import { handleImgError } from '../../lib/imgFallback'
 
+/** Strip outer curly/straight quotation marks so we can quote once cleanly. */
+function stripOuterQuotes(value: string): string {
+  return value.trim().replace(/^[“"']+|[”"']+$/g, '').trim()
+}
+
+/** Format a writer's note or quote without ever doubling quotation marks or
+    wrapping an trailing attribution (`“...” — Name`) inside extra quotes. */
+export function formatQuotedNote(raw?: string): string {
+  if (!raw) return ''
+  const trimmed = raw.trim()
+  if (!trimmed) return ''
+  if (/^[“"].*[”"]\s*[—–-]\s*\S/.test(trimmed)) {
+    return trimmed.replace(/^[“"]+/, '“')
+  }
+  const clean = stripOuterQuotes(trimmed)
+  return clean ? `“${clean}”` : ''
+}
+
 /** The writer's own note — the first note found across their features. */
 export function writerNoteOf(authorId: string): string | undefined {
   for (const a of ARTICLES) {
     if (a.authorId !== authorId) continue
-    if (a.note) return a.note.replace(/^“|”$/g, '')
-    if (a.closing?.paragraphs?.length) return a.closing.paragraphs.join(' ')
+    if (a.note && a.note.trim()) return a.note.trim()
+    if (a.closing?.paragraphs?.length) return a.closing.paragraphs.join(' ').trim()
   }
   return undefined
 }
@@ -109,7 +127,7 @@ export default function WriterProfile({ author }: { author: Author }) {
           </Reveal>
 
           {/* favorite quote — their own words */}
-          {author.favoriteQuote && (
+          {author.favoriteQuote && stripOuterQuotes(author.favoriteQuote) && (
             <Reveal className="mt-12">
               <div className="relative border-y border-gold/25 py-10">
                 <span aria-hidden="true" className="absolute -top-5 left-0 flex items-center gap-3">
@@ -117,7 +135,7 @@ export default function WriterProfile({ author }: { author: Author }) {
                   <span className="font-serif text-2xl leading-none text-gold">“</span>
                 </span>
                 <p className="pull-quote mx-auto max-w-[30ch] text-[clamp(1.5rem,2.6vw,2.2rem)] leading-[1.4] text-ivory">
-                  {author.favoriteQuote}
+                  {stripOuterQuotes(author.favoriteQuote)}
                 </p>
                 <span aria-hidden="true" className="absolute -bottom-5 right-0 flex items-center gap-3">
                   <span className="font-serif text-2xl leading-none text-gold">”</span>
@@ -128,26 +146,28 @@ export default function WriterProfile({ author }: { author: Author }) {
           )}
 
           {/* the handwritten note — the final page of a printed book */}
-          <Reveal className="mt-12">
-            <div className="relative border border-gold/25 bg-[#17060B] px-7 py-10 md:px-10">
-              <span aria-hidden="true" className="absolute -left-2 -top-2 h-4 w-4 border-l border-t border-gold" />
-              <span aria-hidden="true" className="absolute -right-2 -top-2 h-4 w-4 border-r border-t border-gold" />
-              <span aria-hidden="true" className="absolute -bottom-2 -left-2 h-4 w-4 border-b border-l border-gold" />
-              <span aria-hidden="true" className="absolute -bottom-2 -right-2 h-4 w-4 border-b border-r border-gold" />
-              <p className="font-mono text-[10px] uppercase tracking-[0.28em] text-gold">
-                {note ? 'A note from the writer' : 'In their own words'}
-              </p>
-              <p className="mt-5 font-serif text-[clamp(1.15rem,1.8vw,1.45rem)] font-light italic leading-[1.8] text-ivory/90">
-                “{note ?? author.favoriteQuote}”
-              </p>
-              <div className="mt-6 flex items-center justify-between border-t border-white/10 pt-4">
-                <span className="font-mono text-[9px] uppercase tracking-[0.30em] text-white/55">
-                  {note ? 'from their featured work' : 'from their writing'}
-                </span>
-                <span className="font-mono text-[9px] uppercase tracking-[0.30em] text-gold">the writer’s note</span>
+          {formatQuotedNote(note ?? author.favoriteQuote) && (
+            <Reveal className="mt-12">
+              <div className="relative border border-gold/25 bg-[#17060B] px-7 py-10 md:px-10">
+                <span aria-hidden="true" className="absolute -left-2 -top-2 h-4 w-4 border-l border-t border-gold" />
+                <span aria-hidden="true" className="absolute -right-2 -top-2 h-4 w-4 border-r border-t border-gold" />
+                <span aria-hidden="true" className="absolute -bottom-2 -left-2 h-4 w-4 border-b border-l border-gold" />
+                <span aria-hidden="true" className="absolute -bottom-2 -right-2 h-4 w-4 border-b border-r border-gold" />
+                <p className="font-mono text-[10px] uppercase tracking-[0.28em] text-gold">
+                  {note ? 'A note from the writer' : 'In their own words'}
+                </p>
+                <p className="mt-5 font-serif text-[clamp(1.15rem,1.8vw,1.45rem)] font-light italic leading-[1.8] text-ivory/90">
+                  {formatQuotedNote(note ?? author.favoriteQuote)}
+                </p>
+                <div className="mt-6 flex items-center justify-between border-t border-white/10 pt-4">
+                  <span className="font-mono text-[9px] uppercase tracking-[0.30em] text-white/55">
+                    {note ? 'from their featured work' : 'from their writing'}
+                  </span>
+                  <span className="font-mono text-[9px] uppercase tracking-[0.30em] text-gold">the writer’s note</span>
+                </div>
               </div>
-            </div>
-          </Reveal>
+            </Reveal>
+          )}
 
           {/* published works — or the folios this name is co-credited in */}
           <Reveal className="mt-14">
@@ -170,7 +190,7 @@ export default function WriterProfile({ author }: { author: Author }) {
                     <p className="mt-1 font-mono text-[9px] uppercase tracking-[0.30em] text-white/60">
                       {isCoCredit
                         ? `Co-credited · ${a.date.split('-').reverse().join('.')}`
-                        : a.likes > 0
+                        : hasKnownLikes(a)
                           ? `${a.date.split('-').reverse().join('.')} · ${a.likes} appreciations`
                           : `${a.date.split('-').reverse().join('.')} · appreciations not tallied in the ledger`}
                     </p>
@@ -190,7 +210,15 @@ export default function WriterProfile({ author }: { author: Author }) {
           {others.length > 0 && (
             <Reveal className="mt-14">
               <p className="kicker">Stories beside theirs</p>
-              <div className="mt-6 grid grid-cols-1 gap-4 sm:grid-cols-3">
+              <div
+                className={`mt-6 grid gap-4 ${
+                  others.length === 1
+                    ? 'max-w-[260px] grid-cols-1'
+                    : others.length === 2
+                      ? ' max-w-[540px] grid-cols-1 sm:grid-cols-2'
+                      : 'grid-cols-1 sm:grid-cols-2 md:grid-cols-3'
+                }`}
+              >
                 {others.map((a) => (
                   <Link key={a.id} to={`/article/${a.id}`} className="group block no-underline">
                     <div className="img-frame relative aspect-[4/5] overflow-hidden border border-white/10">

@@ -3,6 +3,34 @@ export default {
   content: ['./index.html', './src/**/*.{ts,tsx}'],
   theme: {
     extend: {
+      /* ---- R08 motion tokens -------------------------------------------
+         One vocabulary for the whole publication. Six durations, three
+         easings. New motion uses a token; a raw duration in a class is a
+         review comment. Existing call sites are migrated opportunistically,
+         not in a single sweeping diff.
+           instant  90ms   state flips, checkbox, pressed
+           quick    240ms  hover, focus ring, small reveals
+           settle   520ms  panels, drawers, page furniture
+           unfold   900ms  editorial reveals, plates entering
+           ink      1400ms slow image/scale moves, the archival veil
+           breathe  4000ms ambient, never attention-seeking
+      ------------------------------------------------------------------- */
+      transitionDuration: {
+        instant: '90ms',
+        quick: '240ms',
+        settle: '520ms',
+        unfold: '900ms',
+        ink: '1400ms',
+        breathe: '4000ms',
+      },
+      transitionTimingFunction: {
+        /* the house curve — everything decelerates into place */
+        editorial: 'cubic-bezier(0.22, 1, 0.36, 1)',
+        /* entrances that must feel pressed, not floated */
+        press: 'cubic-bezier(0.65, 0.05, 0.36, 1)',
+        /* ambient only */
+        drift: 'cubic-bezier(0.37, 0, 0.63, 1)',
+      },
       colors: {
         wine: { DEFAULT: '#5C1224', deep: '#3B0D17', ink: '#2E0913', night: '#1C1C1C' },
         ivory: '#F8F6F2',

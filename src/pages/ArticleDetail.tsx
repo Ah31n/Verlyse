@@ -6,7 +6,7 @@ import Reveal from '../components/ui/Reveal'
 import SplitText from '../components/ui/SplitText'
 import { MetaRow } from '../components/ui/primitives'
 import ShareButtons from '../components/ui/ShareButtons'
-import { getArticle, getAuthor, relatedArticles, folioNoOf, type Vibe, type Article, type Author, AUTHORS, authorPhoto } from '../data/content'
+import { getArticle, getAuthor, relatedArticles, folioNoOf, type Vibe, type Article, type Author, AUTHORS, authorPhoto , coverAlt, primaryRole } from '../data/content'
 import { handleImgError } from '../lib/imgFallback'
 import { AuthorPhoto } from '../components/ui/AuthorFrame'
 import { ArticleEnding, MotifDivider, Signature, WritersNoteClosing } from '../components/ui/ArticleClosing'
@@ -21,6 +21,8 @@ const StoryEnding3D = lazy(() => import('../components/spatial/StoryEnding3D'))
 import SaveButton from '../components/ui/SaveButton'
 import { useReadingMode } from '../components/ui/ReadingMode'
 import { ImmersiveShell, BrassThread, ReadingMeasure } from '../components/immersive'
+import { progress } from '../lib/stringTune/attrs'
+import ArtGallery from '../components/ui/ArtGallery'
 
 /* ------------------------------------------------------------------ */
 /* Every feature carries its own temperament — motion and finish      */
@@ -360,7 +362,10 @@ export default function ArticleDetail() {
             <Reveal delay={0.3}>
               <div className="mt-8 flex max-w-[560px] items-center justify-between border-t border-white/15 pt-4 font-mono text-[9px] uppercase tracking-[0.30em] text-white/55">
                 <span>Issue — {article.date.split('-').reverse().join('.')}</span>
-                <span className="flex items-center gap-2"><span className="text-gold">✦</span>{article.motif ?? 'a verlyse feature'}</span>
+                <span className="flex items-center gap-2">
+                  <span className="text-gold">✦</span>
+                  {(article.motif && MARGINALIA[article.motif]) || `Folio № ${folio}`}
+                </span>
               </div>
             </Reveal>
           </div>
@@ -400,7 +405,7 @@ export default function ArticleDetail() {
                       the title and metadata stay the focal point. */}
                   <img
                     src={article.cover}
-                    alt=""
+                    alt={article.slideDescriptions?.[0]?.alt ?? coverAlt(article)}
                     className="aspect-[4/5] w-full object-contain"
                     loading="lazy"
                     decoding="async"
@@ -418,10 +423,10 @@ export default function ArticleDetail() {
         </section>
       ) : article.heroMode === 'gallery' ? (
         /* ——— GALLERY: the artwork itself is the hero — the plate, framed ——— */
-        <section className="relative flex min-h-[80svh] items-end overflow-hidden border-b border-white/10 bg-wine-deep pt-36">
+        <section className="relative flex items-end overflow-hidden border-b border-white/10 bg-wine-deep pt-12 md:min-h-[80svh] md:pt-36">
           <WorldTexture world={article.world} />
           <div className="relative z-[2] mx-auto w-full max-w-page px-[clamp(1.75rem,5.5vw,4.75rem)] pb-16">
-            <div className="grid grid-cols-1 items-end gap-10 lg:grid-cols-[1fr_auto]">
+            <div className="grid grid-cols-1 items-end gap-10 lg:grid-cols-[1fr_auto] lg:pr-[256px]">
               <div>
                 <Reveal><HeroKicker article={article} author={author} /></Reveal>
                 <div className={`${vibe.titleClass} inline-block`}>
@@ -435,7 +440,16 @@ export default function ArticleDetail() {
                 <figure className="relative w-full max-w-[300px]">
                   <div aria-hidden="true" className="absolute -inset-3 translate-x-3 translate-y-3 border border-gold/35" />
                   <div className="img-frame relative overflow-hidden border border-gold/25">
-                    <img src={article.cover} alt="" className="aspect-[4/5] w-full object-cover" loading="lazy" decoding="async" onError={(e) => handleImgError(e, article.title, folio)} />
+                    <img
+                      src={article.cover}
+                      alt={article.slideDescriptions?.[0]?.alt ?? coverAlt(article)}
+                      width={article.slideDescriptions?.[0]?.width}
+                      height={article.slideDescriptions?.[0]?.height}
+                      className={article.slideDescriptions?.[0]?.width ? 'w-full object-contain' : 'aspect-[4/5] w-full object-cover'}
+                      loading="lazy"
+                      decoding="async"
+                      onError={(e) => handleImgError(e, article.title, folio)}
+                    />
                     <span aria-hidden="true" className="absolute inset-2 border border-gold/40" />
                   </div>
                   <figcaption className="mt-3 flex items-center justify-between font-mono text-[9px] uppercase tracking-[0.30em] text-white/50">
@@ -450,8 +464,8 @@ export default function ArticleDetail() {
       ) : (
         /* ——— CINEMATIC: the default full-bleed ——— */
         <section className="relative flex min-h-[92svh] items-end overflow-hidden pt-36">
-          <div aria-hidden="true" className="absolute inset-0">
-            <img src={article.cover} alt="" className="h-full w-full object-cover" decoding="async" onError={(e) => handleImgError(e, article.title, folio)} />
+          <div className="pointer-events-none absolute inset-0">
+            <img src={article.cover} alt={coverAlt(article)} className="h-full w-full object-cover" decoding="async" onError={(e) => handleImgError(e, article.title, folio)} />
           </div>
           <div aria-hidden="true" className={`absolute inset-0 ${vibe.overlay}`} />
           <VibeAmbient vibe={article.vibe ?? 'solemn'} section="hero" />
@@ -471,13 +485,16 @@ export default function ArticleDetail() {
                 <span>Issue — {article.date.split('-').reverse().join('.')}</span>
                 <span className="flex items-center gap-2">
                   <span className="text-gold">✦</span>
-                  {article.motif ? article.motif : 'a verlyse feature'}
+                  {(article.motif && MARGINALIA[article.motif]) || `Folio № ${folio}`}
                 </span>
               </div>
             </Reveal>
           </div>
         </section>
       )}
+
+      {/* ---------- Gallery viewing room — plate sequence & lightbox ---------- */}
+      {article.gallery && <ArtGallery article={article} />}
 
 {/* ---------- Body — inside the publication's world ---------- */}
       <section className={`relative border-t border-white/10 py-[clamp(6rem,14vh,11rem)] transition-colors duration-1000 ${worldBodyClass(article.world)} ${vibe.bodyClass} ${reading ? 'bg-wine-deep' : ''}`}>
@@ -526,7 +543,7 @@ export default function ArticleDetail() {
                   to={`/creator/${author.id}`}
                   className="mt-5 inline-flex items-center gap-2 border-b border-gold/50 pb-1 font-mono text-[10px] uppercase tracking-[0.28em] text-gold no-underline transition-colors hover:text-ivory max-[767px]:py-2"
                 >
-                  About the writer <span aria-hidden="true">→</span>
+                  About the {primaryRole(author).toLowerCase().replace(/^the\s+/i, '')} <span aria-hidden="true">→</span>
                 </Link>
               )}
               {/* a second creator, credited by the caption itself */}
@@ -534,8 +551,20 @@ export default function ArticleDetail() {
             </div>
           </Reveal>
 
-          {/* Body — prose or verse, set with care, moved by the feature's vibe */}
-          <article>
+          {/* Body — prose or verse, set with care, moved by the feature's vibe.
+              The <article> carries the scroll-progress binding; --progress
+              inherits to the sticky measure below, which fills as the reader
+              moves through the feature. The body text itself is never moved
+              by it — the reading column stays still by rule. */}
+          <article {...progress('bottom', 'top')}>
+            {/* the reading measure — a brass hairline, part of the page
+                furniture rather than a browser chrome bar */}
+            <div
+              aria-hidden="true"
+              className="pointer-events-none sticky top-[72px] z-[3] -mx-1 mb-8 h-px bg-gold/15"
+            >
+              <div className="st-measure h-px w-full origin-left bg-gold/70" />
+            </div>
             {article.body.map((p, i) => (
               <motion.div
                 key={i}
@@ -610,7 +639,10 @@ export default function ArticleDetail() {
                       </div>
                       <figcaption className="mt-4">
                         <p className="font-mono text-[10px] uppercase tracking-[0.28em] text-gold">
-                          {f.label} <span className="text-white/55">— {String(i + 1).padStart(2, '0')} / {figures.length}</span>
+                          {f.label}
+                          {figures.length > 1 && (
+                            <span className="text-white/55"> — {String(i + 1).padStart(2, '0')} / {String(figures.length).padStart(2, '0')}</span>
+                          )}
                         </p>
                         <p className="mt-2 max-w-[44ch] text-sm leading-relaxed text-white/60">{f.caption}</p>
                       </figcaption>
@@ -630,6 +662,42 @@ export default function ArticleDetail() {
               ))}
             </div>
           </Reveal>
+
+          {/* Verbatim source caption & provenance colophon (when preserved from source dataset) */}
+          {article.sourceCaption && (
+            <Reveal className="mt-14">
+              <div className="border border-gold/30 bg-wine-deep/55 p-6 md:p-8">
+                <div className="flex flex-wrap items-center justify-between gap-3 border-b border-white/10 pb-4">
+                  <p className="font-mono text-[10px] uppercase tracking-[0.26em] text-gold">
+                    Source Caption — Verbatim Record
+                  </p>
+                  <span className="font-mono text-[9px] uppercase tracking-[0.22em] text-white/60">
+                    {article.editorialFormat === 'carousel-feature' ? `Five-plate sequence · Folio № ${folio}` : `Folio № ${folio}`}
+                  </span>
+                </div>
+                <pre className="mt-5 whitespace-pre-wrap break-words font-serif text-[15px] italic leading-[1.75] text-ivory/88">
+                  {article.sourceCaption}
+                </pre>
+                {article.normalizedHashtags && article.normalizedHashtags.length > 0 && (
+                  <div className="mt-6 border-t border-white/10 pt-4">
+                    <p className="font-mono text-[9px] uppercase tracking-[0.24em] text-white/55">
+                      Archival index tags
+                    </p>
+                    <div className="mt-2.5 flex flex-wrap gap-2">
+                      {article.normalizedHashtags.map((tag) => (
+                        <span
+                          key={tag}
+                          className="border border-gold/25 px-2.5 py-1 font-mono text-[9px] tracking-[0.16em] text-gold"
+                        >
+                          {tag}
+                        </span>
+                      ))}
+                    </div>
+                  </div>
+                )}
+              </div>
+            </Reveal>
+          )}
 
           {/* Save + Share — a quiet hairline block */}
           <Reveal className="mt-14">

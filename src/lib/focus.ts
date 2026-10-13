@@ -8,13 +8,22 @@
 const FOCUSABLE =
   'a[href], button:not([disabled]), input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])'
 
+function isFocusableVisible(el: HTMLElement): boolean {
+  if (el.hidden || el.getAttribute('aria-hidden') === 'true') return false
+  if (typeof window !== 'undefined' && typeof window.getComputedStyle === 'function') {
+    const style = window.getComputedStyle(el)
+    if (style.display === 'none' || style.visibility === 'hidden') return false
+  }
+  return true
+}
+
 /** Attach to a dialog's container element while it is open. Returns a cleanup. */
 export function trapFocus(container: HTMLElement | null): () => void {
   if (!container) return () => {}
   const onKey = (e: KeyboardEvent) => {
     if (e.key !== 'Tab') return
     const nodes = Array.from(container.querySelectorAll<HTMLElement>(FOCUSABLE)).filter(
-      (el) => el.offsetParent !== null || el === document.activeElement,
+      (el) => isFocusableVisible(el) || el === document.activeElement,
     )
     if (nodes.length === 0) return
     const first = nodes[0]
@@ -28,6 +37,6 @@ export function trapFocus(container: HTMLElement | null): () => void {
       first.focus()
     }
   }
-  container.addEventListener('keydown', onKey)
-  return () => container.removeEventListener('keydown', onKey)
+  document.addEventListener('keydown', onKey)
+  return () => document.removeEventListener('keydown', onKey)
 }

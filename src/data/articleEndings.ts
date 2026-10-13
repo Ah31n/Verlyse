@@ -75,6 +75,8 @@ const SIGNATURE_MAP: Record<string, { label: string; kind: EndingSceneKind }> = 
   failure: { label: 'one step at a time', kind: 'steps' },
   'my-last-breath': { label: 'the cycle', kind: 'cycle' },
   'the-garden-beyond-my-tower': { label: 'she prays', kind: 'prayer' },
+  'mir-raza-ali': { label: 'the cart', kind: 'candle' },
+  'the-quiet-grief': { label: 'the colours never faded', kind: 'painting' },
 }
 
 function endingFor(article: Article): ArticleEndingDefinition {

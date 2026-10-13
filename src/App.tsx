@@ -3,8 +3,11 @@ import { Link, Routes, Route, useLocation } from 'react-router-dom'
 import type { ReactNode } from 'react'
 import { AnimatePresence, motion, useReducedMotion } from 'motion/react'
 import Layout from './components/layout/Layout'
+import RouteErrorBoundary from './components/layout/RouteErrorBoundary'
+import StringTuneProvider from './lib/stringTune/StringTuneProvider'
 import ReadingRoom from './components/reading/ReadingRoom'
 import { ARTICLES, LEDGER } from './data/content'
+import { ROUTE_PATTERNS as R } from './data/routes'
 
 /* Route-level code splitting — each page loads in its own chunk, so the
    first paint ships only the cover, the chrome, and the shared editorial
@@ -27,11 +30,20 @@ const RoomPage = lazy(() => import('./pages/Room'))
 /** Route-aware transition label — the "folio" the reader is moving toward,
  *  so every navigation reads like moving through the publication. */
 function thresholdLabel(pathname: string): string {
+  /* The primary host serves prerendered shells as directory indexes, so it
+     301s /article/khageena to /article/khageena/. Splitting the raw pathname
+     kept that trailing slash, the lookup missed, and every one of the 19
+     article pages read "Folio — · Reading" in production while looking
+     correct in dev. Normalise before matching. */
+  const segment = (prefix: string) => pathname.split(prefix)[1]?.replace(/\/+$/, '') ?? ''
   if (pathname.startsWith('/article/')) {
-    const id = pathname.split('/article/')[1]
+    const id = segment('/article/')
     const i = ARTICLES.findIndex((a) => a.id === id)
-    const folio = i >= 0 ? String(i + 1).padStart(2, '0') : '—'
-    return `Folio ${folio} · Reading`
+    if (i >= 0) {
+      const folio = String(i + 1).padStart(2, '0')
+      return `“${ARTICLES[i].title}” — № ${folio}`
+    }
+    return 'The Reading Room'
   }
   if (pathname.startsWith('/creator/')) return 'A contributor dossier'
   switch (pathname) {
@@ -115,33 +127,40 @@ export default function App() {
   return (
     <>
       <ScrollToTop />
+      {/* Scroll-linked DOM motion for the whole publication. Client-only,
+          booted on idle after first paint, re-scanned per route. */}
+      <StringTuneProvider />
       {isRoom ? (
-        <Suspense fallback={<div className="min-h-screen bg-charcoal" aria-hidden="true" />}>
-          <Routes location={location}>
-            <Route path="/room" element={<RoomPage />} />
-          </Routes>
-        </Suspense>
+        <RouteErrorBoundary resetKey={location.pathname}>
+          <Suspense fallback={<div className="min-h-screen bg-charcoal" aria-hidden="true" />}>
+            <Routes location={location}>
+              <Route path={R.room} element={<RoomPage />} />
+            </Routes>
+          </Suspense>
+        </RouteErrorBoundary>
       ) : (
       <Layout>
+      <RouteErrorBoundary resetKey={location.pathname}>
       <Suspense fallback={<div className="min-h-[80vh] bg-wine-deep" aria-hidden="true" />}>
       <AnimatePresence mode="wait">
         <Routes location={location} key={location.pathname}>
-          <Route path="/" element={<PageTransition label={threshold}><Home /></PageTransition>} />
-          <Route path="/about" element={<PageTransition label={threshold}><About /></PageTransition>} />
-          <Route path="/articles" element={<PageTransition label={threshold}><Articles /></PageTransition>} />
-          <Route path="/article/:id" element={<PageTransition label={threshold}><ReadingRoom><ArticleDetail /></ReadingRoom></PageTransition>} />
-          <Route path="/categories" element={<PageTransition label={threshold}><Categories /></PageTransition>} />
-          <Route path="/categories/:slug" element={<PageTransition label={threshold}><Categories /></PageTransition>} />
-          <Route path="/community" element={<PageTransition label={threshold}><Community /></PageTransition>} />
-          <Route path="/submit" element={<PageTransition label={threshold}><Submit /></PageTransition>} />
-          <Route path="/ambassadors" element={<PageTransition label={threshold}><Ambassadors /></PageTransition>} />
-          <Route path="/creators" element={<PageTransition label={threshold}><Creators /></PageTransition>} />
-          <Route path="/contact" element={<PageTransition label={threshold}><Contact /></PageTransition>} />
-          <Route path="/creator/:authorId" element={<PageTransition label={threshold}><WriterProfilePage /></PageTransition>} />
-          <Route path="*" element={<PageTransition label={threshold}><NotFound /></PageTransition>} />
+          <Route path={R.home} element={<PageTransition label={threshold}><Home /></PageTransition>} />
+          <Route path={R.about} element={<PageTransition label={threshold}><About /></PageTransition>} />
+          <Route path={R.articles} element={<PageTransition label={threshold}><Articles /></PageTransition>} />
+          <Route path={R.article} element={<PageTransition label={threshold}><ReadingRoom><ArticleDetail /></ReadingRoom></PageTransition>} />
+          <Route path={R.categories} element={<PageTransition label={threshold}><Categories /></PageTransition>} />
+          <Route path={R.category} element={<PageTransition label={threshold}><Categories /></PageTransition>} />
+          <Route path={R.community} element={<PageTransition label={threshold}><Community /></PageTransition>} />
+          <Route path={R.submit} element={<PageTransition label={threshold}><Submit /></PageTransition>} />
+          <Route path={R.ambassadors} element={<PageTransition label={threshold}><Ambassadors /></PageTransition>} />
+          <Route path={R.creators} element={<PageTransition label={threshold}><Creators /></PageTransition>} />
+          <Route path={R.contact} element={<PageTransition label={threshold}><Contact /></PageTransition>} />
+          <Route path={R.creator} element={<PageTransition label={threshold}><WriterProfilePage /></PageTransition>} />
+          <Route path={R.notFound} element={<PageTransition label={threshold}><NotFound /></PageTransition>} />
         </Routes>
       </AnimatePresence>
       </Suspense>
+      </RouteErrorBoundary>
       </Layout>
       )}
     </>

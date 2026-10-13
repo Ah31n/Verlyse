@@ -3,17 +3,19 @@ import { useSeo } from '../hooks/useSeo'
 import Reveal from '../components/ui/Reveal'
 import { BRAND, CATEGORIES } from '../data/content'
 
-/** A quiet field-level note — shown only when the line needs attention. */
-function FieldHint({ show, children }: { show: boolean; children: ReactNode }) {
+/** A quiet field-level note — shown only when the line needs attention.
+    Linked to its input via aria-describedby; a single form-level live region
+    announces validation state so multiple simultaneous alerts never collide. */
+function FieldHint({ id, show, children }: { id: string; show: boolean; children: ReactNode }) {
   if (!show) return null
   return (
-    <p role="alert" className="font-serif text-sm italic leading-snug text-[#E8A2A2]">
+    <p id={id} className="font-serif text-sm italic leading-snug text-[#E8A2A2]">
       {children}
     </p>
   )
 }
 
-import { CrashZoom , MaskReveal, Slate } from '../components/cinematic'
+import { CrashZoom , MaskReveal } from '../components/cinematic'
 
 export default function Submit() {
   useSeo({
@@ -23,6 +25,7 @@ path: '/submit',
   })
 
   const formRef = useRef<HTMLFormElement>(null)
+  const fileInputRef = useRef<HTMLInputElement>(null)
   const [sent, setSent] = useState(false)
   const [sending, setSending] = useState(false)
   const [viaBackend, setViaBackend] = useState(true)
@@ -33,6 +36,17 @@ path: '/submit',
       fallback can only name a file, so an honest size keeps both paths sane */
   const MAX_COVER_BYTES = 8 * 1024 * 1024
   const ACCEPTED_COVER = ['image/jpeg', 'image/png', 'image/webp', 'image/avif', 'image/gif']
+
+  const clearFieldError = (field: string) => {
+    setErrors((prev) => (prev.includes(field) ? prev.filter((k) => k !== field) : prev))
+    formRef.current?.querySelector<HTMLElement>(`[name="${field}"]`)?.classList.remove('is-invalid')
+  }
+
+  const clearCoverSelection = () => {
+    setFileName('')
+    setFileError('')
+    if (fileInputRef.current) fileInputRef.current.value = ''
+  }
 
   /** validate a chosen cover before the form can name it — type and size
       only; the writer is told exactly why a file was refused */
@@ -169,7 +183,6 @@ path: '/submit',
               <span className="relative">The editorial <em className="italic text-gold">desk</em></span>
             </MaskReveal>
           </h1>
-          <Slate move="crash zoom" className="mt-6" />
           <Reveal delay={0.15}>
             <p className="mt-6 max-w-[52ch] text-lg leading-[1.8] text-white/70">
               The platform puts it plainly: “{BRAND.submitCta}”
@@ -222,10 +235,15 @@ path: '/submit',
                     Your mail app should have opened with the piece written out — if it didn’t, send it directly to {BRAND.email}. The cover image’s filename travels with the submission; attach the file itself in the email if it opened.
                   </p>
                 )}
-                {viaBackend && fileName && (
-                  <p className="mt-4 max-w-[44ch] text-sm leading-[1.8] text-white/60">
-                    The cover image ({fileName}) is noted with the submission — the desk will ask for the file itself if the piece is selected.
-                  </p>
+                {fileName && (
+                  <div role="note" className="mt-6 max-w-[46ch] border border-gold/40 bg-wine-deep/60 px-5 py-4 text-left">
+                    <p className="font-mono text-[9px] uppercase tracking-[0.26em] text-gold">
+                      Cover image reminder — attach by email
+                    </p>
+                    <p className="mt-2 text-sm leading-[1.75] text-ivory/85">
+                      The cover image ({fileName}) is noted by filename only — the image file itself was not uploaded by this form. Reply to the desk’s email with the image file attached, or send it to {BRAND.email} now.
+                    </p>
+                  </div>
                 )}
                 <button type="button" onClick={resetForm} className="btn btn-ghost mt-10">
                   Send another piece
@@ -239,13 +257,31 @@ path: '/submit',
                   <div className="mt-6 grid grid-cols-1 gap-8 border-t border-white/10 pt-6 sm:grid-cols-2">
                     <div className="field">
                       <label className="field-label" htmlFor="sf-name">Full name</label>
-                      <input className="field-input" id="sf-name" name="name" type="text" autoComplete="name" />
-                      <FieldHint show={errors.includes('name')}>Please sign your name.</FieldHint>
+                      <input
+                        className="field-input"
+                        id="sf-name"
+                        name="name"
+                        type="text"
+                        autoComplete="name"
+                        aria-invalid={errors.includes('name') ? 'true' : undefined}
+                        aria-describedby={errors.includes('name') ? 'sf-name-err' : undefined}
+                        onInput={() => clearFieldError('name')}
+                      />
+                      <FieldHint id="sf-name-err" show={errors.includes('name')}>Please sign your name.</FieldHint>
                     </div>
                     <div className="field">
                       <label className="field-label" htmlFor="sf-email">Email</label>
-                      <input className="field-input" id="sf-email" name="email" type="email" autoComplete="email" />
-                      <FieldHint show={errors.includes('email')}>An email is needed — the desk writes back.</FieldHint>
+                      <input
+                        className="field-input"
+                        id="sf-email"
+                        name="email"
+                        type="email"
+                        autoComplete="email"
+                        aria-invalid={errors.includes('email') ? 'true' : undefined}
+                        aria-describedby={errors.includes('email') ? 'sf-email-err' : undefined}
+                        onInput={() => clearFieldError('email')}
+                      />
+                      <FieldHint id="sf-email-err" show={errors.includes('email')}>An email is needed — the desk writes back.</FieldHint>
                     </div>
                     <div className="field sm:col-span-2">
                       <label className="field-label" htmlFor="sf-handle">Instagram / social handle <span className="text-white/40">— optional</span></label>
@@ -260,13 +296,29 @@ path: '/submit',
                   <div className="mt-6 grid grid-cols-1 gap-8 border-t border-white/10 pt-6 sm:grid-cols-2">
                     <div className="field sm:col-span-2">
                       <label className="field-label" htmlFor="sf-title">Title of the work</label>
-                      <input className="field-input" id="sf-title" name="title" type="text" />
-                      <FieldHint show={errors.includes('title')}>Every piece needs a title.</FieldHint>
+                      <input
+                        className="field-input"
+                        id="sf-title"
+                        name="title"
+                        type="text"
+                        aria-invalid={errors.includes('title') ? 'true' : undefined}
+                        aria-describedby={errors.includes('title') ? 'sf-title-err' : undefined}
+                        onInput={() => clearFieldError('title')}
+                      />
+                      <FieldHint id="sf-title-err" show={errors.includes('title')}>Every piece needs a title.</FieldHint>
                     </div>
                     <div className="field sm:col-span-2">
                       <label className="field-label" htmlFor="sf-cat">Category</label>
                       <div className="relative">
-                        <select className="field-input w-full cursor-pointer appearance-none pr-10" id="sf-cat" name="category" defaultValue="">
+                        <select
+                          className="field-input w-full cursor-pointer appearance-none pr-10"
+                          id="sf-cat"
+                          name="category"
+                          defaultValue=""
+                          aria-invalid={errors.includes('category') ? 'true' : undefined}
+                          aria-describedby={errors.includes('category') ? 'sf-cat-err' : undefined}
+                          onChange={() => clearFieldError('category')}
+                        >
                           <option value="" disabled>Choose a department…</option>
                           {CATEGORIES.map((c) => (
                             <option key={c.slug} value={c.name}>{c.name}</option>
@@ -277,7 +329,7 @@ path: '/submit',
                           <path d="M6 9l6 6 6-6" />
                         </svg>
                       </div>
-                      <FieldHint show={errors.includes('category')}>Choose a department.</FieldHint>
+                      <FieldHint id="sf-cat-err" show={errors.includes('category')}>Choose a department.</FieldHint>
                     </div>
                     <div className="field sm:col-span-2">
                       <label className="field-label" htmlFor="sf-desc">Short description / excerpt <span className="text-white/40">— optional</span></label>
@@ -304,32 +356,65 @@ path: '/submit',
                         name="work"
                         rows={10}
                         placeholder="Your story, in your words — or a note about the work you want featured."
+                        aria-invalid={errors.includes('work') ? 'true' : undefined}
+                        aria-describedby={errors.includes('work') ? 'sf-work-err' : undefined}
+                        onInput={() => clearFieldError('work')}
                       />
-                      <FieldHint show={errors.includes('work')}>The work itself is required.</FieldHint>
+                      <FieldHint id="sf-work-err" show={errors.includes('work')}>The work itself is required.</FieldHint>
                     </div>
                     <div className="field">
-                      <span className="field-label">Cover / supporting image <span className="text-white/40">— optional</span></span>
-                      <label className="mt-1 flex cursor-pointer items-center justify-between gap-4 border border-dashed border-gold/30 px-5 py-4 transition-colors duration-500 hover:border-gold/60">
-                        <span className="min-w-0 truncate font-serif text-base italic text-white/70">
-                          {fileName || 'Choose a file — a cover plate, a photograph, a scan'}
+                      <label className="field-label" htmlFor="sf-cover">Cover / supporting image <span className="text-white/40">— optional (filename only; attach image by email)</span></label>
+                      <div className="mt-1 flex flex-wrap items-center justify-between gap-4 border border-dashed border-gold/30 px-5 py-4 transition-colors duration-500 focus-within:border-gold hover:border-gold/60">
+                        <span className="min-w-0 flex-1 truncate font-serif text-base italic text-white/70">
+                          {fileName ? `Filename noted: ${fileName} (not uploaded)` : 'Name your cover — a plate, a photograph, a scan'}
                         </span>
-                        <span className="shrink-0 border border-gold/50 px-4 py-2 font-mono text-[9px] uppercase tracking-[0.28em] text-gold">
-                          Choose
-                        </span>
+                        <div className="flex shrink-0 items-center gap-2">
+                          {fileName && (
+                            <button
+                              type="button"
+                              onClick={clearCoverSelection}
+                              className="border border-white/20 px-3 py-2 font-mono text-[9px] uppercase tracking-[0.24em] text-white/70 transition-colors hover:border-gold hover:text-gold focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-gold"
+                            >
+                              Clear
+                            </button>
+                          )}
+                          <label
+                            htmlFor="sf-cover"
+                            className="cursor-pointer border border-gold/50 px-4 py-2 font-mono text-[9px] uppercase tracking-[0.28em] text-gold transition-colors hover:border-gold hover:bg-gold/10"
+                          >
+                            {fileName ? 'Change' : 'Choose'}
+                          </label>
+                        </div>
                         <input
+                          ref={fileInputRef}
+                          id="sf-cover"
                           type="file"
                           name="cover"
                           accept="image/jpeg,image/png,image/webp,image/avif,image/gif"
-                          aria-label="Cover image — optional"
+                          aria-label="Cover image — optional (filename recorded only; attach actual image by email)"
+                          aria-invalid={fileError ? 'true' : undefined}
+                          aria-describedby={
+                            fileError
+                              ? 'sf-cover-err sf-cover-note'
+                              : fileName
+                                ? 'sf-cover-status sf-cover-note'
+                                : 'sf-cover-note'
+                          }
                           className="sr-only"
                           onChange={onCoverChange}
                         />
-                      </label>
+                      </div>
                       {fileError
-                        ? <FieldHint show>{fileError}</FieldHint>
+                        ? <FieldHint id="sf-cover-err" show>{fileError}</FieldHint>
                         : fileName
-                          ? <p className="mt-2 font-mono text-[9px] uppercase tracking-[0.22em] text-gold/80">Cover attached — {fileName}</p>
+                          ? <p id="sf-cover-status" className="mt-2 font-mono text-[9px] uppercase tracking-[0.22em] text-gold/80">Cover filename noted ({fileName}) — file not uploaded by this form; attach image by email.</p>
                           : null}
+                      {/* The desk must never imply it is holding a file it does
+                          not have: this form records the cover's name, and the
+                          image itself arrives by email. */}
+                      <p id="sf-cover-note" className="mt-2 max-w-[44ch] text-xs leading-[1.7] text-white/50">
+                        The image file isn’t sent with this form — only its name. The desk will reply to your email address and ask you to attach it there.
+                      </p>
                     </div>
                   </div>
                 </div>
@@ -348,6 +433,9 @@ path: '/submit',
                         type="checkbox"
                         id="sf-original"
                         name="original"
+                        aria-invalid={errors.includes('original') ? 'true' : undefined}
+                        aria-describedby={errors.includes('original') ? 'sf-original-err' : undefined}
+                        onChange={() => clearFieldError('original')}
                         className="mt-1 h-4 w-4 shrink-0 cursor-pointer accent-[#B89146] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-gold"
                       />
                       <span className="text-sm leading-[1.8] text-white/70">
@@ -357,7 +445,7 @@ path: '/submit',
                         </span>
                       </span>
                     </label>
-                    <FieldHint show={errors.includes('original')}>The desk needs this before the piece can be read.</FieldHint>
+                    <FieldHint id="sf-original-err" show={errors.includes('original')}>The desk needs this before the piece can be read.</FieldHint>
                     <p className="mt-5 max-w-[58ch] font-mono text-[9px] uppercase leading-[2.1] tracking-[0.22em] text-white/45">
                       Privacy — your name, email and handle are used for this submission only. The desk keeps no list beyond it, sells nothing, and deletes on request at {BRAND.email}. The work is not published unless it is featured — and never without your credit.
                     </p>
@@ -372,6 +460,11 @@ path: '/submit',
                   <button type="submit" disabled={sending} aria-busy={sending} className="btn btn-gold self-start disabled:pointer-events-none disabled:opacity-60">
                     {sending ? 'Sending the piece…' : 'Submit the piece'}
                   </button>
+                  {(errors.length > 0 || fileError) && (
+                    <p role="alert" className="font-mono text-[10px] uppercase tracking-[0.24em] text-[#E8A2A2]">
+                      A few required lines remain — the desk has marked them ({errors.length + (fileError ? 1 : 0)} {errors.length + (fileError ? 1 : 0) === 1 ? 'item' : 'items'}).
+                    </p>
+                  )}
                   <p aria-live="polite" className="max-w-[52ch] text-sm leading-[1.8] text-white/60">
                     {sending
                       ? 'The piece is crossing to the desk — one moment.'

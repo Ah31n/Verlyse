@@ -80,7 +80,7 @@ export default function ReadingRoom({ children }: { children: ReactNode }) {
         </span>
         {/* right index — where this folio sits in the issue */}
         <span className="absolute right-[clamp(1.75rem,5.5vw,4.75rem)] top-[46%] [writing-mode:vertical-rl] font-mono text-[9px] uppercase tracking-[0.34em] text-white/30">
-          {article ? `${article.category.toUpperCase()} · № ${folio} / 19` : 'VERLYSE MEDIA'}
+          {article ? `${article.category.toUpperCase()} · № ${folio} / ${String(ARTICLES.length).padStart(2, '0')}` : 'VERLYSE MEDIA'}
         </span>
         {/* corner registration ticks — the plate is held inside this field */}
         <span className="absolute left-[clamp(1.75rem,5.5vw,4.75rem)] top-24 h-3 w-px bg-[#D9B978]/35" />
@@ -149,9 +149,9 @@ export default function ReadingRoom({ children }: { children: ReactNode }) {
         <div className="mt-6 flex items-end">
           {/* thread stub — the reading thread's stub, hanging from the rule */}
           <span aria-hidden="true" className="block h-[3.25rem] w-px bg-gradient-to-b from-[#D9B978]/45 to-transparent" />
-          {/* the small ghost folio — the numeral of the folio in hand */}
+          {/* the small ghost folio — the numeral of the folio in hand, inset from the fixed reading-mode button */}
           {folio && (
-            <span aria-hidden="true" className="ml-auto block select-none font-serif text-[2.4rem] font-semibold leading-none text-transparent [-webkit-text-stroke:1px_rgba(184,145,70,0.28)]">
+            <span aria-hidden="true" className="ml-auto mr-14 block select-none font-serif text-[2.4rem] font-semibold leading-none text-transparent [-webkit-text-stroke:1px_rgba(184,145,70,0.28)]">
               № {folio}
             </span>
           )}

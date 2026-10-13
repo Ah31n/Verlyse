@@ -107,18 +107,18 @@ export default function DossierRoom({ author }: { author: Author }) {
           </Link>
         </div>
 
-        {/* the dossier sheet — plates overlap its edges on desktop, flow in
-            the Penpot mobile order below */}
+        {/* the dossier sheet — plates overlap its edges on wide desktop (xl+),
+            and flow cleanly inside the sheet at narrower widths */}
         <motion.div
           initial={reduce ? false : { opacity: 0, y: 16 }}
           animate={{ opacity: 1, y: 0 }}
           transition={reduce ? undefined : { duration: 0.9, ease: E }}
-          className="relative mx-auto mt-10 max-w-[1080px] lg:mt-16"
+          className="relative mx-auto mt-10 max-w-[1080px] lg:mt-16 xl:mx-[7.5rem] 2xl:mx-auto 2xl:max-w-[1040px]"
         >
           {/* the paper-edge sheet — a cream sheet behind, offset like a stack */}
           <div aria-hidden="true" className="absolute -bottom-1.5 -right-1.5 hidden h-full w-full border border-[#E7DCC8] bg-[#EFE8DD] lg:block" />
 
-          <div className="relative border border-[#7C6338]/60 bg-[#F8F6F2] px-[clamp(1.25rem,3vw,2.5rem)] py-9 text-[#241D18] lg:py-12">
+          <div className="relative border border-[#7C6338]/60 bg-[#F8F6F2] px-[clamp(1.25rem,3vw,2.5rem)] py-9 text-[#241D18] lg:py-12 xl:min-h-[32rem]">
             {/* inner brass hairline — the plate is held inside this field */}
             <div aria-hidden="true" className="pointer-events-none absolute inset-2 hidden border border-[#7C6338]/50 lg:block" />
 
@@ -141,10 +141,10 @@ export default function DossierRoom({ author }: { author: Author }) {
               {author.handle} · {author.role}
             </p>
 
-            {/* portrait plate — in flow after the handle on mobile, overlapping
-                the sheet's left edge on desktop */}
-            <div className="relative z-[3] mt-8 lg:absolute lg:left-[-9rem] lg:top-[40%] lg:mt-0 lg:w-[200px] lg:-translate-y-1/2">
-              <div className="relative w-[150px] border border-[#7C6338]/70 bg-[#F8F6F2] lg:w-full">
+            {/* portrait plate — in flow after the handle on mobile/tablet/1024px,
+                overlapping the sheet's left edge alongside the biography on wide desktop (xl+) */}
+            <div className="relative z-[3] mt-8 xl:absolute xl:left-[-6.75rem] xl:top-[16.5rem] xl:mt-0 xl:w-[190px] 2xl:left-[-8.5rem] 2xl:w-[200px]">
+              <div className="relative w-[150px] border border-[#7C6338]/70 bg-[#F8F6F2] xl:w-full">
                 {/* brass registration frame */}
                 <div aria-hidden="true" className="pointer-events-none absolute inset-2 border border-[#D9B978]/80" />
                 <div className="relative aspect-[3/4] overflow-hidden">
@@ -167,7 +167,7 @@ export default function DossierRoom({ author }: { author: Author }) {
             </div>
 
             {/* biography + archival metadata */}
-            <div className="relative mt-10 grid grid-cols-1 gap-8 lg:mt-12 lg:grid-cols-[1.3fr_0.7fr] lg:gap-12 lg:pl-[8rem] lg:pr-[12rem]">
+            <div className="relative mt-10 grid grid-cols-1 gap-8 lg:mt-12 lg:grid-cols-[1.3fr_0.7fr] lg:gap-12 xl:pl-[6.75rem] xl:pr-[9.5rem] 2xl:pl-[8rem] 2xl:pr-[12rem]">
               <div>
                 <p className="font-mono text-[10px] font-semibold uppercase tracking-[0.2em] text-[#7C6338]">
                   Biography — Contributor record
@@ -190,14 +190,18 @@ export default function DossierRoom({ author }: { author: Author }) {
                     <dt className="text-[#8A8178]">{coCredit ? 'First co-credit' : 'First folio'}</dt>
                     <dd>{first ? first.date.split('-').reverse().join('.') : '—'}</dd>
                   </div>
-                  <div className="flex justify-between gap-4 border-b border-[#3A332C]/30 pb-2">
-                    <dt className="text-[#8A8178]">Primary folios</dt>
-                    <dd>{String(works.length).padStart(2, '0')}</dd>
-                  </div>
-                  <div className="flex justify-between gap-4 border-b border-[#3A332C]/30 pb-2">
-                    <dt className="text-[#8A8178]">Co-credits</dt>
-                    <dd>{String(coWorks.length).padStart(2, '0')}</dd>
-                  </div>
+                  {works.length > 0 && (
+                    <div className="flex justify-between gap-4 border-b border-[#3A332C]/30 pb-2">
+                      <dt className="text-[#8A8178]">Primary folios</dt>
+                      <dd>{works.map((w) => `№ ${folioOf(w.id)}`).join(' · ')}</dd>
+                    </div>
+                  )}
+                  {coWorks.length > 0 && (
+                    <div className="flex justify-between gap-4 border-b border-[#3A332C]/30 pb-2">
+                      <dt className="text-[#8A8178]">Co-credits</dt>
+                      <dd>{coWorks.map((w) => `№ ${folioOf(w.id)}`).join(' · ')}</dd>
+                    </div>
+                  )}
                   <div className="flex justify-between gap-4 border-b border-[#3A332C]/30 pb-2">
                     <dt className="text-[#8A8178]">Portrait</dt>
                     <dd>{portrait ? 'on file' : 'the monogram'}</dd>
@@ -214,11 +218,11 @@ export default function DossierRoom({ author }: { author: Author }) {
               </div>
             </div>
 
-            {/* featured folio plate — in flow after the metadata on mobile,
-                overlapping the sheet's right edge on desktop */}
+            {/* featured folio plate — in flow after the metadata on mobile/tablet/1024px,
+                overlapping the sheet's right edge alongside the metadata on wide desktop (xl+) */}
             {featured && (
-              <div className="relative z-[3] mt-8 lg:absolute lg:right-[-11rem] lg:top-[46%] lg:mt-0 lg:w-[224px] lg:-translate-y-1/2">
-                <div aria-hidden="true" className="absolute -bottom-1 -right-1 h-full w-full border border-[#E7DCC8] bg-[#EFE8DD] lg:hidden" />
+              <div className="relative z-[3] mt-8 xl:absolute xl:right-[-7.25rem] xl:top-[16.5rem] xl:mt-0 xl:w-[216px] 2xl:right-[-10rem] 2xl:w-[224px]">
+                <div aria-hidden="true" className="absolute -bottom-1 -right-1 h-full w-full border border-[#E7DCC8] bg-[#EFE8DD] xl:hidden" />
                 <div className="relative border border-[#7C6338]/70 bg-[#EFE8DD] px-5 py-5 text-[#241D18]">
                   <div aria-hidden="true" className="pointer-events-none absolute inset-1.5 border border-[#D9B978]/50" />
                   <p className="font-mono text-[10px] font-semibold uppercase tracking-[0.2em] text-[#7C6338]">
@@ -249,7 +253,7 @@ export default function DossierRoom({ author }: { author: Author }) {
             )}
 
             {/* the other folios — the rest of the archive behind this name */}
-            <div className="relative mt-10 lg:mt-12 lg:pl-[8rem]">
+            <div className="relative mt-10 lg:mt-12 xl:pl-[6.75rem] 2xl:pl-[8rem]">
               <p className="font-mono text-[9px] uppercase tracking-[0.15em] text-[#7C6338]">
                 {also.length > 0
                   ? `Also in the archive — ${also.map((w) => `№ ${folioOf(w.id)} · ${w.title} · ${w.category} · ${w.readingTime}`).join('   ·   ')}`

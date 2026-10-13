@@ -9,7 +9,15 @@ import { existsSync } from 'node:fs'
 
 const root = process.cwd()
 const ignoredDirs = new Set(['.git', 'node_modules', 'dist', 'coverage', '.cache', '.arena', '.vercel'])
-const safeFiles = new Set(['.env.example', 'scripts/check-secrets.mjs'])
+const safeFiles = new Set([
+  '.env.example',
+  'scripts/check-secrets.mjs',
+  /* Design tokens, not credentials. The filename rule matches the substring
+     "token"; this is the allowlist the rule provides for exactly this case,
+     and it is preferred over renaming a domain concept or loosening the
+     pattern for every file in the repository. */
+  'src/lib/stringTune/tokens.ts',
+])
 const sensitiveName = /(^|\/)(\.env(\..*)?|.*(\.mcp|mcp\.json|oauth|credential|secret|token|cookie|login data|session|pk[i]|private).*)$/i
 const secretPatterns = [
   /-----BEGIN (?:RSA |EC |OPENSSH |DSA )?PRIVATE KEY-----/,

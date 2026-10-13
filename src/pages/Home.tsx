@@ -9,14 +9,16 @@ import VoiceCarousel from '../components/ui/VoiceCarousel'
 import { MotifDivider } from '../components/ui/ArticleClosing'
 import { AnticipatedTitle, ReflectionLine } from '../components/ui/ScrollBeat'
 import { LibraryCard, HiddenQuote } from '../components/ui/EasterEggs'
+import HiringMarquee from '../components/ui/HiringMarquee'
 import { MetaRow, SectionHead, UnderlineLink } from '../components/ui/primitives'
 import { ImmersiveShell, BrassThread } from '../components/immersive'
-import { Magnetic, MaskReveal, Tilt3D, Slate } from '../components/cinematic'
+import { Magnetic, MaskReveal, Tilt3D } from '../components/cinematic'
 import SaveButton from '../components/ui/SaveButton'
 import { ARTICLES, BRAND, CATEGORIES, LEDGER, folioNoOf, getAuthor } from '../data/content'
 import { handleImgError } from '../lib/imgFallback'
 import { useWebGLSupport } from '../lib/three/useWebGLSupport'
 import { introSeen, onIntroResolved } from '../lib/intro'
+import { drift } from '../lib/stringTune/attrs'
 // The spatial engine is loaded on demand so its heavy chunk (three) never
 // ships with the initial publication shell.
 const SpatialArchive = lazy(() => import('../components/spatial/SpatialArchive'))
@@ -177,7 +179,6 @@ function Cover({ selectedId, state }: { selectedId: string | null; state: Spatia
         >
           “Where Vision <em className="italic text-gold">Becomes</em> A Voice”
         </motion.h1>
-        <Slate move="crash zoom" className="mt-6" />
       </motion.div>
 
       {/* ——— MID · ghost folio — № 01 engraved behind the threshold ——— */}
@@ -257,7 +258,8 @@ function Cover({ selectedId, state }: { selectedId: string | null; state: Spatia
                 height={720}
                 decoding="async"
                 onError={(e) => handleImgError(e, feature.title, folioNoOf(feature.id))}
-                className="h-full w-full object-cover"
+                className="h-full w-full scale-[1.06] object-cover"
+                {...drift('restrained')}
               />
               <span aria-hidden="true" className="absolute inset-0 bg-[linear-gradient(180deg,transparent_55%,rgba(28,5,9,0.55))] " />
               <span aria-hidden="true" className="absolute bottom-2 left-3 font-mono text-[8px] uppercase tracking-[0.3em] text-ivory/85">
@@ -504,7 +506,7 @@ function WorksStrip() {
               </AnticipatedTitle>
             </div>
             <div className="text-right">
-              <p className="font-mono text-[9px] uppercase tracking-[0.30em] text-white/55">The eight newest folios · June–August 2026</p>
+              <p className="font-mono text-[9px] uppercase tracking-[0.30em] text-white/55">The eight newest folios · June–October 2026</p>
               <p className="mt-2 font-mono text-[9px] uppercase tracking-[0.30em] text-white/55">{LEDGER.features} features · {LEDGER.creators} creators · {LEDGER.appreciations.toLocaleString('en-US')} appreciations</p>
               <p className="mt-3 max-w-[30ch] font-serif text-base font-light italic leading-[1.6] text-ivory/70">
                 The next issue could begin with your name.
@@ -587,7 +589,7 @@ function FeatureSection({ feature, authorName }: { feature: (typeof ARTICLES)[nu
   return (
     <section className="border-t border-white/10 py-[clamp(8rem,16vh,12rem)]">
       <div className="mx-auto max-w-page px-[clamp(1.75rem,5.5vw,4.75rem)]">
-        <SectionHead eyebrow="The first feature" page="P. 02" ghost="02" />
+        <SectionHead eyebrow="The first feature" />
         <div className="grid grid-cols-1 items-center gap-[clamp(3rem,7vw,8rem)] lg:grid-cols-[1.02fr_0.98fr]">
           <Reveal>
             <div className="grid grid-cols-3 items-start gap-3">
@@ -602,7 +604,7 @@ function FeatureSection({ feature, authorName }: { feature: (typeof ARTICLES)[nu
                     className="aspect-[4/5] w-full object-cover transition-transform duration-[1400ms] ease-out hover:scale-[1.07]"
                   />
                   <figcaption className="border-t border-white/10 px-2 py-2 font-mono text-[8px] uppercase tracking-[0.26em] text-white/50">
-                    {String(i + 1).padStart(2, '0')} / {plates.length}
+                    {String(i + 1).padStart(2, '0')} / {String(plates.length).padStart(2, '0')}
                   </figcaption>
                 </figure>
               ))}
@@ -664,7 +666,7 @@ function Pulse() {
               Every post on the feed — from the founder’s call for women’s rights to the Mir Raza Ali memorial.
             </p>
             <p className="mt-6 font-mono text-[9px] uppercase leading-[2] tracking-[0.26em] text-white/40">
-              Archive data — read from the published feed of June–August 2026. Not live counts.
+              Archive data — read from the published feed of June–October 2026. Not live counts.
             </p>
           </Reveal>
           <div className="border-t border-white/15">
@@ -916,7 +918,7 @@ function SpatialReading({ pickIdx, onSelect }: { pickIdx: number; onSelect: (i: 
       <div className="mx-auto max-w-page px-[clamp(1.75rem,5.5vw,4.75rem)]">
         <div className="flex flex-wrap items-end justify-between gap-6">
           <div>
-            <p className="kicker">Optional spatial reading</p>
+            <p className="kicker">From the archive</p>
             <h2 id="spatial-reading-title" className="mt-5 max-w-[22ch] font-serif text-[clamp(2.2rem,4.6vw,4rem)] font-light leading-[1.05] text-ivory">
               Read a plate. <em className="italic text-gold">Shift the atmosphere.</em>
             </h2>
@@ -1102,6 +1104,7 @@ export default function Home() {
       <VoiceCarousel />
       <MotifDivider label="The invitation" motif="feather" />
       <Invitation />
+      <HiringMarquee />
       <Colophon />
     </ImmersiveShell>
   )

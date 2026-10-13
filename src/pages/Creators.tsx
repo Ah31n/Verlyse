@@ -2,7 +2,7 @@ import { useMemo, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { motion, AnimatePresence, useReducedMotion } from 'motion/react'
 import { useSeo } from '../hooks/useSeo'
-import { ARTICLES, AUTHORS, LEDGER, authorPhoto, coCreditedWorks, folioNoOf, stampDate } from '../data/content'
+import { ARTICLES, AUTHORS, LEDGER, authorPhoto, coCreditedWorks, folioNoOf, hasKnownLikes, stampDate } from '../data/content'
 import { handleImgError } from '../lib/imgFallback'
 
 /** The folios a creator holds in the archive — their own entries. */
@@ -29,7 +29,8 @@ function monogram(name: string) {
  * Not a grid of profile cards: a wall whose names step forward.
  * Keyboard: names are real buttons; ← → move · Enter selects · Esc returns.
  */
-import { CrashZoom , MaskReveal, Magnetic, Tilt3D, Slate } from '../components/cinematic'
+import { CrashZoom , MaskReveal, Magnetic, Tilt3D } from '../components/cinematic'
+import { spotlight } from '../lib/stringTune/attrs'
 
 export default function Creators() {
   useSeo({
@@ -61,7 +62,15 @@ export default function Creators() {
     [folios, coCredits],
   )
   const selectedFeature = useMemo(
-    () => folios.length ? [...folios].sort((a, b) => b.likes - a.likes)[0] : undefined,
+    () =>
+      folios.length
+        ? [...folios].sort(
+            (a, b) =>
+              (hasKnownLikes(b) ? b.likes : -1) - (hasKnownLikes(a) ? a.likes : -1) ||
+              b.comments - a.comments ||
+              b.date.localeCompare(a.date),
+          )[0]
+        : undefined,
     [folios],
   )
 
@@ -123,7 +132,6 @@ export default function Creators() {
           <p className="mx-auto mt-2 max-w-[70ch] font-mono text-[9px] uppercase leading-[1.9] tracking-[0.22em] text-white/45">
             {LEDGER.creators} byline names carry a feature — {LEDGER.humanCreators} named writers plus the masthead’s own dispatch; the wall holds {LEDGER.wallRecords} records because the extra one is the poet who wrote the verse beside a painting. Every record is real
           </p>
-          <Slate move="crash zoom" className="mt-5" />
         </div>
 
         {/* ——— FRONT · the dossier plate — the focused contributor steps forward ——— */}
@@ -256,7 +264,10 @@ export default function Creators() {
 
                   {/* portrait / monogram plate */}
                   <Tilt3D>
-                  <div className="img-frame relative flex aspect-[3/4] w-full max-w-[190px] items-center justify-center overflow-hidden bg-[#F2EADA] p-3">
+                  <div
+                    className="img-frame st-spotlit relative flex aspect-[3/4] w-full max-w-[190px] items-center justify-center overflow-hidden bg-[#F2EADA] p-3"
+                    {...spotlight()}
+                  >
                     {selected.portrait || selected.profilePhoto ? (
                       <img
                         src={selected.profilePhoto ?? selected.portrait ?? authorPhoto(selected.id)}
@@ -274,7 +285,7 @@ export default function Creators() {
                     )}
                     <span aria-hidden className="absolute inset-2 border border-gold/40" />
                     <span className="absolute -bottom-3 left-1/2 -translate-x-1/2 whitespace-nowrap bg-[#1C0509] px-2 py-1 font-mono text-[8px] uppercase tracking-[0.24em] text-ivory">
-                      Portrait · Plate 01
+                      {selected.handle}
                     </span>
                   </div>
                   </Tilt3D>
