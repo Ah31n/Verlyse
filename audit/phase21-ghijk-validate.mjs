@@ -61,14 +61,14 @@ const plateOpacity = (page) => page.evaluate(() => Array.from(document.querySele
   const ghosts = ops.filter((o) => o <= 0.12).length
   if (members === bright && ghosts === ops.length - members) pass('G: selecting a room reorganizes the archive', `${bright} bright / ${ghosts} ghosts`)
   else fail('G: room reorg', JSON.stringify({ members, bright, ghosts }))
-  const headTxt = await page.evaluate(() => Array.from(document.querySelectorAll('h2')).map((h) => h.innerText).join(' | '))
+  const headTxt = await page.evaluate(() => Array.from(document.querySelectorAll('h2, [role="status"]')).map((h) => h.innerText).join(' | '))
   if (/Poetry/i.test(headTxt) && /folio/i.test(headTxt)) pass('G: heading reflects the room', headTxt.trim().slice(0, 40))
   else fail('G: heading', headTxt)
   // restore
   await page.evaluate(() => { Array.from(document.querySelectorAll('button[aria-pressed]')).find((b) => /Poetry/i.test(b.innerText))?.click() })
   await sleep(1000)
   const ops2 = await plateOpacity(page)
-  if (ops2.length === 19 && ops2.filter((o) => o > 0.3).length >= 5) pass('G: deselect restores the whole archive (19 plates, plain stacks)')
+  if (ops2.length === 20 && ops2.filter((o) => o > 0.3).length >= 5) pass('G: deselect restores the whole archive (20 plates, plain stacks)')
   else fail('G: restore', JSON.stringify(ops2))
   // keyboard: focus a room via Tab, press Enter to select
   let tabbed = false
@@ -239,7 +239,7 @@ const plateOpacity = (page) => page.evaluate(() => Array.from(document.querySele
   await page.goto(`${BASE}/categories`, { waitUntil: 'domcontentloaded', timeout: 30000 })
   await sleep(1500)
   const plates = await plateCount(page)
-  if (plates === 19 && !(await overflow(page))) pass('R: mobile /categories — 19 plates, no overflow')
+  if (plates === 20 && !(await overflow(page))) pass('R: mobile /categories — 20 plates, no overflow')
   else fail('R: mobile /categories', String(plates))
   await page.screenshot({ path: `${OUT}/phase21-categories-mobile.png` })
   await p.close()
@@ -275,5 +275,5 @@ const fails = results.filter((r) => r.status === 'FAIL')
 console.log('\n=== PHASE 21 SLICES G–K VALIDATION ===')
 for (const r of results) console.log(`${r.status === 'PASS' ? '✅' : '❌'} ${r.check}${r.detail ? ' — ' + r.detail : ''}`)
 console.log(`\nTOTAL ${results.length} | PASS ${results.length - fails.length} | FAIL ${fails.length}`)
-fs.writeFileSync('/home/user/verlyse-project/audit/phase21-ghijk-results.json', JSON.stringify(results, null, 2))
+fs.writeFileSync(`${OUT}/phase21-ghijk-results.json`, JSON.stringify(results, null, 2))
 process.exit(fails.length ? 1 : 0)
