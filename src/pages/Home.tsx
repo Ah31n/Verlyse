@@ -12,11 +12,10 @@ import { LibraryCard, HiddenQuote } from '../components/ui/EasterEggs'
 import HiringMarquee from '../components/ui/HiringMarquee'
 import { MetaRow, SectionHead, UnderlineLink } from '../components/ui/primitives'
 import { ImmersiveShell, BrassThread } from '../components/immersive'
-import { Magnetic, MaskReveal, Tilt3D, Slate } from '../components/cinematic'
+import { Magnetic, MaskReveal, Tilt3D } from '../components/cinematic'
 import SaveButton from '../components/ui/SaveButton'
 import { ARTICLES, BRAND, CATEGORIES, LEDGER, folioNoOf, getAuthor } from '../data/content'
 import { handleImgError } from '../lib/imgFallback'
-import { useWebGLSupport } from '../lib/three/useWebGLSupport'
 import { introSeen, onIntroResolved } from '../lib/intro'
 import { drift } from '../lib/stringTune/attrs'
 // The spatial engine is loaded on demand so its heavy chunk (three) never
@@ -179,7 +178,6 @@ function Cover({ selectedId, state }: { selectedId: string | null; state: Spatia
         >
           “Where Vision <em className="italic text-gold">Becomes</em> A Voice”
         </motion.h1>
-        <Slate move="crash zoom" className="mt-6" />
       </motion.div>
 
       {/* ——— MID · ghost folio — № 01 engraved behind the threshold ——— */}
@@ -590,7 +588,7 @@ function FeatureSection({ feature, authorName }: { feature: (typeof ARTICLES)[nu
   return (
     <section className="border-t border-white/10 py-[clamp(8rem,16vh,12rem)]">
       <div className="mx-auto max-w-page px-[clamp(1.75rem,5.5vw,4.75rem)]">
-        <SectionHead eyebrow="The first feature" page="P. 02" ghost="02" />
+        <SectionHead eyebrow="The first feature" />
         <div className="grid grid-cols-1 items-center gap-[clamp(3rem,7vw,8rem)] lg:grid-cols-[1.02fr_0.98fr]">
           <Reveal>
             <div className="grid grid-cols-3 items-start gap-3">
@@ -605,7 +603,7 @@ function FeatureSection({ feature, authorName }: { feature: (typeof ARTICLES)[nu
                     className="aspect-[4/5] w-full object-cover transition-transform duration-[1400ms] ease-out hover:scale-[1.07]"
                   />
                   <figcaption className="border-t border-white/10 px-2 py-2 font-mono text-[8px] uppercase tracking-[0.26em] text-white/50">
-                    {String(i + 1).padStart(2, '0')} / {plates.length}
+                    {String(i + 1).padStart(2, '0')} / {String(plates.length).padStart(2, '0')}
                   </figcaption>
                 </figure>
               ))}
@@ -874,10 +872,6 @@ const SPATIAL_PICKS = ['their-voices-matter', '3-13', 'the-garden-beyond-my-towe
  */
 function SpatialReading({ pickIdx, onSelect }: { pickIdx: number; onSelect: (i: number) => void }) {
   const reduce = useReducedMotion() === true
-  /* whether the WebGL hall is actually alive behind the cover — the panel's
-     marginal note may only claim the hall is leaning when it truly is */
-  const { supported: glSupported } = useWebGLSupport()
-  const hallLive = glSupported && !reduce
   const picks = SPATIAL_PICKS.map((id) => ARTICLES.find((x) => x.id === id)).filter(Boolean) as typeof ARTICLES
   const active = picks[pickIdx] ?? picks[0]
   const au = getAuthor(active.authorId)
@@ -919,7 +913,7 @@ function SpatialReading({ pickIdx, onSelect }: { pickIdx: number; onSelect: (i: 
       <div className="mx-auto max-w-page px-[clamp(1.75rem,5.5vw,4.75rem)]">
         <div className="flex flex-wrap items-end justify-between gap-6">
           <div>
-            <p className="kicker">Optional spatial reading</p>
+            <p className="kicker">From the archive</p>
             <h2 id="spatial-reading-title" className="mt-5 max-w-[22ch] font-serif text-[clamp(2.2rem,4.6vw,4rem)] font-light leading-[1.05] text-ivory">
               Read a plate. <em className="italic text-gold">Shift the atmosphere.</em>
             </h2>
@@ -1044,11 +1038,6 @@ function SpatialReading({ pickIdx, onSelect }: { pickIdx: number; onSelect: (i: 
                     <Link to={`/article/${active.id}`} className="btn btn-gold !px-7 !py-3">
                       Open the full feature →
                     </Link>
-                    <span className="font-mono text-[9px] uppercase tracking-[0.26em] text-white/45">
-                      {hallLive
-                        ? 'The hall above is leaning toward this plate'
-                        : 'This reader keeps the hall still — the plate still turns'}
-                    </span>
                   </div>
                 </div>
               </motion.div>

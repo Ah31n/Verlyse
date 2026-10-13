@@ -22,7 +22,8 @@ export function isPendingSourceAsset(path: string): boolean {
 
 export function plateFallback(title?: string, folioNo?: string, subtitle?: string): string {
   const safeTitle = esc((title || 'Verlyse Media').slice(0, 64))
-  const safeFolio = esc(folioNo ? `FOLIO № ${folioNo}` : 'VERLYSE MEDIA · ARCHIVE')
+  const validFolio = folioNo && folioNo !== '0' && folioNo !== '00' ? folioNo : ''
+  const safeFolio = esc(validFolio ? `FOLIO № ${validFolio}` : 'VERLYSE MEDIA · ARCHIVE')
   const safeSub = subtitle ? esc(subtitle.slice(0, 64)) : ''
   const svg = `<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 800 1000' width='800' height='1000'>
     <defs>

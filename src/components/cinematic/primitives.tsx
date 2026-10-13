@@ -429,19 +429,8 @@ export function Rise3D({
  * slate (CAM — CRASH ZOOM · 35MM). Purely presentational and aria-hidden; it
  * carries the "directed" reading without adding motion of its own.
  */
-export function Slate({
-  move,
-  lens = '35MM',
-  className = '',
-}: { move: string; lens?: string; className?: string }) {
-  return (
-    <p aria-hidden="true" className={`flex items-center justify-center gap-2.5 font-mono text-[9px] uppercase tracking-[0.3em] text-gold/70 ${className}`}>
-      <span className="inline-block h-1.5 w-1.5 rounded-full bg-gold/80" />
-      <span>cam — {move}</span>
-      <span className="text-gold/40">·</span>
-      <span>{lens}</span>
-    </p>
-  )
+export function Slate(_props: { move?: string; lens?: string; className?: string }) {
+  return null
 }
 
 /**

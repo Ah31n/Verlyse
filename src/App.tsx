@@ -39,8 +39,11 @@ function thresholdLabel(pathname: string): string {
   if (pathname.startsWith('/article/')) {
     const id = segment('/article/')
     const i = ARTICLES.findIndex((a) => a.id === id)
-    const folio = i >= 0 ? String(i + 1).padStart(2, '0') : '—'
-    return `Folio ${folio} · Reading`
+    if (i >= 0) {
+      const folio = String(i + 1).padStart(2, '0')
+      return `“${ARTICLES[i].title}” — № ${folio}`
+    }
+    return 'The Reading Room'
   }
   if (pathname.startsWith('/creator/')) return 'A contributor dossier'
   switch (pathname) {

@@ -23,7 +23,7 @@ function LetterHint({ id, show, children }: { id: string; show: boolean; childre
  * that is pressed when the letter is sent. When the seal is pressed,
  * the letter becomes its acknowledgement.
  */
-import { CrashZoom , MaskReveal, Slate } from '../components/cinematic'
+import { CrashZoom , MaskReveal } from '../components/cinematic'
 
 export default function Contact() {
   useSeo({
@@ -144,7 +144,6 @@ path: '/contact',
             <p className="mt-6 font-mono text-[10px] uppercase tracking-[0.3em] text-gold/85">
               Write to the publication — a letter, not a form
             </p>
-          <Slate move="crash zoom" className="mt-5" />
           </Reveal>
           <Reveal delay={0.25}>
             <p className="mx-auto mt-6 max-w-[52ch] text-lg leading-[1.8] text-white/70">

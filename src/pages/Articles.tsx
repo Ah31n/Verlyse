@@ -432,7 +432,7 @@ function Archive() {
                 Esc · return to the full shelf
               </button>
             )}
-            {cat === 'All' && !query && sort === 'registry' && <span className="text-white/40">State · rest — the shelf holds all {LEDGER.features}</span>}
+            {cat === 'All' && !query && sort === 'registry' && <span className="text-white/40">Issue № {LEDGER.issueNo} — all {LEDGER.features} folios in registry order</span>}
           </span>
         </div>
       </div>

@@ -46,7 +46,7 @@
     },
     "hiring-marquee-and-roster-removal": {
       "status": "PASS",
-      "detail": "{\"ctaPresent\":true,\"targetBlank\":true,\"relSafe\":true,\"noRemovedTeam\":true,\"hasRoles\":true,\"hasHeadline\":true}"
+      "detail": "{\"ctaPresent\":true,\"targetBlank\":true,\"relSafe\":true,\"noRemovedTeam\":true,\"noPlaceholderLabels\":true,\"hasRoles\":true,\"hasHeadline\":true}"
     },
     "mobile-375px-no-overflow": {
       "status": "PASS",

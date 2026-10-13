@@ -22,7 +22,7 @@ import WriterProfile, { formatQuotedNote } from '../src/components/ui/WriterProf
 import Ambassadors from '../src/pages/Ambassadors'
 import Submit from '../src/pages/Submit'
 import Contact from '../src/pages/Contact'
-import { ARTICLES, AUTHORS, BRAND, hasKnownLikes, sortArticles } from '../src/data/content'
+import { ARTICLES, AUTHORS, BRAND, folioNoOf, hasKnownLikes, sortArticles } from '../src/data/content'
 
 interface Result { name: string; ok: boolean; detail: string }
 const results: Result[] = []
@@ -252,6 +252,7 @@ export async function run() {
     assert(text.includes('The next voice could be yours.'), 'missing hiring headline')
     assert(text.includes('Researcher') && text.includes('Palette Designer') && text.includes('Content Writer'), 'missing one or more open roles')
     assert(text.includes('Previous experience isn’t essential'), 'missing beginner-friendly experience note')
+    assert(!/track\s*0/i.test(text), 'HiringMarquee rendered generic Track 0 label')
 
     const cta = screen.getByRole('link', { name: /Explore the roles and apply to Verlyse Media/i })
     assert(cta.getAttribute('href') === exactFormUrl, `hiring CTA href mismatch: ${cta.getAttribute('href')}`)
@@ -263,7 +264,12 @@ export async function run() {
     const ambText = document.body.textContent ?? ''
     assert(!ambText.includes('Haiqa Nafees') && !ambText.includes('HAIQA NAFEES'), 'Haiqa Nafees still rendered on /ambassadors')
     assert(!ambText.includes('Manha') && !ambText.includes('MANHA'), 'Manha still rendered on /ambassadors')
+    assert(!/crash zoom|35mm/i.test(ambText), '/ambassadors rendered generic camera slate text')
     cleanup()
+
+    const haiqaAuthor = AUTHORS.find((a) => a.id === 'haiqa-nafees')
+    assert(!!haiqaAuthor && haiqaAuthor.role === 'Writer · Associate Editor', 'Haiqa Nafees author profile was not preserved in AUTHORS')
+    assert(folioNoOf('non-existent-article') === '', 'folioNoOf should return empty string rather than 00 for missing article')
   })
 
   const failed = results.filter((r) => !r.ok)

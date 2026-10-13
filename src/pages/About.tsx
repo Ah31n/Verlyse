@@ -5,7 +5,7 @@ import { BRAND, COMMUNITY_STATS, LEDGER } from '../data/content'
 import BrassRule from '../components/ui/BrassRule'
 import HiringMarquee from '../components/ui/HiringMarquee'
 import { LibraryCard } from '../components/ui/EasterEggs'
-import { CrashZoom, DepthStage, DepthLayer, OrbitalDrift, PushIn , MaskReveal, Slate } from '../components/cinematic'
+import { CrashZoom, DepthStage, DepthLayer, OrbitalDrift, PushIn , MaskReveal } from '../components/cinematic'
 import { handleImgError } from '../lib/imgFallback'
 
 /**
@@ -68,7 +68,6 @@ export default function About() {
           <p className="mt-4 font-mono text-[10px] uppercase tracking-[0.34em] text-gold/80">
             The colophon — the institutional record of Verlyse Media
           </p>
-          <Slate move="crash zoom" className="mt-5" />
         </div>
 
         {/* ——— MID · the layered editorial sheets ———

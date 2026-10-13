@@ -190,14 +190,18 @@ export default function DossierRoom({ author }: { author: Author }) {
                     <dt className="text-[#8A8178]">{coCredit ? 'First co-credit' : 'First folio'}</dt>
                     <dd>{first ? first.date.split('-').reverse().join('.') : '—'}</dd>
                   </div>
-                  <div className="flex justify-between gap-4 border-b border-[#3A332C]/30 pb-2">
-                    <dt className="text-[#8A8178]">Primary folios</dt>
-                    <dd>{String(works.length).padStart(2, '0')}</dd>
-                  </div>
-                  <div className="flex justify-between gap-4 border-b border-[#3A332C]/30 pb-2">
-                    <dt className="text-[#8A8178]">Co-credits</dt>
-                    <dd>{String(coWorks.length).padStart(2, '0')}</dd>
-                  </div>
+                  {works.length > 0 && (
+                    <div className="flex justify-between gap-4 border-b border-[#3A332C]/30 pb-2">
+                      <dt className="text-[#8A8178]">Primary folios</dt>
+                      <dd>{works.map((w) => `№ ${folioOf(w.id)}`).join(' · ')}</dd>
+                    </div>
+                  )}
+                  {coWorks.length > 0 && (
+                    <div className="flex justify-between gap-4 border-b border-[#3A332C]/30 pb-2">
+                      <dt className="text-[#8A8178]">Co-credits</dt>
+                      <dd>{coWorks.map((w) => `№ ${folioOf(w.id)}`).join(' · ')}</dd>
+                    </div>
+                  )}
                   <div className="flex justify-between gap-4 border-b border-[#3A332C]/30 pb-2">
                     <dt className="text-[#8A8178]">Portrait</dt>
                     <dd>{portrait ? 'on file' : 'the monogram'}</dd>

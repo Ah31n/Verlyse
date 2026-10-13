@@ -362,7 +362,10 @@ export default function ArticleDetail() {
             <Reveal delay={0.3}>
               <div className="mt-8 flex max-w-[560px] items-center justify-between border-t border-white/15 pt-4 font-mono text-[9px] uppercase tracking-[0.30em] text-white/55">
                 <span>Issue — {article.date.split('-').reverse().join('.')}</span>
-                <span className="flex items-center gap-2"><span className="text-gold">✦</span>{article.motif ?? 'a verlyse feature'}</span>
+                <span className="flex items-center gap-2">
+                  <span className="text-gold">✦</span>
+                  {(article.motif && MARGINALIA[article.motif]) || `Folio № ${folio}`}
+                </span>
               </div>
             </Reveal>
           </div>
@@ -482,7 +485,7 @@ export default function ArticleDetail() {
                 <span>Issue — {article.date.split('-').reverse().join('.')}</span>
                 <span className="flex items-center gap-2">
                   <span className="text-gold">✦</span>
-                  {article.motif ? article.motif : 'a verlyse feature'}
+                  {(article.motif && MARGINALIA[article.motif]) || `Folio № ${folio}`}
                 </span>
               </div>
             </Reveal>
@@ -636,7 +639,10 @@ export default function ArticleDetail() {
                       </div>
                       <figcaption className="mt-4">
                         <p className="font-mono text-[10px] uppercase tracking-[0.28em] text-gold">
-                          {f.label} <span className="text-white/55">— {String(i + 1).padStart(2, '0')} / {figures.length}</span>
+                          {f.label}
+                          {figures.length > 1 && (
+                            <span className="text-white/55"> — {String(i + 1).padStart(2, '0')} / {String(figures.length).padStart(2, '0')}</span>
+                          )}
                         </p>
                         <p className="mt-2 max-w-[44ch] text-sm leading-relaxed text-white/60">{f.caption}</p>
                       </figcaption>
@@ -666,9 +672,7 @@ export default function ArticleDetail() {
                     Source Caption — Verbatim Record
                   </p>
                   <span className="font-mono text-[9px] uppercase tracking-[0.22em] text-white/60">
-                    {article.publicationStatus === 'provisional' ? 'Provisional entry · ' : ''}
-                    {article.editorialFormat === 'carousel-feature' ? 'Five-plate sequence · ' : ''}
-                    {article.shortCode}
+                    {article.editorialFormat === 'carousel-feature' ? `Five-plate sequence · Folio № ${folio}` : `Folio № ${folio}`}
                   </span>
                 </div>
                 <pre className="mt-5 whitespace-pre-wrap break-words font-serif text-[15px] italic leading-[1.75] text-ivory/88">

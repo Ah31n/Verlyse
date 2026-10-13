@@ -157,6 +157,7 @@ async function run() {
     const exactHref = 'https://docs.google.com/forms/d/e/1FAIpQLScbXxbyw22YM4Mlid81RoyckzgwvpBC9h8siWff3hMp6tcBwg/viewform?usp=publish-editor'
     const cta = document.querySelector(`a[href="${exactHref}"]`)
     const noRemovedTeam = !/haiqa nafees|\bmanha\b/i.test(txt)
+    const noPlaceholderLabels = !/crash zoom|35mm|track\s*0|folio\s*00/i.test(txt)
     const hasRoles = txt.includes('Researcher') && txt.includes('Palette Designer') && txt.includes('Content Writer')
     const hasHeadline = txt.includes('The next voice could be yours.')
     return {
@@ -164,6 +165,7 @@ async function run() {
       targetBlank: cta?.getAttribute('target') === '_blank',
       relSafe: (cta?.getAttribute('rel') || '').includes('noopener'),
       noRemovedTeam,
+      noPlaceholderLabels,
       hasRoles,
       hasHeadline,
     }
@@ -174,6 +176,7 @@ async function run() {
       rosterAndHiring.targetBlank &&
       rosterAndHiring.relSafe &&
       rosterAndHiring.noRemovedTeam &&
+      rosterAndHiring.noPlaceholderLabels &&
       rosterAndHiring.hasRoles &&
       rosterAndHiring.hasHeadline,
     JSON.stringify(rosterAndHiring),

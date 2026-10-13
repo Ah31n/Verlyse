@@ -4,25 +4,22 @@ import { Magnetic, MaskReveal } from '../cinematic'
 import Reveal from './Reveal'
 
 const MARQUEE_PHRASES = [
-  { tag: '01', text: 'Researchers wanted', italicWord: 'Researchers' },
-  { tag: '02', text: 'Palette Designers wanted', italicWord: 'Palette Designers' },
-  { tag: '03', text: 'Content Writers wanted', italicWord: 'Content Writers' },
-  { tag: '✦', text: 'The next byline could be yours', italicWord: 'next byline' },
+  { text: 'Researchers wanted', italicWord: 'Researchers' },
+  { text: 'Palette Designers wanted', italicWord: 'Palette Designers' },
+  { text: 'Content Writers wanted', italicWord: 'Content Writers' },
+  { text: 'The next byline could be yours', italicWord: 'next byline' },
 ] as const
 
-function renderPhrase({ tag, text, italicWord }: (typeof MARQUEE_PHRASES)[number]) {
+function renderPhrase({ text, italicWord }: (typeof MARQUEE_PHRASES)[number]) {
   const idx = text.indexOf(italicWord)
   if (idx < 0) return <span>{text}</span>
   const before = text.slice(0, idx)
   const after = text.slice(idx + italicWord.length)
   return (
-    <span className="inline-flex items-baseline gap-3">
-      <span className="font-mono text-[9px] uppercase tracking-[0.28em] text-gold/80">[{tag}]</span>
-      <span className="font-serif text-[clamp(1.35rem,2.8vw,2.35rem)] font-light tracking-[-0.01em] text-ivory">
-        {before}
-        <em className="italic text-gold">{italicWord}</em>
-        {after}
-      </span>
+    <span className="font-serif text-[clamp(1.35rem,2.8vw,2.35rem)] font-light tracking-[-0.01em] text-ivory">
+      {before}
+      <em className="italic text-gold">{italicWord}</em>
+      {after}
     </span>
   )
 }
@@ -69,7 +66,7 @@ export default function HiringMarquee({ className = '' }: { className?: string }
               {hiring.kicker}
             </p>
             <p className="font-mono text-[9px] uppercase tracking-[0.28em] text-white/55">
-              {hiring.concept} · Three Editorial Tracks
+              {hiring.rolesMicrocopy}
             </p>
           </div>
         </Reveal>
@@ -150,7 +147,7 @@ export default function HiringMarquee({ className = '' }: { className?: string }
         )}
       </div>
 
-      {/* ============ Three Role Tracks + LAYER C — Clear Application Invitation ============ */}
+      {/* ============ Three Open Roles + LAYER C — Clear Application Invitation ============ */}
       <div className="relative z-10 mx-auto mt-10 max-w-page px-[clamp(1.75rem,5.5vw,4.75rem)]">
         {/* Three editorial role cards */}
         <div className="grid grid-cols-1 gap-5 md:grid-cols-3">
@@ -158,11 +155,8 @@ export default function HiringMarquee({ className = '' }: { className?: string }
             <Reveal key={r.title} delay={0.06 * (i + 1)}>
               <div className="relative flex h-full flex-col justify-between border border-gold/25 bg-[#F8F6F2]/[0.03] p-6 transition-colors duration-500 hover:border-gold/55 hover:bg-[#F8F6F2]/[0.05]">
                 <div>
-                  <div className="flex items-baseline justify-between gap-3 border-b border-white/10 pb-3">
-                    <span className="font-mono text-[9px] uppercase tracking-[0.28em] text-gold">
-                      Track {r.index}
-                    </span>
-                    <span className="font-mono text-[8.5px] uppercase tracking-[0.22em] text-white/50">
+                  <div className="border-b border-white/10 pb-3">
+                    <span className="font-mono text-[9px] uppercase tracking-[0.26em] text-gold">
                       {r.focus}
                     </span>
                   </div>
@@ -173,9 +167,6 @@ export default function HiringMarquee({ className = '' }: { className?: string }
                     {r.summary}
                   </p>
                 </div>
-                <p className="mt-5 pt-2 font-mono text-[8.5px] uppercase tracking-[0.24em] text-gold/80">
-                  Role-specific section in the form
-                </p>
               </div>
             </Reveal>
           ))}
@@ -189,7 +180,7 @@ export default function HiringMarquee({ className = '' }: { className?: string }
                 {hiring.rolesMicrocopy}
               </p>
               <p className="mt-1.5 font-serif text-lg italic leading-snug text-[#241D18]/85">
-                Choose your track in the official application form — role-specific questions plus a shared availability section.
+                Apply through the official Verlyse Media open call — role-specific questions and shared availability in one form.
               </p>
             </div>
             <Magnetic className="w-full shrink-0 sm:w-auto">

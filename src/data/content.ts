@@ -271,9 +271,9 @@ export const AUTHORS: Author[] = [
     id: 'haiqa-nafees',
     name: 'Haiqa Nafees',
     handle: '@maddu__0',
-    role: 'Writer · Poet',
-    bio: 'Shared her go-to Khageena recipe — simple ingredients, 10 minutes, zero stress — made specially for students (presented 24 July 2026), and wrote the poem “Jaldi” (presented 29 July 2026).',
-    confirmed: true,    philosophy: 'Writer and poet — she writes the small, true things: recipes for tired students, and the word “jaldi” that stands between parents and children.',
+    role: 'Writer · Associate Editor',
+    bio: 'Associate editor of Verlyse Media. She shared her go-to Khageena recipe — simple ingredients, 10 minutes, zero stress — made specially for students (presented 24 July 2026).',
+    confirmed: true,    philosophy: 'Associate editor and poet — she writes the small, true things: recipes for tired students, and the word “jaldi” that stands between parents and children.',
     favoriteQuote: 'A break from continuous working helps the mind work better.',
 
   },
@@ -1232,38 +1232,38 @@ export const ARTICLES: Article[] = [
       '/img/works/DeUZFPTCjPU-1.webp',
       'The Quiet Grief — Plate 01 · Ballet shoes',
       '20 · 01',
-      'PLATE 01 / 05 · BALLET SHOES · DeUZFPTCjPU',
+      'PLATE 01 / 05 · BALLET SHOES',
     ),
     slides: [
       plateSrc(
         '/img/works/DeUZFPTCjPU-1.webp',
         'The Quiet Grief — Plate 01 · Ballet shoes',
         '20 · 01',
-        'PLATE 01 / 05 · BALLET SHOES · DeUZFPTCjPU',
+        'PLATE 01 / 05 · BALLET SHOES',
       ),
       plateSrc(
         '/img/works/DeUZFPTCjPU-2.webp',
         'The Quiet Grief — Plate 02 · A camera',
         '20 · 02',
-        'PLATE 02 / 05 · A CAMERA · DeUZFPTCjPU',
+        'PLATE 02 / 05 · A CAMERA',
       ),
       plateSrc(
         '/img/works/DeUZFPTCjPU-3.webp',
         'The Quiet Grief — Plate 03 · Books',
         '20 · 03',
-        'PLATE 03 / 05 · BOOKS · DeUZFPTCjPU',
+        'PLATE 03 / 05 · BOOKS',
       ),
       plateSrc(
         '/img/works/DeUZFPTCjPU-4.webp',
         'The Quiet Grief — Plate 04 · Vanity objects',
         '20 · 04',
-        'PLATE 04 / 05 · VANITY OBJECTS · DeUZFPTCjPU',
+        'PLATE 04 / 05 · VANITY OBJECTS',
       ),
       plateSrc(
         '/img/works/DeUZFPTCjPU-5.webp',
         'The Quiet Grief — Plate 05 · Pink technology (2000s)',
         '20 · 05',
-        'PLATE 05 / 05 · PINK TECHNOLOGY (2000S) · DeUZFPTCjPU',
+        'PLATE 05 / 05 · PINK TECHNOLOGY (2000S)',
       ),
     ],
     tags: ['Art', 'TheQuietGrief', 'LostPassions', 'ArtAndWords', 'CreativeExpression'],
@@ -1278,7 +1278,7 @@ export const ARTICLES: Article[] = [
       '#verlysemedia #TheQuietGrief #LostPassions #ArtAndWords CreativeExpression',
     ].join('\n\n'),
     editorialFormat: 'carousel-feature',
-    publicationStatus: 'provisional',
+    publicationStatus: 'published',
     slideDescriptions: [
       {
         plate: '01',
@@ -1576,21 +1576,18 @@ export const BRAND = {
     rolesMicrocopy: 'Researcher · Palette Designer · Content Writer',
     roles: [
       {
-        index: '01',
         title: 'Researcher',
         focus: 'Investigation & Source Evaluation',
         summary:
           'Reliable information gathering, topic exploration, and organized research — distinguishing credible sources from misinformation to support editorial features.',
       },
       {
-        index: '02',
         title: 'Palette Designer',
         focus: 'Color & Visual Direction',
         summary:
           'Color palettes, visual moods, and color theory — translating each topic’s atmosphere into consistent visual direction and editorial storytelling.',
       },
       {
-        index: '03',
         title: 'Content Writer',
         focus: 'Editorial Storytelling',
         summary:
@@ -1704,7 +1701,7 @@ export function getAuthor(id: string): Author | undefined {
  * metadata previously did on all sixteen dossiers — is not a styling choice,
  * it is a miscrediting. The role is real data; this reads it.
  *
- * Compound roles ("Writer · Poet", "Founder · prose poet") are
+ * Compound roles ("Writer · Associate Editor", "Founder · prose poet") are
  * reduced to their first segment for a page title, where brevity matters;
  * every other surface keeps the full role string.
  */
@@ -1729,9 +1726,10 @@ export function roleInSentence(author: Author): string {
 export function worksBy(authorId: string): Article[] {
   return ARTICLES.filter((a) => a.authorId === authorId)
 }
-/** Registry folio number of an article as a zero-padded string (01…19). */
+/** Registry folio number of an article as a zero-padded string (01…20). */
 export function folioNoOf(articleId: string): string {
-  return String(ARTICLES.findIndex((x) => x.id === articleId) + 1).padStart(2, '0')
+  const idx = ARTICLES.findIndex((x) => x.id === articleId)
+  return idx >= 0 ? String(idx + 1).padStart(2, '0') : ''
 }
 /** Folios that name the author in a secondary credit line (the poem
     written beside a painting). This is how a record with zero primary
