@@ -1278,7 +1278,7 @@ export const ARTICLES: Article[] = [
       '#verlysemedia #TheQuietGrief #LostPassions #ArtAndWords CreativeExpression',
     ].join('\n\n'),
     editorialFormat: 'carousel-feature',
-    publicationStatus: 'published',
+    publicationStatus: 'provisional',
     slideDescriptions: [
       {
         plate: '01',

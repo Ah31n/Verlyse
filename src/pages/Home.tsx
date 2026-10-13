@@ -16,6 +16,7 @@ import { Magnetic, MaskReveal, Tilt3D } from '../components/cinematic'
 import SaveButton from '../components/ui/SaveButton'
 import { ARTICLES, BRAND, CATEGORIES, LEDGER, folioNoOf, getAuthor } from '../data/content'
 import { handleImgError } from '../lib/imgFallback'
+import { useWebGLSupport } from '../lib/three/useWebGLSupport'
 import { introSeen, onIntroResolved } from '../lib/intro'
 import { drift } from '../lib/stringTune/attrs'
 // The spatial engine is loaded on demand so its heavy chunk (three) never
@@ -872,6 +873,10 @@ const SPATIAL_PICKS = ['their-voices-matter', '3-13', 'the-garden-beyond-my-towe
  */
 function SpatialReading({ pickIdx, onSelect }: { pickIdx: number; onSelect: (i: number) => void }) {
   const reduce = useReducedMotion() === true
+  /* whether the WebGL hall is actually alive behind the cover — the panel's
+     marginal note may only claim the hall is leaning when it truly is */
+  const { supported: glSupported } = useWebGLSupport()
+  const hallLive = glSupported && !reduce
   const picks = SPATIAL_PICKS.map((id) => ARTICLES.find((x) => x.id === id)).filter(Boolean) as typeof ARTICLES
   const active = picks[pickIdx] ?? picks[0]
   const au = getAuthor(active.authorId)
@@ -1038,6 +1043,11 @@ function SpatialReading({ pickIdx, onSelect }: { pickIdx: number; onSelect: (i: 
                     <Link to={`/article/${active.id}`} className="btn btn-gold !px-7 !py-3">
                       Open the full feature →
                     </Link>
+                    <span className="font-mono text-[9px] uppercase tracking-[0.26em] text-white/45">
+                      {hallLive
+                        ? 'The hall above is leaning toward this plate'
+                        : 'This reader keeps the hall still — the plate still turns'}
+                    </span>
                   </div>
                 </div>
               </motion.div>
