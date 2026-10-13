@@ -20,7 +20,7 @@ import ArticleSignature from '../components/ui/ArticleSignature'
 const StoryEnding3D = lazy(() => import('../components/spatial/StoryEnding3D'))
 import SaveButton from '../components/ui/SaveButton'
 import { useReadingMode } from '../components/ui/ReadingMode'
-import { ImmersiveShell, BrassThread, ReadingMeasure } from '../components/immersive'
+import { ImmersiveShell, ReadingMeasure } from '../components/immersive'
 import { progress } from '../lib/stringTune/attrs'
 import ArtGallery from '../components/ui/ArtGallery'
 
@@ -299,18 +299,6 @@ export default function ArticleDetail() {
           added to this route, it lives entirely outside the reading column, and
           the only property it changes is its own scaleX. */}
       <ReadingMeasure />
-
-      {/* the folio thread — a brass hairline down the left margin of the reading
-          room, desktop only, where the measure is wide enough for it to read as
-          the spine of the feature rather than a stray line. Same brass as the
-          cover frames and the marginalia. Decorative: aria-hidden, no pointer
-          events, no focusable descendants. */}
-      <div
-        aria-hidden="true"
-        className="pointer-events-none absolute bottom-[12rem] left-[clamp(1rem,3vw,2.75rem)] top-[14rem] z-[1] hidden xl:block"
-      >
-        <BrassThread height="100%" from={0.04} to={0.9} stroke="#D9B978" />
-      </div>
     <>
       {/* the road back to the shelf — the pair to the reading lamp; fixed,
           quiet, and always reachable mid-read without scrolling up */}
@@ -423,10 +411,10 @@ export default function ArticleDetail() {
         </section>
       ) : article.heroMode === 'gallery' ? (
         /* ——— GALLERY: the artwork itself is the hero — the plate, framed ——— */
-        <section className="relative flex items-end overflow-hidden border-b border-white/10 bg-wine-deep pt-12 md:min-h-[80svh] md:pt-36">
+        <section className="relative flex items-end overflow-hidden border-b border-white/10 bg-wine-deep pt-28 md:min-h-[80svh] md:pt-36">
           <WorldTexture world={article.world} />
           <div className="relative z-[2] mx-auto w-full max-w-page px-[clamp(1.75rem,5.5vw,4.75rem)] pb-16">
-            <div className="grid grid-cols-1 items-end gap-10 lg:grid-cols-[1fr_auto] lg:pr-[256px]">
+            <div className="grid grid-cols-1 items-end gap-10 lg:grid-cols-[1fr_auto]">
               <div>
                 <Reveal><HeroKicker article={article} author={author} /></Reveal>
                 <div className={`${vibe.titleClass} inline-block`}>
@@ -499,15 +487,6 @@ export default function ArticleDetail() {
 {/* ---------- Body — inside the publication's world ---------- */}
       <section className={`relative border-t border-white/10 py-[clamp(6rem,14vh,11rem)] transition-colors duration-1000 ${worldBodyClass(article.world)} ${vibe.bodyClass} ${reading ? 'bg-wine-deep' : ''}`}>
         <WorldTexture world={article.world} />
-        {article.motif && MARGINALIA[article.motif] && (
-          <span
-            aria-hidden="true"
-            className="pointer-events-none absolute right-4 top-64 hidden select-none items-center gap-3 [writing-mode:vertical-rl] font-mono text-[9px] uppercase tracking-[0.30em] text-white/55 xl:flex"
-          >
-            <span className="text-gold">✦</span>
-            {MARGINALIA[article.motif]}
-          </span>
-        )}
         <div className={`relative mx-auto px-[clamp(1.75rem,5.5vw,4.75rem)] transition-all duration-1000 ${reading ? 'max-w-[680px]' : 'max-w-[720px]'}`}>
           {/* The contributor — the monogram stands for the writer (no photograph
               exists in the dataset); the signature draws beneath the name. */}

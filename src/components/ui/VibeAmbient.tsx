@@ -29,17 +29,9 @@ export default function VibeAmbient({ vibe, section }: { vibe: Vibe; section: 'h
         <div aria-hidden="true" className="pointer-events-none absolute bottom-24 left-[clamp(1.75rem,5.5vw,4.75rem)] h-px w-44 bg-[linear-gradient(90deg,transparent,#B89146,transparent)]" />
       )
     case 'mechanical':
-      return (
-        <span aria-hidden="true" className="pointer-events-none absolute right-[clamp(1.75rem,5.5vw,4.75rem)] top-28 hidden font-mono text-[10px] uppercase tracking-[0.28em] text-white/55 md:inline">
-          Think beyond
-        </span>
-      )
+      return null
     case 'newsprint':
-      return (
-        <span aria-hidden="true" className="pointer-events-none absolute right-[clamp(1.75rem,5.5vw,4.75rem)] top-28 hidden rotate-90 font-mono text-[10px] uppercase tracking-[0.28em] text-white/55 md:inline">
-          AsiaNews dispatch
-        </span>
-      )
+      return null
     case 'urgent':
       /* a still gold rule — urgency by line, not by pulse */
       return (
