@@ -520,34 +520,66 @@ function WorksStrip() {
 
         {/* ——— the cover story + supporting stack ——— */}
         <div className="mt-16 grid grid-cols-1 gap-x-14 gap-y-16 lg:grid-cols-12">
-          <Reveal className="lg:col-span-7 lg:h-full">
-            <StoryCard work={cover} size="cover" showExcerpt />
-          </Reveal>
-
-          <div className="flex flex-col gap-y-14 lg:col-span-5">
+          <div className="flex flex-col gap-y-12 lg:col-span-7">
             <Reveal>
-              <StoryCard work={s1} size="stack" />
+              <StoryCard work={cover} size="cover" showExcerpt />
             </Reveal>
 
-            {/* the issue note — a quiet interlude between the stack stories */}
-            <Reveal delay={0.06} className="border-y border-gold/20 py-8">
+            {cover.slides && cover.slides.length > 1 && (
+              <Reveal delay={0.05} className="border-t border-white/10 pt-8">
+                <div className="mb-4 flex items-center justify-between font-mono text-[9px] uppercase tracking-[0.28em] text-white/55">
+                  <span>In this folio — {cover.slides.length} plates</span>
+                  <Link to={`/article/${cover.id}`} className="text-gold no-underline transition-colors hover:text-ivory">
+                    Enter viewing room →
+                  </Link>
+                </div>
+                <div className="grid grid-cols-5 gap-2.5">
+                  {cover.slides.map((src, idx) => (
+                    <Link
+                      key={src}
+                      to={`/article/${cover.id}`}
+                      aria-label={`${cover.title} — Plate ${String(idx + 1).padStart(2, '0')}`}
+                      className="group/plate img-frame block overflow-hidden border border-white/10 transition-colors duration-500 hover:border-gold/60"
+                    >
+                      <img
+                        src={src}
+                        alt=""
+                        loading="lazy"
+                        decoding="async"
+                        onError={(e) => handleImgError(e, cover.title, folioNoOf(cover.id))}
+                        className="aspect-[4/5] w-full object-cover transition-transform duration-700 ease-out group-hover/plate:scale-[1.06]"
+                      />
+                    </Link>
+                  ))}
+                </div>
+              </Reveal>
+            )}
+
+            {/* the issue note — a quiet interlude anchoring the cover column */}
+            <Reveal delay={0.08} className="border-y border-gold/20 py-8">
               <p className="mb-3 font-mono text-[9px] uppercase tracking-[0.3em] text-gold/80">Pull — the issue note</p>
               <p className="pull-quote text-[clamp(1.15rem,1.7vw,1.4rem)] leading-[1.6] text-ivory/80">
                 Every feature in this issue begins the same way — a submission, read carefully, credited fully, and presented with care.
               </p>
               <p className="mt-3 font-mono text-[9px] uppercase tracking-[0.30em] text-white/55">— the desk, Verlyse Media</p>
             </Reveal>
+          </div>
 
-            <Reveal delay={0.1} className="lg:mt-10">
+          <div className="flex flex-col gap-y-14 lg:col-span-5">
+            <Reveal>
+              <StoryCard work={s1} size="stack" />
+            </Reveal>
+
+            <Reveal delay={0.1}>
               <StoryCard work={s2} size="stack" />
             </Reveal>
           </div>
         </div>
 
         {/* ——— the spread — three supporting stories, the middle floating lower ——— */}
-        <div className="mt-20 grid grid-cols-1 gap-x-12 gap-y-16 sm:grid-cols-2 lg:grid-cols-3">
+        <div className="mt-20 grid grid-cols-1 gap-x-8 gap-y-16 md:grid-cols-3 lg:gap-x-12">
           {spread.map((w, i) => (
-            <Reveal key={w.id} delay={i * 0.07} className={i === 1 ? 'lg:mt-20' : ''}>
+            <Reveal key={w.id} delay={i * 0.07} className={i === 1 ? 'md:mt-14 lg:mt-20' : ''}>
               <StoryCard work={w} size="spread" />
             </Reveal>
           ))}
