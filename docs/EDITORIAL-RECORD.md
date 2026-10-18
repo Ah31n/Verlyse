@@ -109,4 +109,4 @@ To reclassify “The Quiet Grief” from a provisional carousel-led feature in `
    - **Result:** Passed (`Security check passed: no sensitive filenames or obvious secret patterns found`).
 
 ### 3.2 External Asset Resolution
-- All five original binary slide images (`/img/works/DeUZFPTCjPU-1.webp`..`-5.webp`, `1,229,906` bytes total) are self-hosted in `public/img/works/` and verified HTTP 200 (`45/45` static assets resolved, `0` missing).
+- All five original binary slide images (`/img/works/DeUZFPTCjPU-1.webp`..`-5.webp`, `1,229,906` bytes total) are self-hosted in `public/img/works/` and verified HTTP 200 (`45/45` sampled role-subset assets and `104/104` total static media/font assets in `public/` resolved, `0` missing).

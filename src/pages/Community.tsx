@@ -4,6 +4,7 @@ import { motion, useReducedMotion } from 'motion/react'
 import { useSeo } from '../hooks/useSeo'
 import { ARTICLES, BRAND, COMMUNITY_STATS, COMMUNITY_VOICES, LEDGER, stampDate, type Article } from '../data/content'
 import { handleImgError } from '../lib/imgFallback'
+import { spotlight } from '../lib/stringTune/attrs'
 
 /** The five most recent replies in the commons — real comments, read from
     the feed backwards by publication date, each tied to its folio. */
@@ -28,7 +29,7 @@ function FilmRail() {
 function FilmFrame({ article, folio }: { article: Article; folio: string }) {
   return (
     <Link to={`/article/${article.id}`} className="group block w-[220px] shrink-0 no-underline md:w-[248px]">
-      <div className="img-frame relative aspect-[4/5] overflow-hidden border border-white/12 transition-colors duration-700 group-hover:border-gold/50">
+      <div {...spotlight()} className="img-frame st-spotlit relative aspect-[4/5] overflow-hidden border border-white/12 transition-colors duration-700 group-hover:border-gold/50">
         <img
           src={article.cover}
           alt={`${article.title} — cover`}
@@ -65,7 +66,13 @@ function FilmFrame({ article, folio }: { article: Article; folio: string }) {
  * States: HABITAT · READ · RETURN. Reduced motion: reel stays still and
  * fully present.
  */
-import { CrashZoom , MaskReveal, Magnetic, Tilt3D } from '../components/cinematic'
+import { CrashZoom, Magnetic, Tilt3D } from '../components/cinematic'
+import {
+  DotMatrixLedger,
+  FloralWord,
+  HaikeiContourPlane,
+  RouteEmblemSeal,
+} from '../components/ui/EditorialCraftSystem'
 
 export default function Community() {
   useSeo({
@@ -135,20 +142,27 @@ export default function Community() {
       {/* ——— BACK · the hall ——— */}
       <div aria-hidden="true" className="pointer-events-none absolute inset-0">
         <div className="absolute inset-0 bg-[radial-gradient(120%_90%_at_50%_0%,rgba(92,18,36,0.38),transparent_62%),radial-gradient(90%_70%_at_90%_100%,rgba(184,145,70,0.10),transparent_60%),linear-gradient(170deg,#4A1120_0%,#3B0D17_52%,#1A070E_100%)]" />
+        <HaikeiContourPlane tone="dark" seed={5} className="opacity-20" />
       </div>
 
       <div className="relative mx-auto max-w-[1440px] px-[clamp(1.25rem,4vw,4.75rem)] pb-[clamp(4rem,9vh,7rem)] pt-[clamp(7rem,15vh,9.5rem)]">
         {/* ——— header — ghost COMMONS + the reel's promise ——— */}
         <div className="text-center">
+          <div className="mb-4 flex flex-wrap items-center justify-center gap-3">
+            <RouteEmblemSeal variant="amphora" folioCode="COMMONS" tone="dark" />
+            <DotMatrixLedger
+              code={`0${COMMUNITY_VOICES.length}${LEDGER.features}`}
+              label={`${COMMUNITY_VOICES.length} Voices · ${LEDGER.features} Covers`}
+              tone="dark"
+            />
+          </div>
           <h1 className="relative font-serif text-[clamp(2.8rem,8vw,6.5rem)] font-light leading-[0.9] tracking-[-0.02em] text-ivory">
-                        <CrashZoom className="pointer-events-none absolute inset-x-0 top-1/2 -translate-y-1/2">
-              <span aria-hidden="true" className="block select-none font-serif text-[clamp(4rem,12vw,9.5rem)] font-semibold leading-none text-transparent [-webkit-text-stroke:1px_rgba(184,145,70,0.14)]">
+            <CrashZoom className="pointer-events-none absolute inset-x-0 top-1/2 -translate-y-1/2">
+              <span aria-hidden="true" className="block select-none font-serif text-[clamp(4rem,12vw,9.5rem)] font-semibold leading-none text-transparent [-webkit-text-stroke:1px_rgba(184,145,70,0.08)]">
                 COMMONS
               </span>
             </CrashZoom>
-            <MaskReveal>
-              <span className="relative">The <em className="italic text-gold">commons</em></span>
-            </MaskReveal>
+            <span className="relative">The <FloralWord variant="marigold">commons</FloralWord></span>
           </h1>
           <p className="mt-4 font-mono text-[10px] uppercase tracking-[0.34em] text-gold/85">
             The feed in pictures — all {LEDGER.features} covers, held not driven
@@ -214,21 +228,21 @@ export default function Community() {
             The commons in numbers — read from the feed, nothing invented
           </p>
           <div className="mt-10 grid grid-cols-2 gap-x-6 gap-y-12 lg:grid-cols-4">
-            {COMMUNITY_STATS.map((st) => (
+            {COMMUNITY_STATS.map((st, idx) => (
               <motion.div
                 key={st.label}
                 initial={{ opacity: 0, y: 16 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true, margin: '0px 0px -6% 0px' }}
                 transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
-                className="relative border-l border-gold/30 pl-5"
+                className="relative overflow-hidden border border-white/10 border-l-2 border-l-gold/55 bg-white/[0.015] p-5"
               >
-                <span aria-hidden="true" className="pointer-events-none absolute -right-1 -top-3 select-none font-serif text-[clamp(3.5rem,7vw,6rem)] font-semibold leading-none text-transparent [-webkit-text-stroke:1px_rgba(184,145,70,0.16)]">
-                  {st.value}
+                <span aria-hidden="true" className="pointer-events-none absolute bottom-2 right-3 select-none font-mono text-[clamp(2.2rem,4vw,3.4rem)] font-semibold leading-none text-transparent [-webkit-text-stroke:1px_rgba(184,145,70,0.12)]">
+                  0{idx + 1}
                 </span>
-                <p className="font-serif text-[clamp(2.6rem,5vw,4.2rem)] font-light leading-[0.95] text-ivory">{st.value}</p>
-                <p className="mt-3 font-mono text-[9px] uppercase tracking-[0.28em] text-gold/90">{st.label}</p>
-                <p className="mt-3 max-w-[30ch] text-sm leading-[1.7] text-white/60">{st.note}</p>
+                <p className="relative z-[1] font-serif text-[clamp(2.6rem,5vw,4.2rem)] font-light leading-[0.95] text-ivory">{st.value}</p>
+                <p className="relative z-[1] mt-3 font-mono text-[9px] uppercase tracking-[0.28em] text-gold/90">{st.label}</p>
+                <p className="relative z-[1] mt-3 max-w-[30ch] text-sm leading-[1.7] text-white/60">{st.note}</p>
               </motion.div>
             ))}
           </div>
@@ -253,7 +267,7 @@ export default function Community() {
           {/* more real voices — the feed answers the writers */}
           <div className="mx-auto mt-10 grid max-w-4xl grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
             {otherVoices.map((v) => (
-              <p key={v.handle + v.text.slice(0, 8)} className="border border-white/10 bg-[#2A0F18]/50 px-5 py-4 text-left">
+              <p key={v.handle + v.text.slice(0, 8)} className="border border-white/10 bg-[#2A0F18]/50 px-5 py-4 text-left last:sm:col-span-2 last:lg:col-span-1">
                 <span className="block font-serif text-sm italic leading-[1.55] text-ivory/80">“{v.text}”</span>
                 <span className="mt-2 block font-mono text-[8px] uppercase tracking-[0.24em] text-white/50">
                   {v.handle} · beneath “{v.post}”

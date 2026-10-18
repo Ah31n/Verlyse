@@ -29,8 +29,14 @@ function monogram(name: string) {
  * Not a grid of profile cards: a wall whose names step forward.
  * Keyboard: names are real buttons; ← → move · Enter selects · Esc returns.
  */
-import { CrashZoom , MaskReveal, Magnetic, Tilt3D } from '../components/cinematic'
+import { CrashZoom, Magnetic, Tilt3D } from '../components/cinematic'
 import { spotlight } from '../lib/stringTune/attrs'
+import {
+  DotMatrixLedger,
+  FloralWord,
+  HaikeiContourPlane,
+  RouteEmblemSeal,
+} from '../components/ui/EditorialCraftSystem'
 
 export default function Creators() {
   useSeo({
@@ -108,6 +114,7 @@ export default function Creators() {
       {/* ——— BACK · wine wall with brass rules ——— */}
       <div aria-hidden="true" className="pointer-events-none absolute inset-0">
         <div className="absolute inset-0 bg-[radial-gradient(120%_90%_at_50%_0%,rgba(92,18,36,0.38),transparent_62%),radial-gradient(90%_70%_at_90%_100%,rgba(184,145,70,0.10),transparent_60%),linear-gradient(170deg,#4A1120_0%,#3B0D17_52%,#1A070E_100%)]" />
+        <HaikeiContourPlane tone="dark" seed={4} className="opacity-20" />
         {[0.2, 0.4, 0.6, 0.8].map((t, i) => (
           <div key={i} className="absolute inset-x-0 h-px" style={{ top: `${t * 100}%`, background: 'linear-gradient(90deg, transparent, rgba(217,185,120,0.08), transparent)' }} />
         ))}
@@ -116,21 +123,27 @@ export default function Creators() {
       <div onKeyDown={onKeyDown} className="relative mx-auto max-w-[1440px] px-[clamp(1.25rem,4vw,4.75rem)] pb-[clamp(4rem,9vh,7rem)] pt-[clamp(7rem,15vh,9.5rem)]">
         {/* ——— MID · header — ghost CONTRIBUTORS + real subtitle ——— */}
         <div className="text-center">
+          <div className="mb-4 flex flex-wrap items-center justify-center gap-3">
+            <RouteEmblemSeal variant="vesperal" folioCode="DIRECTORY" tone="dark" />
+            <DotMatrixLedger
+              code={`${LEDGER.creators}${LEDGER.wallRecords}`}
+              label={`${LEDGER.creators} Creators · ${LEDGER.wallRecords} Records`}
+              tone="dark"
+            />
+          </div>
           <h1 className="relative font-serif text-[clamp(2.8rem,8vw,6.5rem)] font-light leading-[0.9] tracking-[-0.02em] text-ivory">
-                        <CrashZoom className="pointer-events-none absolute inset-x-0 top-1/2 -translate-y-1/2">
-              <span aria-hidden="true" className="block select-none font-serif text-[clamp(4rem,12vw,9.5rem)] font-semibold leading-none text-transparent [-webkit-text-stroke:1px_rgba(184,145,70,0.14)]">
+            <CrashZoom className="pointer-events-none absolute inset-x-0 top-1/2 -translate-y-1/2">
+              <span aria-hidden="true" className="block select-none font-serif text-[clamp(4rem,12vw,9.5rem)] font-semibold leading-none text-transparent [-webkit-text-stroke:1px_rgba(184,145,70,0.08)]">
                 CONTRIBUTORS
               </span>
             </CrashZoom>
-            <MaskReveal>
-              <span className="relative">The wall <em className="italic text-gold">of names</em></span>
-            </MaskReveal>
+            <span className="relative">The wall <FloralWord variant="lotus">of names</FloralWord></span>
           </h1>
           <p className="mt-4 font-mono text-[10px] uppercase tracking-[0.34em] text-gold/85">
             The contributor wall — {LEDGER.wallRecords} records · {LEDGER.creators} bylined in the archive · {ARTICLES.length} folios
           </p>
           <p className="mx-auto mt-2 max-w-[70ch] font-mono text-[9px] uppercase leading-[1.9] tracking-[0.22em] text-white/45">
-            {LEDGER.creators} byline names carry a feature — {LEDGER.humanCreators} named writers plus the masthead’s own dispatch; the wall holds {LEDGER.wallRecords} records because the extra one is the poet who wrote the verse beside a painting. Every record is real
+            {LEDGER.creators} bylined voices and one co-credited poet across {LEDGER.features} catalogued features ({LEDGER.publishedFeatures} published folios and {LEDGER.provisionalFeatures} provisional record) in Issue № {LEDGER.issueNo}
           </p>
         </div>
 
@@ -215,7 +228,7 @@ export default function Creators() {
                             “{selectedFeature.title}”
                           </span>
                         </span>
-                        <span aria-hidden="true" className="ml-auto self-center font-mono text-[9px] uppercase tracking-[0.24em] text-white/45 transition-colors group-hover:text-gold">
+                        <span aria-hidden="true" className="ml-auto shrink-0 self-center whitespace-nowrap font-mono text-[9px] uppercase tracking-[0.24em] text-white/45 transition-colors group-hover:text-gold">
                           Read →
                         </span>
                       </Link>
@@ -246,7 +259,7 @@ export default function Creators() {
                             “{coCredits[0].title}”
                           </span>
                         </span>
-                        <span aria-hidden="true" className="ml-auto self-center font-mono text-[9px] uppercase tracking-[0.24em] text-white/45 transition-colors group-hover:text-gold">
+                        <span aria-hidden="true" className="ml-auto shrink-0 self-center whitespace-nowrap font-mono text-[9px] uppercase tracking-[0.24em] text-white/45 transition-colors group-hover:text-gold">
                           Read →
                         </span>
                       </Link>
@@ -284,7 +297,7 @@ export default function Creators() {
                       </span>
                     )}
                     <span aria-hidden className="absolute inset-2 border border-gold/40" />
-                    <span className="absolute -bottom-3 left-1/2 -translate-x-1/2 whitespace-nowrap bg-[#1C0509] px-2 py-1 font-mono text-[8px] uppercase tracking-[0.24em] text-ivory">
+                    <span className="absolute bottom-2 left-1/2 z-[2] -translate-x-1/2 whitespace-nowrap bg-[#1C0509] px-2 py-1 font-mono text-[8px] uppercase tracking-[0.24em] text-ivory">
                       {selected.handle}
                     </span>
                   </div>
@@ -341,7 +354,8 @@ export default function Creators() {
                   onClick={() => select(a.id)}
                   onFocus={() => !resting && setSelectedId(a.id)}
                   aria-pressed={!resting && isSel}
-                  className={`group relative border-l-2 py-3 pl-5 text-left transition-all duration-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-gold/70 ${
+                  {...spotlight()}
+                  className={`st-spotlit group relative border-l-2 py-3 pl-5 text-left transition-all duration-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-gold/70 ${
                     !resting && isSel
                       ? 'border-gold bg-gradient-to-r from-gold/[0.08] to-transparent'
                       : 'border-white/10 hover:border-gold/50'

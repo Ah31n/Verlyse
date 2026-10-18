@@ -19,10 +19,14 @@ import SaveButton from '../src/components/ui/SaveButton'
 import ArtGallery from '../src/components/ui/ArtGallery'
 import HiringMarquee from '../src/components/ui/HiringMarquee'
 import WriterProfile, { formatQuotedNote } from '../src/components/ui/WriterProfile'
+import Footer, { resolveNewsletterEndpoint } from '../src/components/layout/Footer'
+import Creators from '../src/pages/Creators'
 import Ambassadors from '../src/pages/Ambassadors'
 import Submit from '../src/pages/Submit'
 import Contact from '../src/pages/Contact'
-import { ARTICLES, AUTHORS, BRAND, folioNoOf, hasKnownLikes, sortArticles } from '../src/data/content'
+import StringTuneProvider from '../src/lib/stringTune/StringTuneProvider'
+import { isStringTuneRunning, startStringTune, stopStringTune } from '../src/lib/stringTune/runtime'
+import { ARTICLES, AUTHORS, BRAND, LEDGER, folioNoOf, hasKnownLikes, sortArticles } from '../src/data/content'
 
 interface Result { name: string; ok: boolean; detail: string }
 const results: Result[] = []
@@ -109,12 +113,29 @@ export async function run() {
   cleanup()
 
   /* ---- SAVED DRAWER: dialog semantics + scroll lock -------------------- */
-  await check('saved drawer: opens as a modal dialog and locks scroll', async () => {
-    wrap(<SavedDrawer />)
+  await check('saved drawer: opens as a modal dialog, locks scroll, and syncs single-item removal', async () => {
+    window.localStorage.clear()
+    const item = ARTICLES[0]
+    wrap(
+      <>
+        <SaveButton id={item.id} title={item.title} category={item.category} />
+        <SavedDrawer />
+      </>,
+    )
+    const saveTrigger = screen.getByRole('button', { name: new RegExp(`Save “${item.title}”`, 'i') })
+    await act(async () => { fireEvent.click(saveTrigger) })
+    assert(saveTrigger.getAttribute('aria-pressed') === 'true', 'SaveButton did not flip to true')
+
     await act(async () => { window.dispatchEvent(new CustomEvent('verlyse:saved')) })
     const dialog = await screen.findByRole('dialog')
     assert(dialog.getAttribute('aria-modal') === 'true', 'saved drawer is not aria-modal')
     assert(document.body.style.overflow === 'hidden', 'saved drawer did not lock body scroll')
+
+    const removeBtn = screen.getByRole('button', { name: new RegExp(`Remove ${item.title}`, 'i') })
+    await act(async () => { fireEvent.click(removeBtn) })
+    await waitFor(() => {
+      assert(saveTrigger.getAttribute('aria-pressed') === 'false', 'removing single item in SavedDrawer did not sync SaveButton')
+    })
   })
 
   cleanup()
@@ -149,7 +170,11 @@ export async function run() {
     assert(!document.body.textContent?.includes('/img/works/DeUZFPTCjPU-1.webp'), 'public gallery leaked internal assetPath')
     assert(!document.body.textContent?.includes('pending source binary'), 'public gallery leaked internal status text')
 
+    const gallerySection = document.querySelector('section[aria-label*="plate sequence"]')
+    assert(!gallerySection?.className.includes('256px'), 'ArtGallery still has leftover +256px right-gutter padding offset')
+
     const trigger = screen.getByRole('button', { name: /Inspect Plate 01 of 05/i })
+    assert(!trigger.className.includes('transition-all'), 'ArtGallery plate button uses transition-all alongside StringGlide transform')
     trigger.focus()
     await act(async () => { fireEvent.click(trigger) })
 
@@ -270,6 +295,75 @@ export async function run() {
     const haiqaAuthor = AUTHORS.find((a) => a.id === 'haiqa-nafees')
     assert(!!haiqaAuthor && haiqaAuthor.role === 'Writer · Associate Editor', 'Haiqa Nafees author profile was not preserved in AUTHORS')
     assert(folioNoOf('non-existent-article') === '', 'folioNoOf should return empty string rather than 00 for missing article')
+  })
+
+  cleanup()
+
+  /* ---- EDITORIAL COUNTS, FOOTER NEWSLETTER & CRAFT CONTROLS A11Y ------- */
+  await check('editorial counts, footer newsletter guidance, and craft system a11y', async () => {
+    assert(LEDGER.features === 20, `expected 20 catalogued features, got ${LEDGER.features}`)
+    assert(LEDGER.publishedFeatures === 19, `expected 19 published features, got ${LEDGER.publishedFeatures}`)
+    assert(LEDGER.provisionalFeatures === 1, `expected 1 provisional feature, got ${LEDGER.provisionalFeatures}`)
+    assert(
+      resolveNewsletterEndpoint('verlysemedia.kesug.com') === 'https://verlyse-react.vercel.app/api/newsletter',
+      'static canonical host did not resolve to Vercel newsletter endpoint'
+    )
+    assert(resolveNewsletterEndpoint('localhost') === '/api/newsletter', 'local host did not resolve to /api/newsletter')
+
+    wrap(<Creators />)
+    const creatorsText = document.body.textContent ?? ''
+    assert(
+      creatorsText.includes('20 catalogued features (19 published folios and 1 provisional record)'),
+      'Creators page did not distinguish published vs provisional counts'
+    )
+    const floralSpan = document.querySelector('[data-craft-floral-word]')
+    assert(!!floralSpan && !floralSpan.className.includes('cursor-pointer'), 'FloralWord should be decorative without cursor-pointer')
+    cleanup()
+
+    wrap(<Footer />)
+    const footerEl = document.querySelector('footer[aria-label="Footer"]')
+    assert(!!footerEl, 'Footer landmark missing')
+    const nlInput = screen.getByLabelText(/Email address for The Verlyse Letter/i)
+    assert(nlInput.getAttribute('placeholder') === 'Enter your email address…', 'Newsletter email input missing visible placeholder guidance')
+    const nlSubmitBtn = screen.getByRole('button', { name: /Take the letter/i })
+    assert(!!nlSubmitBtn, 'Newsletter submit button missing')
+
+    const specimen = document.querySelector('[data-footer-specimen="verlyse"]')
+    assert(!!specimen, 'Fixed Verlyse footer specimen missing')
+    assert(specimen?.getAttribute('aria-hidden') === 'true', 'Footer specimen must be aria-hidden="true"')
+    assert((specimen?.textContent ?? '').trim() === 'Verlyse', `Footer specimen should render fixed "Verlyse" wordmark, got "${specimen?.textContent}"`)
+    const specimenControls = specimen?.querySelectorAll(
+      'input, select, textarea, button, a, [role="radio"], [role="button"], [download], [tabindex]:not([tabindex="-1"])'
+    )
+    assert((specimenControls?.length ?? 0) === 0, `Footer specimen must contain 0 interactive/focusable descendants, found ${specimenControls?.length}`)
+
+    const footerInputs = footerEl?.querySelectorAll('input, select, textarea') ?? []
+    assert(footerInputs.length === 1 && footerInputs[0].id === 'nl-email', 'Footer should only contain the newsletter email input')
+
+    const footerText = footerEl?.textContent ?? ''
+    assert(!/\bTG\d+\b/i.test(footerText), 'Footer rendered TG+digits tool identifier')
+    assert(
+      !/herbarium colophon|inscribe phrase|foliage density|keep plate|oxblood\s*&\s*antique brass|tudor rose|nocturne\s*&\s*gilded|mulberry velvet/i.test(footerText),
+      'Footer rendered generic Type Garden demo labels'
+    )
+    for (const navHref of ['/articles', '/categories', '/creators', '/room', '/about', '/community', '/ambassadors', '/submit', '/contact']) {
+      assert(!!footerEl?.querySelector(`a[href="${navHref}"]`), `Footer missing navigation link ${navHref}`)
+    }
+    cleanup()
+  })
+
+  /* ---- STRINGTUNE REDUCED-MOTION RACE SAFETY --------------------------- */
+  await check('stringTune: start/stop race safety when reduced-motion changes or provider unmounts mid-boot', async () => {
+    stopStringTune()
+    const pending = startStringTune()
+    // Immediately stop before the async import resolves
+    stopStringTune()
+    const resolved = await pending
+    assert(resolved === null && !isStringTuneRunning(), 'StringTune started despite stopStringTune() during pending boot')
+
+    const view = wrap(<StringTuneProvider />)
+    view.unmount()
+    assert(!isStringTuneRunning(), 'StringTune remained running after provider unmount')
   })
 
   const failed = results.filter((r) => !r.ok)

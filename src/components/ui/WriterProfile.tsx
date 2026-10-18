@@ -5,6 +5,7 @@ import Reveal from './Reveal'
 import { Signature } from './ArticleClosing'
 import { MetaRow } from './primitives'
 import { handleImgError } from '../../lib/imgFallback'
+import { spotlight, spotlitGlide } from '../../lib/stringTune/attrs'
 
 /** Strip outer curly/straight quotation marks so we can quote once cleanly. */
 function stripOuterQuotes(value: string): string {
@@ -72,8 +73,8 @@ export default function WriterProfile({ author }: { author: Author }) {
         {/* ——— the portrait & signature ——— */}
         <div className="lg:sticky lg:top-28 lg:self-start">
           <Reveal>
-            <figure className="relative mx-auto max-w-[300px] lg:mx-0">
-              <div aria-hidden="true" className="absolute -inset-4 translate-x-5 translate-y-5 border border-gold/30" />
+            <figure {...spotlight()} className="st-spotlit relative mx-auto max-w-[256px] sm:max-w-[300px] lg:mx-0">
+              <div aria-hidden="true" className="absolute -inset-2 translate-x-2.5 translate-y-2.5 border border-gold/30 sm:-inset-4 sm:translate-x-5 sm:translate-y-5" />
               {author.portrait && !author.hideArticlePhoto ? (
                 <AuthorFrame variant="matte" rotate={-0.6} caption={author.name}>
                   <AuthorPhoto src={author.profilePhoto ?? authorPhoto(author.id)} alt={`${author.name} — photograph`} fallbackLabel={author.name} className="h-auto w-full" />
@@ -171,7 +172,13 @@ export default function WriterProfile({ author }: { author: Author }) {
 
           {/* published works — or the folios this name is co-credited in */}
           <Reveal className="mt-14">
-            <p className="kicker">{isCoCredit ? 'Co-credited in the archive' : 'Published works'}</p>
+            <p className="kicker">
+              {isCoCredit
+                ? 'Co-credited in the archive'
+                : listedWorks.some((w) => w.publicationStatus === 'provisional')
+                  ? 'Catalogued works'
+                  : 'Published works'}
+            </p>
             <div className="mt-7 space-y-0 border-t border-white/10">
               {listedWorks.map((a) => (
                 <Link
@@ -221,7 +228,7 @@ export default function WriterProfile({ author }: { author: Author }) {
               >
                 {others.map((a) => (
                   <Link key={a.id} to={`/article/${a.id}`} className="group block no-underline">
-                    <div className="img-frame relative aspect-[4/5] overflow-hidden border border-white/10">
+                    <div {...spotlitGlide('restrained')} className="img-frame st-spotlit relative aspect-[4/5] overflow-hidden border border-white/10">
                       <img src={a.cover} alt="" loading="lazy" decoding="async" onError={(e) => handleImgError(e, a.title)} className="h-full w-full object-cover transition-transform duration-[1400ms] group-hover:scale-[1.08]" />
                     </div>
                     <p className="mt-2.5 font-serif text-base leading-snug text-ivory/90 transition-colors group-hover:text-[#E8D9A8]">“{a.title}”</p>

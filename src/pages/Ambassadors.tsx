@@ -6,6 +6,7 @@ import Reveal from '../components/ui/Reveal'
 import HiringMarquee from '../components/ui/HiringMarquee'
 import { SectionHead } from '../components/ui/primitives'
 import { BRAND } from '../data/content'
+import { useBodyScrollLock } from '../hooks/useBodyScrollLock'
 
 type Member = (typeof BRAND.team)[number]
 
@@ -43,6 +44,12 @@ const initialsOf = (n: string) => n.split(' ').map((p) => p[0]).join('').slice(0
  * waiting for the first ambassador the program brings.
  */
 import { CrashZoom , MaskReveal, Magnetic, Rise3D } from '../components/cinematic'
+import {
+  DotMatrixLedger,
+  FloralWord,
+  HaikeiContourPlane,
+  RouteEmblemSeal,
+} from '../components/ui/EditorialCraftSystem'
 
 export default function Ambassadors() {
   useSeo({
@@ -56,6 +63,7 @@ export default function Ambassadors() {
   const selected = selectedId ? ALL_MEMBERS.find((m) => m.name === selectedId) ?? null : null
   const selectedNo = selected ? ALL_MEMBERS.findIndex((m) => m.name === selected.name) + 1 : 0
   const close = () => setSelectedId(null)
+  useBodyScrollLock(!!selected)
 
   // keep the dialog focused and escapable — the record behaves like a drawer
   const dialogRef = useRef<HTMLDivElement>(null)
@@ -88,24 +96,31 @@ export default function Ambassadors() {
       <section className="relative overflow-hidden border-b border-white/10 bg-wine-deep pb-14 pt-[clamp(7rem,16vh,10rem)]">
         <div aria-hidden="true" className="pointer-events-none absolute inset-0">
           <div className="absolute inset-0 bg-[radial-gradient(120%_90%_at_50%_0%,rgba(92,18,36,0.38),transparent_62%),radial-gradient(90%_70%_at_90%_100%,rgba(184,145,70,0.10),transparent_60%),linear-gradient(170deg,#4A1120_0%,#3B0D17_52%,#1A070E_100%)]" />
+          <HaikeiContourPlane tone="dark" seed={7} className="opacity-20" />
         </div>
         <div className="relative mx-auto w-full max-w-page px-[clamp(1.25rem,4vw,4.75rem)] text-center">
+          <div className="mb-4 flex flex-wrap items-center justify-center gap-3">
+            <RouteEmblemSeal variant="astrolabe" folioCode="THE PEOPLE" tone="dark" />
+            <DotMatrixLedger
+              code={`${ALL_MEMBERS.length}03`}
+              label={`${ALL_MEMBERS.length} Medallions · 03 Clusters`}
+              tone="dark"
+            />
+          </div>
           <h1 className="relative font-serif text-[clamp(2.8rem,8vw,6.5rem)] font-light leading-[0.9] tracking-[-0.02em] text-ivory">
-                        <CrashZoom className="pointer-events-none absolute inset-x-0 top-1/2 -translate-y-1/2">
-              <span aria-hidden="true" className="block select-none font-serif text-[clamp(4rem,12vw,9.5rem)] font-semibold leading-none text-transparent [-webkit-text-stroke:1px_rgba(184,145,70,0.14)]">
+            <CrashZoom className="pointer-events-none absolute inset-x-0 top-1/2 -translate-y-1/2">
+              <span aria-hidden="true" className="block select-none font-serif text-[clamp(4rem,12vw,9.5rem)] font-semibold leading-none text-transparent [-webkit-text-stroke:1px_rgba(184,145,70,0.08)]">
                 PEOPLE
               </span>
             </CrashZoom>
-            <MaskReveal>
-              <span className="relative">The people <em className="italic text-gold">in the room</em></span>
-            </MaskReveal>
+            <span className="relative">The people <FloralWord variant="astrolabe-bloom">in the room</FloralWord></span>
           </h1>
           <p className="mt-4 font-mono text-[10px] uppercase tracking-[0.34em] text-gold/85">
             The people — ambassadors · team · the open seat
           </p>
           <Reveal delay={0.2}>
             <p className="mx-auto mt-6 max-w-[52ch] text-lg leading-[1.8] text-white/70">
-              Ten credited in the room today, each a numbered medallion. Choose one to open the record. The eleventh diamond is drawn open, waiting for the ambassador the program brings.
+              Ten editors, writers, and chapter leads credited across the masthead of Issue № 01 — alongside the eleventh open seat for the next ambassador cohort.
             </p>
           </Reveal>
         </div>
@@ -123,7 +138,7 @@ export default function Ambassadors() {
               </div>
               </Rise3D>
 
-              <div className="grid grid-cols-2 gap-5 sm:grid-cols-3 md:grid-cols-4">
+              <div className={`grid grid-cols-2 gap-5 ${cluster.members.length === 3 ? 'sm:grid-cols-3' : 'sm:grid-cols-2 md:grid-cols-4'}`}>
                 {cluster.members.map((m) => {
                   const no = ALL_MEMBERS.findIndex((x) => x.name === m.name) + 1
                   const isSel = selectedId === m.name
@@ -136,6 +151,8 @@ export default function Ambassadors() {
                       aria-expanded={isSel}
                       aria-label={`№${String(no).padStart(2, '0')} — ${m.name}, ${m.role}${isSel ? '. Record open.' : ''}`}
                       className={`group relative flex flex-col items-center px-2 pb-5 text-center transition-transform duration-500 ${
+                        cluster.members.length === 3 ? 'last:col-span-2 sm:last:col-span-1' : ''
+                      } ${
                         isSel ? 'z-10 -translate-y-2' : 'hover:-translate-y-1'
                       }`}
                     >

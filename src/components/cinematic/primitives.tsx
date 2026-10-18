@@ -1,6 +1,7 @@
 import type { ReactNode } from 'react'
 import gsap from 'gsap'
 import { useCinematic } from './useCinematic'
+export { Magnetic } from '../ui/Magnetic'
 
 /**
  * The cinematic primitives — Higgsfield-style camera moves built on GSAP
@@ -209,45 +210,6 @@ export function PushIn({
     <div ref={scope} className={className}>
       <div>{children}</div>
     </div>
-  )
-}
-
-/**
- * MAGNETIC — the GSAP-homepage micro-interaction. The child is drawn a few
- * percent toward the cursor while the pointer is over the wrapper, and springs
- * home when it leaves. Hover-only: it never runs on touch, never affects layout,
- * and under reduced motion no listeners are attached at all.
- */
-export function Magnetic({
-  children,
-  className = '',
-  strength = 0.3,
-}: WrapProps & { strength?: number }) {
-  const scope = useCinematic((root) => {
-    const el = target(root)
-    if (!el) return
-    // Hover-only micro-interaction: on touch there is no cursor to follow, and
-    // emulated post-tap mousemove would leave the CTA stuck off-centre.
-    if (typeof window.matchMedia === 'function' && window.matchMedia('(pointer: coarse)').matches) return
-    const xTo = gsap.quickTo(el, 'x', { duration: 0.5, ease: 'power3.out' })
-    const yTo = gsap.quickTo(el, 'y', { duration: 0.5, ease: 'power3.out' })
-    const move = (e: MouseEvent) => {
-      const r = root.getBoundingClientRect()
-      xTo((e.clientX - (r.left + r.width / 2)) * strength)
-      yTo((e.clientY - (r.top + r.height / 2)) * strength)
-    }
-    const leave = () => { xTo(0); yTo(0) }
-    root.addEventListener('mousemove', move)
-    root.addEventListener('mouseleave', leave)
-    return () => {
-      root.removeEventListener('mousemove', move)
-      root.removeEventListener('mouseleave', leave)
-    }
-  })
-  return (
-    <span ref={scope} className={`inline-block ${className}`}>
-      <span className="inline-block will-change-transform">{children}</span>
-    </span>
   )
 }
 

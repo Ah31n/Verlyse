@@ -4,7 +4,7 @@
 /* Rules this file enforces, so no component has to remember them:      */
 /*                                                                      */
 /*  1. Client only. The library is dynamically imported after first     */
-/*     paint, so the SSR prerender and its 52 metadata shells are       */
+/*     paint, so the SSR prerender and its 53 metadata shells are       */
 /*     untouched and nothing is added to the critical path.             */
 /*  2. The BROWSER owns scroll. StringTune ships its own smooth-scroll  */
 /*     engine; it is explicitly switched off on desktop and mobile.     */
@@ -24,6 +24,7 @@ import type { TuneHandle as Tune } from './boot'
 
 let instance: Tune | null = null
 let starting: Promise<Tune | null> | null = null
+let lifecycleGeneration = 0
 
 export function prefersReducedMotion(): boolean {
   if (typeof window === 'undefined' || !window.matchMedia) return false
@@ -39,22 +40,41 @@ export function supportsPointerEffects(): boolean {
   )
 }
 
+export function isStringTuneRunning(): boolean {
+  return instance !== null
+}
+
 /**
- * Boot the runtime. Idempotent: repeated calls return the same instance.
- * Returns null when motion is suppressed or the import fails — callers must
- * treat that as normal, not as an error.
+ * Boot the runtime. Idempotent and race-safe:
+ * - If `stopStringTune()` is called or `prefersReducedMotion()` flips to true
+ *   while `await import('./boot')` is pending, the generation check aborts
+ *   startup before `tune.start(60)` or `instance` assignment can occur.
+ * - Returns null when motion is suppressed or the import fails — callers must
+ *   treat that as normal, not as an error.
  */
 export async function startStringTune(): Promise<Tune | null> {
   if (typeof window === 'undefined') return null
-  if (prefersReducedMotion()) return null
+  if (prefersReducedMotion()) {
+    stopStringTune()
+    return null
+  }
   if (instance) return instance
   if (starting) return starting
 
-  starting = (async () => {
+  const gen = ++lifecycleGeneration
+
+  const pending = (async () => {
     try {
       /* ./boot holds STATIC named imports so this chunk stays lazy and
          still tree-shakes to the modules actually listed there. */
       const { getTune, UNIVERSAL_MODULES, POINTER_MODULES } = await import('./boot')
+
+      /* Abort if stopStringTune() ran or reduced-motion was enabled while the
+         dynamic import was in flight. */
+      if (gen !== lifecycleGeneration || prefersReducedMotion()) {
+        return null
+      }
+
       const tune = getTune()
 
       /* ---- scroll ownership: the browser keeps it ---- */
@@ -66,6 +86,11 @@ export async function startStringTune(): Promise<Tune | null> {
         for (const m of POINTER_MODULES) tune.use(m)
       }
 
+      if (gen !== lifecycleGeneration || prefersReducedMotion()) {
+        tune.destroy()
+        return null
+      }
+
       /* 60fps ceiling; the library idles when nothing is in view. */
       tune.start(60)
       instance = tune
@@ -75,11 +100,14 @@ export async function startStringTune(): Promise<Tune | null> {
          Everything degrades to the CSS composition. */
       return null
     } finally {
-      starting = null
+      if (gen === lifecycleGeneration) {
+        starting = null
+      }
     }
   })()
 
-  return starting
+  starting = pending
+  return pending
 }
 
 /**
@@ -90,12 +118,27 @@ export async function startStringTune(): Promise<Tune | null> {
  * picked up explicitly.
  */
 export function rescanStringTune(): void {
+  if (prefersReducedMotion()) {
+    stopStringTune()
+    return
+  }
   if (!instance) return
-  instance.onRebuild()
-  instance.onResize(true)
+  try {
+    instance.onRebuild()
+    instance.onResize(true)
+  } catch {
+    /* preserve static CSS fallback if runtime rebuild fails */
+  }
 }
 
 export function stopStringTune(): void {
-  instance?.destroy()
+  lifecycleGeneration += 1
+  starting = null
+  const current = instance
   instance = null
+  try {
+    current?.destroy()
+  } catch {
+    /* ignore teardown errors on already-disposed instances */
+  }
 }

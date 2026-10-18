@@ -31,8 +31,22 @@ const expect = (name, condition) => checks.push([name, Boolean(condition)])
 const allowed = await call({ method: 'OPTIONS', origin: 'https://verlyse-react.vercel.app' })
 expect('allowed OPTIONS returns 204', allowed.statusCode === 204)
 expect('allowed origin is echoed', allowed.headers['Access-Control-Allow-Origin'] === 'https://verlyse-react.vercel.app')
+const kesugAllowed = await call({ method: 'OPTIONS', origin: 'https://verlysemedia.kesug.com' })
+expect('canonical kesug.com origin is echoed', kesugAllowed.headers['Access-Control-Allow-Origin'] === 'https://verlysemedia.kesug.com')
 const blocked = await call({ method: 'OPTIONS', origin: 'https://example.invalid' })
 expect('disallowed origin is not echoed', !blocked.headers['Access-Control-Allow-Origin'])
+
+// Verify localhost is allowed in development fallback but excluded in production fallback
+process.env.NODE_ENV = 'development'
+const devLocalhost = await call({ method: 'OPTIONS', origin: 'http://localhost:5173' })
+expect('localhost allowed in development fallback', devLocalhost.headers['Access-Control-Allow-Origin'] === 'http://localhost:5173')
+
+process.env.NODE_ENV = 'production'
+const prodLocalhost = await call({ method: 'OPTIONS', origin: 'http://localhost:5173' })
+expect('localhost excluded in production fallback', !prodLocalhost.headers['Access-Control-Allow-Origin'])
+const prodKesug = await call({ method: 'OPTIONS', origin: 'https://verlysemedia.kesug.com' })
+expect('canonical kesug.com allowed in production fallback', prodKesug.headers['Access-Control-Allow-Origin'] === 'https://verlysemedia.kesug.com')
+process.env.NODE_ENV = ''
 const get = await call({ method: 'GET', origin: 'https://verlyse-react.vercel.app' })
 expect('GET is rejected', get.statusCode === 405)
 const invalid = await call({ method: 'POST', origin: 'https://verlyse-react.vercel.app', body: { email: 'not-an-email' } })

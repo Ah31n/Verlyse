@@ -1,12 +1,18 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { Link, useSearchParams } from 'react-router-dom'
-import { spotlitGlide } from '../lib/stringTune/attrs'
+import { spotlight, spotlitGlide } from '../lib/stringTune/attrs'
 import { motion } from 'motion/react'
 import { useSeo } from '../hooks/useSeo'
 import { getAuthor, ARTICLES, LEDGER, sortArticles, stampDate, isEditorsPick, folioNoOf, articleSearchText, SORTS, type SortKey } from '../data/content'
 import SaveButton from '../components/ui/SaveButton'
 import { handleImgError } from '../lib/imgFallback'
 import { ImmersiveShell, BrassThread } from '../components/immersive'
+import {
+  DotMatrixLedger,
+  FloralWord,
+  HaikeiContourPlane,
+  RouteEmblemSeal,
+} from '../components/ui/EditorialCraftSystem'
 
 const ROOM_PARAM = 'room'
 const QUERY_PARAM = 'q'
@@ -185,6 +191,7 @@ function Archive() {
       {/* ——— BACK · the wine hall with shelf depths ——— */}
       <div aria-hidden="true" className="pointer-events-none absolute inset-0">
         <div className="absolute inset-0 bg-[radial-gradient(120%_90%_at_50%_0%,rgba(92,18,36,0.38),transparent_62%),radial-gradient(90%_70%_at_90%_100%,rgba(184,145,70,0.10),transparent_60%),linear-gradient(170deg,#4A1120_0%,#3B0D17_52%,#1A070E_100%)]" />
+        <HaikeiContourPlane tone="dark" seed={2} className="opacity-20" />
         {/* shelf rows — horizontal hairlines receding into the hall */}
         {[0.16, 0.3, 0.44, 0.58, 0.72, 0.86].map((t, i) => (
           <div
@@ -198,17 +205,25 @@ function Archive() {
       <div className="relative mx-auto max-w-[1440px] px-[clamp(1.25rem,4vw,4.75rem)] pb-[clamp(5rem,10vh,8rem)] pt-[clamp(4.5rem,7.5vh,5.5rem)] md:pt-[clamp(5rem,10vh,7rem)]">
         {/* ——— MID · header block — ghost folio range, title, search ——— */}
         <div className="relative flex flex-wrap items-end justify-between gap-6">
-          <div aria-hidden="true" className="pointer-events-none absolute right-0 top-0 z-0 hidden select-none md:block">
-            <span className="whitespace-nowrap font-serif text-[clamp(4rem,10vw,8rem)] font-semibold leading-[0.8] text-transparent [-webkit-text-stroke:1px_rgba(184,145,70,0.18)]">
+          <div aria-hidden="true" className="pointer-events-none absolute -top-6 right-0 z-0 hidden select-none lg:block">
+            <span className="whitespace-nowrap font-serif text-[clamp(3.5rem,7.5vw,6.2rem)] font-semibold leading-[0.8] text-transparent [-webkit-text-stroke:1px_rgba(184,145,70,0.09)]">
               № 01–{LEDGER.features}
             </span>
           </div>
           <div className="relative z-10 min-w-0">
+            <div className="mb-3 flex flex-wrap items-center gap-3">
+              <RouteEmblemSeal variant="rosette" folioCode="ARCHIVE" tone="dark" />
+              <DotMatrixLedger
+                code={`${LEDGER.features}${String(LEDGER.departments).padStart(2, '0')}`}
+                label={`${LEDGER.features} Folios · ${LEDGER.departments} Wings`}
+                tone="dark"
+              />
+            </div>
             <p className="font-mono text-[10px] uppercase tracking-[0.34em] text-gold">
               The Archive — {LEDGER.features} features · {LEDGER.creators} creators · {LEDGER.departments} departments
             </p>
             <h1 className="mt-4 font-serif text-[clamp(2.2rem,4.5vw,3.75rem)] font-light leading-[0.95] tracking-[-0.02em] text-ivory">
-              The <em className="italic text-gold">folio shelf</em>
+              The <FloralWord variant="laurel">folio shelf</FloralWord>
             </h1>
           </div>
           <div className="relative z-10 mt-5 w-full max-w-md md:mt-0 md:w-[490px] md:max-w-none">
@@ -222,9 +237,8 @@ function Archive() {
               value={query}
               onChange={(e) => setQuery(e.target.value)}
               onKeyDown={onKeyDown}
-              placeholder="Titles, writers, genres, keywords…"
               aria-describedby="art-search-status"
-              className="mt-2 w-full border border-gold/40 bg-transparent px-3 py-2 font-mono text-[10px] uppercase tracking-[0.18em] text-ivory outline-none placeholder:text-ivory/35 focus:border-gold"
+              className="mt-2 w-full border border-gold/40 bg-transparent px-3 py-2 font-mono text-[10px] uppercase tracking-[0.18em] text-ivory outline-none focus:border-gold"
             />
             <p id="art-search-status" aria-live="polite" className="mt-1.5 min-h-4 font-mono text-[9px] uppercase tracking-[0.24em] text-white/45">
               {busy
@@ -287,9 +301,51 @@ function Archive() {
           </span>
         </div>
 
+        {/* ——— Selected Folio Curatorial Preview Bar ——— */}
+        {(() => {
+          const activeFolio = ARTICLES.find((a) => a.id === selId) ?? ordered[0] ?? ARTICLES[0]
+          const activeAuthor = getAuthor(activeFolio.authorId)
+          const activeFolioNum = folioNoOf(activeFolio.id)
+          return (
+            <div
+              {...spotlight()}
+              className="st-spotlit relative z-10 mt-6 flex flex-wrap items-center justify-between gap-5 border-y border-white/10 py-3.5"
+            >
+              <div className="flex min-w-0 flex-1 items-center gap-4">
+                <img
+                  src={activeFolio.thumbnail ?? activeFolio.cover}
+                  alt=""
+                  loading="lazy"
+                  decoding="async"
+                  onError={(e) => handleImgError(e, activeFolio.title, activeFolioNum)}
+                  className="h-14 w-16 shrink-0 border border-white/15 object-cover"
+                />
+                <div className="min-w-0">
+                  <p className="font-mono text-[9px] uppercase tracking-[0.28em] text-gold">
+                    Selected Folio · № {activeFolioNum} · {activeFolio.category}
+                  </p>
+                  <p className="mt-0.5 truncate font-serif text-lg text-ivory md:text-xl">
+                    “{activeFolio.title}”
+                  </p>
+                  <p className="mt-0.5 truncate font-mono text-[9px] uppercase tracking-[0.24em] text-white/55">
+                    {activeAuthor?.name} · {activeFolio.readingTime} · {activeFolio.date}
+                  </p>
+                </div>
+              </div>
+              <Link
+                to={`/article/${activeFolio.id}`}
+                className="font-mono text-[9px] uppercase tracking-[0.28em] text-gold no-underline transition-colors hover:text-ivory"
+              >
+                Open Folio № {activeFolioNum} →
+              </Link>
+            </div>
+          )
+        })()}
+
         {/* ——— FRONT · the folios — solid ivory plates on the shelf.
-            Desktop follows P27's 7 + 7 + 5 shelf rhythm; mobile collapses
-            to one quiet column. ——— */}
+            Desktop uses a balanced 5-column (4 × 5 = 20) / 4-column (5 × 4 = 20)
+            shelf rhythm so every row is full and every folio plate has room for
+            its complete date, reading time, and selection badge. ——— */}
         <div
           role="group"
           aria-label={`The archive — ${visibleIds.length} of ${LEDGER.features} folios shown`}
@@ -301,7 +357,7 @@ function Archive() {
             className="pointer-events-none absolute bottom-0 left-1/2 top-0 z-0 hidden w-px -translate-x-1/2 bg-gradient-to-b from-transparent via-[#D9B978]/30 to-transparent xl:block"
           />
           <div
-            className="relative z-10 mx-auto mt-[clamp(1.5rem,3.5vh,2.5rem)] grid max-w-[1080px] grid-cols-1 items-stretch gap-x-[clamp(0.75rem,1.2vw,1.25rem)] gap-y-[clamp(1.4rem,3vh,2.2rem)] pb-16 sm:grid-cols-2 md:mt-[clamp(2rem,4.5vh,2.75rem)] md:pb-0 md:grid-cols-3 xl:grid-cols-7 xl:[perspective:1500px]"
+            className="relative z-10 mx-auto mt-[clamp(1.5rem,3.5vh,2.5rem)] grid grid-cols-1 items-stretch gap-x-[clamp(1rem,1.5vw,1.5rem)] gap-y-[clamp(1.4rem,3vh,2.2rem)] pb-16 sm:grid-cols-2 md:mt-[clamp(2rem,4.5vh,2.75rem)] md:grid-cols-3 md:pb-0 lg:grid-cols-4 xl:grid-cols-5 xl:[perspective:1500px]"
             onKeyDown={onKeyDown}
           >
             {ordered.map((a, pos) => {
@@ -314,7 +370,7 @@ function Archive() {
               const isMatch = visibleIds.includes(a.id)
               const receded = filtering && !isMatch
               /* at rest the shelf tapers — the focused folio holds, neighbours recede by a step */
-              const inner = filtering ? (isMatch ? 1 : 0.1) : selected ? 1 : Math.max(1 - pos * 0.03, 0.72)
+              const inner = filtering ? (isMatch ? 1 : 0.1) : selected ? 1 : Math.max(1 - pos * 0.02, 0.78)
               const dist = visibleIds.indexOf(a.id)
               const neighbour = !filtering && dist > 0 && dist <= 2
               return (
@@ -331,14 +387,14 @@ function Archive() {
                       id={`folio-${a.id}`}
                       to={isMatch ? `/article/${a.id}` : '#'}
                       onClick={(e) => { if (!isMatch) e.preventDefault() }}
-                      aria-label={`Folio ${folio} — ${a.title}, ${a.category}, ${author?.name}. ${a.readingTime}, published ${a.date}.`}
+                      aria-label={`Folio ${folio} — ${a.title}, ${a.category}, ${author?.name}. ${a.readingTime}, ${a.publicationStatus === 'provisional' ? `provisional record ${a.date}` : `published ${a.date}`}.`}
                       onFocus={() => setSelId(a.id)}
                       onMouseEnter={() => setSelId(a.id)}
                       tabIndex={selected ? 0 : -1}
-                      className={`group relative flex h-full flex-col overflow-hidden bg-[#F8F6F2] px-4 pb-3 pt-0 text-left no-underline transition-all duration-500 ${
+                      className={`group relative flex h-full flex-col overflow-hidden bg-[#F8F6F2] px-4 pb-3.5 pt-0 text-left no-underline transition-all duration-500 ${
                         selected
-                          ? 'z-[2] border border-[#B89146] shadow-[0_12px_28px_rgba(0,0,0,0.4)] md:-translate-y-1.5 xl:-translate-y-3 xl:scale-[1.045] xl:shadow-[0_26px_54px_rgba(0,0,0,0.52)]'
-                          : `border border-[#B89146]/35 hover:border-[#D9B978]/90 hover:shadow-[0_8px_20px_rgba(0,0,0,0.25)]${neighbour ? ' xl:scale-[0.982]' : ''}`
+                          ? 'z-[2] border border-[#B89146] shadow-[0_12px_28px_rgba(0,0,0,0.4)] md:-translate-y-1.5 xl:-translate-y-2.5 xl:scale-[1.03] xl:shadow-[0_24px_50px_rgba(0,0,0,0.5)]'
+                          : `border border-[#B89146]/35 hover:border-[#D9B978]/90 hover:shadow-[0_8px_20px_rgba(0,0,0,0.25)]${neighbour ? ' xl:scale-[0.99]' : ''}`
                       } focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-gold`}
                     >
                       {/* the cover strip — the feature's own plate, cropped wide
@@ -353,7 +409,7 @@ function Archive() {
                           loading="lazy"
                           decoding="async"
                           onError={(e) => handleImgError(e, a.title, folioNoOf(a.id))}
-                          className="h-[92px] w-full object-cover object-top"
+                          className="h-[118px] w-full object-cover object-top"
                         />
                         <span aria-hidden="true" className="absolute inset-0 bg-[linear-gradient(180deg,rgba(42,15,24,0.12),rgba(42,15,24,0.34))]" />
                         {isEditorsPick(a.id) && (
@@ -369,20 +425,20 @@ function Archive() {
                           selected ? 'border-[#D9B978]/50' : 'border-transparent group-hover/plate:border-[#D9B978]/25'
                         }`}
                       />
-                      <span className="relative mt-3 flex items-baseline justify-between gap-3">
-                        <span className="font-mono text-[9px] uppercase tracking-[0.3em] text-[#7C6338]">№ {folio}</span>
-                        <span className="font-mono text-[8px] uppercase tracking-[0.22em] text-[#2A0F18]/50">{stampDate(a.date)} · {a.readingTime}</span>
+                      <span className="relative mt-3 flex items-baseline justify-between gap-2">
+                        <span className="shrink-0 whitespace-nowrap font-mono text-[9px] uppercase tracking-[0.28em] text-[#7C6338]">№ {folio}</span>
+                        <span className="truncate font-mono text-[8px] uppercase tracking-[0.18em] text-[#2A0F18]/55">{stampDate(a.date)} · {a.readingTime}</span>
                       </span>
-                      <span className="relative mt-1.5 block font-serif text-[clamp(0.95rem,1.15vw,1.1rem)] font-normal leading-[1.15] text-[#1E0B12] transition-colors duration-500 group-hover/plate:text-[#5C1224]">
+                      <span className="relative mt-1.5 block font-serif text-[clamp(1.02rem,1.2vw,1.18rem)] font-normal leading-[1.15] text-[#1E0B12] transition-colors duration-500 group-hover/plate:text-[#5C1224]">
                         {a.title}
                       </span>
-                      <span className="relative mt-1.5 block font-mono text-[8px] uppercase tracking-[0.3em] text-[#2A0F18]/65">
+                      <span className="relative mt-1.5 block font-mono text-[8px] uppercase tracking-[0.26em] text-[#2A0F18]/65">
                         {a.category} · {author?.name}
                       </span>
                       {selected && (
-                        <span className="relative mt-auto inline-flex items-center gap-2 pt-2 font-mono text-[8px] uppercase tracking-[0.3em] text-[#7C6338]">
-                          <span aria-hidden="true" className="h-px w-4 bg-[#B89146]" />
-                          Selected — open folio →
+                        <span className="relative mt-auto inline-flex items-center gap-1.5 pt-2.5 font-mono text-[8px] uppercase tracking-[0.16em] text-[#7C6338]">
+                          <span aria-hidden="true" className="h-px w-2.5 shrink-0 bg-[#B89146]" />
+                          <span className="whitespace-nowrap">Selected — open folio →</span>
                         </span>
                       )}
                     </Link>

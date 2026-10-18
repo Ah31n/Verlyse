@@ -1,7 +1,7 @@
 import { lazy, Suspense, useEffect } from 'react'
 import { Link, Routes, Route, useLocation } from 'react-router-dom'
 import type { ReactNode } from 'react'
-import { AnimatePresence, motion, useReducedMotion } from 'motion/react'
+import { AnimatePresence, MotionConfig, motion, useReducedMotion } from 'motion/react'
 import Layout from './components/layout/Layout'
 import RouteErrorBoundary from './components/layout/RouteErrorBoundary'
 import StringTuneProvider from './lib/stringTune/StringTuneProvider'
@@ -125,7 +125,7 @@ export default function App() {
   const isRoom = location.pathname.startsWith('/room')
 
   return (
-    <>
+    <MotionConfig reducedMotion="user">
       <ScrollToTop />
       {/* Scroll-linked DOM motion for the whole publication. Client-only,
           booted on idle after first paint, re-scanned per route. */}
@@ -163,7 +163,7 @@ export default function App() {
       </RouteErrorBoundary>
       </Layout>
       )}
-    </>
+    </MotionConfig>
   )
 }
 

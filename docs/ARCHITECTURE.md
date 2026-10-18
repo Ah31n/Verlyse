@@ -118,7 +118,7 @@ curl -i -X POST https://verlysemedia.kesug.com/api/newsletter \
 | Variable | Class | Used by | Required? | Notes |
 |---|---|---|---|---|
 | `BUTTONDOWN_API_KEY` | **server-only** | `api/newsletter.ts` | optional | Absent → endpoint returns `503 not-configured`. Must never be client-exposed. |
-| `ALLOWED_ORIGINS` | server-only | `api/newsletter.ts` | optional | Comma-separated CORS allowlist. Falls back to Vercel + localhost — **the canonical domain is not in the default list**; add it if the client ever calls the API cross-origin. |
+| `ALLOWED_ORIGINS` | **server-only** | `api/newsletter.ts` | optional | Comma-separated CORS allowlist override. When unset, production runtime defaults to `https://verlysemedia.kesug.com, https://verlyse-react.vercel.app` (local dev origins `http://localhost:5173`, `http://localhost:4173`, `http://127.0.0.1:5173`, `http://127.0.0.1:4173` are allowed only in non-production runtimes; code complete, live deployment verification pending). |
 | `PUBLIC_SITE_ORIGIN` | build-time | prerender, sitemap, metadata audit | optional | Defaults to `https://verlysemedia.kesug.com`. Set for preview builds. |
 | `FTP_HOST` / `FTP_USER` / `FTP_PASS` / `FTP_DIR` | **server-only (deploy)** | `scripts/deploy-ftp.mjs` | required to deploy | Credentials. Never in the repo; `check:secrets` guards this. |
 | `PORT` | local | preview server | optional | — |
@@ -134,11 +134,12 @@ One layer owns each surface. Nothing is animated by two systems.
 | System | Owns | Scope |
 |---|---|---|
 | **CSS / Tailwind** | Hover, focus-visible, colour and opacity transitions, `@property` custom-property defaults, the global `prefers-reduced-motion` clamp (`index.css`) | sitewide |
-| **StringTune (`@fiddle-digital/string-tune@1.2.5`)** | Scroll progress (`--progress`), plate glide (`string="glide[]"`), shallow desktop parallax (`string="parallax[]"`), fine-pointer spotlight (`--spotlight-angle`, `--spotlight-distance`) | lazy-loaded via `src/lib/stringTune/boot.ts`; disabled under `prefers-reduced-motion: reduce` |
-| **motion (v13)** | Route transitions (`PageTransition`), `AnimatePresence`, overlays/drawers/lightboxes, reveals, `components/cinematic/*`, scroll-linked `useScroll` | sitewide |
-| **R3F / three** | `SpatialArchive` (Home), `StoryEnding3D` (articles) | lazy; gated on WebGL support, reduced motion and tab visibility |
+| **StringTune (`@fiddle-digital/string-tune@1.2.5`)** | Scroll progress (`--progress`), plate glide (`string="glide[]"`), shallow desktop parallax (`string="progress|parallax[]"`), fine-pointer spotlight (`--spotlight-angle`, `--spotlight-distance`) | lazy-loaded via `src/lib/stringTune/boot.ts` (`dist/assets/boot-CfrjN6Gu.js`, `199.82 kB` / `51.65 kB` gzip; 4 registered & active modules); disabled & torn down under `prefers-reduced-motion: reduce` |
+| **motion (v13)** | `<MotionConfig reducedMotion="user">`, route transitions (`PageTransition`), `AnimatePresence`, overlays/drawers/lightboxes, reveals (`Reveal`, `SplitText`, `ArticleClosing`), `Magnetic` (`src/components/ui/Magnetic.tsx`), scroll-linked `useScroll` | sitewide |
+| **GSAP 3.15 + Anime.js 4.5** | Outer ScrollTrigger camera wrappers (`src/components/cinematic/primitives.tsx`) and SVG stroke draw (`src/components/ui/BrassRule.tsx`) | isolated into lazy chunks (`dist/assets/gsap-a3sj5zmn.js`: `114.01 kB` / `45.16 kB` gzip; `dist/assets/anime-CcJk6tc-.js`: `32.40 kB` / `13.15 kB` gzip, dynamically imported by `BrassRule` only when `!reduce && near`); evicted from `index-*.js` |
+| **R3F / three** | `SpatialArchive` (Home), `StoryEnding3D` (articles via `EndingSpatialStage`), `/room` | lazy; gated on WebGL support, reduced motion, near-viewport, and tab visibility; wrapped in local React Error Boundaries (`SpatialBoundary`, `EndingSpatialBoundary`, `RouteErrorBoundary`) |
 
-**Scroll owner: the browser.** There is no smooth-scroll engine (`tune.scrollDesktopMode = 'default'` and `tune.scrollMobileMode = 'default'`). Both StringTune and `motion`'s `useScroll` only *read* native scroll; neither drives it. `gsap` and `animejs` have been retired and removed from `package.json`.
+**Scroll owner: the browser.** There is no smooth-scroll engine (`tune.scrollDesktopMode = 'default'` and `tune.scrollMobileMode = 'default'`). StringTune, GSAP ScrollTrigger, and `motion`'s `useScroll` only *read* native scroll; none of them drives or hijacks it.
 
 ---
 
@@ -148,12 +149,13 @@ Verified by import-site count including dynamic imports — **nothing removed on
 
 | Package | Import sites | Verdict |
 |---|---|---|
-| `motion` 13.2 | 44 | keep |
-| `react-router-dom` 7.18 | 23 | keep |
-| `gsap` 3.15 | 3 | **in use** — retire later, deliberately, not now. Non-OSS licence; ships in the main chunk because `Header` imports `Magnetic`. |
-| `three` 0.185 | 2 | keep (lazy) |
-| `@react-three/fiber` 8.18 | 2 | keep (lazy) |
-| `animejs` 4.5 | 1 | **in use** — a whole library for one SVG rule on one page. Retire later. |
+| `motion` 13.2 | 46 | keep (`dist/assets/motion-Bx_UBRF8.js`: `137.25 kB` / `45.39 kB` gzip) |
+| `react-router-dom` 7.18 | 23 | keep (bundled in `dist/assets/react-bCe7H_Od.js`: `279.15 kB` / `90.10 kB` gzip) |
+| `@fiddle-digital/string-tune` 1.2.5 | 10 | keep (`dist/assets/boot-CfrjN6Gu.js`: `199.82 kB` / `51.65 kB` gzip, lazy on idle; 4-module allowlist in `boot.ts`) |
+| `gsap` 3.15 | 2 | **in use (isolated)** — isolated into `dist/assets/gsap-a3sj5zmn.js` (`114.01 kB` / `45.16 kB` gzip) and evicted from `Header`/`index-*.js` (**B2 closed**). |
+| `three` 0.185 | 2 | keep (lazy `dist/assets/three-DF4bklDy.js`: `770.49 kB` / `203.48 kB` gzip) |
+| `@react-three/fiber` 8.18 | 2 | keep (lazy `dist/assets/three-DF4bklDy.js`) |
+| `animejs` 4.5 | 1 | **in use (isolated)** — dynamically imported by `src/components/ui/BrassRule.tsx` (`dist/assets/anime-CcJk6tc-.js`: `32.40 kB` / `13.15 kB` gzip) only when `!reduce && near`. |
 | `puppeteer`, `puppeteer-core`, `@playwright/test` | test harnesses | keep (dev) |
 
 No unused runtime dependency was found. Nothing was deleted.
@@ -173,6 +175,6 @@ No unused runtime dependency was found. Nothing was deleted.
 
 ## 9 · Asset truth
 
-100 assets in `public/` (95 images, 5 fonts), each referenced by code. R01 removed one orphan: `public/img/works/alina-cafe.jpg` (247 KB), which had zero references in `src/`, `scripts/`, `index.html` or the built output.
+`public/` contains **104** static media and font assets (`100` image/SVG files across `public/img/**` and `public/favicon.svg`, plus `4` `.woff2` font files in `public/fonts/`, alongside `3` config/stylesheet files `public/fonts/fonts.css`, `public/robots.txt`, and `public/.htaccess`). `scripts/asset-audit.mjs` verifies both the `45/45` sampled role subset (`covers: 24, inner: 7, signature: 1, portrait: 5, fonts: 4, logo: 1, poster: 3`) and the `104/104` full static media/font inventory (`0` missing).
 
 **Outstanding (not R01 scope):** five contributor portraits are still `.jpg` while the other 89 images are WebP — `alina-javed-about.jpg` is 259 KB and renders on four surfaces. No image uses `srcset`. See `audit/CODEBASE-AND-SITE-ASSESSMENT.md` §B5.

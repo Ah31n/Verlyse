@@ -12,10 +12,11 @@ Pick the lowest tier that does the job. Moving *up* a tier requires a reason wri
 |---|---|---|---|
 | 1 | **CSS / Tailwind** | hover, focus-visible, colour, opacity, simple transitions, static states, `@property` custom-property interpolation | anything needing presence/exit |
 | 2 | **StringTune (`@fiddle-digital/string-tune`)** | declarative scroll progress (`--progress`), gentle scroll-lag glide (`string="glide[]"`), shallow desktop parallax (`string="parallax[]"`), fine-pointer brass spotlight (`--spotlight-angle` / `--spotlight-distance`) | scroll-jacking (`scrollDesktopMode` and `scrollMobileMode` stay `'default'`) |
-| 3 | **motion (v13)** | React presence (`AnimatePresence`), layout animation, controlled reveals (`Reveal`, `SplitText`), scroll-linked DOM (`useScroll`) | continuous unthrottled decorative loops |
-| 4 | **R3F / three** | true spatial rendering (`SpatialArchive`, `StoryEnding3D`) | 2D decoration |
+| 3 | **motion (v13)** | `<MotionConfig reducedMotion="user">`, React presence (`AnimatePresence`), layout animation, controlled reveals (`Reveal`, `SplitText`, `ArticleClosing`), `Magnetic` (`useSpring`), scroll-linked DOM (`useScroll`) | continuous unthrottled decorative loops |
+| 4 | **GSAP 3.15 + Anime.js 4.5 (isolated lazy chunks)** | Established ScrollTrigger camera wrappers (`src/components/cinematic/primitives.tsx`) and SVG stroke draw (`src/components/ui/BrassRule.tsx`) | main entry chunk (`index-*.js`), scroll pinning, or new surfaces |
+| 5 | **R3F / three** | true spatial rendering (`SpatialArchive`, `StoryEnding3D`, `/room`) wrapped in local React Error Boundaries (`SpatialBoundary`, `EndingSpatialBoundary`, `RouteErrorBoundary`) | 2D decoration |
 
-> **Retired packages:** `gsap` and `animejs` have been retired and removed from `package.json`. Former GSAP primitives (`src/components/cinematic/primitives.tsx`) and `BrassRule` (`src/components/ui/BrassRule.tsx`) now run on `motion/react` + CSS / SVG stroke transitions.
+> **Bundle isolation note (`B2` closed):** `Magnetic` (`src/components/ui/Magnetic.tsx`) now runs on `motion/react` (`useMotionValue` + `useSpring`), and `vite.config.ts` isolates `gsap` (`dist/assets/gsap-a3sj5zmn.js`, `114.01 kB` / `45.16 kB` gzip) and `animejs` (`dist/assets/anime-CcJk6tc-.js`, `32.40 kB` / `13.15 kB` gzip, dynamically imported by `BrassRule` only when `!reduce && near`) into lazy chunks. The blocking `index-*.js` entry bundle evicted `gsap` completely (`252.87 kB` / `89.38 kB` gzip before `gsap` eviction; `154.45 kB` / `51.49 kB` gzip immediately after `gsap` eviction prior to `EditorialCraftSystem`; `dist/assets/index-B4mHalN7.js` at `177.64 kB` / `57.97 kB` gzip in the current build with `EditorialCraftSystem` included).
 
 ---
 
@@ -26,15 +27,16 @@ Pick the lowest tier that does the job. Moving *up* a tier requires a reason wri
 | Surface | Owner | Notes |
 |---|---|---|
 | Hover / focus / active states, colour + opacity | **CSS** | sitewide; the reduced-motion clamp in `index.css` covers these |
-| Route transitions (`PageTransition`, archival veil) | **motion** | `AnimatePresence`, keyed on pathname |
-| Search overlay, saved drawer, mobile menu | **motion** | presence + focus trap |
-| Reveals (`Reveal`, `RevealImage`, `SplitText`) | **motion** | `useInView`, `once: true` |
+| Route transitions (`PageTransition`, archival veil) | **motion** | `<MotionConfig reducedMotion="user">` + `AnimatePresence`, keyed on pathname |
+| Search overlay, saved drawer, mobile menu, lightbox, ambassador dialog | **motion** | presence + focus trap + `useBodyScrollLock` |
+| Reveals (`Reveal`, `RevealImage`, `SplitText`, `ArticleClosing`) | **motion** | `useInView`, `once: true`, `useReducedMotion()` |
+| `Magnetic` (`src/components/ui/Magnetic.tsx`) | **motion** | `useMotionValue` + `useSpring` (re-exported by `src/components/cinematic` for backward compatibility) |
 | Scroll progress bar, header condense | **CSS**, driven by a passive listener in `Layout` | reads `window.scrollY`; writes class names only |
 | Home scroll transforms, `ImmersiveShell`, `DossierRoom`, `ScrollBeat` | **motion** `useScroll` | read-only on scroll |
-| `components/cinematic/*` (`CrashZoom`, `MaskReveal`, `Slate`, `Magnetic`, `Tilt3D`, …) | **motion** | migrated off GSAP onto `motion/react` (`useScroll`, `useSpring`, `useMotionValue`) |
-| `BrassRule` SVG draw | **motion / CSS** | migrated off Anime.js |
-| Reading measure (`.st-measure`), archive/gallery plate spotlight & glide (`.st-spotlit`), cover drift | **StringTune** | lazy-loaded via `src/lib/stringTune/boot.ts`; skipped completely under `prefers-reduced-motion: reduce` |
-| `SpatialArchive` (Home), `StoryEnding3D` (articles), `components/room/*` | **R3F / motion** | lazy; gated on WebGL + reduced motion + tab visibility |
+| `components/cinematic/*` (`CrashZoom`, `MaskReveal`, `Slate`, `Tilt3D`, …) | **GSAP (`ScrollTrigger`)** | outer camera wrappers on secondary routes only (`dist/assets/gsap-a3sj5zmn.js` lazy chunk); reverts via `gsap.context()` |
+| `BrassRule` SVG draw (`src/components/ui/BrassRule.tsx`) | **Anime.js (`animejs/svg`)** | SVG stroke draw (`dist/assets/anime-CcJk6tc-.js` lazy chunk, dynamically imported only when `!reduce && near`) |
+| Reading measure (`.st-measure`), archive/gallery plate spotlight & glide (`.st-spotlit`), cover drift | **StringTune** | lazy-loaded via `src/lib/stringTune/boot.ts` (`dist/assets/boot-CfrjN6Gu.js`: `199.82 kB` / `51.65 kB` gzip; 4 registered & active modules); skipped & torn down under `prefers-reduced-motion: reduce` |
+| `SpatialArchive` (Home), `StoryEnding3D` (articles via `EndingSpatialStage`), `components/room/*` | **R3F / motion** | lazy; gated on WebGL + reduced motion + near-viewport + tab visibility; wrapped in local React Error Boundaries (`SpatialBoundary`, `EndingSpatialBoundary`, `RouteErrorBoundary`) |
 
 ### Scroll ownership
 
@@ -69,36 +71,31 @@ Existing call sites are migrated opportunistically. A single sweeping rewrite of
 
 ---
 
-## 4 · Reduced motion
+## 4 · Reduced motion (**D3 — Closed**)
 
 Reduced mode must produce a **deliberate static composition**, never a broken animation.
 
-Two mechanisms, and they do different things:
+Three mechanisms work together:
 
-1. **CSS clamp** (`index.css:69-76`) — sets `animation-duration` and `transition-duration` to `0.001s`. Covers tier 1 only.
-2. **`useReducedMotion()`** — the JS engines (motion, GSAP, R3F) are *not* covered by the CSS clamp, because they drive transforms via JS/WAAPI. Each must check explicitly.
+1. **CSS clamp** (`index.css:69-76`) — sets `animation-duration` and `transition-duration` to `0.001s`. Covers tier 1.
+2. **Root `<MotionConfig reducedMotion="user">`** (`src/App.tsx`) — instructs `motion/react` globally to respect the operating system's reduced-motion setting.
+3. **Explicit `useReducedMotion()` / `matchMedia` guards** — **32 of 32 animated components guard explicitly**, including all 13 closing components in `src/components/ui/ArticleClosing.tsx` (**D3 closed**) and the live `prefers-reduced-motion: reduce` media-query listener in `src/lib/stringTune/StringTuneProvider.tsx`.
 
-**Current coverage: 28 of 32 animated components guard explicitly.** The known gap is `components/ui/ArticleClosing.tsx` — 61 `motion.*` elements, 34 with entrance animations, no guard — rendered on all 19 article pages. Recorded in `audit/CODEBASE-AND-SITE-ASSESSMENT.md` as **D3**; still open.
-
-3D is fully gated: `useWebGLSupport()` + `useReducedMotion()` + tab visibility.
+3D is fully gated: `useWebGLSupport()` + `useReducedMotion()` + tab visibility + local Error Boundaries (`SpatialBoundary` and `EndingSpatialBoundary`).
 
 ---
 
-## 5 · Interaction rules
+## 5 · Interaction rules (**D4 — Closed**)
 
 - **No interaction may require hover.** Every hover affordance has a focus and a touch equivalent.
 - **No mobile behaviour may depend on cursor mechanics.** Cursor, magnetic, spotlight and parallax effects are desktop-only.
-- **Dialogs** (search, saved drawer, mobile menu) have focus traps, Escape, and focus restoration to the opening control — verified present.
-- **Known gap:** none of the three dialogs locks body scroll, so the page scrolls behind them. Recorded as **D4**; still open.
+- **Dialogs** (`Header` mobile menu, `SearchOverlay`, `SavedDrawer`, `ArtGallery` lightbox, and `Ambassadors` record dialog) all have focus traps, Escape dismissal, focus restoration to the opening control, and reference-counted body scroll lock via `useBodyScrollLock` (**D4 closed**).
 - **Keyboard contract** for search: Escape closes, ArrowUp/ArrowDown move the active result, Enter opens, Tab leaves. Implemented in `SearchOverlay`.
 
 ---
 
-## 6 · Scheduled consolidation (not yet done)
+## 6 · Completed bundle & motion consolidation (**B1 & B2 — Closed**)
 
-Per the decision recorded in `docs/3D-IMMERSIVE-PLAN.md` §3:
-
-- Retire **GSAP** — 40 call sites across 10 cinematic primitives move to motion + scroll-progress. Removes a non-OSS dependency and takes GSAP out of the 92 KB gzip main chunk, where it currently ships on every route because `Header` imports `Magnetic`.
-- Retire **Anime.js** — one SVG draw, replaceable with CSS `stroke-dashoffset`.
-
-This is a large, entirely invisible refactor. It belongs in its own PR and has not been started.
+- **`Magnetic` migrated to `motion/react` (`src/components/ui/Magnetic.tsx`)**: Replaced `gsap.quickTo` with `useMotionValue` + `useSpring` + `useReducedMotion`, removing `gsap` from `Header.tsx` and the blocking `index-*.js` entry bundle (`252.87 kB` / `89.38 kB` gzip → `154.45 kB` / `51.49 kB` gzip prior to `EditorialCraftSystem`; `dist/assets/index-B4mHalN7.js` at `177.64 kB` / `57.97 kB` gzip in the current build).
+- **Dedicated chunk isolation (`vite.config.ts`, `BrassRule.tsx`, `ArticleDetail.tsx`)**: `gsap` (`dist/assets/gsap-a3sj5zmn.js`, `114.01 kB` / `45.16 kB` gzip) is isolated into a secondary-route chunk; `BrassRule.tsx` dynamically imports `animejs` (`dist/assets/anime-CcJk6tc-.js`, `32.40 kB` / `13.15 kB` gzip) only when `!reduce && near`; and `EndingSpatialStage` dynamically loads `StoryEnding3D` (`dist/assets/StoryEnding3D-C6ccyV-p.js`, `10.93 kB` / `3.20 kB` gzip) only when `glSupported && !reduce && near && tabVisible`.
+- **StringTune 4-module allowlist & native-scroll parallax (`src/lib/stringTune/boot.ts`, `src/lib/stringTune/attrs.ts`)**: Trimmed `boot.ts` to the exact 4 modules used by active surfaces (`UNIVERSAL_MODULES = [StringProgress, StringGlide]`, `POINTER_MODULES = [StringParallax, StringSpotlight]`, emitted as `dist/assets/boot-CfrjN6Gu.js` at `199.82 kB` / `51.65 kB` gzip) and updated `drift()` to `string: 'progress|parallax[]'` so `StringParallax` receives `progress-value` in native scroll mode.

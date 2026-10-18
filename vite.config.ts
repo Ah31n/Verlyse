@@ -51,6 +51,12 @@ export default defineConfig({
           if (id.includes('node_modules/framer-motion')) return 'motion'
           if (id.includes('node_modules/motion')) return 'motion'
 
+          // Isolate GSAP and Anime.js into dedicated chunks so routes that do
+          // not mount cinematic ScrollTrigger primitives (/articles, /article/*,
+          // /categories/*, /creator/*, /room) never download them.
+          if (id.includes('node_modules/gsap')) return 'gsap'
+          if (id.includes('node_modules/animejs')) return 'anime'
+
           // react-router-dom's path CONTAINS 'node_modules/react', so it must
           // be claimed before the react test or it silently lands in the react
           // chunk. It is small and always needed, so it deliberately ships in

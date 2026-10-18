@@ -5,8 +5,15 @@ import { BRAND, COMMUNITY_STATS, LEDGER } from '../data/content'
 import BrassRule from '../components/ui/BrassRule'
 import HiringMarquee from '../components/ui/HiringMarquee'
 import { LibraryCard } from '../components/ui/EasterEggs'
-import { CrashZoom, DepthStage, DepthLayer, OrbitalDrift, PushIn , MaskReveal } from '../components/cinematic'
+import { CrashZoom, DepthStage, DepthLayer, OrbitalDrift, PushIn } from '../components/cinematic'
 import { handleImgError } from '../lib/imgFallback'
+import { spotlight } from '../lib/stringTune/attrs'
+import {
+  DotMatrixLedger,
+  FloralWord,
+  HaikeiContourPlane,
+  RouteEmblemSeal,
+} from '../components/ui/EditorialCraftSystem'
 
 /**
  * THE COLOPHON — the quiet institutional record of Verlyse Media, from the
@@ -47,23 +54,30 @@ export default function About() {
       {/* ——— BACK · quiet dim room — the least wash of any space ——— */}
       <div aria-hidden="true" className="pointer-events-none absolute inset-0">
         <div className="absolute inset-0 bg-[radial-gradient(110%_80%_at_50%_0%,rgba(92,18,36,0.30),transparent_60%),radial-gradient(80%_60%_at_88%_100%,rgba(184,145,70,0.07),transparent_60%),linear-gradient(175deg,#3E0D17_0%,#2A0F18_55%,#17060C_100%)]" />
+        <HaikeiContourPlane tone="dark" seed={6} className="opacity-20" />
       </div>
 
       <div className="relative mx-auto max-w-[1080px] px-[clamp(1.25rem,4vw,4.75rem)] pb-[clamp(4rem,9vh,7rem)] pt-[clamp(7rem,15vh,9.5rem)]">
         {/* ——— header — ghost COLOPHON, quiet ——— */}
         <div className="text-center">
+          <div className="mb-4 flex flex-wrap items-center justify-center gap-3">
+            <RouteEmblemSeal variant="pillars" folioCode="COLOPHON" tone="dark" />
+            <DotMatrixLedger
+              code={`04${LEDGER.features}`}
+              label={`04 Principles · ${LEDGER.features} Folios`}
+              tone="dark"
+            />
+          </div>
           <h1 className="relative font-serif text-[clamp(2.6rem,7vw,5.5rem)] font-light leading-[0.92] tracking-[-0.02em] text-ivory">
             {/* Beat 1 — CRASH ZOOM. The ghost imprint dollies through the lens
                 and dissolves as the visitor scrolls. GSAP owns this wrapper's
                 transform only; the h1's real text is untouched. */}
             <CrashZoom className="pointer-events-none absolute inset-x-0 top-1/2 -translate-y-1/2">
-              <span aria-hidden="true" className="block select-none font-serif text-[clamp(4rem,11vw,8.5rem)] font-semibold leading-none text-transparent [-webkit-text-stroke:1px_rgba(184,145,70,0.13)]">
+              <span aria-hidden="true" className="block select-none font-serif text-[clamp(4rem,11vw,8.5rem)] font-semibold leading-none text-transparent [-webkit-text-stroke:1px_rgba(184,145,70,0.08)]">
                 COLOPHON
               </span>
             </CrashZoom>
-            <MaskReveal>
-              <span className="relative">The <em className="italic text-gold">colophon</em></span>
-            </MaskReveal>
+            <span className="relative">The <FloralWord variant="camellia">colophon</FloralWord></span>
           </h1>
           <p className="mt-4 font-mono text-[10px] uppercase tracking-[0.34em] text-gold/80">
             The colophon — the institutional record of Verlyse Media
@@ -157,7 +171,7 @@ export default function About() {
             <span aria-hidden="true" className="absolute inset-0 -translate-x-1 -translate-y-2 border border-gold/10" />
             <p className="font-mono text-[9px] uppercase tracking-[0.3em] text-gold">The founder — Sheet IV</p>
             <div className="mt-6 grid grid-cols-1 items-center gap-8 sm:grid-cols-[minmax(0,200px)_1fr] md:gap-10">
-              <figure className="relative m-0">
+              <figure {...spotlight()} className="st-spotlit relative m-0">
                 <span aria-hidden="true" className="absolute inset-0 translate-x-2 translate-y-2 border border-gold/25" />
                 <img
                   src="/img/founder-alina.webp"

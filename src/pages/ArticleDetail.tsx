@@ -1,12 +1,14 @@
 import { Link, useParams } from 'react-router-dom'
-import { useEffect, lazy, Suspense } from 'react'
-import { motion } from 'motion/react'
+import { useEffect, useRef, useState, lazy, Suspense, Component, type ReactNode } from 'react'
+import { motion, useReducedMotion } from 'motion/react'
 import { useArticleSeo } from '../hooks/useSeo'
 import Reveal from '../components/ui/Reveal'
 import SplitText from '../components/ui/SplitText'
 import { MetaRow } from '../components/ui/primitives'
 import ShareButtons from '../components/ui/ShareButtons'
 import { getArticle, getAuthor, relatedArticles, folioNoOf, type Vibe, type Article, type Author, AUTHORS, authorPhoto , coverAlt, primaryRole } from '../data/content'
+import { getEndingStatic } from '../data/articleEndings'
+import { useWebGLSupport } from '../lib/three/useWebGLSupport'
 import { handleImgError } from '../lib/imgFallback'
 import { AuthorPhoto } from '../components/ui/AuthorFrame'
 import { ArticleEnding, MotifDivider, Signature, WritersNoteClosing } from '../components/ui/ArticleClosing'
@@ -16,13 +18,146 @@ import { WorldTexture, worldBodyClass } from '../components/ui/ArticleWorld'
 import { ReflectionLine } from '../components/ui/ScrollBeat'
 import { InkSpread, EditorialWipe } from '../components/ui/MotionMoves'
 import ArticleSignature from '../components/ui/ArticleSignature'
-// The story-ending spatial atmosphere is loaded on demand (three is heavy).
-const StoryEnding3D = lazy(() => import('../components/spatial/StoryEnding3D'))
 import SaveButton from '../components/ui/SaveButton'
 import { useReadingMode } from '../components/ui/ReadingMode'
 import { ImmersiveShell, ReadingMeasure } from '../components/immersive'
 import { progress } from '../lib/stringTune/attrs'
 import ArtGallery from '../components/ui/ArtGallery'
+
+// The story-ending spatial atmosphere is loaded on demand (three is heavy) and
+// gated by EndingSpatialStage so the chunk is only requested when eligible and
+// near the viewport.
+const StoryEnding3D = lazy(() => import('../components/spatial/StoryEnding3D'))
+
+/**
+ * Local Error Boundary around StoryEnding3D (`MOTION_PLAYBOOK.md` §7) so any
+ * runtime WebGL/context-loss failure inside the background ending scene never
+ * unmounts the article body or its semantic HTML closing.
+ */
+class EndingSpatialBoundary extends Component<{ children: ReactNode }, { failed: boolean }> {
+  state = { failed: false }
+  static getDerivedStateFromError() { return { failed: true } }
+  componentDidCatch() { /* semantic ArticleEnding + ArticleSignature remain visible */ }
+  render() { return this.state.failed ? null : this.props.children }
+}
+
+/**
+ * Eligibility & near-viewport gate for StoryEnding3D:
+ * - Always renders the lightweight `[data-ending]` stage marker synchronously
+ *   so the semantic HTML ending has its stage metadata without importing Three.
+ * - Only mounts the lazy `<StoryEnding3D>` chunk when WebGL is supported,
+ *   `prefers-reduced-motion` is not active, the document tab is visible, and
+ *   the reader has scrolled near `#ending`.
+ */
+function EndingSpatialStage({ article }: { article: Article }) {
+  const reduce = useReducedMotion() === true
+  const { supported: glSupported } = useWebGLSupport()
+  const wrapRef = useRef<HTMLDivElement>(null)
+  const ending = getEndingStatic(article)
+
+  const [near, setNear] = useState(false)
+  const [settled, setSettled] = useState(false)
+  const [tabVisible, setTabVisible] = useState(() =>
+    typeof document === 'undefined' ? true : document.visibilityState !== 'hidden'
+  )
+
+  useEffect(() => {
+    setNear(false)
+    setSettled(false)
+  }, [article.id])
+
+  useEffect(() => {
+    if (typeof document === 'undefined') return undefined
+    const onVis = () => setTabVisible(document.visibilityState !== 'hidden')
+    document.addEventListener('visibilitychange', onVis)
+    return () => document.removeEventListener('visibilitychange', onVis)
+  }, [])
+
+  useEffect(() => {
+    if (reduce || !glSupported || near) return undefined
+    const el = wrapRef.current
+    if (!el || typeof window === 'undefined') return undefined
+
+    let done = false
+    const activate = () => {
+      if (done) return
+      done = true
+      setNear(true)
+    }
+
+    const checkRect = () => {
+      if (done || !wrapRef.current) return
+      const r = wrapRef.current.getBoundingClientRect()
+      if (r.top < window.innerHeight * 1.15 && r.bottom > -60) {
+        activate()
+      }
+    }
+
+    checkRect()
+    if (done) return undefined
+
+    let io: IntersectionObserver | null = null
+    if ('IntersectionObserver' in window) {
+      io = new IntersectionObserver(
+        (entries) => {
+          if (entries.some((entry) => entry.isIntersecting)) {
+            activate()
+            io?.disconnect()
+          }
+        },
+        { rootMargin: '240px 0px' }
+      )
+      io.observe(el)
+    }
+
+    const t = window.setTimeout(checkRect, 400)
+    window.addEventListener('scroll', checkRect, { passive: true })
+    window.addEventListener('resize', checkRect)
+    return () => {
+      io?.disconnect()
+      window.clearTimeout(t)
+      window.removeEventListener('scroll', checkRect)
+      window.removeEventListener('resize', checkRect)
+    }
+  }, [article.id, glSupported, near, reduce])
+
+  useEffect(() => {
+    if (!near || reduce || !glSupported || settled) return undefined
+    const id = window.setTimeout(() => setSettled(true), ending.motion.revealMs)
+    return () => window.clearTimeout(id)
+  }, [ending.motion.revealMs, glSupported, near, reduce, settled])
+
+  const phase = reduce
+    ? 'REDUCED'
+    : !glSupported
+      ? 'FALLBACK'
+      : !near
+        ? 'RESTING'
+        : !settled
+          ? 'ENTERING'
+          : 'ALIVE'
+
+  const eligible = glSupported && !reduce && near && tabVisible
+
+  return (
+    <div
+      ref={wrapRef}
+      data-ending={ending.endingId}
+      data-phase={phase}
+      data-scene-kind={ending.sceneKind}
+      className="pointer-events-none absolute inset-0 z-0"
+      aria-hidden="true"
+    >
+      {eligible ? (
+        <EndingSpatialBoundary key={article.id}>
+          <Suspense fallback={null}>
+            <StoryEnding3D article={article} activePhase={phase} />
+          </Suspense>
+        </EndingSpatialBoundary>
+      ) : null}
+    </div>
+  )
+}
 
 /* ------------------------------------------------------------------ */
 /* Every feature carries its own temperament — motion and finish      */
@@ -300,38 +435,52 @@ export default function ArticleDetail() {
           the only property it changes is its own scaleX. */}
       <ReadingMeasure />
     <>
-      {/* the road back to the shelf — the pair to the reading lamp; fixed,
-          quiet, and always reachable mid-read without scrolling up */}
-      <Link
-        to="/articles"
-        aria-label="Back to the archive"
-        title="Back to the archive"
-        className={`fixed left-6 top-24 z-[1200] flex items-center gap-2 border px-4 py-2.5 font-mono text-[9px] uppercase tracking-[0.30em] no-underline transition-all duration-700 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-gold ${
+      {/* the road back to the shelf & the library lamp — fixed in the outer
+          margin on wide desktop or while reading mode is active; anchored at
+          the top of the hero on tablet and mobile so they never float over
+          the article prose or artwork plates while scrolling. */}
+      <div
+        className={
           reading
-            ? 'border-gold/60 bg-[#1C0509]/80 text-gold'
-            : 'border-white/15 bg-[#1C0509]/40 text-ivory/70 hover:border-gold/50 hover:text-gold'
-        }`}
+            ? 'contents'
+            : 'max-xl:pointer-events-none max-xl:absolute max-xl:inset-x-0 max-xl:top-[92px] max-xl:z-[20] max-xl:mx-auto max-xl:flex max-xl:w-full max-xl:max-w-page max-xl:items-center max-xl:justify-between max-xl:gap-3 max-xl:px-[clamp(1.75rem,5.5vw,4.75rem)]'
+        }
       >
-        <span aria-hidden="true">←</span>
-        <span className="max-[479px]:sr-only">The archive</span>
-      </Link>
+        <Link
+          to="/articles"
+          aria-label="Back to the archive"
+          title="Back to the archive"
+          className={`pointer-events-auto ${
+            reading ? 'fixed left-4 top-5 sm:left-6 sm:top-6' : 'xl:fixed xl:left-6 xl:top-24'
+          } z-[1200] flex items-center gap-2 border px-3.5 py-2 sm:px-4 sm:py-2.5 font-mono text-[9px] uppercase tracking-[0.30em] no-underline transition-all duration-700 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-gold ${
+            reading
+              ? 'border-gold/60 bg-[#1C0509]/80 text-gold'
+              : 'border-white/15 bg-[#1C0509]/55 text-ivory/75 backdrop-blur-[2px] hover:border-gold/50 hover:text-gold'
+          }`}
+        >
+          <span aria-hidden="true">←</span>
+          <span>The archive</span>
+        </Link>
 
-      {/* the library lamp — enter / leave the quiet reading room */}
-      <button
-        type="button"
-        onClick={toggleReading}
-        aria-pressed={reading}
-        aria-label={reading ? 'Leave reading mode' : 'Enter reading mode'}
-        title={reading ? 'Leave the reading room' : 'The reading room'}
-        className={`fixed right-6 top-24 z-[1200] flex items-center gap-2 border px-4 py-2.5 font-mono text-[9px] uppercase tracking-[0.30em] transition-all duration-700 max-[479px]:px-3 ${
-          reading
-            ? 'border-gold/60 bg-[#1C0509]/80 text-gold'
-            : 'border-white/15 bg-[#1C0509]/40 text-ivory/70 hover:border-gold/50 hover:text-gold'
-        }`}
-      >
-        <span aria-hidden="true" className={`text-sm leading-none ${reading ? 'text-gold' : 'text-ivory/60'}`}>☙</span>
-        <span className="max-[479px]:sr-only">{reading ? 'The reading room' : 'Read quietly'}</span>
-      </button>
+        {/* the library lamp — enter / leave the quiet reading room */}
+        <button
+          type="button"
+          onClick={toggleReading}
+          aria-pressed={reading}
+          aria-label={reading ? 'Leave reading mode' : 'Enter reading mode'}
+          title={reading ? 'Leave the reading room' : 'The reading room'}
+          className={`pointer-events-auto ${
+            reading ? 'fixed right-4 top-5 sm:right-6 sm:top-6' : 'xl:fixed xl:right-6 xl:top-24'
+          } z-[1200] flex items-center gap-2 border px-3.5 py-2 sm:px-4 sm:py-2.5 font-mono text-[9px] uppercase tracking-[0.30em] transition-all duration-700 ${
+            reading
+              ? 'border-gold/60 bg-[#1C0509]/80 text-gold'
+              : 'border-white/15 bg-[#1C0509]/55 text-ivory/75 backdrop-blur-[2px] hover:border-gold/50 hover:text-gold'
+          }`}
+        >
+          <span aria-hidden="true" className={`text-sm leading-none ${reading ? 'text-gold' : 'text-ivory/60'}`}>☙</span>
+          <span>{reading ? 'The reading room' : 'Read quietly'}</span>
+        </button>
+      </div>
 
       {/* ---------- Hero — framed by the publication's world ---------- */}
       {article.heroMode === 'quiet' ? (
@@ -411,7 +560,7 @@ export default function ArticleDetail() {
         </section>
       ) : article.heroMode === 'gallery' ? (
         /* ——— GALLERY: the artwork itself is the hero — the plate, framed ——— */
-        <section className="relative flex items-end overflow-hidden border-b border-white/10 bg-wine-deep pt-28 md:min-h-[80svh] md:pt-36">
+        <section className="relative flex items-end overflow-hidden border-b border-white/10 bg-wine-deep pt-36 md:min-h-[80svh]">
           <WorldTexture world={article.world} />
           <div className="relative z-[2] mx-auto w-full max-w-page px-[clamp(1.75rem,5.5vw,4.75rem)] pb-16">
             <div className="grid grid-cols-1 items-end gap-10 lg:grid-cols-[1fr_auto]">
@@ -425,8 +574,8 @@ export default function ArticleDetail() {
                 </Reveal>
               </div>
               <Reveal delay={0.25}>
-                <figure className="relative w-full max-w-[300px]">
-                  <div aria-hidden="true" className="absolute -inset-3 translate-x-3 translate-y-3 border border-gold/35" />
+                <figure className="relative w-full max-w-[280px] sm:max-w-[300px]">
+                  <div aria-hidden="true" className="absolute -inset-2 translate-x-2 translate-y-2 border border-gold/35 sm:-inset-3 sm:translate-x-3 sm:translate-y-3" />
                   <div className="img-frame relative overflow-hidden border border-gold/25">
                     <img
                       src={article.cover}
@@ -712,9 +861,7 @@ export default function ArticleDetail() {
       <section id="ending" className="relative border-t border-white/10 py-[clamp(6rem,14vh,11rem)]">
         {/* the bounded spatial atmosphere — sits BEHIND the canonical signature
             and closing copy, which always render as semantic HTML on top. */}
-        <Suspense fallback={null}>
-          <StoryEnding3D article={article} />
-        </Suspense>
+        <EndingSpatialStage article={article} />
         <div className="relative z-[1] mx-auto max-w-page px-[clamp(1.75rem,5.5vw,4.75rem)]">
           {/* The closing — the publication's own last slide */}
           <ArticleEnding article={article} />

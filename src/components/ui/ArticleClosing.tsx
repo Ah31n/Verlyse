@@ -1,4 +1,4 @@
-import { motion } from 'motion/react'
+import { motion, useReducedMotion } from 'motion/react'
 import { BRAND, folioNoOf, type Article, type Closing , getAuthor , authorPhoto } from '../../data/content'
 import { MotifGlyph } from './Motifs'
 import Reveal from './Reveal'
@@ -15,13 +15,14 @@ const EASE = [0.22, 1, 0.36, 1] as const
 
 /** Animated gold rule that draws itself in. */
 function DrawRule({ delay = 0, className = '' }: { delay?: number; className?: string }) {
+  const reduce = useReducedMotion() === true
   return (
     <motion.span
       aria-hidden="true"
-      initial={{ scaleX: 0 }}
+      initial={reduce ? false : { scaleX: 0 }}
       whileInView={{ scaleX: 1 }}
       viewport={{ once: true, margin: '0px 0px -10% 0px' }}
-      transition={{ duration: 1.1, ease: EASE, delay }}
+      transition={reduce ? { duration: 0 } : { duration: 1.1, ease: EASE, delay }}
       className={`block h-px w-24 origin-left bg-gold ${className}`}
     />
   )
@@ -29,13 +30,14 @@ function DrawRule({ delay = 0, className = '' }: { delay?: number; className?: s
 
 /** A floating ✦ ornament. */
 function Ornament({ delay = 0 }: { delay?: number }) {
+  const reduce = useReducedMotion() === true
   return (
     <motion.span
       aria-hidden="true"
-      initial={{ opacity: 0, rotate: -30, scale: 0.6 }}
+      initial={reduce ? false : { opacity: 0, rotate: -30, scale: 0.6 }}
       whileInView={{ opacity: 1, rotate: 0, scale: 1 }}
       viewport={{ once: true, margin: '0px 0px -10% 0px' }}
-      transition={{ duration: 0.9, ease: EASE, delay }}
+      transition={reduce ? { duration: 0 } : { duration: 0.9, ease: EASE, delay }}
       className="inline-block text-gold"
     >
       ✦
@@ -45,12 +47,13 @@ function Ornament({ delay = 0 }: { delay?: number }) {
 
 /** Small mono label above a closing block. */
 function Kicker({ text, dark = true, delay = 0 }: { text: string; dark?: boolean; delay?: number }) {
+  const reduce = useReducedMotion() === true
   return (
     <motion.div
-      initial={{ opacity: 0, y: 10 }}
+      initial={reduce ? false : { opacity: 0, y: 10 }}
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true, margin: '0px 0px -10% 0px' }}
-      transition={{ duration: 0.7, ease: EASE, delay }}
+      transition={reduce ? { duration: 0 } : { duration: 0.7, ease: EASE, delay }}
       className="flex items-center gap-4"
     >
       <DrawRule delay={delay + 0.1} />
@@ -69,20 +72,21 @@ function Kicker({ text, dark = true, delay = 0 }: { text: string; dark?: boolean
 /* pen on paper.                                                      */
 /* ------------------------------------------------------------------ */
 export function Signature({ name, delay = 0.35, align = 'left' }: { name: string; delay?: number; align?: 'left' | 'center' }) {
+  const reduce = useReducedMotion() === true
   const plain = name.replace(/^—\s*/, '').trim()
   return (
     <motion.div
-      initial={{ opacity: 0 }}
+      initial={reduce ? false : { opacity: 0 }}
       whileInView={{ opacity: 1 }}
       viewport={{ once: true, margin: '0px 0px -8% 0px' }}
-      transition={{ duration: 0.7, delay }}
+      transition={reduce ? { duration: 0 } : { duration: 0.7, delay }}
       className={`${align === 'center' ? 'flex flex-col items-center' : ''} mt-7`}
     >
       <motion.p
-        initial={{ opacity: 0, x: align === 'left' ? -6 : 0 }}
+        initial={reduce ? false : { opacity: 0, x: align === 'left' ? -6 : 0 }}
         whileInView={{ opacity: 1, x: 0 }}
         viewport={{ once: true, margin: '0px 0px -8% 0px' }}
-        transition={{ duration: 0.8, ease: EASE, delay: delay + 0.15 }}
+        transition={reduce ? { duration: 0 } : { duration: 0.8, ease: EASE, delay: delay + 0.15 }}
         className="inline-block font-serif text-3xl font-light italic text-gold"
         style={{ transform: 'rotate(-1.5deg)' }}
       >
@@ -101,10 +105,10 @@ export function Signature({ name, delay = 0.35, align = 'left' }: { name: string
           r="1.6"
           fill="#B89146"
           stroke="none"
-          initial={{ opacity: 0, scale: 0.4 }}
+          initial={reduce ? false : { opacity: 0, scale: 0.4 }}
           whileInView={{ opacity: 1, scale: 1 }}
           viewport={{ once: true, margin: '0px 0px -8% 0px' }}
-          transition={{ duration: 0.5, ease: EASE, delay: delay + 0.15 }}
+          transition={reduce ? { duration: 0 } : { duration: 0.5, ease: EASE, delay: delay + 0.15 }}
         />
         {/* the main stroke — the pen's first pass */}
         <motion.path
@@ -112,10 +116,10 @@ export function Signature({ name, delay = 0.35, align = 'left' }: { name: string
           stroke="#B89146"
           strokeWidth="1.6"
           strokeLinecap="round"
-          initial={{ pathLength: 0 }}
+          initial={reduce ? false : { pathLength: 0 }}
           whileInView={{ pathLength: 1 }}
           viewport={{ once: true, margin: '0px 0px -8% 0px' }}
-          transition={{ duration: 1.2, ease: 'easeInOut', delay: delay + 0.35 }}
+          transition={reduce ? { duration: 0 } : { duration: 1.2, ease: 'easeInOut', delay: delay + 0.35 }}
         />
         {/* the second pass — a lighter, quicker stroke, like real ink */}
         <motion.path
@@ -124,10 +128,10 @@ export function Signature({ name, delay = 0.35, align = 'left' }: { name: string
           strokeWidth="1"
           strokeLinecap="round"
           opacity="0.45"
-          initial={{ pathLength: 0 }}
+          initial={reduce ? false : { pathLength: 0 }}
           whileInView={{ pathLength: 1 }}
           viewport={{ once: true, margin: '0px 0px -8% 0px' }}
-          transition={{ duration: 0.9, ease: 'easeInOut', delay: delay + 0.7 }}
+          transition={reduce ? { duration: 0 } : { duration: 0.9, ease: 'easeInOut', delay: delay + 0.7 }}
         />
       </svg>
     </motion.div>
@@ -140,45 +144,46 @@ export function Signature({ name, delay = 0.35, align = 'left' }: { name: string
 /* becomes the reader's cue that one movement of the story has closed. */
 /* ------------------------------------------------------------------ */
 export function MotifDivider({ label, motif }: { label?: string; motif?: string }) {
+  const reduce = useReducedMotion() === true
   return (
     <motion.div
       aria-hidden="true"
-      initial={{ opacity: 0 }}
+      initial={reduce ? false : { opacity: 0 }}
       whileInView={{ opacity: 1 }}
       viewport={{ once: true, margin: '0px 0px -10% 0px' }}
-      transition={{ duration: 0.9, ease: EASE }}
+      transition={reduce ? { duration: 0 } : { duration: 0.9, ease: EASE }}
       className="my-16 flex flex-col items-center gap-4"
     >
       <div className="flex items-center gap-4">
         <motion.span
-          initial={{ scaleX: 0 }}
+          initial={reduce ? false : { scaleX: 0 }}
           whileInView={{ scaleX: 1 }}
           viewport={{ once: true, margin: '0px 0px -10% 0px' }}
-          transition={{ duration: 1.1, ease: EASE, delay: 0.1 }}
+          transition={reduce ? { duration: 0 } : { duration: 1.1, ease: EASE, delay: 0.1 }}
           className="h-px w-16 origin-right bg-gold/40 md:w-20"
         />
         <motion.span
-          initial={{ opacity: 0, scale: 0.7 }}
+          initial={reduce ? false : { opacity: 0, scale: 0.7 }}
           whileInView={{ opacity: 1, scale: 1 }}
           viewport={{ once: true, margin: '0px 0px -10% 0px' }}
-          transition={{ duration: 0.9, ease: EASE, delay: 0.3 }}
+          transition={reduce ? { duration: 0 } : { duration: 0.9, ease: EASE, delay: 0.3 }}
         >
           <MotifGlyph type={motif ?? '✦'} />
         </motion.span>
         <motion.span
-          initial={{ scaleX: 0 }}
+          initial={reduce ? false : { scaleX: 0 }}
           whileInView={{ scaleX: 1 }}
           viewport={{ once: true, margin: '0px 0px -10% 0px' }}
-          transition={{ duration: 1.1, ease: EASE, delay: 0.1 }}
+          transition={reduce ? { duration: 0 } : { duration: 1.1, ease: EASE, delay: 0.1 }}
           className="h-px w-16 origin-left bg-gold/40 md:w-20"
         />
       </div>
       {label && (
         <motion.span
-          initial={{ opacity: 0, y: 6 }}
+          initial={reduce ? false : { opacity: 0, y: 6 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true, margin: '0px 0px -10% 0px' }}
-          transition={{ duration: 0.7, ease: EASE, delay: 0.5 }}
+          transition={reduce ? { duration: 0 } : { duration: 0.7, ease: EASE, delay: 0.5 }}
           className="font-mono text-[9px] uppercase tracking-[0.30em] text-white/50"
         >
           {label}
@@ -193,6 +198,7 @@ export function MotifDivider({ label, motif }: { label?: string; motif?: string 
 /* platform's mission card.                                            */
 /* ------------------------------------------------------------------ */
 export function MissionClosing({ kicker = 'About us' }: { kicker?: string }) {
+  const reduce = useReducedMotion() === true
   const sentences = BRAND.mission.split('. ').filter(Boolean)
   return (
     <Reveal className="mt-24">
@@ -203,10 +209,10 @@ export function MissionClosing({ kicker = 'About us' }: { kicker?: string }) {
           <Kicker text={kicker} />
 
           <motion.h2
-            initial={{ opacity: 0, y: 18 }}
+            initial={reduce ? false : { opacity: 0, y: 18 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true, margin: '0px 0px -10% 0px' }}
-            transition={{ duration: 0.9, ease: EASE, delay: 0.1 }}
+            transition={reduce ? { duration: 0 } : { duration: 0.9, ease: EASE, delay: 0.1 }}
             className="mt-6 max-w-[24ch] font-serif text-3xl font-light leading-[1.12] text-ivory md:text-4xl"
           >
             Every post is a <em className="italic text-gold">story</em>, an emotion, and a voice worth sharing.
@@ -216,10 +222,10 @@ export function MissionClosing({ kicker = 'About us' }: { kicker?: string }) {
             {sentences.map((sentence, i) => (
               <motion.p
                 key={i}
-                initial={{ opacity: 0, y: 12 }}
+                initial={reduce ? false : { opacity: 0, y: 12 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true, margin: '0px 0px -8% 0px' }}
-                transition={{ duration: 0.7, ease: EASE, delay: 0.15 + i * 0.1 }}
+                transition={reduce ? { duration: 0 } : { duration: 0.7, ease: EASE, delay: 0.15 + i * 0.1 }}
                 className="mt-3 max-w-[56ch] text-[15px] leading-[1.9] text-white/65"
               >
                 {sentence}.
@@ -228,20 +234,20 @@ export function MissionClosing({ kicker = 'About us' }: { kicker?: string }) {
           </div>
 
           <motion.p
-            initial={{ opacity: 0 }}
+            initial={reduce ? false : { opacity: 0 }}
             whileInView={{ opacity: 1 }}
             viewport={{ once: true, margin: '0px 0px -8% 0px' }}
-            transition={{ duration: 0.8, delay: 0.45 }}
+            transition={reduce ? { duration: 0 } : { duration: 0.8, delay: 0.45 }}
             className="mt-8 max-w-[52ch] font-serif text-base font-light italic leading-relaxed text-gold/90"
           >
             {BRAND.submitCta}
           </motion.p>
 
           <motion.div
-            initial={{ opacity: 0 }}
+            initial={reduce ? false : { opacity: 0 }}
             whileInView={{ opacity: 1 }}
             viewport={{ once: true, margin: '0px 0px -8% 0px' }}
-            transition={{ duration: 0.8, delay: 0.4 }}
+            transition={reduce ? { duration: 0 } : { duration: 0.8, delay: 0.4 }}
             className="mt-10 flex flex-wrap items-center gap-5"
           >
             <span className="font-mono text-[10px] uppercase tracking-[0.28em] text-white/50">{BRAND.handle}</span>
@@ -278,6 +284,7 @@ export function WritersNoteClosing({
   /** the writer's photograph, when their post carries one */
   portrait?: string
 }) {
+  const reduce = useReducedMotion() === true
   return (
     <Reveal className="mt-20">
       {/* the final page of a printed book — the note, framed, signed */}
@@ -303,10 +310,10 @@ export function WritersNoteClosing({
 
         {title && (
           <motion.h2
-            initial={{ opacity: 0, y: 14 }}
+            initial={reduce ? false : { opacity: 0, y: 14 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true, margin: '0px 0px -10% 0px' }}
-            transition={{ duration: 0.8, ease: EASE, delay: 0.12 }}
+            transition={reduce ? { duration: 0 } : { duration: 0.8, ease: EASE, delay: 0.12 }}
             className="mt-6 font-serif text-2xl font-light text-ivory md:text-3xl"
           >
             {title}
@@ -315,10 +322,10 @@ export function WritersNoteClosing({
         {paragraphs.map((note, i) => (
           <motion.p
             key={i}
-            initial={{ opacity: 0, y: 16 }}
+            initial={reduce ? false : { opacity: 0, y: 16 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true, margin: '0px 0px -10% 0px' }}
-            transition={{ duration: 0.9, ease: EASE, delay: 0.1 + i * 0.12 }}
+            transition={reduce ? { duration: 0 } : { duration: 0.9, ease: EASE, delay: 0.1 + i * 0.12 }}
             className={`pull-quote ${title ? 'mt-5' : 'mt-6'} text-[clamp(1.3rem,2vw,1.6rem)] leading-[1.75] text-ivory/90`}
           >
             {note}
@@ -328,10 +335,10 @@ export function WritersNoteClosing({
 
         {/* the colophon line — this note closes the feature */}
         <motion.div
-          initial={{ opacity: 0 }}
+          initial={reduce ? false : { opacity: 0 }}
           whileInView={{ opacity: 1 }}
           viewport={{ once: true, margin: '0px 0px -8% 0px' }}
-          transition={{ duration: 0.9, delay: 0.6 }}
+          transition={reduce ? { duration: 0 } : { duration: 0.9, delay: 0.6 }}
           className="mt-10 flex items-center gap-4 border-t border-white/10 pt-5"
         >
           <span className="h-px w-12 bg-gold/40" aria-hidden="true" />
@@ -354,6 +361,7 @@ export function ArtworkClosing({
   closing: Closing
   article: Article
 }) {
+  const reduce = useReducedMotion() === true
   const work = article.figures?.[0]
   return (
     <Reveal className="mt-24">
@@ -362,10 +370,10 @@ export function ArtworkClosing({
           <Kicker text={closing.kicker} />
           {closing.title && (
             <motion.h2
-              initial={{ opacity: 0, y: 14 }}
+              initial={reduce ? false : { opacity: 0, y: 14 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true, margin: '0px 0px -10% 0px' }}
-              transition={{ duration: 0.8, ease: EASE, delay: 0.12 }}
+              transition={reduce ? { duration: 0 } : { duration: 0.8, ease: EASE, delay: 0.12 }}
               className="mt-5 font-serif text-2xl font-light text-ivory md:text-3xl"
             >
               {closing.title}
@@ -374,10 +382,10 @@ export function ArtworkClosing({
           {closing.paragraphs?.map((p, i) => (
             <motion.p
               key={i}
-              initial={{ opacity: 0, y: 16 }}
+              initial={reduce ? false : { opacity: 0, y: 16 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true, margin: '0px 0px -10% 0px' }}
-              transition={{ duration: 0.9, ease: EASE, delay: 0.1 + i * 0.12 }}
+              transition={reduce ? { duration: 0 } : { duration: 0.9, ease: EASE, delay: 0.1 + i * 0.12 }}
               className="pull-quote mt-6 text-[clamp(1.3rem,2vw,1.6rem)] leading-[1.7] text-ivory/90"
             >
               {p}
@@ -391,10 +399,10 @@ export function ArtworkClosing({
         {/* the work itself — revealed last, like the final plate */}
         {work && (
           <motion.figure
-            initial={{ opacity: 0, y: 40 }}
+            initial={reduce ? false : { opacity: 0, y: 40 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true, margin: '0px 0px -10% 0px' }}
-            transition={{ duration: 1.1, ease: EASE, delay: 0.35 }}
+            transition={reduce ? { duration: 0 } : { duration: 1.1, ease: EASE, delay: 0.35 }}
             className="relative mx-auto mt-16 max-w-[620px]"
           >
             <div aria-hidden="true" className="absolute -inset-5 translate-x-5 translate-y-5 border border-gold/30" />
@@ -424,6 +432,7 @@ export function ArtworkClosing({
 /* “Their Voices Matter” — the founder's three lines, animated.        */
 /* ------------------------------------------------------------------ */
 export function VoicesClosing({ closing }: { closing: Closing }) {
+  const reduce = useReducedMotion() === true
   const lines = closing.lines ?? []
   const paragraphs = closing.paragraphs ?? []
   return (
@@ -435,10 +444,10 @@ export function VoicesClosing({ closing }: { closing: Closing }) {
           {lines.map((line, i) => (
             <motion.p
               key={i}
-              initial={{ opacity: 0, y: 24 }}
+              initial={reduce ? false : { opacity: 0, y: 24 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true, margin: '0px 0px -8% 0px' }}
-              transition={{ duration: 0.9, ease: EASE, delay: 0.15 + i * 0.18 }}
+              transition={reduce ? { duration: 0 } : { duration: 0.9, ease: EASE, delay: 0.15 + i * 0.18 }}
               className="font-serif text-3xl font-light leading-[1.25] text-ivory md:text-5xl"
             >
               {line}
@@ -448,10 +457,10 @@ export function VoicesClosing({ closing }: { closing: Closing }) {
         {paragraphs.map((p, i) => (
           <motion.p
             key={i}
-            initial={{ opacity: 0 }}
+            initial={reduce ? false : { opacity: 0 }}
             whileInView={{ opacity: 1 }}
             viewport={{ once: true, margin: '0px 0px -8% 0px' }}
-            transition={{ duration: 0.8, delay: 0.7 + i * 0.15 }}
+            transition={reduce ? { duration: 0 } : { duration: 0.8, delay: 0.7 + i * 0.15 }}
             className="pull-quote mx-auto mt-8 max-w-[38ch] text-[clamp(1.15rem,1.7vw,1.35rem)] text-white/60"
           >
             {p}
@@ -471,6 +480,7 @@ export function VoicesClosing({ closing }: { closing: Closing }) {
 /* “About the Work” — a gallery label for Tasbih-e-Fatima.             */
 /* ------------------------------------------------------------------ */
 export function AboutWorkClosing({ closing }: { closing: Closing }) {
+  const reduce = useReducedMotion() === true
   return (
     <Reveal className="mt-24">
       <div className="relative overflow-hidden border border-gold/25 bg-[#17060B] px-8 py-12 md:px-14 md:py-14">
@@ -480,10 +490,10 @@ export function AboutWorkClosing({ closing }: { closing: Closing }) {
           {closing.paragraphs?.map((p, i) => (
             <motion.p
               key={i}
-              initial={{ opacity: 0, y: 14 }}
+              initial={reduce ? false : { opacity: 0, y: 14 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true, margin: '0px 0px -8% 0px' }}
-              transition={{ duration: 0.8, ease: EASE, delay: 0.12 + i * 0.1 }}
+              transition={reduce ? { duration: 0 } : { duration: 0.8, ease: EASE, delay: 0.12 + i * 0.1 }}
               className="mt-6 text-[15px] leading-[1.9] text-white/70"
             >
               {p}
@@ -491,10 +501,10 @@ export function AboutWorkClosing({ closing }: { closing: Closing }) {
           ))}
           {closing.quote && (
             <motion.blockquote
-              initial={{ opacity: 0, y: 18 }}
+              initial={reduce ? false : { opacity: 0, y: 18 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true, margin: '0px 0px -8% 0px' }}
-              transition={{ duration: 0.9, ease: EASE, delay: 0.35 }}
+              transition={reduce ? { duration: 0 } : { duration: 0.9, ease: EASE, delay: 0.35 }}
               className="mt-10 border-y border-gold/30 py-8"
             >
               <p className="pull-quote text-[clamp(1.6rem,2.6vw,2.2rem)] text-gold">“{closing.quote}”</p>
@@ -502,10 +512,10 @@ export function AboutWorkClosing({ closing }: { closing: Closing }) {
           )}
           {closing.meta && (
             <motion.div
-              initial={{ opacity: 0 }}
+              initial={reduce ? false : { opacity: 0 }}
               whileInView={{ opacity: 1 }}
               viewport={{ once: true, margin: '0px 0px -8% 0px' }}
-              transition={{ duration: 0.8, delay: 0.5 }}
+              transition={reduce ? { duration: 0 } : { duration: 0.8, delay: 0.5 }}
               className="mt-8 flex flex-wrap items-center gap-x-5 gap-y-3"
             >
               {closing.meta.map((m, i) => (
@@ -526,6 +536,7 @@ export function AboutWorkClosing({ closing }: { closing: Closing }) {
 /* The final stanza — closes “Forgive Me, Mother.”                     */
 /* ------------------------------------------------------------------ */
 export function VerseClosing({ lines, kicker, vibe }: { lines: string[]; kicker: string; vibe?: string }) {
+  const reduce = useReducedMotion() === true
   return (
     <Reveal className="mt-24">
       <div className="mx-auto max-w-[46ch] text-center">
@@ -534,10 +545,10 @@ export function VerseClosing({ lines, kicker, vibe }: { lines: string[]; kicker:
           {lines.map((line, i) => (
             <motion.p
               key={i}
-              initial={vibe === 'letter' ? { opacity: 0, x: -12 } : { opacity: 0, y: 22 }}
+              initial={reduce ? false : vibe === 'letter' ? { opacity: 0, x: -12 } : { opacity: 0, y: 22 }}
               whileInView={vibe === 'letter' ? { opacity: 1, x: 0 } : { opacity: 1, y: 0 }}
               viewport={{ once: true, margin: '0px 0px -8% 0px' }}
-              transition={{ duration: vibe === 'letter' ? 0.8 : 0.9, ease: EASE, delay: 0.15 + i * 0.16 }}
+              transition={reduce ? { duration: 0 } : { duration: vibe === 'letter' ? 0.8 : 0.9, ease: EASE, delay: 0.15 + i * 0.16 }}
               className={`font-serif font-light italic leading-[1.8] ${i === lines.length - 1 ? 'text-[clamp(1.6rem,2.6vw,2.1rem)] text-gold' : 'text-[clamp(1.35rem,2vw,1.7rem)] text-ivory/92'}`}
             >
               {line}
@@ -545,10 +556,10 @@ export function VerseClosing({ lines, kicker, vibe }: { lines: string[]; kicker:
           ))}
         </div>
         <motion.span
-          initial={{ opacity: 0 }}
+          initial={reduce ? false : { opacity: 0 }}
           whileInView={{ opacity: 1 }}
           viewport={{ once: true, margin: '0px 0px -8% 0px' }}
-          transition={{ duration: 0.8, delay: 1 }}
+          transition={reduce ? { duration: 0 } : { duration: 0.8, delay: 1 }}
           className="mt-10 inline-block h-px w-16 bg-gold/60"
         />
       </div>
@@ -560,6 +571,7 @@ export function VerseClosing({ lines, kicker, vibe }: { lines: string[]; kicker:
 /* The closing passage — closes “The Arts Deserve Respect.”            */
 /* ------------------------------------------------------------------ */
 export function PassageClosing({ paragraphs, kicker }: { paragraphs: string[]; kicker: string }) {
+  const reduce = useReducedMotion() === true
   return (
     <Reveal className="mt-24">
       <div className="mx-auto max-w-[64ch]">
@@ -568,10 +580,10 @@ export function PassageClosing({ paragraphs, kicker }: { paragraphs: string[]; k
           {paragraphs.map((p, i) => (
             <motion.p
               key={i}
-              initial={{ opacity: 0, y: 20 }}
+              initial={reduce ? false : { opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true, margin: '0px 0px -8% 0px' }}
-              transition={{ duration: 0.9, ease: EASE, delay: 0.15 + i * 0.12 }}
+              transition={reduce ? { duration: 0 } : { duration: 0.9, ease: EASE, delay: 0.15 + i * 0.12 }}
               className="font-serif text-[clamp(1.4rem,2.2vw,1.9rem)] font-light leading-[1.65] text-ivory/90"
             >
               {p}
@@ -579,10 +591,10 @@ export function PassageClosing({ paragraphs, kicker }: { paragraphs: string[]; k
           ))}
         </div>
         <motion.div
-          initial={{ opacity: 0 }}
+          initial={reduce ? false : { opacity: 0 }}
           whileInView={{ opacity: 1 }}
           viewport={{ once: true, margin: '0px 0px -8% 0px' }}
-          transition={{ duration: 0.8, delay: 0.55 }}
+          transition={reduce ? { duration: 0 } : { duration: 0.8, delay: 0.55 }}
           className="mt-10 flex items-center gap-4"
         >
           <span className="h-px w-16 bg-gold/60" />
@@ -598,6 +610,7 @@ export function PassageClosing({ paragraphs, kicker }: { paragraphs: string[]; k
 /* The story's end — closes “3:13” on the whisper.                     */
 /* ------------------------------------------------------------------ */
 export function StoryEndClosing({ closing, vibe }: { closing: Closing; vibe?: string }) {
+  const reduce = useReducedMotion() === true
   const lines = closing.lines ?? []
   const horror = vibe === 'horror'
   return (
@@ -612,10 +625,10 @@ export function StoryEndClosing({ closing, vibe }: { closing: Closing; vibe?: st
               return (
                 <motion.p
                   key={i}
-                  initial={{ opacity: 0, y: 22 }}
+                  initial={reduce ? false : { opacity: 0, y: 22 }}
                   whileInView={{ opacity: 1, y: 0 }}
                   viewport={{ once: true, margin: '0px 0px -8% 0px' }}
-                  transition={{ duration: 0.9, ease: EASE, delay: 0.15 + i * 0.22 }}
+                  transition={reduce ? { duration: 0 } : { duration: 0.9, ease: EASE, delay: 0.15 + i * 0.22 }}
                   className={`mx-auto max-w-[44ch] font-serif font-light leading-[1.6] ${last ? 'mt-4 text-[clamp(1.8rem,3.2vw,2.6rem)] italic text-gold' : 'text-[clamp(1.15rem,1.7vw,1.4rem)] text-ivory/80'}`}
                 >
                   {line}
@@ -625,10 +638,10 @@ export function StoryEndClosing({ closing, vibe }: { closing: Closing; vibe?: st
           </div>
           {closing.meta && (
             <motion.div
-              initial={{ opacity: 0 }}
+              initial={reduce ? false : { opacity: 0 }}
               whileInView={{ opacity: 1 }}
               viewport={{ once: true, margin: '0px 0px -8% 0px' }}
-              transition={{ duration: 0.8, delay: 0.9 }}
+              transition={reduce ? { duration: 0 } : { duration: 0.8, delay: 0.9 }}
               className="mx-auto mt-12 max-w-[40ch] space-y-1 border-t border-gold/20 pt-8"
             >
               {closing.meta.map((m, i) => (

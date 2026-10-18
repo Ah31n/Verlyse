@@ -1,11 +1,11 @@
 # Verlyse Media — React Edition
 
 **Where Vision Becomes A Voice.** A production-grade editorial publication built with
-React, TypeScript, Tailwind CSS and Framer Motion. Content is grounded entirely in
-the real Instagram post datasets (2026-08-01/02, all kept in `/home/user/uploads/`),
-the profile screenshots, and the founder article — 19 features, 15 credited
-creators, 95 real images (self-hosted), real captions, and real comments beneath
-every work. Nothing is invented.
+React, TypeScript, Tailwind CSS, `motion/react`, and `@fiddle-digital/string-tune`. Content is grounded entirely in
+the real Instagram post datasets (2026-08-01/02 and 2026-10-10),
+the profile screenshots, and the founder article — 20 catalogued features (19 published folios + 1 provisional carousel-led feature), 15 credited
+creators (plus the platform record), 104 self-hosted media and font assets (`100` image/SVG files + `4` `.woff2` font files), real captions, and real comments beneath
+every work. Nothing is invented. See [`docs/SKILLPACK-STACK-ASSESSMENT.md`](docs/SKILLPACK-STACK-ASSESSMENT.md) for the complete UI & Motion Stack assessment.
 
 
 ## The Portrait Rule (permanent)
@@ -60,9 +60,9 @@ Creator portraits are contributor photographs in an editorial magazine — never
 
 | Route | Page |
 |---|---|
-| `/` | Home — masthead, ledger (19 features · 15 creators · 1281 appreciations · 585 conversations), feed strip, departments |
+| `/` | Home — masthead, ledger (20 features · 15 creators · 1281 appreciations · 585 conversations), feed strip, departments |
 | `/about` | About — the platform's mission, values, milestones, founder |
-| `/articles` | Articles — all 19 features with filters and search |
+| `/articles` | Articles — all 20 features with filters and search |
 | `/article/:id` | Feature — full extracted text, plates, unique ending, conversations |
 | `/categories` | Categories — all 7 departments of the feed |
 | `/community` | Community — real numbers, real voices, transparency |

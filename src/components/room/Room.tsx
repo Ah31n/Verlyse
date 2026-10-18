@@ -496,9 +496,8 @@ export default function Room() {
                 ref={searchRef}
                 value={query}
                 onChange={(e) => setQuery(e.target.value)}
-                placeholder="title, author, or category…"
                 aria-label="Search folios"
-                className="mt-6 w-full border-b border-gold/60 bg-transparent pb-3 text-center font-serif text-3xl italic text-ivory placeholder:text-ivory/30 focus:outline-none focus:ring-0 md:text-4xl"
+                className="mt-6 w-full border-b border-gold/60 bg-transparent pb-3 text-center font-serif text-3xl italic text-ivory focus:outline-none focus:ring-0 md:text-4xl"
               />
               <ul className="mt-6 space-y-2">
                 {searchResults.map((f) => (

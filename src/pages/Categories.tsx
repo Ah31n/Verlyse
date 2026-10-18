@@ -1,9 +1,17 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
-import { Link, useNavigate, useParams } from 'react-router-dom'
+import { Link, useNavigate, useParams, useSearchParams } from 'react-router-dom'
 import { motion } from 'motion/react'
 import { useSeo } from '../hooks/useSeo'
-import { getAuthor, ARTICLES, CATEGORIES, LEDGER } from '../data/content'
+import { getAuthor, ARTICLES, CATEGORIES, LEDGER, folioNoOf } from '../data/content'
+import { handleImgError } from '../lib/imgFallback'
 import { ImmersiveShell, BrassThread } from '../components/immersive'
+import { spotlight } from '../lib/stringTune/attrs'
+import {
+  DotMatrixLedger,
+  FloralWord,
+  HaikeiContourPlane,
+  RouteEmblemSeal,
+} from '../components/ui/EditorialCraftSystem'
 
 /**
  * THE WINGS — the department doors of the publication, from the approved
@@ -24,8 +32,18 @@ const folioWord = (n: number) => `${n} folio${n === 1 ? '' : 's'}`
 
 export default function Categories() {
   const { slug } = useParams<{ slug?: string }>()
+  const [searchParams] = useSearchParams()
+  const roomQuery = searchParams.get('room')
   const navigate = useNavigate()
-  const selectedCategory = slug ? CATEGORIES.find((category) => category.slug === slug) : undefined
+  const selectedCategory = slug
+    ? CATEGORIES.find((category) => category.slug === slug)
+    : roomQuery
+      ? CATEGORIES.find(
+          (category) =>
+            category.name.toLowerCase() === roomQuery.toLowerCase() ||
+            category.slug.toLowerCase() === roomQuery.toLowerCase()
+        )
+      : undefined
   useSeo({
     path: slug && selectedCategory ? `/categories/${selectedCategory.slug}` : '/categories',
     title: selectedCategory?.name ?? 'Categories',
@@ -115,6 +133,7 @@ export default function Categories() {
       {/* ——— BACK · the hall — wine falloff, arched recesses ——— */}
       <div aria-hidden="true" className="pointer-events-none absolute inset-0">
         <div className="absolute inset-0 bg-[radial-gradient(120%_90%_at_50%_0%,rgba(92,18,36,0.38),transparent_62%),radial-gradient(90%_70%_at_90%_100%,rgba(184,145,70,0.10),transparent_60%),linear-gradient(170deg,#4A1120_0%,#3B0D17_52%,#1A070E_100%)]" />
+        <HaikeiContourPlane tone="dark" seed={3} className="opacity-20" />
         {/* ghost arched recesses — the doors' negative space behind the row */}
         <div className="absolute inset-x-0 top-[26%] hidden justify-center gap-[4.5vw] xl:flex">
           {CATEGORIES.map((c) => (
@@ -132,11 +151,19 @@ export default function Categories() {
       >
         {/* ——— MID · header — ghost WINGS + real subtitle ——— */}
         <div className="text-center">
+          <div className="mb-4 flex flex-wrap items-center justify-center gap-3">
+            <RouteEmblemSeal variant="prism" folioCode="07 WINGS" tone="dark" />
+            <DotMatrixLedger
+              code={`0${LEDGER.departments}${LEDGER.features}`}
+              label={`${LEDGER.departments} Curatorial Wings · ${LEDGER.features} Folios`}
+              tone="dark"
+            />
+          </div>
           <h1 className="relative font-serif text-[clamp(3.4rem,10vw,8rem)] font-light leading-[0.85] tracking-[-0.02em] text-ivory">
-            <span aria-hidden="true" className="pointer-events-none absolute inset-x-0 top-1/2 -translate-y-1/2 select-none font-serif text-[clamp(4rem,13vw,10.5rem)] font-semibold leading-none text-transparent [-webkit-text-stroke:1px_rgba(184,145,70,0.14)]">
+            <span aria-hidden="true" className="pointer-events-none absolute inset-x-0 top-1/2 -translate-y-1/2 select-none font-serif text-[clamp(4rem,13vw,10.5rem)] font-semibold leading-none text-transparent [-webkit-text-stroke:1px_rgba(184,145,70,0.08)]">
               WINGS
             </span>
-            <span className="relative">The <em className="italic text-gold">wings</em></span>
+            <span className="relative">The <FloralWord variant="iris">wings</FloralWord></span>
           </h1>
           <p className="mt-4 font-mono text-[10px] uppercase tracking-[0.34em] text-gold/85">
             The wings — seven departments of Verlyse Media
@@ -151,16 +178,16 @@ export default function Categories() {
           </p>
         </div>
 
-        {/* ——— MID · the seven wing-doors — the active wing becomes a solid
-            ivory door plate that steps forward (P27 board: tall ivory arch,
-            gold ghost doors); the others recede. ——— */}
-        <div className="mt-[clamp(3rem,8vh,5rem)] grid grid-cols-2 items-start gap-x-4 gap-y-10 md:grid-cols-4 xl:grid-cols-7 xl:[perspective:1500px]" onKeyDown={onKeyDown}>
+        {/* ——— MID · the seven wing-doors — balanced architectural colonnade ——— */}
+        <div className="mt-[clamp(3rem,7vh,4.5rem)] grid grid-cols-2 items-stretch gap-4 md:grid-cols-4 xl:grid-cols-7 xl:[perspective:1500px]" onKeyDown={onKeyDown}>
           {CATEGORIES.map((c, i) => {
             const isActive = active === c.name
             /* the ivory plate: the selected wing's door — or the first door at
                rest, as the board keeps the first wing standing forward */
             const isPlate = isActive || (!active && i === 0)
             const isFocused = focusIdx === i && !active
+            const leadItem = foliosOf(c.name)[0]
+            const leadFolioNum = leadItem ? String(leadItem.i + 1).padStart(2, '0') : '01'
             return (
               <motion.div
                 key={c.slug}
@@ -168,142 +195,177 @@ export default function Categories() {
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true, margin: '0px 0px -4% 0px' }}
                 transition={{ duration: 0.9, ease: [0.16, 1, 0.3, 1], delay: Math.min(i * 0.05, 0.3) }}
-                className={isPlate ? 'col-span-2 md:col-span-1' : ''}
+                className={i === 0 ? 'col-span-2 md:col-span-1' : ''}
               >
-                <div className={`flex flex-col items-center transition-all duration-700 ${active && !isActive ? 'opacity-25 md:opacity-30' : 'opacity-100'}`}>
-                <button
-                  type="button"
-                  onClick={() => select(c.name)}
-                  onFocus={() => !active && setFocusIdx(i)}
-                  aria-pressed={isActive}
-                  className={`group relative flex w-full flex-col items-center px-2 pb-2 pt-6 text-center outline-none transition-all duration-700 ${
-                    isPlate
-                      ? /* the standing wing steps forward out of the corridor:
-                           a longer shadow, a small lift and scale, and a raised
-                           stacking order so it sits cleanly above the doors it
-                           overlaps. Depth is gated to md and xl — on mobile the
-                           door keeps its current composition exactly, so nothing
-                           is forced into perspective where it would cost
-                           readability. The selection is still carried by the
-                           ivory plate, the brass arch and aria-pressed, so it
-                           reads without any of this movement. */
-                        'z-[2] min-h-[clamp(10rem,22vh,13rem)] max-w-none bg-[#F8F6F2] shadow-[0_18px_44px_rgba(0,0,0,0.45)] md:-translate-y-1.5 md:min-h-[clamp(17rem,40vh,24rem)] md:max-w-[180px] md:scale-[1.02] xl:-translate-y-3 xl:scale-[1.045] xl:shadow-[0_28px_60px_rgba(0,0,0,0.55)]'
-                      : /* the other wings stay in the wall — a slight recession
-                           in depth only, never extra opacity, so the existing
-                           recede keeps carrying exactly one meaning */
-                        'max-w-[150px] cursor-pointer xl:scale-[0.985]'
-                  }`}
-                >
-                  {/* the arch — a solid ivory plate for the standing wing, gold ghost otherwise.
-                      The wing's own accent tints the ghost once — one hue, low alpha, never a
-                      neon sign: the rooms are siblings, not rivals. */}
-                  <span
-                    aria-hidden="true"
-                    className={`pointer-events-none absolute inset-0 rounded-t-full border transition-colors duration-500 ${
+                <div className={`flex h-full flex-col items-center transition-all duration-700 ${active && !isActive ? 'opacity-35' : 'opacity-100'}`}>
+                  <button
+                    type="button"
+                    onClick={() => select(c.name)}
+                    onFocus={() => !active && setFocusIdx(i)}
+                    aria-pressed={isActive}
+                    {...spotlight()}
+                    className={`st-spotlit group relative flex min-h-[clamp(11.5rem,21vh,14rem)] w-full flex-1 flex-col items-center justify-between px-3 pb-4 pt-7 text-center outline-none transition-all duration-700 ${
                       isPlate
-                        ? 'border-[#B89146]'
-                        : isFocused
-                          ? 'border-gold/70 bg-gold/[0.04]'
-                          : 'border-white/20 group-hover:border-gold/50'
-                    }`}
-                    style={isPlate ? undefined : { backgroundColor: `${c.accent}0F` }}
-                  />
-                  {/* the plate's inner hairline — brass thread inside the ivory door */}
-                  <span
-                    aria-hidden="true"
-                    className={`pointer-events-none absolute inset-1 rounded-t-full border transition-colors duration-500 ${
-                      isPlate
-                        ? 'border-[#D9B978]/50'
-                        : 'border-transparent'
-                    }`}
-                  />
-                  {/* the recess — a darker opening inside the arch */}
-                  <span
-                    aria-hidden="true"
-                    className={`pointer-events-none absolute inset-x-[18%] top-[9%] bottom-[4%] rounded-t-full border transition-colors duration-500 ${
-                      isPlate ? 'border-[#B89146]/25' : 'border-white/10 group-hover:border-gold/25'
-                    }`}
-                  />
-                  <span
-                    className={`relative font-mono text-[8px] uppercase tracking-[0.3em] ${
-                      isPlate ? 'text-[#7C6338]' : 'text-gold'
+                        ? 'z-[2] bg-[#F8F6F2] shadow-[0_18px_44px_rgba(0,0,0,0.45)] md:-translate-y-1.5 xl:-translate-y-2.5 xl:scale-[1.03] xl:shadow-[0_26px_54px_rgba(0,0,0,0.52)]'
+                        : 'cursor-pointer hover:-translate-y-1'
                     }`}
                   >
-                    Wing {['I', 'II', 'III', 'IV', 'V', 'VI', 'VII'][i]}
-                  </span>
-                  {/* the wing's own mark — small, typographic, in the accent */}
-                  <span aria-hidden="true" className="relative mt-2 text-lg leading-none" style={{ color: isPlate ? '#7C6338' : c.accent }}>
-                    {c.motif}
-                  </span>
-                  <span
-                    className={`relative mt-3 font-serif font-normal leading-[1.05] transition-colors duration-500 ${
-                      isPlate
-                        ? 'italic text-[#1E0B12]'
-                        : 'text-ivory group-hover:text-gold'
-                    } ${c.name === 'Stories' ? 'text-[clamp(1.4rem,1.7vw,1.7rem)]' : 'text-[clamp(1.05rem,1.3vw,1.3rem)]'}`}
-                  >
-                    {c.name}
-                  </span>
-                  <span
-                    className={`relative mt-2 font-mono text-[8px] uppercase tracking-[0.28em] ${
-                      isPlate ? 'text-[#2A0F18]/70' : 'text-white/55'
-                    }`}
-                  >
-                    {c.count} folio{c.count === 1 ? '' : 's'}
-                  </span>
-                  {isActive && (
-                    <span className="relative mt-3 font-mono text-[8px] uppercase tracking-[0.28em] text-[#7C6338]">
-                      Showing ↓
-                    </span>
-                  )}
-                </button>
-
-                {/* ——— FRONT · the wing's folios — the selected wing's stories step forward ——— */}
-                <ul
-                  className={`mt-4 w-full space-y-3 border-l-2 pl-4 transition-colors duration-700 ${
-                    isActive ? 'border-gold/60' : active ? 'border-white/10' : 'border-gold/20'
-                  }`}
-                  aria-label={`Folios in the ${c.name} wing`}
-                >
-                  {foliosOf(c.name).map(({ a, i }) => {
-                    const author = getAuthor(a.authorId)
-                    const folio = String(i + 1).padStart(2, '0')
-                    const ghosted = !!active && !isActive
-                    return (
-                      /* A ghosted row belongs to a wing that is not the
-                         selected one: it is dimmed to 10% and is effectively
-                         invisible. It previously kept a real tab stop and an
-                         aria-label while pointing at '#', so a keyboard or
-                         screen-reader user met eighteen unreadable links that
-                         went nowhere. The href stays correct — every folio
-                         link resolves — but the row is inert while dimmed. */
-                      <li
-                        key={a.id}
-                        className={`transition-opacity duration-700 ${ghosted ? 'pointer-events-none opacity-10' : 'opacity-100'}`}
-                        aria-hidden={ghosted || undefined}
+                    {/* the arch — a solid ivory plate for the standing wing, gold ghost otherwise */}
+                    <span
+                      aria-hidden="true"
+                      className={`pointer-events-none absolute inset-0 rounded-t-full border transition-colors duration-500 ${
+                        isPlate
+                          ? 'border-[#B89146]'
+                          : isFocused
+                            ? 'border-gold/70 bg-gold/[0.04]'
+                            : 'border-white/20 group-hover:border-gold/50'
+                      }`}
+                      style={isPlate ? undefined : { backgroundColor: `${c.accent}0F` }}
+                    />
+                    {/* the plate's inner hairline — brass thread inside the ivory door */}
+                    <span
+                      aria-hidden="true"
+                      className={`pointer-events-none absolute inset-1 rounded-t-full border transition-colors duration-500 ${
+                        isPlate ? 'border-[#D9B978]/50' : 'border-transparent'
+                      }`}
+                    />
+                    {/* the recess — a darker opening inside the arch */}
+                    <span
+                      aria-hidden="true"
+                      className={`pointer-events-none absolute inset-x-[16%] top-[8%] bottom-[4%] rounded-t-full border transition-colors duration-500 ${
+                        isPlate ? 'border-[#B89146]/25' : 'border-white/10 group-hover:border-gold/25'
+                      }`}
+                    />
+                    <div className="relative flex flex-col items-center">
+                      <span
+                        className={`font-mono text-[8px] uppercase tracking-[0.3em] ${
+                          isPlate ? 'text-[#7C6338]' : 'text-gold'
+                        }`}
                       >
-                        <Link
-                          to={`/article/${a.id}`}
-                          tabIndex={ghosted ? -1 : undefined}
-                          aria-label={`Folio ${folio} — ${a.title}, ${c.name}`}
-                          className="group block no-underline focus-visible:outline focus-visible:outline-2 focus-visible:outline-gold/70"
-                        >
-                          <span className="font-mono text-[8px] uppercase tracking-[0.28em] text-gold/90">№ {folio}</span>
-                          <span className="mt-1 block font-serif text-sm leading-[1.25] text-ivory/90 transition-all duration-300 group-hover:text-gold">
-                            {a.title}
-                          </span>
-                          <span className="mt-1 block font-mono text-[8px] uppercase tracking-[0.24em] text-white/50">
-                            {c.name} · {author?.name}
-                          </span>
-                        </Link>
-                      </li>
-                    )
-                  })}
-                </ul>
+                        Wing {['I', 'II', 'III', 'IV', 'V', 'VI', 'VII'][i]}
+                      </span>
+                      <span aria-hidden="true" className="mt-2 text-lg leading-none" style={{ color: isPlate ? '#7C6338' : c.accent }}>
+                        {c.motif}
+                      </span>
+                      <span
+                        className={`mt-3 font-serif text-[clamp(1.18rem,1.45vw,1.45rem)] font-normal leading-[1.08] transition-colors duration-500 ${
+                          isPlate ? 'italic text-[#1E0B12]' : 'text-ivory group-hover:text-gold'
+                        }`}
+                      >
+                        {c.name}
+                      </span>
+                    </div>
+                    <div className="relative mt-3 flex flex-col items-center">
+                      <span
+                        className={`font-mono text-[8px] uppercase tracking-[0.28em] ${
+                          isPlate ? 'text-[#2A0F18]/75' : 'text-white/60'
+                        }`}
+                      >
+                        {c.count} folio{c.count === 1 ? '' : 's'}
+                      </span>
+                      <span
+                        className={`mt-1.5 font-mono text-[7px] uppercase tracking-[0.22em] ${
+                          isPlate ? 'text-[#7C6338]' : 'text-gold/65 group-hover:text-gold'
+                        }`}
+                      >
+                        {isActive ? 'Showing room ↓' : `Lead · № ${leadFolioNum}`}
+                      </span>
+                    </div>
+                  </button>
                 </div>
               </motion.div>
             )
           })}
+        </div>
+
+        {/* ——— FRONT · Curatorial Wing Folio Shelves — balanced multi-column gallery with zero empty vertical voids ——— */}
+        <div className="mt-12 space-y-6">
+          {[...CATEGORIES]
+            .sort((a, b) => (active === a.name ? -1 : active === b.name ? 1 : 0))
+            .map((c) => {
+              const wingIdx = CATEGORIES.findIndex((cat) => cat.slug === c.slug)
+              const isActive = active === c.name
+              const ghosted = !!active && !isActive
+              const items = foliosOf(c.name)
+
+              return (
+                <section
+                  key={c.slug}
+                  aria-label={`${c.name} wing shelf`}
+                  className={`border transition-all duration-700 ${
+                    isActive
+                      ? 'border-gold/60 bg-[#240912]/90 p-6 shadow-[0_20px_50px_rgba(0,0,0,0.45)] md:p-8'
+                      : ghosted
+                        ? 'pointer-events-none border-white/5 bg-white/[0.01] p-4 opacity-20'
+                        : 'border-white/10 bg-[#1E070F]/65 p-5 hover:border-gold/30 md:p-6'
+                  }`}
+                >
+                  <div className="flex flex-wrap items-center justify-between gap-4 border-b border-white/10 pb-4">
+                    <div className="flex flex-wrap items-center gap-3">
+                      <span className="font-mono text-[9px] uppercase tracking-[0.3em] text-gold">
+                        Wing {['I', 'II', 'III', 'IV', 'V', 'VI', 'VII'][wingIdx]}
+                      </span>
+                      <span aria-hidden="true" className="text-base leading-none" style={{ color: c.accent }}>
+                        {c.motif}
+                      </span>
+                      <h2 className="font-serif text-2xl font-normal italic text-ivory">
+                        {c.name}
+                      </h2>
+                      <span className="font-mono text-[9px] uppercase tracking-[0.26em] text-white/50">
+                        · {folioWord(c.count)}
+                      </span>
+                    </div>
+                    <p className="max-w-[54ch] font-serif text-sm italic text-ivory/65">
+                      {c.blurb}
+                    </p>
+                  </div>
+
+                  <ul
+                    className="mt-5 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4"
+                    aria-label={`Folios in the ${c.name} wing`}
+                  >
+                    {items.map(({ a, i }) => {
+                      const author = getAuthor(a.authorId)
+                      const folio = String(i + 1).padStart(2, '0')
+                      return (
+                        <li
+                          key={a.id}
+                          className={`transition-opacity duration-700 ${ghosted ? 'pointer-events-none opacity-10' : 'opacity-100'}`}
+                          aria-hidden={ghosted || undefined}
+                        >
+                          <Link
+                            to={`/article/${a.id}`}
+                            tabIndex={ghosted ? -1 : undefined}
+                            aria-label={`Folio ${folio} — ${a.title}, ${c.name}`}
+                            className="group flex h-full items-center gap-3.5 border border-white/10 bg-black/25 p-3 no-underline transition-all duration-300 hover:border-gold/55 hover:bg-gold/[0.05] focus-visible:outline focus-visible:outline-2 focus-visible:outline-gold/70"
+                          >
+                            <img
+                              src={a.thumbnail ?? a.cover}
+                              alt=""
+                              loading="lazy"
+                              decoding="async"
+                              onError={(e) => handleImgError(e, a.title, folioNoOf(a.id))}
+                              className="h-14 w-12 shrink-0 border border-white/15 object-cover"
+                            />
+                            <span className="min-w-0 flex-1">
+                              <span className="block font-mono text-[8px] uppercase tracking-[0.28em] text-gold/90">
+                                № {folio} · {a.readingTime}
+                              </span>
+                              <span className="mt-1 block truncate font-serif text-base leading-[1.2] text-ivory transition-colors duration-300 group-hover:text-gold">
+                                {a.title}
+                              </span>
+                              <span className="mt-1 block truncate font-mono text-[8px] uppercase tracking-[0.22em] text-white/55">
+                                {c.name} · {author?.name}
+                              </span>
+                            </span>
+                          </Link>
+                        </li>
+                      )
+                    })}
+                  </ul>
+                </section>
+              )
+            })}
         </div>
 
         {/* ——— FRONT · the selected-wing line + RETURN ——— */}

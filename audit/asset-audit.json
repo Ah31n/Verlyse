@@ -43,6 +43,15 @@
       "wrongRole": []
     }
   },
+  "inventorySummary": {
+    "roleSubsetTotal": 45,
+    "roleSubsetResolved": 45,
+    "publicImageAndSvgTotal": 100,
+    "publicFontTotal": 4,
+    "publicMediaAndFontTotal": 104,
+    "publicInventoryResolved": 104,
+    "publicInventoryMissing": []
+  },
   "pendingSourceAssets": [],
   "liveRequests": [
     "http://127.0.0.1:5173/fonts/CormorantGaramond-normal.woff2",
@@ -50,12 +59,16 @@
     "http://127.0.0.1:5173/fonts/Inter.woff2",
     "http://127.0.0.1:5173/img/works/DaDY7WRkw0y-1.webp",
     "http://127.0.0.1:5173/fonts/CormorantGaramond-italic.woff2",
+    "http://127.0.0.1:5173/img/works/DbYa5WSE5wf-1.webp",
     "http://127.0.0.1:5173/img/works/DaDY7WRkw0y-2.webp",
     "http://127.0.0.1:5173/img/works/DeUZFPTCjPU-1.webp",
+    "http://127.0.0.1:5173/img/works/DeUZFPTCjPU-2.webp",
+    "http://127.0.0.1:5173/img/works/DeUZFPTCjPU-3.webp",
+    "http://127.0.0.1:5173/img/works/DeUZFPTCjPU-4.webp",
+    "http://127.0.0.1:5173/img/works/DeUZFPTCjPU-5.webp",
     "http://127.0.0.1:5173/img/works/DciqQXTCilh-1.webp",
     "http://127.0.0.1:5173/img/works/Dbf7jnBk3ho-1.webp",
     "http://127.0.0.1:5173/img/works/DbaNAZTk5X9-1.webp",
-    "http://127.0.0.1:5173/img/works/DbYa5WSE5wf-1.webp",
     "http://127.0.0.1:5173/img/works/DbQMFVEitsU-1.webp",
     "http://127.0.0.1:5173/img/works/DbKynTxk_6F-1.webp",
     "http://127.0.0.1:5173/img/works/DbCuHgrEypR-1.webp",
@@ -67,10 +80,6 @@
     "http://127.0.0.1:5173/img/inner/afghanistan-photo.webp",
     "http://127.0.0.1:5173/img/signatures/tvm-hero.webp",
     "http://127.0.0.1:5173/img/works/DaPbjVRE3nA-1.webp",
-    "http://127.0.0.1:5173/img/works/DeUZFPTCjPU-2.webp",
-    "http://127.0.0.1:5173/img/works/DeUZFPTCjPU-3.webp",
-    "http://127.0.0.1:5173/img/works/DeUZFPTCjPU-4.webp",
-    "http://127.0.0.1:5173/img/works/DeUZFPTCjPU-5.webp",
     "http://127.0.0.1:5173/img/works/DaU7EU2E46N-1.webp",
     "http://127.0.0.1:5173/img/works/DakDJF9Ez1l-1.webp"
   ],

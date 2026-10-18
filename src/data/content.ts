@@ -1398,6 +1398,8 @@ export const CATEGORIES: Category[] = _CATEGORY_DEFS.map((wing) => ({
 /* magazine states its counts once and everywhere reads the same page. */
 /* ------------------------------------------------------------------ */
 const _featureCount = ARTICLES.length
+const _publishedFeatureCount = ARTICLES.filter((a) => a.publicationStatus !== 'provisional').length
+const _provisionalFeatureCount = ARTICLES.filter((a) => a.publicationStatus === 'provisional').length
 const _primaryAuthorIds = new Set(ARTICLES.map((a) => a.authorId))
 /* 15 byline names carry a primary byline on the shelf — fourteen human
    writers plus Verlyse Media's own dispatch (“Mir Raza Ali”). */
@@ -1422,8 +1424,12 @@ export const LEDGER = {
   /** the current issue */
   issueNo: '01',
   issueLabel: 'Issue № 01',
-  /** features on the shelf */
+  /** features on the shelf (total catalogued entries) */
   features: _featureCount,
+  /** verified published folios (excluding provisional entries) */
+  publishedFeatures: _publishedFeatureCount,
+  /** provisional entries awaiting external publication verification */
+  provisionalFeatures: _provisionalFeatureCount,
   /** credited names with a primary byline — fourteen writers + the masthead */
   creators: _creatorCount,
   /** human writers only (the masthead's own dispatch excluded) */
