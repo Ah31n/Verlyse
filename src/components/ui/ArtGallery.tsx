@@ -113,11 +113,26 @@ export default function ArtGallery({ article }: { article: Article }) {
               {slides.length === 1 ? 'The plate' : `The ${slides.length} plates`}
               {author ? ` — ${author.name}` : ''}
             </h2>
+            {article.credit && (
+              <p className="mt-1.5 font-mono text-[9px] uppercase tracking-[0.26em] text-gold/85">
+                {article.credit}
+              </p>
+            )}
           </div>
           <span className="font-mono text-[10px] uppercase tracking-[0.22em] text-white/60">
             {slides.length} {slides.length === 1 ? 'plate' : 'plates'} · use ← → in lightbox
           </span>
         </div>
+        {descriptions.some((d) => d.status === 'pending-source-binary') && (
+          <div className="mb-8 flex flex-wrap items-center justify-between gap-3 border border-gold/30 bg-[#1B060D]/80 px-4 py-3">
+            <p className="font-mono text-[9px] uppercase tracking-[0.24em] text-gold">
+              Archival Specimen Edition · Folio № {folio}
+            </p>
+            <p className="font-serif text-sm italic text-ivory/75">
+              All {slides.length} carousel plates are catalogued from the source publication and rendered as typographic archival plates while original slide binaries await attachment.
+            </p>
+          </div>
+        )}
       </Reveal>
 
       <div

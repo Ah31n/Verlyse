@@ -1,8 +1,8 @@
 /**
  * Image fallback helper — swaps a failed `<img>` source to an inline
  * wine-and-brass SVG plate carrying the piece's title and folio number,
- * and resolves pending external source assets to the same archival plate
- * without fabricating replacement artwork or triggering HTTP 404s.
+ * and resolves pending external source assets to an art-directed typographic
+ * archival plate without fabricating replacement artwork or triggering HTTP 404s.
  */
 
 const esc = (s: string) =>
@@ -33,30 +33,181 @@ export function isPendingSourceAsset(path: string): boolean {
   return PENDING_SOURCE_ASSETS.has(path)
 }
 
+/** Word-wraps a string into balanced lines that never overflow the 800x1000 SVG frame. */
+function wrapSvgLines(input: string, maxCharsPerLine: number, maxLines: number): string[] {
+  const words = input.trim().split(/\s+/).filter(Boolean)
+  if (words.length === 0) return []
+  const lines: string[] = []
+  let current = ''
+  for (const word of words) {
+    const candidate = current ? `${current} ${word}` : word
+    if (candidate.length <= maxCharsPerLine || !current) {
+      current = candidate
+    } else {
+      lines.push(current)
+      current = word
+      if (lines.length === maxLines - 1) break
+    }
+  }
+  const consumedWords = lines.join(' ').split(/\s+/).filter(Boolean).length
+  const remaining = words.slice(consumedWords).join(' ')
+  if (remaining) {
+    lines.push(
+      remaining.length > maxCharsPerLine + 4
+        ? `${remaining.slice(0, maxCharsPerLine + 1).trimEnd()}…`
+        : remaining,
+    )
+  } else if (current && lines.length < maxLines) {
+    lines.push(current)
+  }
+  return lines.slice(0, maxLines)
+}
+
+/** Returns a restrained architectural brass SVG emblem keyed to plate number (1..9). */
+function plateEmblemSvg(plateIdx: number): string {
+  switch (plateIdx) {
+    case 1:
+      /* Two parted threshold rings + unbroken rising voice line */
+      return `
+        <circle cx='348' cy='335' r='44' fill='none' stroke='#F7F2EA' stroke-opacity='0.42' stroke-width='1.3' stroke-dasharray='200 76'/>
+        <circle cx='452' cy='335' r='44' fill='none' stroke='#D4B06A' stroke-opacity='0.68' stroke-width='1.3' stroke-dasharray='200 76' transform='rotate(180 452 335)'/>
+        <line x1='400' y1='402' x2='400' y2='258' stroke='#D4B06A' stroke-width='1.6'/>
+        <circle cx='400' cy='252' r='4.5' fill='#D4B06A'/>
+      `
+    case 2:
+      /* Parted arch & broken coercion seal */
+      return `
+        <path d='M 332 392 L 332 316 A 68 68 0 0 1 392 249' fill='none' stroke='#F7F2EA' stroke-opacity='0.45' stroke-width='1.3'/>
+        <path d='M 468 392 L 468 316 A 68 68 0 0 0 408 249' fill='none' stroke='#D4B06A' stroke-opacity='0.68' stroke-width='1.3'/>
+        <line x1='312' y1='392' x2='488' y2='392' stroke='#B89146' stroke-opacity='0.45' stroke-width='1.1'/>
+        <circle cx='400' cy='320' r='5' fill='#D4B06A'/>
+      `
+    case 3:
+      /* Sovereign balance beam — culture vs truth */
+      return `
+        <line x1='310' y1='335' x2='490' y2='335' stroke='#D4B06A' stroke-opacity='0.72' stroke-width='1.4'/>
+        <line x1='400' y1='265' x2='400' y2='395' stroke='#B89146' stroke-opacity='0.5' stroke-width='1.3'/>
+        <circle cx='336' cy='335' r='22' fill='none' stroke='#F7F2EA' stroke-opacity='0.4' stroke-width='1.2'/>
+        <circle cx='464' cy='335' r='22' fill='none' stroke='#D4B06A' stroke-opacity='0.7' stroke-width='1.2'/>
+        <polygon points='400,255 394,267 406,267' fill='#D4B06A'/>
+      `
+    case 4:
+      /* Unmasked horizon & open threshold */
+      return `
+        <rect x='338' y='262' width='124' height='132' fill='none' stroke='#B89146' stroke-opacity='0.52' stroke-width='1.2'/>
+        <path d='M 338 352 Q 400 312 462 352' fill='none' stroke='#D4B06A' stroke-opacity='0.72' stroke-width='1.4'/>
+        <circle cx='400' cy='302' r='16' fill='none' stroke='#F7F2EA' stroke-opacity='0.55' stroke-width='1.3'/>
+        <circle cx='400' cy='302' r='3.5' fill='#D4B06A'/>
+      `
+    case 5:
+      /* Central thesis — two autonomous sovereign circles & star */
+      return `
+        <circle cx='356' cy='332' r='38' fill='none' stroke='#F7F2EA' stroke-opacity='0.52' stroke-width='1.3'/>
+        <circle cx='444' cy='332' r='38' fill='none' stroke='#D4B06A' stroke-opacity='0.75' stroke-width='1.3'/>
+        <circle cx='356' cy='332' r='3.5' fill='#F7F2EA' fill-opacity='0.75'/>
+        <circle cx='444' cy='332' r='3.5' fill='#D4B06A'/>
+        <path d='M 400 264 L 404 276 L 416 280 L 404 284 L 400 296 L 396 284 L 384 280 L 396 276 Z' fill='#D4B06A' fill-opacity='0.85'/>
+      `
+    case 6:
+      /* Botanical stem & four-petal bloom — autonomy & rights */
+      return `
+        <circle cx='400' cy='332' r='52' fill='none' stroke='#B89146' stroke-opacity='0.35' stroke-width='1.1'/>
+        <path d='M 400 392 L 400 312' stroke='#D4B06A' stroke-width='1.4'/>
+        <path d='M 400 356 C 378 350, 374 334, 392 330' fill='none' stroke='#F7F2EA' stroke-opacity='0.5' stroke-width='1.2'/>
+        <path d='M 400 346 C 422 340, 426 324, 408 320' fill='none' stroke='#D4B06A' stroke-opacity='0.7' stroke-width='1.2'/>
+        <circle cx='400' cy='304' r='12' fill='none' stroke='#D4B06A' stroke-width='1.3'/>
+        <circle cx='400' cy='304' r='3.5' fill='#F7F2EA'/>
+      `
+    case 7:
+      /* Concentric resonance arcs — breaking the silence */
+      return `
+        <circle cx='400' cy='356' r='6' fill='#D4B06A'/>
+        <path d='M 368 338 A 40 40 0 0 1 432 338' fill='none' stroke='#F7F2EA' stroke-opacity='0.55' stroke-width='1.3'/>
+        <path d='M 346 318 A 68 68 0 0 1 454 318' fill='none' stroke='#D4B06A' stroke-opacity='0.65' stroke-width='1.3'/>
+        <path d='M 324 298 A 96 96 0 0 1 476 298' fill='none' stroke='#B89146' stroke-opacity='0.45' stroke-width='1.2'/>
+      `
+    case 8:
+      /* Architectural colonnade & steadied lamp */
+      return `
+        <line x1='328' y1='388' x2='472' y2='388' stroke='#B89146' stroke-opacity='0.55' stroke-width='1.3'/>
+        <line x1='352' y1='288' x2='352' y2='388' stroke='#F7F2EA' stroke-opacity='0.38' stroke-width='1.3'/>
+        <line x1='400' y1='274' x2='400' y2='388' stroke='#D4B06A' stroke-opacity='0.75' stroke-width='1.5'/>
+        <line x1='448' y1='288' x2='448' y2='388' stroke='#F7F2EA' stroke-opacity='0.38' stroke-width='1.3'/>
+        <circle cx='400' cy='268' r='5' fill='#D4B06A'/>
+      `
+    default:
+      /* Double-diamond editorial colophon seal */
+      return `
+        <rect x='362' y='294' width='76' height='76' transform='rotate(45 400 332)' fill='none' stroke='#D4B06A' stroke-opacity='0.65' stroke-width='1.3'/>
+        <rect x='374' y='306' width='52' height='52' fill='none' stroke='#F7F2EA' stroke-opacity='0.38' stroke-width='1.1'/>
+        <circle cx='400' cy='332' r='4.5' fill='#D4B06A'/>
+      `
+  }
+}
+
 export function plateFallback(title?: string, folioNo?: string, subtitle?: string): string {
-  const safeTitle = esc((title || 'Verlyse Media').slice(0, 64))
+  const rawTitle = (title || 'Verlyse Media').trim()
   const validFolio = folioNo && folioNo !== '0' && folioNo !== '00' ? folioNo : ''
   const safeFolio = esc(validFolio ? `FOLIO № ${validFolio}` : 'VERLYSE MEDIA · ARCHIVE')
-  const safeSub = subtitle ? esc(subtitle.slice(0, 64)) : ''
+
+  /* Extract primary work title vs per-plate statement if separated by ' — ' */
+  const parts = rawTitle.split(/\s+—\s+/)
+  const headlineRaw = parts[0] || 'Verlyse Media'
+  const detailRaw = parts.slice(1).join(' · ').replace(/^Plate\s+\d+\s*·\s*/i, '').trim()
+
+  const headlineLines = wrapSvgLines(`“${headlineRaw.replace(/^[“"]|[”"]$/g, '')}”`, 24, 2)
+  const detailLines = detailRaw ? wrapSvgLines(detailRaw, 34, 2) : []
+  const safeSub = subtitle ? esc(subtitle.slice(0, 56)) : ''
+
+  /* Detect plate number (1..9) from folioNo or subtitle for distinct emblem */
+  const plateMatch = (folioNo || subtitle || '').match(/0?([1-9])$/)
+  const plateIdx = plateMatch ? Number(plateMatch[1]) : 1
+  const roman = ['I', 'II', 'III', 'IV', 'V', 'VI', 'VII', 'VIII', 'IX'][plateIdx - 1] || 'I'
+
+  const headlineTspans = headlineLines
+    .map((line, idx) => `<tspan x='400' dy='${idx === 0 ? 0 : 40}'>${esc(line)}</tspan>`)
+    .join('')
+
+  const detailStartY = 530 + (headlineLines.length - 1) * 40 + 48
+  const detailTspans = detailLines
+    .map((line, idx) => `<tspan x='400' dy='${idx === 0 ? 0 : 28}'>${esc(line)}</tspan>`)
+    .join('')
+
+  const subY = detailLines.length > 0 ? detailStartY + (detailLines.length - 1) * 28 + 52 : detailStartY + 14
+
   const svg = `<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 800 1000' width='800' height='1000'>
     <defs>
-      <radialGradient id='g' cx='50%' cy='42%' r='70%'>
-        <stop offset='0%' stop-color='#471323'/>
-        <stop offset='65%' stop-color='#260913'/>
+      <radialGradient id='g' cx='50%' cy='38%' r='72%'>
+        <stop offset='0%' stop-color='#4A1222'/>
+        <stop offset='62%' stop-color='#260913'/>
         <stop offset='100%' stop-color='#120409'/>
       </radialGradient>
     </defs>
     <rect width='800' height='1000' fill='url(#g)'/>
-    <rect x='36' y='36' width='728' height='928' fill='none' stroke='#B89146' stroke-opacity='0.38' stroke-width='1'/>
-    <rect x='52' y='52' width='696' height='896' fill='none' stroke='#B89146' stroke-opacity='0.18' stroke-width='1'/>
-    <line x1='120' y1='180' x2='680' y2='180' stroke='#B89146' stroke-opacity='0.35' stroke-width='1'/>
-    <line x1='120' y1='820' x2='680' y2='820' stroke='#B89146' stroke-opacity='0.35' stroke-width='1'/>
-    <text x='400' y='148' text-anchor='middle' fill='#D4B06A' font-family='monospace' font-size='15' letter-spacing='6'>${safeFolio}</text>
-    <circle cx='400' cy='430' r='54' fill='none' stroke='#B89146' stroke-opacity='0.45' stroke-width='1.2'/>
-    <circle cx='400' cy='430' r='4' fill='#D4B06A'/>
-    <text x='400' y='560' text-anchor='middle' fill='#F7F2EA' font-family='Georgia, serif' font-style='italic' font-size='27'>${safeTitle}</text>
-    ${safeSub ? `<text x='400' y='612' text-anchor='middle' fill='#D4B06A' fill-opacity='0.82' font-family='monospace' font-size='13' letter-spacing='3'>${safeSub}</text>` : ''}
-    <text x='400' y='866' text-anchor='middle' fill='#B89146' fill-opacity='0.75' font-family='monospace' font-size='12' letter-spacing='5'>WHERE VISION BECOMES A VOICE</text>
+    <!-- Subtle Haikei-inspired organic contour lines -->
+    <path d='M 52 240 C 230 210, 570 275, 748 235' fill='none' stroke='#B89146' stroke-opacity='0.08' stroke-width='1'/>
+    <path d='M 52 760 C 260 795, 540 725, 748 765' fill='none' stroke='#B89146' stroke-opacity='0.08' stroke-width='1'/>
+    <!-- Outer and inner archival plate borders -->
+    <rect x='36' y='36' width='728' height='928' fill='none' stroke='#B89146' stroke-opacity='0.42' stroke-width='1'/>
+    <rect x='52' y='52' width='696' height='896' fill='none' stroke='#B89146' stroke-opacity='0.20' stroke-width='1'/>
+    <!-- Corner registration marks -->
+    <path d='M 68 88 L 68 68 L 88 68 M 712 68 L 732 68 L 732 88 M 68 912 L 68 932 L 88 932 M 712 932 L 732 932 L 732 912' fill='none' stroke='#D4B06A' stroke-opacity='0.55' stroke-width='1.2'/>
+    <line x1='116' y1='176' x2='684' y2='176' stroke='#B89146' stroke-opacity='0.32' stroke-width='1'/>
+    <line x1='116' y1='812' x2='684' y2='812' stroke='#B89146' stroke-opacity='0.32' stroke-width='1'/>
+    <!-- Top archival ledger header -->
+    <text x='400' y='132' text-anchor='middle' fill='#D4B06A' font-family='monospace' font-size='14' letter-spacing='5.5'>${safeFolio}</text>
+    <text x='400' y='158' text-anchor='middle' fill='#F7F2EA' fill-opacity='0.55' font-family='Georgia, serif' font-style='italic' font-size='14' letter-spacing='2'>Plate ${roman}</text>
+    <!-- Plate-specific architectural emblem -->
+    ${plateEmblemSvg(plateIdx)}
+    <!-- Wrapped headline (never clips horizontally) -->
+    <text x='400' y='524' text-anchor='middle' fill='#F7F2EA' font-family='Georgia, serif' font-style='italic' font-size='31'>${headlineTspans}</text>
+    <!-- Wrapped plate statement -->
+    ${detailLines.length > 0 ? `<text x='400' y='${detailStartY}' text-anchor='middle' fill='#E8D9A8' fill-opacity='0.90' font-family='Georgia, serif' font-size='21'>${detailTspans}</text>` : ''}
+    <!-- Monospace plate index subtitle -->
+    ${safeSub ? `<text x='400' y='${subY}' text-anchor='middle' fill='#D4B06A' fill-opacity='0.82' font-family='monospace' font-size='12' letter-spacing='3'>${safeSub}</text>` : ''}
+    <!-- Bottom colophon & provenance stamp -->
+    <text x='400' y='858' text-anchor='middle' fill='#D4B06A' fill-opacity='0.80' font-family='monospace' font-size='11.5' letter-spacing='4.5'>WHERE VISION BECOMES A VOICE</text>
+    <text x='400' y='888' text-anchor='middle' fill='#F7F2EA' fill-opacity='0.45' font-family='monospace' font-size='10' letter-spacing='3'>VERLYSE MEDIA · ARCHIVAL SPECIMEN PLATE</text>
   </svg>`
   return `data:image/svg+xml;utf8,${encodeURIComponent(svg)}`
 }

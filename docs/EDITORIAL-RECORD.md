@@ -102,19 +102,19 @@ Writer :haieqa wahab
 - **Comments (`commentsCount: 12`):** In accordance with the comment privacy and anti-fabrication policy (do not import third-party commenter usernames or external Instagram CDN avatar URLs into the public UI on provisional scraper records), `voices` is `[]` and `comments` is `0` (`LEDGER.conversations` remains `585`).
 
 ### 1B.4 Nine-Slide Carousel Plate Mapping
-Until the 9 binary `.webp` slide files are attached to `public/img/works/`, `PENDING_SOURCE_ASSETS` in `src/lib/imgFallback.ts` resolves each canonical path through `plateSrc(...)` to a wine-and-brass typographic archival SVG plate (`0` HTTP 404s, `0` fabricated/AI images):
+Until the 9 binary `.webp` slide files are attached to `public/img/works/`, `PENDING_SOURCE_ASSETS` in `src/lib/imgFallback.ts` resolves each canonical path through `plateSrc(...)` to a multi-line wrapped, plate-indexed wine-and-brass archival SVG specimen plate (`0` HTTP 404s, `0` fabricated/AI images, `0` text clipping):
 
-| Plate | Child Shortcode | Child Post ID | Canonical Asset Path | Dimensions | Status |
-|---|---|---|---|---|---|
-| `01 / 09` | `DehgrPwitkY` | `4008628852682840344` | `/img/works/Dehg27tE_hF-1.webp` | `1080 × 1350` | `pending-source-binary` |
-| `02 / 09` | `DehgrS2iOC4` | `4008628856004599992` | `/img/works/Dehg27tE_hF-2.webp` | `1080 × 1350` | `pending-source-binary` |
-| `03 / 09` | `DehgsHPCwNE` | `4008628912250356548` | `/img/works/Dehg27tE_hF-3.webp` | `1080 × 1350` | `pending-source-binary` |
-| `04 / 09` | `Dehgr1YCAUK` | `4008628893073802506` | `/img/works/Dehg27tE_hF-4.webp` | `1080 × 1350` | `pending-source-binary` |
-| `05 / 09` | `DehgsRni9Rm` | `4008628923398870118` | `/img/works/Dehg27tE_hF-5.webp` | `1080 × 1350` | `pending-source-binary` |
-| `06 / 09` | `Dehgr6CiDob` | `4008628898081815067` | `/img/works/Dehg27tE_hF-6.webp` | `1080 × 1350` | `pending-source-binary` |
-| `07 / 09` | `DehgsH3C-5V` | `4008628912921505365` | `/img/works/Dehg27tE_hF-7.webp` | `1080 × 1350` | `pending-source-binary` |
-| `08 / 09` | `DehgsIeCCT3` | `4008628913575568631` | `/img/works/Dehg27tE_hF-8.webp` | `1080 × 1350` | `pending-source-binary` |
-| `09 / 09` | `DehgsHuCVDR` | `4008628912770339025` | `/img/works/Dehg27tE_hF-9.webp` | `1080 × 1350` | `pending-source-binary` |
+| Plate | Child Shortcode | Child Post ID | Verbatim Subject / Statement | Canonical Asset Path | Dimensions | Status |
+|---|---|---|---|---|---|---|
+| `01 / 09` | `DehgrPwitkY` | `4008628852682840344` | `She didn’t say Qubool Hai` | `/img/works/Dehg27tE_hF-1.webp` | `1080 × 1350` | `pending-source-binary` |
+| `02 / 09` | `DehgrS2iOC4` | `4008628856004599992` | `She was forced to` | `/img/works/Dehg27tE_hF-2.webp` | `1080 × 1350` | `pending-source-binary` |
+| `03 / 09` | `DehgsHPCwNE` | `4008628912250356548` | `Forced marriage is not culture` | `/img/works/Dehg27tE_hF-3.webp` | `1080 × 1350` | `pending-source-binary` |
+| `04 / 09` | `Dehgr1YCAUK` | `4008628893073802506` | `It is not tradition. It is abuse` | `/img/works/Dehg27tE_hF-4.webp` | `1080 × 1350` | `pending-source-binary` |
+| `05 / 09` | `DehgsRni9Rm` | `4008628923398870118` | `A marriage without consent is not a marriage` | `/img/works/Dehg27tE_hF-5.webp` | `1080 × 1350` | `pending-source-binary` |
+| `06 / 09` | `Dehgr6CiDob` | `4008628898081815067` | `Women’s rights & consent` (`#WomensRights · #ConsentMatters`) | `/img/works/Dehg27tE_hF-6.webp` | `1080 × 1350` | `pending-source-binary` |
+| `07 / 09` | `DehgsH3C-5V` | `4008628912921505365` | `End forced marriage` (`#ForcedMarriage · #EndForcedMarriage`) | `/img/works/Dehg27tE_hF-7.webp` | `1080 × 1350` | `pending-source-binary` |
+| `08 / 09` | `DehgsIeCCT3` | `4008628913575568631` | `Where Vision Becomes A Voice` (`#verlysemedia`) | `/img/works/Dehg27tE_hF-8.webp` | `1080 × 1350` | `pending-source-binary` |
+| `09 / 09` | `DehgsHuCVDR` | `4008628912770339025` | `Editor: Wajiha Ahmed · Writer: Haieqa Wahab` | `/img/works/Dehg27tE_hF-9.webp` | `1080 × 1350` | `pending-source-binary` |
 
 ---
 
@@ -139,13 +139,13 @@ Until the 9 binary `.webp` slide files are attached to `public/img/works/`, `PEN
 
 ### 3.1 Commands Executed & Results
 1. `npm run build` (`tsc -b && vite build && node scripts/prerender-metadata.mjs && node scripts/generate-sitemap.mjs`)
-   - **Result:** Passed (`0` TypeScript errors, Vite production bundle built cleanly, `53` metadata shells prerendered — `core: 9, spatial: 1, category: 7, article: 21, creator: 16` — and `53` URLs written to `dist/sitemap.xml`).
+   - **Result:** Passed (`0` TypeScript errors, Vite production bundle built cleanly, `54` metadata shells prerendered — `core: 9, spatial: 1, category: 7, article: 21, creator: 16` — and `54` URLs written to `dist/sitemap.xml`).
 2. `npm run test:metadata` (`node scripts/metadata-audit.mjs`)
    - **Result:** Passed (`Metadata audit passed: 54 shells, 54 sitemap URLs, registry coherent`).
 3. `npm run test:smoke` (`node scripts/ssr-smoke.mjs`)
-   - **Result:** Passed (`20/20` SSR routes rendered cleanly including `/article (the-quiet-grief)`, `SMOKE PASS`).
+   - **Result:** Passed (`21/21` SSR routes rendered cleanly including `/article (the-quiet-grief)` and `/article (she-didnt-say-qubool-hai)`, `SMOKE PASS`).
 4. `npm run test:flows` (`node scripts/interaction-jsdom.mjs`)
-   - **Result:** Passed (`7/7` JSDOM behavioral flows: search dialog open, scroll lock, query filtering, Escape focus restoration, save toggle persistence, saved drawer modal + scroll lock, clean unmount).
+   - **Result:** Passed (`14/14` JSDOM behavioral flows: search dialog open, scroll lock, query filtering, Escape focus restoration, save toggle persistence, saved drawer modal + scroll lock, clean unmount, art gallery focus trap + no asset leak, submit/contact accessible validation, writer profile quotes, hiring marquee & team roster, editorial counts + craft system a11y, StringTune lifecycle race safety).
 5. `npm test` (`node scripts/full-matrix-audit.mjs && node scripts/interaction-audit.mjs && node scripts/verify-flags.mjs && node scripts/asset-audit.mjs` using headless Chromium `153.0.8010.0`)
    - **Full Matrix Audit (`scripts/full-matrix-audit.mjs`):**
      - Desktop (`1440×900`): `52` routes audited, `0` console/page/network errors, `0` horizontal overflow routes, `0` footer alignment failures.

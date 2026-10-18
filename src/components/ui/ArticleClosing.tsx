@@ -71,27 +71,16 @@ function Kicker({ text, dark = true, delay = 0 }: { text: string; dark?: boolean
 /* italic serif, slightly rotated, and the line draws itself in like  */
 /* pen on paper.                                                      */
 /* ------------------------------------------------------------------ */
-export function Signature({ name, delay = 0.35, align = 'left' }: { name: string; delay?: number; align?: 'left' | 'center' }) {
-  const reduce = useReducedMotion() === true
+export function Signature({ name, align = 'left' }: { name: string; delay?: number; align?: 'left' | 'center' }) {
   const plain = name.replace(/^—\s*/, '').trim()
   return (
-    <motion.div
-      initial={reduce ? false : { opacity: 0 }}
-      whileInView={{ opacity: 1 }}
-      viewport={{ once: true, margin: '0px 0px -8% 0px' }}
-      transition={reduce ? { duration: 0 } : { duration: 0.7, delay }}
-      className={`${align === 'center' ? 'flex flex-col items-center' : ''} mt-7`}
-    >
-      <motion.p
-        initial={reduce ? false : { opacity: 0, x: align === 'left' ? -6 : 0 }}
-        whileInView={{ opacity: 1, x: 0 }}
-        viewport={{ once: true, margin: '0px 0px -8% 0px' }}
-        transition={reduce ? { duration: 0 } : { duration: 0.8, ease: EASE, delay: delay + 0.15 }}
-        className="inline-block font-serif text-3xl font-light italic text-gold"
+    <div className={`${align === 'center' ? 'flex flex-col items-center' : ''} mt-7`}>
+      <p
+        className="inline-block font-serif text-2xl font-light italic text-[#D9B978] md:text-3xl"
         style={{ transform: 'rotate(-1.5deg)' }}
       >
         {plain}
-      </motion.p>
+      </p>
       <svg
         viewBox="0 0 220 22"
         fill="none"
@@ -99,42 +88,24 @@ export function Signature({ name, delay = 0.35, align = 'left' }: { name: string
         className={`mt-0.5 block h-[22px] w-48 overflow-visible ${align === 'center' ? 'mx-auto' : ''}`}
       >
         {/* the ink dot where the pen first touches the paper */}
-        <motion.circle
-          cx="8"
-          cy="13"
-          r="1.6"
-          fill="#B89146"
-          stroke="none"
-          initial={reduce ? false : { opacity: 0, scale: 0.4 }}
-          whileInView={{ opacity: 1, scale: 1 }}
-          viewport={{ once: true, margin: '0px 0px -8% 0px' }}
-          transition={reduce ? { duration: 0 } : { duration: 0.5, ease: EASE, delay: delay + 0.15 }}
-        />
+        <circle cx="8" cy="13" r="1.6" fill="#B89146" stroke="none" />
         {/* the main stroke — the pen's first pass */}
-        <motion.path
+        <path
           d="M8 13 C 42 5, 120 18, 212 9"
           stroke="#B89146"
           strokeWidth="1.6"
           strokeLinecap="round"
-          initial={reduce ? false : { pathLength: 0 }}
-          whileInView={{ pathLength: 1 }}
-          viewport={{ once: true, margin: '0px 0px -8% 0px' }}
-          transition={reduce ? { duration: 0 } : { duration: 1.2, ease: 'easeInOut', delay: delay + 0.35 }}
         />
         {/* the second pass — a lighter, quicker stroke, like real ink */}
-        <motion.path
+        <path
           d="M20 14 C 70 10, 130 17, 196 11"
           stroke="#B89146"
           strokeWidth="1"
           strokeLinecap="round"
           opacity="0.45"
-          initial={reduce ? false : { pathLength: 0 }}
-          whileInView={{ pathLength: 1 }}
-          viewport={{ once: true, margin: '0px 0px -8% 0px' }}
-          transition={reduce ? { duration: 0 } : { duration: 0.9, ease: 'easeInOut', delay: delay + 0.7 }}
         />
       </svg>
-    </motion.div>
+    </div>
   )
 }
 
@@ -429,48 +400,46 @@ export function ArtworkClosing({
 }
 
 /* ------------------------------------------------------------------ */
-/* “Their Voices Matter” — the founder's three lines, animated.        */
+/* “Their Voices Matter” & “She Didn’t Say Qubool Hai” — closing card */
 /* ------------------------------------------------------------------ */
 export function VoicesClosing({ closing }: { closing: Closing }) {
-  const reduce = useReducedMotion() === true
   const lines = closing.lines ?? []
   const paragraphs = closing.paragraphs ?? []
   return (
     <Reveal className="mt-24">
-      <div className="relative overflow-hidden border border-gold/25 bg-gradient-to-b from-wine-deep to-[#2A0811] px-8 py-16 text-center md:py-20">
-        <div aria-hidden="true" className="pointer-events-none absolute inset-x-0 top-0 h-72 bg-[radial-gradient(62%_55%_at_50%_6%,rgba(184,145,70,0.1),transparent_74%)]" />
-        <DrawRule delay={0.1} className="mx-auto" />
-        <div className="mt-8">
-          {lines.map((line, i) => (
-            <motion.p
-              key={i}
-              initial={reduce ? false : { opacity: 0, y: 24 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true, margin: '0px 0px -8% 0px' }}
-              transition={reduce ? { duration: 0 } : { duration: 0.9, ease: EASE, delay: 0.15 + i * 0.18 }}
-              className="font-serif text-3xl font-light leading-[1.25] text-ivory md:text-5xl"
-            >
-              {line}
-            </motion.p>
-          ))}
-        </div>
-        {paragraphs.map((p, i) => (
-          <motion.p
-            key={i}
-            initial={reduce ? false : { opacity: 0 }}
-            whileInView={{ opacity: 1 }}
-            viewport={{ once: true, margin: '0px 0px -8% 0px' }}
-            transition={reduce ? { duration: 0 } : { duration: 0.8, delay: 0.7 + i * 0.15 }}
-            className="pull-quote mx-auto mt-8 max-w-[38ch] text-[clamp(1.15rem,1.7vw,1.35rem)] text-white/60"
-          >
-            {p}
-          </motion.p>
-        ))}
-        {closing.signoff && (
-          <div className="mt-10">
-            <Signature name={closing.signoff} align="center" delay={0.85} />
+      <div className="relative overflow-hidden border border-gold/30 bg-gradient-to-b from-wine-deep to-[#2A0811] px-8 py-16 text-center md:py-20">
+        <div aria-hidden="true" className="pointer-events-none absolute inset-x-0 top-0 h-72 bg-[radial-gradient(62%_55%_at_50%_6%,rgba(184,145,70,0.12),transparent_74%)]" />
+        <div className="relative">
+          {closing.kicker && (
+            <p className="mb-4 font-mono text-[10px] uppercase tracking-[0.28em] text-gold">
+              {closing.kicker}
+            </p>
+          )}
+          <DrawRule delay={0.05} className="mx-auto" />
+          <div className="mt-8 space-y-2">
+            {lines.map((line, i) => (
+              <p
+                key={i}
+                className="font-serif text-3xl font-light leading-[1.25] text-ivory md:text-5xl"
+              >
+                {line}
+              </p>
+            ))}
           </div>
-        )}
+          {paragraphs.map((p, i) => (
+            <p
+              key={i}
+              className="pull-quote mx-auto mt-6 max-w-[42ch] text-[clamp(1.18rem,1.75vw,1.4rem)] text-ivory/80"
+            >
+              {p}
+            </p>
+          ))}
+          {closing.signoff && (
+            <div className="mt-10">
+              <Signature name={closing.signoff} align="center" delay={0.2} />
+            </div>
+          )}
+        </div>
       </div>
     </Reveal>
   )

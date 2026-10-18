@@ -174,6 +174,33 @@ async function run() {
     JSON.stringify({ m375: gal375, t768: gal768, d1440: gal1440 }),
   )
 
+  // ---- SHE DIDN'T SAY QUBOOL HAI GALLERY, CREDITS & PROVENANCE ----
+  await page.goto(BASE + '/article/she-didnt-say-qubool-hai', { waitUntil: 'networkidle' })
+  await page.waitForTimeout(600)
+  const quboolCheck = await page.evaluate(() => {
+    const txt = document.body.textContent || ''
+    const plates = document.querySelectorAll('button[aria-label*="Inspect Plate "]')
+    return {
+      plateCount: plates.length,
+      noRawShortcodeLeak: !txt.includes('Dehg27tE_hF') && !txt.includes('/img/works/Dehg27tE_hF'),
+      hasCredits: txt.includes('Editor: Wajiha Ahmed') && txt.includes('Writer: Haieqa Wahab'),
+      hasVerbatimCaption:
+        txt.includes('Editor: wajiha ahmed') &&
+        txt.includes('Writer :haieqa wahab') &&
+        txt.includes('#ForcedMarriage #verlysemedia #EndForcedMarriage #WomensRights #ConsentMatters'),
+      noMinusOneLikes: !txt.includes('-1 appreciations'),
+    }
+  })
+  pass(
+    'qubool-hai-gallery-and-caption',
+    quboolCheck.plateCount === 9 &&
+      quboolCheck.noRawShortcodeLeak &&
+      quboolCheck.hasCredits &&
+      quboolCheck.hasVerbatimCaption &&
+      quboolCheck.noMinusOneLikes,
+    JSON.stringify(quboolCheck),
+  )
+
   // ---- SUBMIT & CONTACT ACCESSIBLE VALIDATION & WRITER PROFILE QUOTES ----
   await page.goto(BASE + '/submit', { waitUntil: 'networkidle' })
   await page.getByRole('button', { name: 'Submit the piece' }).click()

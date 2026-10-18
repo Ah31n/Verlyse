@@ -23,6 +23,7 @@ import { useReadingMode } from '../components/ui/ReadingMode'
 import { ImmersiveShell, ReadingMeasure } from '../components/immersive'
 import { progress } from '../lib/stringTune/attrs'
 import ArtGallery from '../components/ui/ArtGallery'
+import { FloralWord, HaikeiContourPlane } from '../components/ui/EditorialCraftSystem'
 
 // The story-ending spatial atmosphere is loaded on demand (three is heavy) and
 // gated by EndingSpatialStage so the chunk is only requested when eligible and
@@ -513,55 +514,121 @@ export default function ArticleDetail() {
       ) : article.heroMode === 'documentary' ? (
         /* ——— DOCUMENTARY: the dispatch — dateline, stronger type, the cover as a
             framed plate (fixed aspect ratio, object-contain — never a stretched
-            full-bleed banner, never cropped) ——— */
-        <section className="relative flex min-h-[86svh] items-center overflow-hidden border-b border-white/10 bg-wine-deep pt-36">
+            full-bleed banner, never cropped). For carousel-led dispatches, sets
+            a two-column editorial spread so title, dual credits, thesis, and
+            Plate 01 compose above the fold before the multi-plate viewing room. ——— */
+        <section className="relative flex min-h-[82svh] items-center overflow-hidden border-b border-white/10 bg-wine-deep pt-36">
           <WorldTexture world={article.world} />
-          <div aria-hidden="true" className="pointer-events-none absolute inset-x-0 top-0 h-72 bg-[radial-gradient(62%_55%_at_50%_6%,rgba(184,145,70,0.05),transparent_74%)]" />
-          <div className="relative z-[2] mx-auto flex w-full max-w-page flex-col items-center px-[clamp(1.75rem,5.5vw,4.75rem)] pb-14 text-center">
-            <div className="w-full max-w-[820px]">
-              <Reveal>
-                <p className="mb-6 flex items-center justify-center gap-4 font-mono text-[9px] uppercase tracking-[0.30em] text-gold">
-                  <span className="h-px w-10 bg-gold/60" aria-hidden="true" />
-                  Dispatch — {article.date.split('-').reverse().join('.')}
-                </p>
-              </Reveal>
-              <Reveal><HeroKicker article={article} author={author} /></Reveal>
-              <div className={`${vibe.titleClass} inline-block`}>
-                <SplitText as="h1" text={`“${article.title}”`} className="mx-auto mt-5 max-w-[20ch] text-[clamp(2.8rem,6.8vw,6.4rem)]" />
+          <div aria-hidden="true" className="pointer-events-none absolute inset-0">
+            <div className="absolute inset-x-0 top-0 h-72 bg-[radial-gradient(62%_55%_at_50%_6%,rgba(184,145,70,0.06),transparent_74%)]" />
+            <HaikeiContourPlane tone="dark" seed={Number(folio) || 21} className="opacity-20" />
+          </div>
+          {article.editorialFormat === 'carousel-feature' ? (
+            <div className="relative z-[2] mx-auto w-full max-w-page px-[clamp(1.75rem,5.5vw,4.75rem)] pb-16">
+              <div className="grid grid-cols-1 items-center gap-12 lg:grid-cols-[minmax(0,1fr)_340px]">
+                <div>
+                  <Reveal>
+                    <p className="mb-5 flex flex-wrap items-center gap-4 font-mono text-[9px] uppercase tracking-[0.30em] text-gold">
+                      <span className="h-px w-10 bg-gold/60" aria-hidden="true" />
+                      <span>Dispatch — {article.date.split('-').reverse().join('.')} · Folio № {folio}</span>
+                    </p>
+                  </Reveal>
+                  <Reveal><HeroKicker article={article} author={author} /></Reveal>
+                  <div className={`${vibe.titleClass} inline-block`}>
+                    <SplitText as="h1" text={`“${article.title}”`} className="mt-5 max-w-[18ch] text-[clamp(2.8rem,6.4vw,5.8rem)]" />
+                  </div>
+                  <Reveal delay={0.18} className="mt-7">
+                    <MetaRow category={article.category} author={author?.name} readingTime={article.readingTime} />
+                  </Reveal>
+                  {article.credit && (
+                    <Reveal delay={0.22} className="mt-4">
+                      <p className="inline-block border border-gold/35 bg-[#160409]/70 px-3.5 py-2 font-mono text-[9px] uppercase leading-[1.6] tracking-[0.26em] text-gold">
+                        <span className="mr-2" aria-hidden="true">✦</span>
+                        <span>{article.credit}</span>
+                      </p>
+                    </Reveal>
+                  )}
+                  <Reveal delay={0.28}>
+                    <div className="mt-7 max-w-[56ch] border-l-2 border-gold/55 pl-5">
+                      <p className="font-serif text-[clamp(1.15rem,1.65vw,1.38rem)] font-light italic leading-[1.68] text-ivory/90">
+                        {article.id === 'she-didnt-say-qubool-hai' ? (
+                          <>
+                            She didn’t say Qubool Hai. She was forced to. Forced marriage is not culture. It is not tradition. It is abuse. A marriage without <FloralWord variant="rose">consent</FloralWord> is not a marriage.
+                          </>
+                        ) : (
+                          article.excerpt
+                        )}
+                      </p>
+                    </div>
+                  </Reveal>
+                </div>
+                <Reveal delay={0.24}>
+                  <figure className="relative mx-auto w-full max-w-[320px] lg:max-w-[340px]">
+                    <div aria-hidden="true" className="absolute -inset-2 translate-x-2 translate-y-2 border border-gold/30 sm:-inset-3 sm:translate-x-3 sm:translate-y-3" />
+                    <div className="img-frame relative overflow-hidden border border-gold/35 bg-[#140409]">
+                      <img
+                        src={article.cover}
+                        alt={article.slideDescriptions?.[0]?.alt ?? coverAlt(article)}
+                        width={article.slideDescriptions?.[0]?.width ?? 1080}
+                        height={article.slideDescriptions?.[0]?.height ?? 1350}
+                        className="aspect-[4/5] w-full object-contain"
+                        loading="eager"
+                        decoding="async"
+                        onError={(e) => handleImgError(e, article.title, folio)}
+                      />
+                      <span aria-hidden="true" className="pointer-events-none absolute inset-2 border border-gold/35" />
+                    </div>
+                    <figcaption className="mt-3 flex items-center justify-between font-mono text-[9px] uppercase tracking-[0.28em] text-white/60">
+                      <span>Plate 01 — the cover</span>
+                      <span className="text-gold">✦ {article.slides.length} plates below</span>
+                    </figcaption>
+                  </figure>
+                </Reveal>
               </div>
-              <Reveal delay={0.2} className="mt-8 flex justify-center">
-                <MetaRow category={article.category} author={author?.name} readingTime={article.readingTime} />
-              </Reveal>
-              <Reveal delay={0.3}>
-                <p className="mx-auto mt-6 max-w-[58ch] font-serif text-lg font-light italic leading-[1.7] text-white/70">{article.excerpt}</p>
+            </div>
+          ) : (
+            <div className="relative z-[2] mx-auto flex w-full max-w-page flex-col items-center px-[clamp(1.75rem,5.5vw,4.75rem)] pb-14 text-center">
+              <div className="w-full max-w-[820px]">
+                <Reveal>
+                  <p className="mb-6 flex items-center justify-center gap-4 font-mono text-[9px] uppercase tracking-[0.30em] text-gold">
+                    <span className="h-px w-10 bg-gold/60" aria-hidden="true" />
+                    Dispatch — {article.date.split('-').reverse().join('.')}
+                  </p>
+                </Reveal>
+                <Reveal><HeroKicker article={article} author={author} /></Reveal>
+                <div className={`${vibe.titleClass} inline-block`}>
+                  <SplitText as="h1" text={`“${article.title}”`} className="mx-auto mt-5 max-w-[20ch] text-[clamp(2.8rem,6.8vw,6.4rem)]" />
+                </div>
+                <Reveal delay={0.2} className="mt-8 flex justify-center">
+                  <MetaRow category={article.category} author={author?.name} readingTime={article.readingTime} />
+                </Reveal>
+                <Reveal delay={0.3}>
+                  <p className="mx-auto mt-6 max-w-[58ch] font-serif text-lg font-light italic leading-[1.7] text-white/70">{article.excerpt}</p>
+                </Reveal>
+              </div>
+              <Reveal delay={0.25}>
+                <figure className="relative mx-auto mt-12 w-full max-w-[640px] max-sm:w-[88%]">
+                  <div className="img-frame relative overflow-hidden border border-white/15">
+                    <img
+                      src={article.cover}
+                      alt={article.slideDescriptions?.[0]?.alt ?? coverAlt(article)}
+                      width={article.slideDescriptions?.[0]?.width ?? 1080}
+                      height={article.slideDescriptions?.[0]?.height ?? 1350}
+                      className="aspect-[4/5] w-full object-contain"
+                      loading="eager"
+                      decoding="async"
+                      onError={(e) => handleImgError(e, article.title, folio)}
+                    />
+                    <span aria-hidden="true" className="absolute inset-2 border border-gold/30" />
+                  </div>
+                  <figcaption className="mt-3 flex items-center justify-between font-mono text-[9px] uppercase tracking-[0.30em] text-white/50">
+                    <span>Plate 01 — the cover</span>
+                    <span className="text-gold">✦</span>
+                  </figcaption>
+                </figure>
               </Reveal>
             </div>
-            <Reveal delay={0.25}>
-              <figure className="relative mx-auto mt-12 w-full max-w-[640px] max-sm:w-[88%]">
-                <div className="img-frame relative overflow-hidden border border-white/15">
-                  {/* the cover plate — the frame takes the photograph's own
-                      ratio (aspect-[3/4] default), object-contain keeps the
-                      entire original visible. On phones it is scaled down so
-                      the title and metadata stay the focal point. */}
-                  <img
-                    src={article.cover}
-                    alt={article.slideDescriptions?.[0]?.alt ?? coverAlt(article)}
-                    width={article.slideDescriptions?.[0]?.width ?? 1080}
-                    height={article.slideDescriptions?.[0]?.height ?? 1350}
-                    className="aspect-[4/5] w-full object-contain"
-                    loading="eager"
-                    decoding="async"
-                    onError={(e) => handleImgError(e, article.title, folio)}
-                  />
-                  <span aria-hidden="true" className="absolute inset-2 border border-gold/30" />
-                </div>
-                <figcaption className="mt-3 flex items-center justify-between font-mono text-[9px] uppercase tracking-[0.30em] text-white/50">
-                  <span>Plate 01 — the cover</span>
-                  <span className="text-gold">✦</span>
-                </figcaption>
-              </figure>
-            </Reveal>
-          </div>
+          )}
         </section>
       ) : article.heroMode === 'gallery' ? (
         /* ——— GALLERY: the artwork itself is the hero — the plate, framed ——— */

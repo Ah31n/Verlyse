@@ -48,6 +48,10 @@
       "status": "PASS",
       "detail": "{\"m375\":{\"symmetricPad\":true,\"cols\":1,\"row1SideBySide\":false,\"stackedMobile\":true,\"safeTransition\":true,\"transitionProperty\":\"border-color, box-shadow\"},\"t768\":{\"symmetricPad\":true,\"cols\":6,\"row1SideBySide\":true,\"stackedMobile\":false,\"safeTransition\":true,\"transitionProperty\":\"border-color, box-shadow\"},\"d1440\":{\"symmetricPad\":true,\"cols\":6,\"row1SideBySide\":true,\"stackedMobile\":false,\"safeTransition\":true,\"transitionProperty\":\"border-color, box-shadow\"}}"
     },
+    "qubool-hai-gallery-and-caption": {
+      "status": "PASS",
+      "detail": "{\"plateCount\":9,\"noRawShortcodeLeak\":true,\"hasCredits\":true,\"hasVerbatimCaption\":true,\"noMinusOneLikes\":true}"
+    },
     "forms-and-profile-a11y": {
       "status": "PASS",
       "detail": "submitA11y=true, creatorQuotesOk=true"
