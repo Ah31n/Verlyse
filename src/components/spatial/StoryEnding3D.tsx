@@ -247,50 +247,92 @@ const SCENES: Record<EndingSceneKind, (p: Palette) => ReactNode> = {
   unspecified: (p) => <SceneUnspecified p={p} />,
 }
 
-export default function StoryEnding3D({ article }: { article: Article }) {
-  const reduce = useReducedMotion()
+export default function StoryEnding3D({
+  article,
+  activePhase,
+}: {
+  article: Article
+  activePhase?: Phase
+}) {
+  const reduce = useReducedMotion() === true
   const { supported } = useWebGLSupport()
   const wrap = useRef<HTMLDivElement>(null)
-  const [phase, setPhase] = useState<Phase>(supported && !reduce ? 'RESTING' : reduce ? 'REDUCED' : 'FALLBACK')
+  const [tabVisible, setTabVisible] = useState(() =>
+    typeof document === 'undefined' ? true : document.visibilityState !== 'hidden'
+  )
+  const [internalPhase, setInternalPhase] = useState<Phase>(
+    supported && !reduce ? 'RESTING' : reduce ? 'REDUCED' : 'FALLBACK'
+  )
+  const phase = activePhase ?? internalPhase
 
   const ending = getEndingStatic(article)
   const palette: Palette = { primary: ending.palette.primary, secondary: ending.palette.secondary }
   const scene = SCENES[ending.sceneKind] ?? SCENES.unspecified
 
-  // Activate on approach, then settle into ALIVE after ENTERING.
   useEffect(() => {
-    if (!wrap.current) return
+    if (typeof document === 'undefined') return undefined
+    const onVis = () => setTabVisible(document.visibilityState !== 'hidden')
+    document.addEventListener('visibilitychange', onVis)
+    return () => document.removeEventListener('visibilitychange', onVis)
+  }, [])
+
+  // Activate on approach when rendered standalone without EndingSpatialStage.
+  useEffect(() => {
+    if (activePhase !== undefined || reduce || !supported || !wrap.current) return undefined
+    const el = wrap.current
     let done = false
-    const check = () => {
+    const activate = () => {
       if (done) return
-      const r = wrap.current!.getBoundingClientRect()
+      done = true
+      setInternalPhase((p) => (p === 'RESTING' ? 'ENTERING' : p))
+    }
+    const check = () => {
+      if (done || !wrap.current) return
+      const r = wrap.current.getBoundingClientRect()
       if (r.top < window.innerHeight * 1.1 && r.bottom > -60) {
-        done = true
-        setPhase((p) => (p === 'RESTING' ? 'ENTERING' : p))
+        activate()
       }
     }
     check()
+    if (done) return undefined
+
+    let io: IntersectionObserver | null = null
+    if ('IntersectionObserver' in window) {
+      io = new IntersectionObserver(
+        (entries) => {
+          if (entries.some((entry) => entry.isIntersecting)) {
+            activate()
+            io?.disconnect()
+          }
+        },
+        { rootMargin: '240px 0px' }
+      )
+      io.observe(el)
+    }
+
     const t = setTimeout(check, 400)
     window.addEventListener('scroll', check, { passive: true })
     window.addEventListener('resize', check)
     return () => {
+      io?.disconnect()
       clearTimeout(t)
       window.removeEventListener('scroll', check)
       window.removeEventListener('resize', check)
     }
-  }, [])
+  }, [activePhase, reduce, supported])
 
   useEffect(() => {
-    if (phase === 'ENTERING') {
-      const id = setTimeout(() => setPhase('ALIVE'), ending.motion.revealMs)
+    if (activePhase === undefined && internalPhase === 'ENTERING') {
+      const id = setTimeout(() => setInternalPhase('ALIVE'), ending.motion.revealMs)
       return () => clearTimeout(id)
     }
-  }, [phase, ending.motion.revealMs])
+    return undefined
+  }, [activePhase, internalPhase, ending.motion.revealMs])
 
   const render =
-    (phase === 'ALIVE' || phase === 'ENTERING') && !reduce && supported ? (
+    (phase === 'ALIVE' || phase === 'ENTERING') && !reduce && supported && tabVisible ? (
       <Canvas
-        frameloop={phase === 'ALIVE' ? 'always' : 'demand'}
+        frameloop={phase === 'ALIVE' && tabVisible ? 'always' : 'demand'}
         dpr={[1, 1.5]}
         camera={{ position: [0, 0, 6], fov: 45 }}
         // Same ACES filmic grade as the spatial archive, so an article's ending
@@ -314,6 +356,10 @@ export default function StoryEnding3D({ article }: { article: Article }) {
         {scene(palette)}
       </Canvas>
     ) : null
+
+  if (activePhase !== undefined) {
+    return render
+  }
 
   return (
     <div

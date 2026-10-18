@@ -98,7 +98,7 @@ export default function ArtGallery({ article }: { article: Article }) {
   return (
     <section
       aria-label={`${article.title} — plate sequence`}
-      className="mx-auto max-w-page px-[clamp(1.5rem,5vw,4.5rem)] py-12 lg:pr-[calc(clamp(1.75rem,5.5vw,4.75rem)+256px)]"
+      className="mx-auto max-w-page px-[clamp(1.75rem,5.5vw,4.75rem)] py-12"
     >
       <div ref={galleryContentRef} aria-hidden={open !== null ? 'true' : undefined}>
       <Reveal>
@@ -113,6 +113,11 @@ export default function ArtGallery({ article }: { article: Article }) {
               {slides.length === 1 ? 'The plate' : `The ${slides.length} plates`}
               {author ? ` — ${author.name}` : ''}
             </h2>
+            {article.credit && (
+              <p className="mt-1.5 font-mono text-[9px] uppercase tracking-[0.26em] text-gold/85">
+                {article.credit}
+              </p>
+            )}
           </div>
           <span className="font-mono text-[10px] uppercase tracking-[0.22em] text-white/60">
             {slides.length} {slides.length === 1 ? 'plate' : 'plates'} · use ← → in lightbox
@@ -124,17 +129,31 @@ export default function ArtGallery({ article }: { article: Article }) {
         className={`grid gap-8 ${
           slides.length === 1
             ? 'mx-auto max-w-[680px]'
-            : slides.length === 2
+            : slides.length === 2 || slides.length === 4
               ? 'grid-cols-1 sm:grid-cols-2'
-              : 'grid-cols-1 sm:grid-cols-2 min-[1400px]:grid-cols-3'
+              : slides.length === 5
+                ? 'grid-cols-1 sm:grid-cols-6'
+                : slides.length === 8
+                  ? 'grid-cols-1 sm:grid-cols-2 lg:grid-cols-4'
+                  : 'grid-cols-1 sm:grid-cols-2 lg:grid-cols-3'
         }`}
       >
         {slides.map((src, i) => {
           const desc = descriptions[i]
           const plateNum = String(i + 1).padStart(2, '0')
           const totalNum = String(slides.length).padStart(2, '0')
+          const spanCls =
+            slides.length === 5
+              ? i < 3
+                ? 'sm:col-span-3 lg:col-span-2'
+                : i === 3
+                  ? 'sm:col-span-3 lg:col-span-3'
+                  : 'sm:col-span-6 lg:col-span-3'
+              : slides.length % 2 === 1 && slides.length !== 5 && i === slides.length - 1
+                ? 'sm:col-span-2 lg:col-span-1'
+                : ''
           return (
-            <Reveal key={`${src}-${i}`} delay={i * 0.06}>
+            <Reveal key={`${src}-${i}`} delay={i * 0.06} className={spanCls}>
               <figure className="group flex h-full flex-col">
                 <button
                   type="button"
@@ -148,7 +167,7 @@ export default function ArtGallery({ article }: { article: Article }) {
                       : `View plate ${i + 1} of ${slides.length} of ${article.title}`
                   }
                   {...spotlitGlide('restrained')}
-                  className="st-spotlit relative block w-full overflow-hidden border border-gold/30 bg-wine-deep/60 p-3 text-left transition-all duration-700 hover:border-gold hover:shadow-[0_24px_70px_-20px_rgba(0,0,0,0.8)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-gold motion-reduce:transition-none"
+                  className="st-spotlit relative block w-full overflow-hidden border border-gold/30 bg-wine-deep/60 p-3 text-left transition-[border-color,box-shadow] duration-700 hover:border-gold hover:shadow-[0_24px_70px_-20px_rgba(0,0,0,0.8)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-gold motion-reduce:transition-none"
                 >
                   <div
                     className={`img-frame overflow-hidden bg-charcoal ${desc?.width && desc?.height ? '' : 'aspect-[4/5]'}`}
@@ -165,11 +184,17 @@ export default function ArtGallery({ article }: { article: Article }) {
                       }
                       width={desc?.width}
                       height={desc?.height}
+                      referrerPolicy="no-referrer"
                       loading="lazy"
                       decoding="async"
                       onError={(e) => {
                         setFailedSlides((prev) => ({ ...prev, [i]: true }))
-                        handleImgError(e, `${article.title} — Plate ${plateNum}`, `${folio} · ${plateNum}`)
+                        handleImgError(
+                          e,
+                          `${article.title} — ${desc?.subject || `Plate ${plateNum}`}`,
+                          `${folio} · ${plateNum}`,
+                          `Plate ${plateNum} / ${totalNum}`,
+                        )
                       }}
                       className={`h-full w-full ${desc?.width && desc?.height ? 'object-contain' : 'object-cover'} transition-transform duration-[1400ms] ease-out group-hover:scale-[1.02] motion-reduce:transition-none motion-reduce:group-hover:scale-100`}
                     />
@@ -254,10 +279,16 @@ export default function ArtGallery({ article }: { article: Article }) {
                     }
                     width={activeDesc?.width}
                     height={activeDesc?.height}
+                    referrerPolicy="no-referrer"
                     decoding="async"
                     onError={(e) => {
                       setFailedSlides((prev) => ({ ...prev, [open]: true }))
-                      handleImgError(e, `${article.title} — Plate ${String(open + 1).padStart(2, '0')}`, folio)
+                      handleImgError(
+                        e,
+                        `${article.title} — ${activeDesc?.subject || `Plate ${String(open + 1).padStart(2, '0')}`}`,
+                        `${folio} · ${String(open + 1).padStart(2, '0')}`,
+                        `Plate ${String(open + 1).padStart(2, '0')} / ${String(slides.length).padStart(2, '0')}`,
+                      )
                     }}
                     className="max-h-[60vh] w-auto max-w-full border border-gold/40 object-contain shadow-[0_30px_90px_rgba(0,0,0,0.9)] md:max-h-[76vh]"
                   />

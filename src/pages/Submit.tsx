@@ -15,7 +15,11 @@ function FieldHint({ id, show, children }: { id: string; show: boolean; children
   )
 }
 
-import { CrashZoom , MaskReveal } from '../components/cinematic'
+import { CrashZoom } from '../components/cinematic'
+import {
+  FloralWord,
+  HaikeiContourPlane,
+} from '../components/ui/EditorialCraftSystem'
 
 export default function Submit() {
   useSeo({
@@ -169,23 +173,24 @@ path: '/submit',
         {/* the desk lamp — a warm, directional light over the desk */}
         <div aria-hidden="true" className="pointer-events-none absolute inset-0">
           <div className="absolute inset-0 bg-[radial-gradient(80%_55%_at_50%_-6%,rgba(232,217,168,0.16),transparent_62%),radial-gradient(110%_85%_at_50%_0%,rgba(92,18,36,0.35),transparent_60%),linear-gradient(175deg,#4A1120_0%,#2A0F18_60%,#15050B_100%)]" />
+          <HaikeiContourPlane tone="dark" seed={8} className="opacity-20" />
           <span aria-hidden="true" className="absolute left-1/2 top-0 h-[3px] w-[34vw] max-w-[520px] -translate-x-1/2 bg-gradient-to-b from-gold/50 to-transparent" />
         </div>
         <div className="relative mx-auto w-full max-w-page px-[clamp(1.25rem,4vw,4.75rem)]">
           <Reveal><p className="eyebrow">Submissions — open · writer → work → piece → desk</p></Reveal>
-          <h1 className="relative mt-8 font-serif text-[clamp(2.8rem,7.5vw,6rem)] font-light leading-[0.92] tracking-[-0.02em] text-ivory">
-                        <CrashZoom className="pointer-events-none absolute inset-x-0 top-1/2 -translate-y-1/2">
-              <span aria-hidden="true" className="block select-none whitespace-nowrap text-center font-serif text-[clamp(3.4rem,9vw,7.5rem)] font-semibold leading-none text-transparent [-webkit-text-stroke:1px_rgba(184,145,70,0.14)]">
+          <div className="relative mt-8">
+            <CrashZoom className="pointer-events-none absolute inset-x-0 top-1/2 -translate-y-1/2">
+              <span aria-hidden="true" className="block select-none whitespace-nowrap text-center font-serif text-[clamp(3.4rem,9vw,7.5rem)] font-semibold leading-none text-transparent [-webkit-text-stroke:1px_rgba(184,145,70,0.08)]">
                 THE EDITORIAL DESK
               </span>
             </CrashZoom>
-            <MaskReveal>
-              <span className="relative">The editorial <em className="italic text-gold">desk</em></span>
-            </MaskReveal>
-          </h1>
+            <h1 className="relative font-serif text-[clamp(2.8rem,7.5vw,6rem)] font-light leading-[0.92] tracking-[-0.02em] text-ivory">
+              <span className="relative">The editorial <FloralWord variant="magnolia">desk</FloralWord></span>
+            </h1>
+          </div>
           <Reveal delay={0.15}>
             <p className="mt-6 max-w-[52ch] text-lg leading-[1.8] text-white/70">
-              The platform puts it plainly: “{BRAND.submitCta}”
+              “{BRAND.submitCta}”
             </p>
           </Reveal>
           <Reveal delay={0.22}>
@@ -285,7 +290,7 @@ path: '/submit',
                     </div>
                     <div className="field sm:col-span-2">
                       <label className="field-label" htmlFor="sf-handle">Instagram / social handle <span className="text-white/40">— optional</span></label>
-                      <input className="field-input" id="sf-handle" name="handle" type="text" autoComplete="username" placeholder="@yourname" />
+                      <input className="field-input" id="sf-handle" name="handle" type="text" autoComplete="username" />
                     </div>
                   </div>
                 </div>
@@ -338,7 +343,6 @@ path: '/submit',
                         id="sf-desc"
                         name="description"
                         rows={3}
-                        placeholder="A line or two about the piece — what it is, what it carries."
                       />
                     </div>
                   </div>
@@ -355,7 +359,6 @@ path: '/submit',
                         id="sf-work"
                         name="work"
                         rows={10}
-                        placeholder="Your story, in your words — or a note about the work you want featured."
                         aria-invalid={errors.includes('work') ? 'true' : undefined}
                         aria-describedby={errors.includes('work') ? 'sf-work-err' : undefined}
                         onInput={() => clearFieldError('work')}

@@ -1,6 +1,5 @@
 import { useEffect, useRef } from 'react'
 import { useReducedMotion } from 'motion/react'
-import { animate, createDrawable, cubicBezier } from 'animejs'
 import { useNearViewport } from '../../hooks/useNearViewport'
 
 /**
@@ -16,28 +15,12 @@ import { useNearViewport } from '../../hooks/useNearViewport'
  * section's opacity and transform; React Three Fiber owns 3D. No engine
  * shares a transform, camera or state property with this component.
  *
- * ── WHY ANIME.JS RATHER THAN motion/react ────────────────────────────────
- * This is a path-length draw, not a layout or route transition. anime.js
- * ships `createDrawable`, which measures the geometry (`pathLength`) and
- * drives the dash pair as a single normalised `draw: "start end"` value, so
- * both directions of the rule and the lozenge share one timeline. Doing the
- * same with motion/react means measuring every path by hand, animating two
- * dash properties per element, and keeping them in sync — more code, and it
- * would put a second engine on an SVG surface for no benefit.
- *
- * ── ACCESSIBILITY / REDUCED MOTION ───────────────────────────────────────
- * Purely ornamental: `aria-hidden` and `pointer-events-none`, so it can never
- * receive focus or be announced. Under `prefers-reduced-motion` the rule
- * renders fully drawn and no timeline is created at all — the dash attributes
- * are never applied, so there is nothing to animate and nothing to clean up.
- *
- * ── CLEANUP ──────────────────────────────────────────────────────────────
- * The animation is paused on unmount, and the dash attributes are removed so
- * no inline style is left behind and no observer or timer outlives the mount.
+ * ── LAZY LOADING ─────────────────────────────────────────────────────────
+ * `animejs` is dynamically imported ONLY when `!reduce && near` is true, so
+ * the `anime-*.js` chunk is never requested on initial Home route load (while
+ * the rule is offscreen) and is never requested at all under
+ * `prefers-reduced-motion: reduce`.
  */
-
-/* the same expo-out curve the publication already uses for entrances */
-const EASE = cubicBezier(0.16, 1, 0.3, 1)
 
 export default function BrassRule({ className = '' }: { className?: string }) {
   const wrapRef = useRef<HTMLDivElement>(null)
@@ -45,74 +28,64 @@ export default function BrassRule({ className = '' }: { className?: string }) {
   const rightRef = useRef<SVGLineElement>(null)
   const gemRef = useRef<SVGPathElement>(null)
 
-  const reduce = useReducedMotion()
+  const reduce = useReducedMotion() === true
   const near = useNearViewport(wrapRef)
 
-  /* holds the drawable proxies once collapsed, so the near-viewport effect can animate them */
-  const drawables = useRef<{
-    lines: ReturnType<typeof createDrawable>
-    gem: ReturnType<typeof createDrawable>
-  } | null>(null)
-
-  /* 1 · collapse once on mount, so the rule is never briefly shown pre-drawn.
-         Skipped entirely under reduced motion: no dash attributes are ever set,
-         so the SVG simply renders complete. */
   useEffect(() => {
-    if (reduce) return
+    if (reduce || !near) return undefined
     const lineEls = [leftRef.current, rightRef.current].filter(Boolean) as SVGGeometryElement[]
     const gemEl = gemRef.current
-    if (!lineEls.length || !gemEl) return
+    if (!lineEls.length || !gemEl) return undefined
 
-    try {
-      const lines = createDrawable(lineEls, 0, 0)
-      const gem = createDrawable(gemEl, 0, 0)
-      /* createDrawable only applies its initial collapsed state the first time
-         it sees an element (it keys off `pathLength`). Under StrictMode the
-         effect runs twice, so the second pass would leave the rule fully drawn
-         and it would flash before redrawing. Force the collapsed state
-         explicitly so the rule is never shown pre-drawn. */
-      for (const d of [...lines, ...gem]) d.setAttribute('draw', '0 0')
-      drawables.current = { lines, gem }
-    } catch {
-      /* if the drawable cannot be built, leave the rule fully drawn */
-      drawables.current = null
-    }
+    let cancelled = false
+    let pauseRules: (() => void) | null = null
+    let pauseLozenge: (() => void) | null = null
+
+    void import('animejs')
+      .then(({ animate, createDrawable, cubicBezier }) => {
+        if (cancelled) return
+        const ease = cubicBezier(0.16, 1, 0.3, 1)
+        const lines = createDrawable(lineEls, 0, 0)
+        const gem = createDrawable(gemEl, 0, 0)
+        for (const d of [...lines, ...gem]) d.setAttribute('draw', '0 0')
+
+        const rulesAnim = animate(lines, {
+          draw: '0 1',
+          duration: 1500,
+          ease,
+        })
+        const lozengeAnim = animate(gem, {
+          draw: '0 1',
+          duration: 900,
+          delay: 780,
+          ease,
+        })
+        pauseRules = () => rulesAnim.pause()
+        pauseLozenge = () => lozengeAnim.pause()
+      })
+      .catch(() => {
+        /* If the optional chunk fails to load, reveal the static rule cleanly. */
+        if (cancelled) return
+        for (const el of [...lineEls, gemEl]) {
+          el.removeAttribute('stroke-dasharray')
+          el.removeAttribute('stroke-dashoffset')
+          el.removeAttribute('pathLength')
+        }
+      })
 
     return () => {
-      /* restore plain geometry — no dash or pathLength state left behind, so a
-         remount re-initialises cleanly */
+      cancelled = true
+      pauseRules?.()
+      pauseLozenge?.()
       for (const el of [...lineEls, gemEl]) {
         el.removeAttribute('stroke-dasharray')
         el.removeAttribute('stroke-dashoffset')
         el.removeAttribute('pathLength')
       }
-      drawables.current = null
-    }
-  }, [reduce])
-
-  /* 2 · draw once, when the rule comes near the viewport */
-  useEffect(() => {
-    if (reduce || !near || !drawables.current) return
-    const { lines, gem } = drawables.current
-
-    const rules = animate(lines, {
-      draw: '0 1',
-      duration: 1500,
-      ease: EASE,
-    })
-
-    const lozenge = animate(gem, {
-      draw: '0 1',
-      duration: 900,
-      delay: 780,
-      ease: EASE,
-    })
-
-    return () => {
-      rules.pause()
-      lozenge.pause()
     }
   }, [near, reduce])
+
+  const initialDash = reduce ? undefined : 1
 
   return (
     <div
@@ -136,6 +109,9 @@ export default function BrassRule({ className = '' }: { className?: string }) {
           stroke="#B89146"
           strokeOpacity="0.55"
           strokeWidth="1"
+          pathLength={initialDash}
+          strokeDasharray={initialDash}
+          strokeDashoffset={initialDash}
         />
         <line
           ref={rightRef}
@@ -146,6 +122,9 @@ export default function BrassRule({ className = '' }: { className?: string }) {
           stroke="#B89146"
           strokeOpacity="0.55"
           strokeWidth="1"
+          pathLength={initialDash}
+          strokeDasharray={initialDash}
+          strokeDashoffset={initialDash}
         />
         {/* the brass lozenge that closes the rule */}
         <path
@@ -154,6 +133,9 @@ export default function BrassRule({ className = '' }: { className?: string }) {
           fill="none"
           stroke="#B89146"
           strokeWidth="1"
+          pathLength={initialDash}
+          strokeDasharray={initialDash}
+          strokeDashoffset={initialDash}
         />
       </svg>
     </div>

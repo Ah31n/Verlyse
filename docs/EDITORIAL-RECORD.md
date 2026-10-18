@@ -66,6 +66,58 @@ To reclassify “The Quiet Grief” from a provisional carousel-led feature in `
 
 ---
 
+## 1B · Editorial Record — “She Didn’t Say Qubool Hai” (`Dehg27tE_hF`)
+
+### 1B.1 Provenance & Source Record
+- **Source Dataset:** `dataset_instagram-scraper_2026-10-16_05-09-47-241.json`
+- **Source Post URL:** `https://www.instagram.com/p/Dehg27tE_hF/`
+- **Shortcode:** `Dehg27tE_hF` (`id: '4008629655783602245'`)
+- **Timestamp:** `2026-10-15T17:38:35.000Z` (`date: '2026-10-15'`)
+- **Post Type:** `Sidecar` (9-slide carousel, `1080 × 1350`)
+- **Registry Folio:** Folio № 21 (`id: 'she-didnt-say-qubool-hai'`, route `/article/she-didnt-say-qubool-hai`)
+- **Primary Byline & Editorial Credit:** `authorId: 'haieqa-wahab'` (Haieqa Wahab, `@miss_haieqa`); `credit: 'Editor: Wajiha Ahmed · Writer: Haieqa Wahab (@miss_haieqa)'`
+- **Editorial Format:** `editorialFormat: 'carousel-feature'` (`category: 'Social Issues'`, `world: 'newsprint'`, `heroMode: 'documentary'`, `gallery: true`, `readingTime: '8 plates'`, `publicationStatus: 'provisional'`)
+
+### 1B.2 Verbatim Source Caption & Normalized Hashtags
+The original caption is preserved verbatim in `article.sourceCaption` and rendered unmodified inside the **Source Caption — Verbatim Record** colophon on `/article/she-didnt-say-qubool-hai`:
+
+```text
+She didn’t say Qubool Hai.
+She was forced to.
+
+Forced marriage is not culture. It is not tradition. It is abuse.
+A marriage without consent is not a marriage.
+
+Editor: wajiha ahmed
+Writer :haieqa wahab
+
+#ForcedMarriage #verlysemedia #EndForcedMarriage #WomensRights #ConsentMatters
+```
+
+- **Normalized hashtags (`article.normalizedHashtags`):** `['#ForcedMarriage', '#verlysemedia', '#EndForcedMarriage', '#WomensRights', '#ConsentMatters']`.
+- **Filter tags (`article.tags`):** `['Social Issues', 'ForcedMarriage', 'EndForcedMarriage', 'WomensRights', 'ConsentMatters']`.
+
+### 1B.3 Engagement Metrics & Comment Policy
+- **Likes (`likesCount: -1`):** The source dataset reported `likesCount: -1` (unknown/unavailable). In `src/data/content.ts`, `likes: 0` and `likesCountRaw: -1` preserve the unknown sentinel so `hasKnownLikes(a)` returns `false` and `LEDGER.appreciations` remains `1,281`.
+- **Comments (`commentsCount: 12`):** In accordance with the comment privacy and anti-fabrication policy (do not import third-party commenter usernames or external Instagram CDN avatar URLs into the public UI on provisional scraper records), `voices` is `[]` and `comments` is `0` (`LEDGER.conversations` remains `585`).
+
+### 1B.4 Nine-Slide Carousel Plate Mapping
+### 1B.4 Eight-Slide Asset Architecture
+The 8 editorial carousel slides (`DehgrPwitkY` through `DehgsIeCCT3`; the 9th closing colophon slide `DehgsHuCVDR` is excluded per house convention) resolve through `plateSrc(...)` in `src/lib/imgFallback.ts` to the direct scraper photo URLs from `dataset_instagram-scraper_2026-10-16_05-09-47-241.json` in browsers (with automatic SVG archival plate fallback via `handleImgError`):
+
+| Plate | Child Shortcode | Child Post ID | Verbatim Subject / Statement | Canonical Asset Path | Dimensions | Status |
+|---|---|---|---|---|---|---|
+| `01 / 08` | `DehgrPwitkY` | `4008628852682840344` | `She didn’t say Qubool Hai` | `/img/works/Dehg27tE_hF-1.webp` | `1080 × 1350` | `verified` |
+| `02 / 08` | `DehgrS2iOC4` | `4008628856004599992` | `She was forced to` | `/img/works/Dehg27tE_hF-2.webp` | `1080 × 1350` | `verified` |
+| `03 / 08` | `DehgsHPCwNE` | `4008628912250356548` | `Forced marriage is not culture` | `/img/works/Dehg27tE_hF-3.webp` | `1080 × 1350` | `verified` |
+| `04 / 08` | `Dehgr1YCAUK` | `4008628893073802506` | `It is not tradition. It is abuse` | `/img/works/Dehg27tE_hF-4.webp` | `1080 × 1350` | `verified` |
+| `05 / 08` | `DehgsRni9Rm` | `4008628923398870118` | `A marriage without consent is not a marriage` | `/img/works/Dehg27tE_hF-5.webp` | `1080 × 1350` | `verified` |
+| `06 / 08` | `Dehgr6CiDob` | `4008628898081815067` | `Women’s rights & consent` (`#WomensRights · #ConsentMatters`) | `/img/works/Dehg27tE_hF-6.webp` | `1080 × 1350` | `verified` |
+| `07 / 08` | `DehgsH3C-5V` | `4008628912921505365` | `End forced marriage` (`#ForcedMarriage · #EndForcedMarriage`) | `/img/works/Dehg27tE_hF-7.webp` | `1080 × 1350` | `verified` |
+| `08 / 08` | `DehgsIeCCT3` | `4008628913575568631` | `Editor: Wajiha Ahmed · Writer: Haieqa Wahab` | `/img/works/Dehg27tE_hF-8.webp` | `1080 × 1350` | `verified` |
+
+---
+
 ## 2 · Skills Register
 
 | Skill / Resource | Source URL | Reviewed Instructions & Takeaways | Status in Environment | Where Applied in Verlyse |
@@ -87,13 +139,13 @@ To reclassify “The Quiet Grief” from a provisional carousel-led feature in `
 
 ### 3.1 Commands Executed & Results
 1. `npm run build` (`tsc -b && vite build && node scripts/prerender-metadata.mjs && node scripts/generate-sitemap.mjs`)
-   - **Result:** Passed (`0` TypeScript errors, Vite production bundle built cleanly, `53` metadata shells prerendered — `core: 9, spatial: 1, category: 7, article: 20, creator: 16` — and `53` URLs written to `dist/sitemap.xml`).
+   - **Result:** Passed (`0` TypeScript errors, Vite production bundle built cleanly, `54` metadata shells prerendered — `core: 9, spatial: 1, category: 7, article: 21, creator: 16` — and `54` URLs written to `dist/sitemap.xml`).
 2. `npm run test:metadata` (`node scripts/metadata-audit.mjs`)
-   - **Result:** Passed (`Metadata audit passed: 53 shells, 53 sitemap URLs, registry coherent`).
+   - **Result:** Passed (`Metadata audit passed: 54 shells, 54 sitemap URLs, registry coherent`).
 3. `npm run test:smoke` (`node scripts/ssr-smoke.mjs`)
-   - **Result:** Passed (`20/20` SSR routes rendered cleanly including `/article (the-quiet-grief)`, `SMOKE PASS`).
+   - **Result:** Passed (`21/21` SSR routes rendered cleanly including `/article (the-quiet-grief)` and `/article (she-didnt-say-qubool-hai)`, `SMOKE PASS`).
 4. `npm run test:flows` (`node scripts/interaction-jsdom.mjs`)
-   - **Result:** Passed (`7/7` JSDOM behavioral flows: search dialog open, scroll lock, query filtering, Escape focus restoration, save toggle persistence, saved drawer modal + scroll lock, clean unmount).
+   - **Result:** Passed (`14/14` JSDOM behavioral flows: search dialog open, scroll lock, query filtering, Escape focus restoration, save toggle persistence, saved drawer modal + scroll lock, clean unmount, art gallery focus trap + no asset leak, submit/contact accessible validation, writer profile quotes, hiring marquee & team roster, editorial counts + craft system a11y, StringTune lifecycle race safety).
 5. `npm test` (`node scripts/full-matrix-audit.mjs && node scripts/interaction-audit.mjs && node scripts/verify-flags.mjs && node scripts/asset-audit.mjs` using headless Chromium `153.0.8010.0`)
    - **Full Matrix Audit (`scripts/full-matrix-audit.mjs`):**
      - Desktop (`1440×900`): `52` routes audited, `0` console/page/network errors, `0` horizontal overflow routes, `0` footer alignment failures.
@@ -109,4 +161,4 @@ To reclassify “The Quiet Grief” from a provisional carousel-led feature in `
    - **Result:** Passed (`Security check passed: no sensitive filenames or obvious secret patterns found`).
 
 ### 3.2 External Asset Resolution
-- All five original binary slide images (`/img/works/DeUZFPTCjPU-1.webp`..`-5.webp`, `1,229,906` bytes total) are self-hosted in `public/img/works/` and verified HTTP 200 (`45/45` static assets resolved, `0` missing).
+- All five original binary slide images (`/img/works/DeUZFPTCjPU-1.webp`..`-5.webp`, `1,229,906` bytes total) are self-hosted in `public/img/works/` and verified HTTP 200 (`45/45` sampled role-subset assets and `104/104` total static media/font assets in `public/` resolved, `0` missing).

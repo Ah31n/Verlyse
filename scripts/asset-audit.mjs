@@ -6,7 +6,7 @@ import * as path from 'node:path'
 const BASE = 'http://127.0.0.1:5173'
 const OUT = 'audit'
 
-// assets expected from the source registry (cover, inner figures, signatures, portraits, fonts, logo)
+// 45-entry sampled role subset from the source registry (cover, inner figures, signatures, portraits, fonts, logo, posters)
 const expected = {
   covers: [
     '/img/works/DaDY7WRkw0y-1.webp', '/img/poster-3-13-1.webp', '/img/works/DbYa5WSE5wf-1.webp',
@@ -18,6 +18,9 @@ const expected = {
     '/img/works/DciqQXTCilh-1.webp',
     '/img/works/DeUZFPTCjPU-1.webp', '/img/works/DeUZFPTCjPU-2.webp', '/img/works/DeUZFPTCjPU-3.webp',
     '/img/works/DeUZFPTCjPU-4.webp', '/img/works/DeUZFPTCjPU-5.webp',
+    '/img/works/Dehg27tE_hF-1.webp', '/img/works/Dehg27tE_hF-2.webp', '/img/works/Dehg27tE_hF-3.webp',
+    '/img/works/Dehg27tE_hF-4.webp', '/img/works/Dehg27tE_hF-5.webp', '/img/works/Dehg27tE_hF-6.webp',
+    '/img/works/Dehg27tE_hF-7.webp', '/img/works/Dehg27tE_hF-8.webp',
   ],
   inner: ['/img/inner/afghanistan-photo.webp', '/img/inner/balochistan-photo.webp', '/img/inner/kashmir-photo.webp', '/img/inner/khageena-dish.webp', '/img/inner/students-painting.webp', '/img/inner/tasbih-calligraphy.webp', '/img/inner/water-cat-art.webp'],
   signature: ['/img/signatures/tvm-hero.webp'],
@@ -25,6 +28,33 @@ const expected = {
   fonts: ['/fonts/CormorantGaramond-normal.woff2', '/fonts/CormorantGaramond-italic.woff2', '/fonts/Inter.woff2', '/fonts/IBMPlexMono.woff2'],
   logo: ['/favicon.svg'],
   poster: ['/img/poster-3-13-1.webp', '/img/poster-3-13-2.webp', '/img/poster-3-13-3.webp'],
+}
+
+function walkPublicAssets(dir, prefix = '') {
+  const entries = fs.readdirSync(dir, { withFileTypes: true })
+  const out = []
+  for (const e of entries) {
+    const rel = `${prefix}/${e.name}`
+    if (e.isDirectory()) {
+      out.push(...walkPublicAssets(path.join(dir, e.name), rel))
+    } else if (/\.(webp|jpg|jpeg|png|svg|woff2)$/i.test(e.name)) {
+      out.push(rel)
+    }
+  }
+  return out.sort()
+}
+
+async function scrollPageToTriggerLazyAssets(page) {
+  await page.evaluate(async () => {
+    const imgs = Array.from(document.querySelectorAll('img'))
+    for (const img of imgs) {
+      img.scrollIntoView({ behavior: 'instant', block: 'center' })
+      await new Promise((r) => setTimeout(r, 90))
+    }
+    window.scrollTo(0, document.documentElement.scrollHeight)
+    await new Promise((r) => setTimeout(r, 150))
+    window.scrollTo(0, 0)
+  })
 }
 
 async function run() {
@@ -41,36 +71,98 @@ async function run() {
       try {
         const res = await page.request.get(BASE + u)
         ok = res.ok()
-      } catch (e) { ok = false }
+      } catch {
+        ok = false
+      }
       if (ok) findings[role].resolved++
-      else { findings[role].missing.push(u); failedAll.push(u) }
+      else {
+        findings[role].missing.push(u)
+        failedAll.push(u)
+      }
     }
   }
 
+  // Verify the complete public media + font inventory on disk and over HTTP
+  const allPublicAssets = walkPublicAssets(path.resolve(process.cwd(), 'public'))
+  const publicMissing = []
+  let publicResolved = 0
+  for (const u of allPublicAssets) {
+    let ok = false
+    try {
+      const res = await page.request.get(BASE + u)
+      ok = res.ok()
+    } catch {
+      ok = false
+    }
+    if (ok) publicResolved++
+    else publicMissing.push(u)
+  }
+  const imageAndSvgAssets = allPublicAssets.filter((u) => !u.endsWith('.woff2'))
+  const fontAssets = allPublicAssets.filter((u) => u.endsWith('.woff2'))
+
   // Also capture what a full homepage + article load actually requests (fonts/images)
   const reqs = []
-  page.on('request', (r) => { if (r.resourceType() === 'image' || r.resourceType() === 'font') reqs.push(r.url()) })
+  page.on('request', (r) => {
+    if (r.resourceType() === 'image' || r.resourceType() === 'font') reqs.push(r.url())
+  })
   await page.goto(BASE + '/', { waitUntil: 'networkidle' })
-  await page.waitForTimeout(2000)
+  await scrollPageToTriggerLazyAssets(page)
+  await page.waitForTimeout(1000)
   await page.goto(BASE + '/article/their-voices-matter', { waitUntil: 'networkidle' })
-  await page.waitForTimeout(2000)
+  await scrollPageToTriggerLazyAssets(page)
+  await page.waitForTimeout(1000)
   await page.goto(BASE + '/article/the-quiet-grief', { waitUntil: 'networkidle' })
-  await page.waitForTimeout(2000)
+  await scrollPageToTriggerLazyAssets(page)
+  await page.waitForTimeout(1000)
+  await page.goto(BASE + '/article/she-didnt-say-qubool-hai', { waitUntil: 'networkidle' })
+  await scrollPageToTriggerLazyAssets(page)
+  await page.waitForTimeout(1000)
 
   const pendingSourceAssets = []
+  let totalRes = 0
+  let totalExp = 0
+  for (const f of Object.values(findings)) {
+    totalExp += f.count
+    totalRes += f.resolved
+  }
+
+  const inventorySummary = {
+    roleSubsetTotal: totalExp,
+    roleSubsetResolved: totalRes,
+    publicImageAndSvgTotal: imageAndSvgAssets.length,
+    publicFontTotal: fontAssets.length,
+    publicMediaAndFontTotal: allPublicAssets.length,
+    publicInventoryResolved: publicResolved,
+    publicInventoryMissing: publicMissing,
+  }
 
   fs.writeFileSync(
     path.join(OUT, 'asset-audit.json'),
-    JSON.stringify({ findings, pendingSourceAssets, liveRequests: [...new Set(reqs)], failedAll }, null, 2),
+    JSON.stringify(
+      {
+        findings,
+        inventorySummary,
+        pendingSourceAssets,
+        liveRequests: [...new Set(reqs)],
+        failedAll,
+      },
+      null,
+      2
+    )
   )
   await browser.close()
 
   console.log('=== ASSET AUDIT ===')
-  let totalRes = 0, totalExp = 0
   for (const [role, f] of Object.entries(findings)) {
-    totalExp += f.count; totalRes += f.resolved
-    console.log(`  ${role.padEnd(12)} ${f.resolved}/${f.count} resolved ${f.missing.length ? 'MISSING: ' + f.missing.join(', ') : ''}`)
+    console.log(
+      `  ${role.padEnd(12)} ${f.resolved}/${f.count} resolved ${f.missing.length ? 'MISSING: ' + f.missing.join(', ') : ''}`
+    )
   }
-  console.log(`TOTAL: ${totalRes}/${totalExp} resolved | missing: ${failedAll.length}`)
+  console.log(
+    `ROLE SUBSET: ${totalRes}/${totalExp} resolved | FULL PUBLIC INVENTORY: ${publicResolved}/${allPublicAssets.length} (${imageAndSvgAssets.length} images/SVGs + ${fontAssets.length} fonts) | missing: ${failedAll.length + publicMissing.length}`
+  )
 }
-run().catch((e) => { console.error(e); process.exit(1) })
+run().catch((e) => {
+  console.error(e)
+  process.exit(1)
+})

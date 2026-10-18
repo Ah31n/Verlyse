@@ -23,12 +23,13 @@ Rule in force: one visual property = one animation owner. No two systems animate
   Framer already handles. Per the blueprint's "do not add a package unless there is a real
   production responsibility," they were omitted.
 
-> **Currency note.** The sentence above describes the *spatial layer*, and it still holds there.
-> Repo-wide it is now out of date: `motion/react` is the DOM choreography engine (44 files),
-> anime.js drives one isolated SVG (`ui/BrassRule.tsx` on `/about`), and GSAP ScrollTrigger drives
-> the cinematic camera layer on `/about` only. The live per-engine ownership table is in
-> `docs/ANIMATION-DECISIONS.md`. The invariant that has *not* changed is the one that matters:
-> **no property on any element is written by two engines.**
+> **Currency note (`2026-10-18` Review & Consolidation update).** The live per-engine ownership table is governed by `docs/MOTION.md` and `docs/STACK_DECISION_MATRIX.md`:
+> - **CSS / Tailwind (`src/index.css`)**: Hover, focus-visible, color/opacity transitions, `@property` custom-property defaults, and global `prefers-reduced-motion` clamp.
+> - **StringTune (`@fiddle-digital/string-tune@1.2.5`, `dist/assets/boot-CfrjN6Gu.js` lazy chunk, `199.82 kB` / `51.65 kB` gzip)**: `--progress` reading hairline, `StringGlide` plate lag, `StringParallax` desktop cover drift, and `StringSpotlight` cursor rim light (`4` registered & active modules; skipped & torn down under `prefers-reduced-motion: reduce`).
+> - **`motion/react` (`motion@13.2.0`, `dist/assets/motion-Bx_UBRF8.js`, `137.25 kB` / `45.39 kB` gzip)**: `<MotionConfig reducedMotion="user">`, route curtains (`PageTransition`), overlays/drawers/lightboxes, reveals (`Reveal`, `SplitText`, `ArticleClosing`), `Magnetic` (`src/components/ui/Magnetic.tsx`), and component-scoped `useScroll` transforms.
+> - **GSAP (`gsap@3.15.0`, `dist/assets/gsap-a3sj5zmn.js` lazy chunk, `114.01 kB` / `45.16 kB` gzip) & Anime.js (`animejs@4.5.0`, `dist/assets/anime-CcJk6tc-.js` lazy chunk, `32.40 kB` / `13.15 kB` gzip)**: GSAP is isolated to outer `ScrollTrigger` camera wrappers on secondary routes (`src/components/cinematic/primitives.tsx`), and Anime.js is dynamically imported inside `src/components/ui/BrassRule.tsx` only when `!reduce && near`; both are evicted from `Header.tsx` and the blocking `index-*.js` entry bundle.
+> - **Three.js + `@react-three/fiber` (`dist/assets/three-DF4bklDy.js` lazy chunk, `770.49 kB` / `203.48 kB` gzip)**: WebGL `<Canvas>` scene graphs (`SpatialArchive`, `StoryEnding3D` via `EndingSpatialStage`, `/room`), gated on WebGL support, reduced motion, near-viewport, and tab visibility, and wrapped in local React Error Boundaries (`SpatialBoundary`, `EndingSpatialBoundary`, `RouteErrorBoundary`).
+> The core invariant holds everywhere: **no property on any element is written by two engines.**
 
 ## Spatial scene bounds (all implemented)
 - ONE shared Canvas. No canvas per card/section/article.

@@ -104,15 +104,12 @@ Required by the Visual + Interaction Override, §20. One entry per change: what 
 
 ---
 
-## 7 · Not done in this pass
+## 7 · Completed in the `2026-10-18` Skill Pack & Review Pass
 
-Stated plainly rather than implied:
-
-- `/categories`, `/community`, `/about`, `/ambassadors`, `/submit`, `/contact`, `/room` have **no StringTune usage yet**. The directive asks for navigation/search state motion and form-assisted interaction; neither is implemented.
-- Kinetic typography still uses the existing motion `SplitText`. `StringSplit` is registered but unused — the existing component already does a masked per-word reveal with a correct `aria-label`, and replacing it would be substitution rather than improvement. If a progress-scrubbed heading is wanted, `splitOnProgress()` exists for it.
-- No masonry. No sequence. No cursor follower. Reasons in `VERLYSE-INTERACTION-SYSTEM.md` §2.
-- **No visual verification.** No browser is installable in this environment, so §21's "the site looks essentially unchanged" test and §22's creative test are unanswered. They need a human with the site open.
-- **No performance measurement.** Bundle sizes are real and measured; LCP/CLS/INP/FPS are not measured and are not claimed.
+- **Extended StringTune across `/categories`, `/community`, `/about`, `/creator/:authorId`, `Footer`, and `ArtGallery`**: Wired `spotlight()` onto `/categories` index shelves, `/community` `FilmFrame` cards, `/about` Sheet IV founder portrait, `Footer` newsletter card, and `WriterProfile` portrait, plus `spotlitGlide('restrained')` onto `WriterProfile` related plates and `ArtGallery` exhibition plates (`transition-[border-color,box-shadow]`).
+- **StringTune 4-module allowlist & race-safe reduced-motion lifecycle**: Trimmed `src/lib/stringTune/boot.ts` to the 4 active modules (`StringProgress`, `StringGlide`, `StringParallax`, `StringSpotlight`; `dist/assets/boot-CfrjN6Gu.js`: `199.82 kB` / `51.65 kB` gzip), updated `drift()` in `src/lib/stringTune/attrs.ts` to `string: 'progress|parallax[]'`, and added generation-checked start/stop serialization in `runtime.ts` + `StringTuneProvider.tsx`.
+- **Evicted `gsap` from `Header`/`index-*.js` and gated `animejs` & `StoryEnding3D`**: Migrated `Magnetic` to `src/components/ui/Magnetic.tsx` (`motion/react` `useSpring`), isolated `gsap` (`dist/assets/gsap-a3sj5zmn.js`, `114.01 kB` / `45.16 kB` gzip), lazy-gated `animejs` (`dist/assets/anime-CcJk6tc-.js`, `32.40 kB` / `13.15 kB` gzip) inside `BrassRule.tsx` on `!reduce && near`, and lazy-gated `StoryEnding3D` (`dist/assets/StoryEnding3D-CDvXr6Hv.js`, `10.93 kB` / `3.21 kB` gzip) inside `EndingSpatialStage` on `glSupported && !reduce && near && tabVisible`.
+- **Verified in headless Chromium (`153.0.8010.0`)**: Executed `asset-audit.mjs` (`45/45` role subset + `104/104` full public media/font inventory), `interaction-audit.mjs` (`17/17` checks including `quiet-grief-gallery-computed-layout`), and `verify-flags.mjs` with `0` console errors.
 
 ---
 
@@ -120,12 +117,13 @@ Stated plainly rather than implied:
 
 | Check | Result |
 |---|---|
-| `tsc -b` | pass |
-| `vite build` | pass — 52 shells, 52 sitemap URLs |
-| `test:metadata` | pass — registry coherent |
-| `test:smoke` | pass — 19 SSR routes render (proves the runtime is client-only and does not break prerender) |
-| `test:flows` (jsdom) | 7/7 — dialog semantics, search keyboard contract, focus restoration, save persistence, 12× mount/unmount clean |
-| `test:newsletter` | pass |
+| `tsc -b` & `npm run typecheck:api` | pass |
+| `vite build` | pass — 54 shells, 54 sitemap URLs |
+| `test:metadata` | pass — registry coherent (54 shells, 54 sitemap URLs) |
+| `test:smoke` | pass — 20/20 SSR route cases render (18 valid routes across all 11 `<Route>` patterns + 2 missing-slug 404 fallbacks) |
+| `test:flows` (jsdom) | 14/14 — dialog semantics, search keyboard contract, focus restoration, save persistence + single-item removal sync, `ArtGallery` layout & transform ownership, editorial published/provisional counts, craft `aria-pressed` states, StringTune pending-boot race safety, 12× mount/unmount clean |
+| `test:newsletter` | pass (15/15 synthetic checks; live production verification pending / blocked in sandbox) |
 | `check:secrets` | pass |
-| entry chunk unchanged | 93 KB gzip before and after |
-| StringTune chunk lazy + shaken | 130 KB → **59 KB** gzip |
+| Chromium `asset-audit`, `interaction-audit`, `verify-flags` | pass — 45/45 role subset & 104/104 full public media/font inventory, 17/17 interaction checks, 0 console errors |
+| entry chunk (`dist/assets/index-Br7b5VOr.js`) | `89.38 kB` gzip (`gsap` bundled) → `51.49 kB` gzip (`gsap` evicted) → **`58.04 kB` gzip** (`180.42 kB` raw, including `EditorialCraftSystem`) |
+| StringTune chunk (`dist/assets/boot-CfrjN6Gu.js`) | `130 kB` → `60.60 kB` (7 modules) → **`51.65 kB` gzip** (`199.82 kB` raw, 4 active modules only) |

@@ -99,6 +99,7 @@ export default function SavedDrawer() {
     const next = saved.filter((s) => s.id !== id)
     try { localStorage.setItem(KEY, JSON.stringify(next)) } catch {}
     setSaved(next)
+    window.dispatchEvent(new CustomEvent('verlyse:saved-updated'))
   }
 
   return (

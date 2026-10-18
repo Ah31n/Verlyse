@@ -130,18 +130,49 @@ interface HandlerResponse {
   status(code: number): { end(): void; json(body: unknown): void }
 }
 
-const DEFAULT_ALLOWED_ORIGINS = [
+const PRODUCTION_ALLOWED_ORIGINS = [
+  'https://verlysemedia.kesug.com',
   'https://verlyse-react.vercel.app',
-  'http://localhost:5173',
-  'http://localhost:4173',
 ]
 
+const DEV_ALLOWED_ORIGINS = [
+  'http://localhost:5173',
+  'http://localhost:4173',
+  'http://127.0.0.1:5173',
+  'http://127.0.0.1:4173',
+]
+
+function isProductionRuntime(): boolean {
+  return (
+    process.env.VERCEL_ENV === 'production' ||
+    process.env.NODE_ENV === 'production'
+  )
+}
+
+/**
+ * Effective CORS allowlist:
+ * - If `ALLOWED_ORIGINS` is set in the server environment, its comma-separated
+ *   list overrides the built-in default (in production runtime, any `localhost`
+ *   or `127.0.0.1` entries are excluded).
+ * - Otherwise, production runtime allows only `PRODUCTION_ALLOWED_ORIGINS`
+ *   (`https://verlysemedia.kesug.com`, `https://verlyse-react.vercel.app`),
+ *   while non-production runtimes additionally allow `DEV_ALLOWED_ORIGINS`.
+ */
 function allowedOrigins(): Set<string> {
+  const prod = isProductionRuntime()
   const configured = process.env.ALLOWED_ORIGINS
     ?.split(',')
     .map((origin) => origin.trim())
     .filter(Boolean)
-  return new Set(configured?.length ? configured : DEFAULT_ALLOWED_ORIGINS)
+  const raw = configured?.length
+    ? configured
+    : prod
+      ? PRODUCTION_ALLOWED_ORIGINS
+      : [...PRODUCTION_ALLOWED_ORIGINS, ...DEV_ALLOWED_ORIGINS]
+  const filtered = prod
+    ? raw.filter((origin) => !/^https?:\/\/(localhost|127\.0\.0\.1)(:\d+)?$/i.test(origin))
+    : raw
+  return new Set(filtered)
 }
 
 function applyCors(req: HandlerRequest, res: HandlerResponse) {

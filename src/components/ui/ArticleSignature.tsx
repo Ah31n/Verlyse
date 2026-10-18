@@ -733,6 +733,41 @@ function SceneQuietGrief({ anim }: { anim: boolean }) {
   )
 }
 
+/* ================================================================== */
+/* 21 · SHE DIDN'T SAY QUBOOL HAI — two parted threshold rings and    */
+/* a rising brass voice line: a marriage without consent is not a     */
+/* marriage.                                                          */
+/* ================================================================== */
+function SceneQuboolHai({ anim }: { anim: boolean }) {
+  const { ref, show } = useShow(anim)
+  return (
+    <Stage label="consent matters">
+      <div ref={ref} className="flex flex-col items-center gap-8">
+        <svg viewBox="0 0 380 210" className="h-[clamp(180px,28vh,300px)] w-auto" aria-hidden="true">
+          <line x1="44" y1="158" x2="336" y2="158" stroke="rgba(184,145,70,0.45)" strokeWidth="1.2" />
+          {/* Two parted rings — coercion broken open */}
+          <circle cx="142" cy="116" r="28" fill="none" stroke="rgba(248,246,242,0.45)" strokeWidth="1.3" strokeDasharray="135 45" />
+          <circle cx="238" cy="116" r="28" fill="none" stroke="rgba(184,145,70,0.65)" strokeWidth="1.3" strokeDasharray="135 45" transform="rotate(180 238 116)" />
+          {/* Unbroken vertical voice line rising between them */}
+          <line
+            x1="190"
+            y1="158"
+            x2="190"
+            y2={show || !anim ? '54' : '124'}
+            stroke="#D4B06A"
+            strokeWidth="1.5"
+            className="transition-all duration-1000"
+          />
+          <circle cx="190" cy="50" r="4.5" fill="#D4B06A" opacity={show || !anim ? 0.95 : 0.35} />
+        </svg>
+        <p aria-hidden="true" className="max-w-[44ch] text-center font-serif text-lg font-light italic leading-[1.6] text-ivory/75">
+          “A marriage without consent is not a marriage.”
+        </p>
+      </div>
+    </Stage>
+  )
+}
+
 const SIGNATURES: Record<string, { name: string; ownFin?: boolean; scene: (anim: boolean) => ReactNode }> = {
   'their-voices-matter': { name: 'the voice', ownFin: true, scene: (anim) => <SceneVoices anim={anim} /> },
   '3-13': { name: 'the wait', scene: () => <SceneClock /> },
@@ -754,6 +789,7 @@ const SIGNATURES: Record<string, { name: string; ownFin?: boolean; scene: (anim:
   'the-garden-beyond-my-tower': { name: 'she prays', scene: () => <SceneGarden /> },
   'mir-raza-ali': { name: 'the cart', scene: (anim) => <SceneMirRaza anim={anim} /> },
   'the-quiet-grief': { name: 'the colours never faded', scene: (anim) => <SceneQuietGrief anim={anim} /> },
+  'she-didnt-say-qubool-hai': { name: 'consent matters', scene: (anim) => <SceneQuboolHai anim={anim} /> },
 }
 
 export default function ArticleSignature({ article }: { article: Article }) {

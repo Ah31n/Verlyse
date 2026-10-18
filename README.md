@@ -1,11 +1,11 @@
 # Verlyse Media — React Edition
 
 **Where Vision Becomes A Voice.** A production-grade editorial publication built with
-React, TypeScript, Tailwind CSS and Framer Motion. Content is grounded entirely in
-the real Instagram post datasets (2026-08-01/02, all kept in `/home/user/uploads/`),
-the profile screenshots, and the founder article — 19 features, 15 credited
-creators, 95 real images (self-hosted), real captions, and real comments beneath
-every work. Nothing is invented.
+React, TypeScript, Tailwind CSS, `motion/react`, and `@fiddle-digital/string-tune`. Content is grounded entirely in
+the real Instagram post datasets (2026-08-01/02, 2026-10-10, and 2026-10-15),
+the profile screenshots, and the founder article — 21 catalogued features (19 published folios + 2 provisional carousel-led features), 15 credited
+creators (plus the platform record), 104 self-hosted media and font assets (`100` image/SVG files + `4` `.woff2` font files), real captions, and real comments beneath
+every work. Nothing is invented. See [`docs/SKILLPACK-STACK-ASSESSMENT.md`](docs/SKILLPACK-STACK-ASSESSMENT.md) for the complete UI & Motion Stack assessment.
 
 
 ## The Portrait Rule (permanent)
@@ -55,14 +55,15 @@ Creator portraits are contributor photographs in an editorial magazine — never
 | Their Voices Matter | Alina Javed @lina_.jved | Social Issues | 26.06 |
 | Mir Raza Ali | Verlyse Media @verlyse.media | Social Issues | 27.08 |
 | The Quiet Grief | Verlyse Media @verlyse.media | Art (carousel-led feature) | 10.10 |
+| She Didn’t Say Qubool Hai | Haieqa Wahab @miss_haieqa · Ed. Wajiha Ahmed | Social Issues (carousel-led feature) | 15.10 |
 
 ## Pages (dataset-only content)
 
 | Route | Page |
 |---|---|
-| `/` | Home — masthead, ledger (19 features · 15 creators · 1281 appreciations · 585 conversations), feed strip, departments |
+| `/` | Home — masthead, ledger (21 features · 15 creators · 1281 appreciations · 585 conversations), feed strip, departments |
 | `/about` | About — the platform's mission, values, milestones, founder |
-| `/articles` | Articles — all 19 features with filters and search |
+| `/articles` | Articles — all 21 features with filters and search |
 | `/article/:id` | Feature — full extracted text, plates, unique ending, conversations |
 | `/categories` | Categories — all 7 departments of the feed |
 | `/community` | Community — real numbers, real voices, transparency |

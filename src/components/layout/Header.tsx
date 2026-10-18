@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
 import { Link, useLocation } from 'react-router-dom'
 import { AnimatePresence, motion, useReducedMotion } from 'motion/react'
-import { Magnetic } from '../cinematic'
+import { Magnetic } from '../ui/Magnetic'
 import { trapFocus } from '../../lib/focus'
 import { BRAND, MENU_LINKS, NAV_LINKS } from '../../data/content'
 import { useBodyScrollLock } from '../../hooks/useBodyScrollLock'
@@ -102,15 +102,26 @@ export default function Header() {
       <header
         className={`fixed inset-x-0 top-0 z-[1100] border-b transition-all duration-500 ${
           scrolled && !menuOpen
-            ? 'border-white/10 bg-[#25070F]/[0.97] shadow-[0_12px_34px_rgba(6,1,4,0.35)] backdrop-blur-[6px]'
-            : 'border-transparent bg-transparent'
+            ? 'h-[68px] border-white/10 bg-[#25070F]/[0.97] shadow-[0_12px_34px_rgba(6,1,4,0.35)] backdrop-blur-[6px]'
+            : 'h-[82px] border-white/[0.08] bg-[#1B050B]/70 backdrop-blur-[4px]'
         }`}
       >
-        <div className={`mx-auto flex max-w-page items-center justify-between gap-4 px-[clamp(1.75rem,5.5vw,4.75rem)] transition-[height] duration-500 max-[479px]:gap-2.5 max-[479px]:px-4 lg:gap-4 lg:px-4 xl:gap-3 xl:px-5 2xl:gap-6 2xl:px-[clamp(1.75rem,5.5vw,4.75rem)] ${scrolled ? 'h-[68px]' : 'h-[86px]'}`}>
-          <Link to="/" className="flex shrink-0 items-center gap-3 text-ivory no-underline max-[479px]:gap-2" aria-label="Verlyse Media — home">
-            <svg viewBox="0 0 40 40" aria-hidden="true" className="h-[30px] w-[30px] text-gold transition-transform duration-700 ease-out hover:rotate-90">
-              <circle cx="20" cy="20" r="18.5" fill="none" stroke="currentColor" strokeWidth="1" />
-              <path d="M12.5 14.5 L20 27 L27.5 14.5" fill="none" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round" />
+        <div className="mx-auto flex h-full max-w-page items-center justify-between gap-4 px-[clamp(1.75rem,5.5vw,4.75rem)] max-[479px]:gap-2.5 max-[479px]:px-4 lg:gap-4 lg:px-4 xl:gap-3 xl:px-5 2xl:gap-6 2xl:px-[clamp(1.75rem,5.5vw,4.75rem)]">
+          <Link to="/" className="group/brand flex shrink-0 items-center gap-3 text-ivory no-underline max-[479px]:gap-2" aria-label="Verlyse Media — home">
+            <svg viewBox="0 0 44 44" aria-hidden="true" className="h-[34px] w-[34px] text-gold transition-transform duration-700 ease-out group-hover/brand:rotate-45">
+              {/* Outer Logosystem / Shapes Gallery octagonal registration ring */}
+              <circle cx="22" cy="22" r="20.5" fill="none" stroke="currentColor" strokeOpacity="0.38" strokeWidth="0.8" strokeDasharray="2 2.5" />
+              <circle cx="22" cy="22" r="17.5" fill="none" stroke="currentColor" strokeWidth="0.95" />
+              <rect x="11.5" y="11.5" width="21" height="21" fill="none" stroke="currentColor" strokeOpacity="0.3" strokeWidth="0.7" transform="rotate(45 22 22)" />
+              {/* Cardinal ticks */}
+              <line x1="22" y1="1.5" x2="22" y2="5" stroke="currentColor" strokeWidth="1" />
+              <line x1="22" y1="39" x2="22" y2="42.5" stroke="currentColor" strokeWidth="1" />
+              <line x1="1.5" y1="22" x2="5" y2="22" stroke="currentColor" strokeWidth="1" />
+              <line x1="39" y1="22" x2="42.5" y2="22" stroke="currentColor" strokeWidth="1" />
+              {/* Split-serif V monogram + botanical calyx node */}
+              <path d="M14.5 16 L22 30.5 L29.5 16" fill="none" stroke="currentColor" strokeWidth="1.45" strokeLinecap="round" strokeLinejoin="round" />
+              <path d="M12.5 16 H16.5 M27.5 16 H31.5" fill="none" stroke="currentColor" strokeWidth="1.1" strokeLinecap="round" />
+              <circle cx="22" cy="12.2" r="1.7" fill="#8C2036" stroke="currentColor" strokeWidth="0.8" />
             </svg>
             <span className="flex items-baseline gap-[0.32em] font-serif text-2xl leading-none max-[479px]:text-lg">
               <span>Verlyse</span>
@@ -222,12 +233,12 @@ export default function Header() {
             animate={{ y: 0 }}
             exit={{ y: '-102%' }}
             transition={{ duration: 0.85, ease: [0.65, 0.05, 0.36, 1] }}
-            className="fixed inset-0 z-[1050] flex flex-col justify-center overflow-y-auto bg-gradient-to-b from-wine-deep via-[#2A0811] to-charcoal px-[clamp(1.75rem,5.5vw,4.75rem)] py-24"
+            className="fixed inset-0 z-[1050] flex flex-col justify-start overflow-y-auto bg-gradient-to-b from-wine-deep via-[#2A0811] to-charcoal px-[clamp(1.75rem,5.5vw,4.75rem)] pb-14 pt-24 md:justify-center md:py-24"
           >
             <p aria-hidden="true" className="pointer-events-none fixed bottom-[-3rem] left-1/2 -translate-x-1/2 select-none font-serif font-semibold text-[clamp(9rem,42vw,15rem)] leading-none text-transparent [-webkit-text-stroke:1px_rgba(248,246,242,0.06)]">
               Verlyse
             </p>
-            <nav className="relative z-10 mx-auto flex w-full max-w-[860px] flex-col" aria-label="Site index">
+            <nav className="relative z-10 mx-auto my-auto flex w-full max-w-[860px] flex-col" aria-label="Site index">
               {MENU_LINKS.map((l, i) => (
                 <motion.div
                   key={l.to}
@@ -237,7 +248,7 @@ export default function Header() {
                 >
                   <Link
                     to={l.to}
-                    className="group flex items-baseline gap-6 py-2 font-serif text-[clamp(2.5rem,9.5vw,4.6rem)] font-light leading-[1.22] text-ivory no-underline transition-colors duration-300 hover:text-gold"
+                    className="group flex items-baseline gap-5 py-1.5 font-serif text-[clamp(2rem,8vw,4.4rem)] font-light leading-[1.2] text-ivory no-underline transition-colors duration-300 hover:text-gold sm:gap-6 sm:py-2"
                   >
                     <span className="font-mono text-xs tracking-[0.2em] text-gold">{String(i + 1).padStart(2, '0')}</span>
                     {l.label}

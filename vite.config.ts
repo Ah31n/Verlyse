@@ -1,5 +1,7 @@
 import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
+import * as fs from 'node:fs'
+import * as path from 'node:path'
 
 /**
  * Build config.
@@ -22,7 +24,44 @@ import react from '@vitejs/plugin-react'
  * manualChunks block and re-measure.
  */
 export default defineConfig({
-  plugins: [react()],
+  plugins: [
+    react(),
+    {
+      name: 'verlyse-scraper-slide-cache',
+      configureServer(server) {
+        server.middlewares.use('/__cache-scraper-slide', (req, res) => {
+          if (req.method !== 'POST') {
+            res.statusCode = 405
+            res.end()
+            return
+          }
+          const url = new URL(req.url || '', 'http://localhost')
+          const file = path.basename(url.searchParams.get('file') || '')
+          if (!/^Dehg27tE_hF-[1-9]\.webp$/.test(file)) {
+            res.statusCode = 400
+            res.end()
+            return
+          }
+          const targetPath = path.resolve(process.cwd(), 'public/img/works', file)
+          if (fs.existsSync(targetPath)) {
+            res.statusCode = 200
+            res.end('exists')
+            return
+          }
+          const chunks: Buffer[] = []
+          req.on('data', (c: Buffer) => chunks.push(c))
+          req.on('end', () => {
+            const buf = Buffer.concat(chunks)
+            if (buf.byteLength > 1024) {
+              fs.writeFileSync(targetPath, buf)
+            }
+            res.statusCode = 200
+            res.end('ok')
+          })
+        })
+      },
+    },
+  ],
   // Allow the platform's live-preview host (a sandboxed proxy origin) to reach
   // the dev server. This is development-only and does not affect production.
   server: {
@@ -50,6 +89,12 @@ export default defineConfig({
           // only for framer-motion used to be correct and no longer is.
           if (id.includes('node_modules/framer-motion')) return 'motion'
           if (id.includes('node_modules/motion')) return 'motion'
+
+          // Isolate GSAP and Anime.js into dedicated chunks so routes that do
+          // not mount cinematic ScrollTrigger primitives (/articles, /article/*,
+          // /categories/*, /creator/*, /room) never download them.
+          if (id.includes('node_modules/gsap')) return 'gsap'
+          if (id.includes('node_modules/animejs')) return 'anime'
 
           // react-router-dom's path CONTAINS 'node_modules/react', so it must
           // be claimed before the react test or it silently lands in the react

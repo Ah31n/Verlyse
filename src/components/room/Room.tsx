@@ -315,7 +315,7 @@ export default function Room() {
               A spatial archive of {count} folios
             </p>
             <h1 className="mt-4 max-w-[10ch] font-serif text-[clamp(2.7rem,13vw,7.5rem)] font-semibold leading-[0.94] md:max-w-none">
-              The Keeping<br />Room
+              The Keeping <br />Room
             </h1>
             <p className="mt-6 max-w-xl font-serif text-[clamp(1.1rem,2vw,1.5rem)] italic leading-snug text-cream/90">
               Enter quietly. Pull a plate when a title calls to you. Read, then return it
@@ -496,9 +496,8 @@ export default function Room() {
                 ref={searchRef}
                 value={query}
                 onChange={(e) => setQuery(e.target.value)}
-                placeholder="title, author, or category…"
                 aria-label="Search folios"
-                className="mt-6 w-full border-b border-gold/60 bg-transparent pb-3 text-center font-serif text-3xl italic text-ivory placeholder:text-ivory/30 focus:outline-none focus:ring-0 md:text-4xl"
+                className="mt-6 w-full border-b border-gold/60 bg-transparent pb-3 text-center font-serif text-3xl italic text-ivory focus:outline-none focus:ring-0 md:text-4xl"
               />
               <ul className="mt-6 space-y-2">
                 {searchResults.map((f) => (

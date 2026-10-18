@@ -1,7 +1,9 @@
 import { useEffect, useState } from 'react'
+import { useLocation } from 'react-router-dom'
 import { motion, AnimatePresence, useReducedMotion } from 'motion/react'
 import { ARTICLES, LEDGER, getAuthor, stampDate } from '../../data/content'
 import { introSeen, markIntroSeen, skipIntro } from '../../lib/intro'
+import { useBodyScrollLock } from '../../hooks/useBodyScrollLock'
 
 /**
  * First-load preloader — the entrance of the magazine, held to its budget.
@@ -15,30 +17,31 @@ import { introSeen, markIntroSeen, skipIntro } from '../../lib/intro'
  *
  * It can never hold anyone: a Skip control answers instantly; reduced-motion
  * visitors skip straight to the magazine at rest; a repeat visit within the
- * session skips without being asked (sessionStorage); and a hard timer closes
- * the curtain even if any of the above fails. No counter, no shimmer, no
- * blank state — the wine hall behind the curtain is already painted.
+ * session skips without being asked (sessionStorage); deep-linked interior
+ * routes skip straight to their page without showing the home cover curtain;
+ * and a hard timer closes the curtain even if any of the above fails.
  */
 export default function Preloader() {
-  // if this session has already opened the magazine (or motion is reduced),
-  // the curtain never falls at all
+  const { pathname } = useLocation()
   const reduce = useReducedMotion() === true
-  const [done, setDone] = useState(() => reduce || introSeen())
+  const isHomeEntry = pathname === '/'
+  const [done, setDone] = useState(() => {
+    if (reduce || introSeen()) return true
+    if (!isHomeEntry) {
+      markIntroSeen()
+      return true
+    }
+    return false
+  })
   const [skipped, setSkipped] = useState(false)
+
+  useBodyScrollLock(!done)
 
   useEffect(() => {
     if (done) return
     // hard ceiling — the intro cannot outlive its own timer
     const t = setTimeout(() => { markIntroSeen(); setDone(true) }, 1900)
     return () => clearTimeout(t)
-  }, [done])
-
-  useEffect(() => {
-    document.documentElement.classList.toggle('preloading', !done)
-    if (done) {
-      const t = setTimeout(() => document.documentElement.classList.add('loaded'), 800)
-      return () => clearTimeout(t)
-    }
   }, [done])
 
   const skip = () => {

@@ -19,12 +19,11 @@ Registered in `src/lib/stringTune/boot.ts`. **That list is the bundle.** Anythin
 | Module | Registered | Surface | Attribute helper |
 |---|---|---|---|
 | `StringProgress` | always | `/article/:id` — the reading measure under the hero, filling as the reader moves through the feature | `progress()` |
-| `StringGlide` | always | `/articles` — each folio's cover plate lags the scroll, so the shelf reads with depth rather than as a flat grid | `spotlitGlide()` |
-| `StringSplit` | always | reserved; the display headings are still served by the existing `SplitText` (see §4) | `split()` |
-| `StringLerp` | always | reserved for scroll-velocity skew | `lerp()` |
+| `StringGlide` | always | `/articles`, `ArtGallery`, `WriterProfile` — each folio's cover plate lags the scroll, so the shelf reads with depth rather than as a flat grid | `spotlitGlide()` |
 | `StringParallax` | desktop only | `/` — the feature cover plate drifts against the page at a restrained rate | `drift('restrained')` |
-| `StringSpotlight` | desktop only | `/articles` folio plates and `/creators` portrait plates — light follows the cursor across the plate | `spotlight()` |
-| `StringMagnetic` | desktop only | available; the existing GSAP `Magnetic` still owns the current call sites (see §5) | `magnetic()` |
+| `StringSpotlight` | desktop only | `/articles`, `/creators`, `/categories`, `/community`, `/about`, `Footer`, `WriterProfile`, and `ArtGallery` plates — light follows the cursor across the plate | `spotlight()` |
+
+*(Note: `src/lib/stringTune/boot.ts` registers only these **4 active modules** (`UNIVERSAL_MODULES = [StringProgress, StringGlide]`, `POINTER_MODULES = [StringParallax, StringSpotlight]`, emitted as `dist/assets/boot-CfrjN6Gu.js`: `199.82 kB` / `51.65 kB` gzip), `drift()` in `attrs.ts` uses `string: 'progress|parallax[]'`, and `runtime.ts` + `StringTuneProvider.tsx` enforce generation-checked start/stop serialization on `prefers-reduced-motion: reduce` and unmount.)*
 
 ### Modules deliberately NOT used
 
@@ -75,11 +74,9 @@ This was the main design constraint, and it shaped every insertion point:
 
 ---
 
-## 5 · A reversal worth flagging
+## 5 · GSAP isolation & `Magnetic` migration (`2026-10-18` update)
 
-An earlier decision in this project was **"consolidate hard — drop GSAP and Anime.js entirely."** §5 of this directive instead keeps GSAP "for already-established cinematic sequences" and forbids arbitrary new GSAP scenes.
-
-**This directive was followed.** GSAP and Anime.js remain; no new GSAP was added. The consequence is that the publication now runs four animation systems, and GSAP still ships in the 93 KB entry chunk because `Header` imports `Magnetic`. That cost is now a deliberate, documented choice rather than an oversight.
+Per §5 of the directive, GSAP remains for already-established `ScrollTrigger` camera sequences (`CrashZoom`, `DepthStage`, `DepthLayer`, `OrbitalDrift`, `PushIn`, `MaskReveal`, `Tilt3D`, `Rise3D` in `src/components/cinematic/primitives.tsx`) and no new GSAP scenes were added. However, `Magnetic` was migrated to `src/components/ui/Magnetic.tsx` (`motion/react` `useMotionValue` + `useSpring`), `vite.config.ts` isolates `gsap` (`dist/assets/gsap-a3sj5zmn.js`, `114.01 kB` / `45.16 kB` gzip) into a lazy chunk, and `BrassRule.tsx` dynamically imports `animejs` (`dist/assets/anime-CcJk6tc-.js`, `32.40 kB` / `13.15 kB` gzip) only when `!reduce && near`. As a result, `Header.tsx` no longer pulls `gsap` into the initial entry chunk (`252.87 kB` / `89.38 kB` gzip before `gsap` eviction; `154.45 kB` / `51.49 kB` gzip immediately after `gsap` eviction prior to `EditorialCraftSystem`; `dist/assets/index-Br7b5VOr.js` at `180.42 kB` / `58.04 kB` gzip in the current build with `EditorialCraftSystem`), and 47 of 54 routes never download `gsap`.
 
 ---
 
@@ -113,12 +110,14 @@ The `@media (prefers-reduced-motion: reduce)` block in the contract then flatten
 
 ## 8 · Performance
 
-Measured, gzipped, from a real build:
+Measured, gzipped, from the current production build (`arena/741ed410-verlyse`, branched from `ea6392572d2481ef3f197799ac0ac2917e9e135a`):
 
-| Chunk | Before | After |
+| Chunk | Historical baseline (`gsap` in `index`) | Current build (`npm run build`) |
 |---|---|---|
-| entry `index` | 93 KB | **93 KB — unchanged** |
-| StringTune (lazy) | — | **59 KB** |
+| entry (`dist/assets/index-Br7b5VOr.js`) | `252.87 kB` (`89.38 kB` gzip) | **`180.42 kB` (`58.04 kB` gzip)** (`gsap` evicted; includes shared `EditorialCraftSystem`; was `154.45 kB` / `51.49 kB` gzip prior to `EditorialCraftSystem`) |
+| StringTune (`dist/assets/boot-CfrjN6Gu.js`, lazy) | `233.36 kB` (`59.09 kB` gzip, 7 modules) | **`199.82 kB` (`51.65 kB` gzip)** (4 active modules in `boot.ts`) |
+| `dist/assets/gsap-a3sj5zmn.js` (lazy on secondary camera routes) | bundled in `index` | **`114.01 kB` (`45.16 kB` gzip)** |
+| `dist/assets/anime-CcJk6tc-.js` (lazy inside `BrassRule` when `!reduce && near`) | bundled in `About` | **`32.40 kB` (`13.15 kB` gzip)** |
 
 The library is dynamically imported on `requestIdleCallback` after first paint, so it is not on the critical path and cannot delay LCP.
 

@@ -23,7 +23,11 @@ function LetterHint({ id, show, children }: { id: string; show: boolean; childre
  * that is pressed when the letter is sent. When the seal is pressed,
  * the letter becomes its acknowledgement.
  */
-import { CrashZoom , MaskReveal } from '../components/cinematic'
+import { CrashZoom } from '../components/cinematic'
+import {
+  FloralWord,
+  HaikeiContourPlane,
+} from '../components/ui/EditorialCraftSystem'
 
 export default function Contact() {
   useSeo({
@@ -127,19 +131,20 @@ path: '/contact',
         {/* the quietest of the two desks — low light, intimate */}
         <div aria-hidden="true" className="pointer-events-none absolute inset-0">
           <div className="absolute inset-0 bg-[radial-gradient(70%_50%_at_50%_0%,rgba(232,217,168,0.12),transparent_60%),radial-gradient(110%_85%_at_50%_0%,rgba(92,18,36,0.32),transparent_62%),linear-gradient(175deg,#3E0D17_0%,#2A0F18_58%,#15050B_100%)]" />
+          <HaikeiContourPlane tone="dark" seed={9} className="opacity-20" />
         </div>
         <div className="relative mx-auto w-full max-w-page px-[clamp(1.25rem,4vw,4.75rem)] text-center">
           <Reveal><p className="eyebrow">Verlyse Media — the desk</p></Reveal>
-          <h1 className="relative mt-8 font-serif text-[clamp(2.6rem,7vw,5.5rem)] font-light leading-[0.92] tracking-[-0.02em] text-ivory">
-                        <CrashZoom className="pointer-events-none absolute inset-x-0 top-1/2 -translate-y-1/2">
-              <span aria-hidden="true" className="block select-none whitespace-nowrap font-serif text-[clamp(3.2rem,8.5vw,7rem)] font-semibold leading-none text-transparent [-webkit-text-stroke:1px_rgba(184,145,70,0.13)]">
+          <div className="relative mt-8">
+            <CrashZoom className="pointer-events-none absolute inset-x-0 top-1/2 -translate-y-1/2">
+              <span aria-hidden="true" className="block select-none whitespace-nowrap font-serif text-[clamp(3.2rem,8.5vw,7rem)] font-semibold leading-none text-transparent [-webkit-text-stroke:1px_rgba(184,145,70,0.08)]">
                 THE CORRESPONDENCE DESK
               </span>
             </CrashZoom>
-            <MaskReveal>
-              <span className="relative">The correspondence <em className="italic text-gold">desk</em></span>
-            </MaskReveal>
-          </h1>
+            <h1 className="relative font-serif text-[clamp(2.6rem,7vw,5.5rem)] font-light leading-[0.92] tracking-[-0.02em] text-ivory">
+              <span className="relative">The correspondence <FloralWord variant="wax-rose">desk</FloralWord></span>
+            </h1>
+          </div>
           <Reveal delay={0.2}>
             <p className="mt-6 font-mono text-[10px] uppercase tracking-[0.3em] text-gold/85">
               Write to the publication — a letter, not a form
@@ -172,9 +177,9 @@ path: '/contact',
                     <span className="font-mono text-[10px] uppercase tracking-[0.28em] text-white/55">{role}</span>
                     {href ? (
                       href.startsWith('http') ? (
-                        <a href={href} rel="noopener noreferrer" target="_blank" className="font-serif text-2xl font-normal italic text-ivory no-underline transition-colors hover:text-gold">{value}</a>
+                        <a href={href} rel="noopener noreferrer" target="_blank" className="break-all font-serif text-2xl font-normal italic text-ivory no-underline transition-colors hover:text-gold sm:break-normal">{value}</a>
                       ) : (
-                        <a href={href} className="font-serif text-2xl font-normal italic text-ivory no-underline transition-colors hover:text-gold">{value}</a>
+                        <a href={href} className="break-all font-serif text-2xl font-normal italic text-ivory no-underline transition-colors hover:text-gold sm:break-normal">{value}</a>
                       )
                     ) : (
                       <span className="font-serif text-2xl font-normal italic text-ivory/85">{value}</span>
@@ -255,7 +260,6 @@ path: '/contact',
                           name="name"
                           type="text"
                           autoComplete="name"
-                          placeholder="your name"
                           value={name}
                           aria-invalid={errors.includes('name') ? 'true' : undefined}
                           aria-describedby={errors.includes('name') ? 'cf-name-err' : undefined}
@@ -274,7 +278,6 @@ path: '/contact',
                           name="email"
                           type="email"
                           autoComplete="email"
-                          placeholder="your@email.com"
                           aria-invalid={errors.includes('email') ? 'true' : undefined}
                           aria-describedby={errors.includes('email') ? 'cf-email-err' : undefined}
                           onInput={() => clearFieldError('email')}
@@ -288,7 +291,6 @@ path: '/contact',
                           id="cf-subject"
                           name="subject"
                           type="text"
-                          placeholder="what the letter is about"
                           aria-invalid={errors.includes('subject') ? 'true' : undefined}
                           aria-describedby={errors.includes('subject') ? 'cf-subject-err' : undefined}
                           onInput={() => clearFieldError('subject')}
@@ -302,7 +304,6 @@ path: '/contact',
                           id="cf-msg"
                           name="message"
                           rows={6}
-                          placeholder="Write it as you would to a reader, not a form —"
                           aria-invalid={errors.includes('message') ? 'true' : undefined}
                           aria-describedby={errors.includes('message') ? 'cf-msg-err' : undefined}
                           onInput={() => clearFieldError('message')}
@@ -313,12 +314,11 @@ path: '/contact',
 
                     {/* closing — the signature fills as the writer writes */}
                     <div className="mt-10 flex flex-wrap items-end justify-between gap-x-10 gap-y-8 border-t border-wine/15 pt-8">
-                      <div className="min-w-[240px]">
+                      <div className="min-w-0 sm:min-w-[240px]">
                         <p className="font-serif text-lg font-light italic leading-[1.4] text-wine">With thanks,</p>
                         <p aria-hidden="true" className="mt-3 min-h-[2.2rem] font-serif text-[1.7rem] font-light italic leading-none text-wine" style={{ transform: 'rotate(-1.5deg)' }}>
-                          {name || <span className="text-wine/30">— your name, when you write it</span>}
+                          {name || <span className="text-wine/35">—</span>}
                         </p>
-                        <p className="mt-2 font-mono text-[8px] uppercase tracking-[0.30em] text-wine/70">Signs itself as you write</p>
                       </div>
                       <div className="flex flex-col items-start gap-4">
                         <button type="submit" disabled={sending} aria-busy={sending} className="btn btn-seal disabled:pointer-events-none disabled:opacity-60">

@@ -171,9 +171,8 @@ export default function SearchOverlay() {
               autoComplete="off"
               value={q}
               onChange={(e) => setQ(e.target.value)}
-              placeholder="Stories, writers, genres…"
               aria-label="Search articles"
-              className="mt-5 w-full border-0 border-b border-gold/40 bg-transparent pb-4 font-serif text-2xl font-light text-ivory outline-none placeholder:italic placeholder:text-ivory/35 focus:border-gold"
+              className="mt-5 w-full border-0 border-b border-gold/40 bg-transparent pb-4 font-serif text-2xl font-light text-ivory outline-none focus:border-gold"
             />
 
             <p className="mt-3 font-mono text-[10px] uppercase tracking-[0.28em] text-white/55">

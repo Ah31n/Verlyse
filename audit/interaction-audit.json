@@ -36,9 +36,21 @@
       "status": "PASS",
       "detail": "{\"hasSig\":true,\"scene\":\"ending-the-quiet-grief\"}"
     },
+    "ending-qubool-hai": {
+      "status": "PASS",
+      "detail": "{\"hasSig\":true,\"scene\":\"ending-she-didnt-say-qubool-hai\"}"
+    },
     "quiet-grief-gallery-and-caption": {
       "status": "PASS",
       "detail": "plate1=true, noLeak=true, lightbox=true, trap=true, plate2=true, closed=true, focusRestored=true, verbatim=true"
+    },
+    "quiet-grief-gallery-computed-layout": {
+      "status": "PASS",
+      "detail": "{\"m375\":{\"symmetricPad\":true,\"cols\":1,\"row1SideBySide\":false,\"stackedMobile\":true,\"safeTransition\":true,\"transitionProperty\":\"border-color, box-shadow\"},\"t768\":{\"symmetricPad\":true,\"cols\":6,\"row1SideBySide\":true,\"stackedMobile\":false,\"safeTransition\":true,\"transitionProperty\":\"border-color, box-shadow\"},\"d1440\":{\"symmetricPad\":true,\"cols\":6,\"row1SideBySide\":true,\"stackedMobile\":false,\"safeTransition\":true,\"transitionProperty\":\"border-color, box-shadow\"}}"
+    },
+    "qubool-hai-gallery-and-caption": {
+      "status": "PASS",
+      "detail": "{\"homeHasQubool\":true,\"plateCount\":8,\"noRawShortcodeLeak\":true,\"hasCredits\":true,\"hasVerbatimCaption\":true,\"noMinusOneLikes\":true}"
     },
     "forms-and-profile-a11y": {
       "status": "PASS",
@@ -48,17 +60,21 @@
       "status": "PASS",
       "detail": "{\"ctaPresent\":true,\"targetBlank\":true,\"relSafe\":true,\"noRemovedTeam\":true,\"noPlaceholderLabels\":true,\"hasRoles\":true,\"hasHeadline\":true}"
     },
+    "footer-static-specimen-and-no-tg-residue": {
+      "status": "PASS",
+      "detail": "{\"singleFooterOk\":true,\"footerSpecimenOk\":true,\"noTgResidueOk\":true,\"checkedRoutes\":12}"
+    },
     "mobile-375px-no-overflow": {
       "status": "PASS",
       "detail": "/:375/375, /articles:375/375, /article/the-quiet-grief:375/375, /room:375/375 + 11 viewports clean"
     },
     "reduced-motion-preserves": {
       "status": "PASS",
-      "detail": "reduced motion: h1 present, no overflow"
+      "detail": "reduced motion: h1=true, phase=REDUCED, semanticSig=true, heavyAnimationChunksRequested=false"
     },
     "no-webgl-fallback": {
       "status": "PASS",
-      "detail": "{\"h1\":true,\"canvases\":0,\"scrollWidth\":1440,\"innerWidth\":1440}"
+      "detail": "{\"h1\":true,\"canvases\":0,\"scrollWidth\":1440,\"innerWidth\":1440,\"articleCanvases\":0,\"endingPhase\":\"FALLBACK\",\"semanticSig\":true,\"heavy3dChunksRequested\":false}"
     }
   },
   "consoleErrorsCaptured": []

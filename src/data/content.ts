@@ -177,9 +177,9 @@ export const AUTHORS: Author[] = [
     id: 'haieqa-wahab',
     name: 'Haieqa Wahab',
     handle: '@miss_haieqa',
-    role: 'Writer · stories',
-    bio: 'Wrote “The Empty Waltz” — a story about an old man, a ballroom, and a waltz he never stopped dancing (presented 29 July 2026).',
-    confirmed: true,    philosophy: 'She writes the grief that goes unseen — the quiet, ordinary loneliness that lives in empty chairs, untouched coffee cups, and habits the heart refuses to unlearn.',
+    role: 'Writer · stories & social issues',
+    bio: 'Wrote “The Empty Waltz” — a story about an old man, a ballroom, and a waltz he never stopped dancing (presented 29 July 2026) — and “She Didn’t Say Qubool Hai,” a feature on forced marriage and women’s consent edited by Wajiha Ahmed (presented 15 October 2026).',
+    confirmed: true,    philosophy: 'She writes the grief that goes unseen — the quiet, ordinary loneliness that lives in empty chairs, untouched coffee cups, and habits the heart refuses to unlearn — and speaks out where silence is forced upon women.',
     favoriteQuote: 'The quietest emotions often speak the loudest.',
 
   },
@@ -1367,6 +1367,209 @@ export const ARTICLES: Article[] = [
     },
     voices: [],
   },
+  {
+    id: 'she-didnt-say-qubool-hai',
+    title: 'She Didn’t Say Qubool Hai',
+    authorId: 'haieqa-wahab',
+    credit: 'Editor: Wajiha Ahmed · Writer: Haieqa Wahab (@miss_haieqa)',
+    category: 'Social Issues',
+    excerpt: 'She didn’t say Qubool Hai. She was forced to. Forced marriage is not culture. It is not tradition. It is abuse. A marriage without consent is not a marriage.',
+    readingTime: '8 plates',
+    date: '2026-10-15',
+    cover: plateSrc(
+      '/img/works/Dehg27tE_hF-1.webp',
+      'She Didn’t Say Qubool Hai — She didn’t say Qubool Hai. She was forced to.',
+      '21 · 01',
+      'PLATE 01 / 08 · OPENING STATEMENT',
+    ),
+    slides: [
+      plateSrc(
+        '/img/works/Dehg27tE_hF-1.webp',
+        'She Didn’t Say Qubool Hai — She didn’t say Qubool Hai.',
+        '21 · 01',
+        'PLATE 01 / 08 · OPENING STATEMENT',
+      ),
+      plateSrc(
+        '/img/works/Dehg27tE_hF-2.webp',
+        'She Didn’t Say Qubool Hai — She was forced to.',
+        '21 · 02',
+        'PLATE 02 / 08 · WITHOUT CONSENT',
+      ),
+      plateSrc(
+        '/img/works/Dehg27tE_hF-3.webp',
+        'She Didn’t Say Qubool Hai — Forced marriage is not culture.',
+        '21 · 03',
+        'PLATE 03 / 08 · NOT CULTURE',
+      ),
+      plateSrc(
+        '/img/works/Dehg27tE_hF-4.webp',
+        'She Didn’t Say Qubool Hai — It is not tradition. It is abuse.',
+        '21 · 04',
+        'PLATE 04 / 08 · NOT TRADITION',
+      ),
+      plateSrc(
+        '/img/works/Dehg27tE_hF-5.webp',
+        'She Didn’t Say Qubool Hai — A marriage without consent is not a marriage.',
+        '21 · 05',
+        'PLATE 05 / 08 · CONSENT MATTERS',
+      ),
+      plateSrc(
+        '/img/works/Dehg27tE_hF-6.webp',
+        'She Didn’t Say Qubool Hai — #WomensRights · #ConsentMatters',
+        '21 · 06',
+        'PLATE 06 / 08 · WOMEN’S RIGHTS',
+      ),
+      plateSrc(
+        '/img/works/Dehg27tE_hF-7.webp',
+        'She Didn’t Say Qubool Hai — #ForcedMarriage · #EndForcedMarriage',
+        '21 · 07',
+        'PLATE 07 / 08 · END FORCED MARRIAGE',
+      ),
+      plateSrc(
+        '/img/works/Dehg27tE_hF-8.webp',
+        'She Didn’t Say Qubool Hai — Editor: Wajiha Ahmed · Writer: Haieqa Wahab',
+        '21 · 08',
+        'PLATE 08 / 08 · EDITORIAL CREDITS',
+      ),
+    ],
+    tags: ['Social Issues', 'ForcedMarriage', 'EndForcedMarriage', 'WomensRights', 'ConsentMatters'],
+    normalizedHashtags: ['#ForcedMarriage', '#verlysemedia', '#EndForcedMarriage', '#WomensRights', '#ConsentMatters'],
+    sourceUrl: 'https://www.instagram.com/p/Dehg27tE_hF/',
+    sourceCaption: [
+      'She didn’t say Qubool Hai.\nShe was forced to.',
+      'Forced marriage is not culture. It is not tradition. It is abuse.\nA marriage without consent is not a marriage.',
+      'Editor: wajiha ahmed\nWriter :haieqa wahab',
+      '#ForcedMarriage #verlysemedia #EndForcedMarriage #WomensRights #ConsentMatters',
+    ].join('\n\n'),
+    editorialFormat: 'carousel-feature',
+    publicationStatus: 'provisional',
+    slideDescriptions: [
+      {
+        plate: '01',
+        subject: 'The Dilemma of Forced Marriages in Pakistan',
+        note: 'Opening cover plate — “Verlyse Media presents: Her Silence is not Consent… the dilemma of Forced Marriages in Pakistan.”',
+        alt: 'Verlyse Media presents: Her Silence is not Consent — the dilemma of Forced Marriages in Pakistan.',
+        assetPath: '/img/works/Dehg27tE_hF-1.webp',
+        sourceSlideShortCode: 'DehgrPwitkY',
+        width: 1080,
+        height: 1350,
+        status: 'verified',
+      },
+      {
+        plate: '02',
+        subject: 'The Girls Nobody Is Counting',
+        note: 'Around 1,000 Hindu and Christian girls in Pakistan are abducted and forced into marriage each year — and of 202 documented cases in 2021–2022, most were under 18. Sources: Aurat Foundation; Christian Solidarity Worldwide.',
+        alt: 'The Girls Nobody Is Counting — Every year, Hindu and Christian girls in Pakistan are taken, pressured to convert, and married off. Around 1,000 a year (Sources: Aurat Foundation; Christian Solidarity Worldwide).',
+        assetPath: '/img/works/Dehg27tE_hF-2.webp',
+        sourceSlideShortCode: 'DehgrS2iOC4',
+        width: 1080,
+        height: 1350,
+        status: 'verified',
+      },
+      {
+        plate: '03',
+        subject: 'The Silence',
+        note: 'Most families never say a word where speaking up brings shame on the whole family — and when no one reports it, it never becomes a statistic. Source: Christian Solidarity Worldwide partners.',
+        alt: 'The Silence — Most families never say a word. When no one reports it, it never becomes a statistic (Source: Christian Solidarity Worldwide partners).',
+        assetPath: '/img/works/Dehg27tE_hF-3.webp',
+        sourceSlideShortCode: 'DehgsHPCwNE',
+        width: 1080,
+        height: 1350,
+        status: 'verified',
+      },
+      {
+        plate: '04',
+        subject: 'Who Gets Taken?',
+        note: 'In 2025, around 75% of the women and girls affected were Hindu, and most of the rest were Christian; 133 of 202 documented cases involved girls under 18 from poor families. Sources: UN OHCHR; Christian Solidarity Worldwide.',
+        alt: 'Who Gets Taken? — In 2025, around 75% of the women and girls affected were Hindu, and most of the rest were Christian. Of 202 documented cases, 133 involved girls under 18 (Sources: UN OHCHR; Christian Solidarity Worldwide).',
+        assetPath: '/img/works/Dehg27tE_hF-4.webp',
+        sourceSlideShortCode: 'Dehgr1YCAUK',
+        width: 1080,
+        height: 1350,
+        status: 'verified',
+      },
+      {
+        plate: '05',
+        subject: 'The Police',
+        note: 'When a daughter goes missing, families are too often turned away, refused a report, or dismissed — leaving families wondering who is actually on their side. Sources: UN OHCHR; LSE Religion & Global Society Blog.',
+        alt: 'The Police — Your daughter is missing. Too often, police turn families away, won’t file the report, or dismiss the complaint (Sources: UN OHCHR; LSE Religion & Global Society Blog).',
+        assetPath: '/img/works/Dehg27tE_hF-5.webp',
+        sourceSlideShortCode: 'DehgsRni9Rm',
+        width: 1080,
+        height: 1350,
+        status: 'verified',
+      },
+      {
+        plate: '06',
+        subject: 'The Laws',
+        note: 'Pakistan has no law that specifically makes forced conversion a crime, and bills in the Sindh Assembly in 2016, 2019, and 2021 stalled under pressure from religious parties. Sources: Christian Daily; The News.',
+        alt: 'The Laws — The laws exist on paper, but Pakistan has no law specifically making forced conversion a crime, and bills in the Sindh Assembly stalled in 2016, 2019, and 2021 (Sources: Christian Daily; The News).',
+        assetPath: '/img/works/Dehg27tE_hF-6.webp',
+        sourceSlideShortCode: 'Dehgr6CiDob',
+        width: 1080,
+        height: 1350,
+        status: 'verified',
+      },
+      {
+        plate: '07',
+        subject: 'The Courts',
+        note: '“Free will” after three weeks in a shelter — frightened girls sent to shelter homes return saying they want to stay with the man who took them, even after crying to go home to their parents. Sources: Dawn.com; Morning Star News.',
+        alt: 'The Courts — “Free will” after three weeks in a shelter. Girls come to court looking hurt and frightened and are sent to shelter homes (Sources: Dawn.com; Morning Star News).',
+        assetPath: '/img/works/Dehg27tE_hF-7.webp',
+        sourceSlideShortCode: 'DehgsH3C-5V',
+        width: 1080,
+        height: 1350,
+        status: 'verified',
+      },
+      {
+        plate: '08',
+        subject: 'Nobody Acts.',
+        note: 'The government knows, UN experts have written reports, and researchers have documented the cases — yet girls keep disappearing into marriages they never agreed to.',
+        alt: 'Nobody Acts. — The government knows. UN experts have written reports. Researchers have documented the cases. And still, girls keep disappearing into marriages they never agreed to.',
+        assetPath: '/img/works/Dehg27tE_hF-8.webp',
+        sourceSlideShortCode: 'DehgsIeCCT3',
+        width: 1080,
+        height: 1350,
+        status: 'verified',
+      },
+    ],
+    description: 'An eight-plate social-issues feature written by Haieqa Wahab and edited by Wajiha Ahmed — “Her Silence is not Consent: the dilemma of Forced Marriages in Pakistan.”',
+    body: [
+      'Her Silence is not Consent — the dilemma of Forced Marriages in Pakistan. She didn’t say Qubool Hai. She was forced to. Forced marriage is not culture. It is not tradition. It is abuse. A marriage without consent is not a marriage.',
+      'The Girls Nobody Is Counting: Every year, Hindu and Christian girls in Pakistan are taken, pressured to convert, and married off. Most of it never gets written down, and most of us never hear about it. Around 1,000 a year. Probably more. That’s the estimate from the Aurat Foundation for Hindu and Christian girls abducted and forced into marriage each year. And that’s only the cases that got reported. Another group documented 202 cases in 2021 and 2022, and most of the girls in them were under 18. (Sources: Aurat Foundation; Christian Solidarity Worldwide)',
+      'The Silence: Most families never say a word. Think about what it takes to speak up. You’d be admitting your daughter was taken and assaulted, in a place where that brings shame on the whole family. So many stay quiet. And when no one reports it, it never becomes a statistic. (Source: Christian Solidarity Worldwide partners)',
+      'Who Gets Taken?: In 2025, around 75% of the women and girls affected were Hindu, and most of the rest were Christian. Of the 202 documented cases, 133 involved girls under 18. Most of these families are poor, with no powerful friends and nobody to call. (Sources: UN OHCHR; Christian Solidarity Worldwide)',
+      'The Police: Your daughter is missing. So you go to the police. Too often, they turn you away, won’t file the report, or dismiss your complaint. Some critics say certain officers sympathize with the people taking these girls. So the family is left wondering who is actually on their side. (Sources: UN OHCHR; LSE Religion & Global Society Blog)',
+      'The Laws: The laws exist. On paper. Pakistan has no law that specifically makes forced conversion a crime. Forced marriage is covered, but it’s hard to prosecute when everything gets labeled consensual. A bill to fix this came up in the Sindh Assembly in 2016, 2019 and 2021, and each time it stalled under pressure from religious parties. (Sources: Christian Daily; The News)',
+      'The Courts: “Free will” after three weeks in a shelter. Girls come to court looking hurt and frightened. They’re sent to a shelter home, and when they come back, many say they want to stay with the man who took them. In one case, a girl cried that she just wanted to go home to her parents. The court sent her to the shelter anyway. (Sources: Dawn.com; Morning Star News)',
+      'Nobody Acts.: The government knows. UN experts have written reports. Researchers have documented the cases. And still, girls keep disappearing into marriages they never agreed to. The real question is who will finally be held accountable. Note: Most figures come from advocacy groups and NGOs. Check the originals before quoting.',
+    ],
+    likes: 0, /* source dataset reported likesCount: -1 (unknown/unavailable); never displayed as a real count */
+    likesCountRaw: -1,
+    comments: 0,
+    shortCode: 'Dehg27tE_hF',
+    motif: 'voices',
+    world: 'newsprint',
+    heroMode: 'documentary',
+    gallery: true,
+    vibe: 'urgent',
+    reflection: 'Forced marriage is not culture. It is not tradition. It is abuse. A marriage without consent is not a marriage.',
+    closing: {
+      kind: 'voices',
+      kicker: 'From the source caption',
+      title: 'A marriage without consent is not a marriage',
+      lines: [
+        'She didn’t say Qubool Hai.',
+        'She was forced to.',
+      ],
+      paragraphs: [
+        'Forced marriage is not culture. It is not tradition. It is abuse.',
+        'A marriage without consent is not a marriage.',
+      ],
+      signoff: 'Writer: Haieqa Wahab · Editor: Wajiha Ahmed',
+    },
+    voices: [],
+  },
 ]
 
 /* ------------------------------------------------------------------ */
@@ -1398,6 +1601,8 @@ export const CATEGORIES: Category[] = _CATEGORY_DEFS.map((wing) => ({
 /* magazine states its counts once and everywhere reads the same page. */
 /* ------------------------------------------------------------------ */
 const _featureCount = ARTICLES.length
+const _publishedFeatureCount = ARTICLES.filter((a) => a.publicationStatus !== 'provisional').length
+const _provisionalFeatureCount = ARTICLES.filter((a) => a.publicationStatus === 'provisional').length
 const _primaryAuthorIds = new Set(ARTICLES.map((a) => a.authorId))
 /* 15 byline names carry a primary byline on the shelf — fourteen human
    writers plus Verlyse Media's own dispatch (“Mir Raza Ali”). */
@@ -1422,8 +1627,12 @@ export const LEDGER = {
   /** the current issue */
   issueNo: '01',
   issueLabel: 'Issue № 01',
-  /** features on the shelf */
+  /** features on the shelf (total catalogued entries) */
   features: _featureCount,
+  /** verified published folios (excluding provisional entries) */
+  publishedFeatures: _publishedFeatureCount,
+  /** provisional entries awaiting external publication verification */
+  provisionalFeatures: _provisionalFeatureCount,
   /** credited names with a primary byline — fourteen writers + the masthead */
   creators: _creatorCount,
   /** human writers only (the masthead's own dispatch excluded) */

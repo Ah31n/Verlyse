@@ -36,9 +36,13 @@ export function progressRepeating(
   return { ...progress(enter, exit), 'string-repeat': '' }
 }
 
-/** Shallow parallax. Desktop only — the module is not registered on touch. */
+/**
+ * Shallow parallax. Desktop only — the module is not registered on touch.
+ * Includes `progress` token so `StringParallax` receives `progress-value`
+ * continuously in native browser scroll mode (`scrollDesktopMode = 'default'`).
+ */
 export function drift(intensity: Intensity = 'standard'): Attrs {
-  return { string: 'parallax[]', 'string-parallax': String(DRIFT[intensity]) }
+  return { string: 'progress|parallax[]', 'string-parallax': String(DRIFT[intensity]) }
 }
 
 /** Scroll lag, for staggering neighbours in a row or reel. */

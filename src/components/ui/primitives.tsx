@@ -64,7 +64,8 @@ export function UnderlineLink({ to, children }: { to: string; children: ReactNod
     >
       <span className="relative">
         {children}
-        <span className="absolute -bottom-1 left-0 h-px w-full origin-left scale-x-[0.32] bg-gold transition-transform duration-[900ms] ease-[cubic-bezier(0.16,1,0.3,1)] group-hover:scale-x-100" />
+        <span aria-hidden="true" className="absolute -bottom-1.5 inset-x-0 h-px bg-gold/30 transition-colors duration-500 group-hover:bg-gold/50" />
+        <span aria-hidden="true" className="absolute -bottom-1.5 left-0 h-px w-full origin-left scale-x-100 bg-gold/75 transition-all duration-[900ms] ease-[cubic-bezier(0.16,1,0.3,1)] group-hover:bg-gold" />
       </span>
       <span aria-hidden="true" className="text-gold transition-transform duration-[700ms] ease-[cubic-bezier(0.16,1,0.3,1)] group-hover:translate-x-2">→</span>
     </Link>

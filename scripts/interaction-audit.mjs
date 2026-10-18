@@ -74,7 +74,7 @@ async function run() {
   // and the `fin.` mark appears after the scene settles (~6s — wait for it
   // instead of sampling early; fixes the known "Their Voices Matter" flake).
   const endings = {}
-  for (const slug of ['their-voices-matter', '3-13', 'the-quiet-grief']) {
+  for (const slug of ['their-voices-matter', '3-13', 'the-quiet-grief', 'she-didnt-say-qubool-hai']) {
     await page.goto(BASE + '/article/' + slug, { waitUntil: 'networkidle' })
     let fin = false
     const deadline = Date.now() + 8000
@@ -90,6 +90,7 @@ async function run() {
   pass('ending-voices', endings['their-voices-matter'].hasSig && endings['their-voices-matter'].scene?.includes('their-voices-matter'), JSON.stringify(endings['their-voices-matter']))
   pass('ending-wait', endings['3-13'].hasSig && endings['3-13'].scene?.includes('3-13'), JSON.stringify(endings['3-13']))
   pass('ending-quiet-grief', endings['the-quiet-grief'].hasSig && endings['the-quiet-grief'].scene?.includes('the-quiet-grief'), JSON.stringify(endings['the-quiet-grief']))
+  pass('ending-qubool-hai', endings['she-didnt-say-qubool-hai'].hasSig && endings['she-didnt-say-qubool-hai'].scene?.includes('she-didnt-say-qubool-hai'), JSON.stringify(endings['she-didnt-say-qubool-hai']))
 
   // ---- THE QUIET GRIEF GALLERY, FOCUS TRAP & PROVENANCE ----
   await page.goto(BASE + '/article/the-quiet-grief', { waitUntil: 'networkidle' })
@@ -128,6 +129,83 @@ async function run() {
     'quiet-grief-gallery-and-caption',
     hasPlate1 && noAssetLeak && lightboxOpen && shiftTabTrapped && tabTrapped && lightboxPlate2 && lightboxClosed && focusRestored && verbatimOk,
     `plate1=${hasPlate1}, noLeak=${noAssetLeak}, lightbox=${lightboxOpen}, trap=${shiftTabTrapped && tabTrapped}, plate2=${lightboxPlate2}, closed=${lightboxClosed}, focusRestored=${focusRestored}, verbatim=${verbatimOk}`,
+  )
+
+  // ---- ART GALLERY COMPUTED LAYOUT & TRANSITION ACROSS VIEWPORTS ----
+  const measureGalleryAt = async (w, h) => {
+    await page.setViewportSize({ width: w, height: h })
+    await page.waitForTimeout(150)
+    return page.evaluate(() => {
+      const sec = document.querySelector('section[aria-label*="plate sequence"]')
+      const btn1 = document.querySelector('button[aria-label*="Inspect Plate 01 of 05"]')
+      const btn2 = document.querySelector('button[aria-label*="Inspect Plate 02 of 05"]')
+      const btn3 = document.querySelector('button[aria-label*="Inspect Plate 03 of 05"]')
+      if (!sec || !btn1 || !btn2 || !btn3) return null
+      const secStyle = window.getComputedStyle(sec)
+      const padL = parseFloat(secStyle.paddingLeft) || 0
+      const padR = parseFloat(secStyle.paddingRight) || 0
+      const grid = btn1.closest('.grid')
+      const cols = grid ? window.getComputedStyle(grid).gridTemplateColumns.split(' ').filter(Boolean).length : 0
+      const r1 = btn1.getBoundingClientRect()
+      const r2 = btn2.getBoundingClientRect()
+      const r3 = btn3.getBoundingClientRect()
+      const tp = window.getComputedStyle(btn1).transitionProperty || ''
+      return {
+        symmetricPad: Math.abs(padR - padL) <= 1.5,
+        cols,
+        row1SideBySide: Math.abs(r1.top - r2.top) <= 4 && r2.left > r1.left,
+        stackedMobile: r2.top > r1.bottom && r3.top > r2.bottom,
+        safeTransition: !tp.includes('all') && !tp.includes('transform'),
+        transitionProperty: tp,
+      }
+    })
+  }
+  const gal375 = await measureGalleryAt(375, 812)
+  const gal768 = await measureGalleryAt(768, 1024)
+  const gal1440 = await measureGalleryAt(1440, 900)
+  const galComputedOk = Boolean(
+    gal375?.symmetricPad && gal375?.cols === 1 && gal375?.stackedMobile && gal375?.safeTransition &&
+    gal768?.symmetricPad && gal768?.cols === 6 && gal768?.row1SideBySide && gal768?.safeTransition &&
+    gal1440?.symmetricPad && gal1440?.cols === 6 && gal1440?.row1SideBySide && gal1440?.safeTransition
+  )
+  pass(
+    'quiet-grief-gallery-computed-layout',
+    galComputedOk,
+    JSON.stringify({ m375: gal375, t768: gal768, d1440: gal1440 }),
+  )
+
+  // ---- SHE DIDN'T SAY QUBOOL HAI GALLERY, CREDITS, HOME FEATURE & PROVENANCE ----
+  await page.goto(BASE + '/', { waitUntil: 'networkidle' })
+  await page.waitForTimeout(300)
+  const homeHasQubool = await page.evaluate(() => {
+    const txt = document.body.textContent || ''
+    return txt.includes('She Didn’t Say Qubool Hai') && txt.includes('In this folio — 8 plates')
+  })
+  await page.goto(BASE + '/article/she-didnt-say-qubool-hai', { waitUntil: 'networkidle' })
+  await page.waitForTimeout(600)
+  const quboolCheck = await page.evaluate(() => {
+    const txt = document.body.textContent || ''
+    const plates = document.querySelectorAll('button[aria-label*="Inspect Plate "]')
+    return {
+      plateCount: plates.length,
+      noRawShortcodeLeak: !txt.includes('Dehg27tE_hF') && !txt.includes('/img/works/Dehg27tE_hF'),
+      hasCredits: txt.includes('Editor: Wajiha Ahmed') && txt.includes('Writer: Haieqa Wahab'),
+      hasVerbatimCaption:
+        txt.includes('Editor: wajiha ahmed') &&
+        txt.includes('Writer :haieqa wahab') &&
+        txt.includes('#ForcedMarriage #verlysemedia #EndForcedMarriage #WomensRights #ConsentMatters'),
+      noMinusOneLikes: !txt.includes('-1 appreciations'),
+    }
+  })
+  pass(
+    'qubool-hai-gallery-and-caption',
+    homeHasQubool &&
+      quboolCheck.plateCount === 8 &&
+      quboolCheck.noRawShortcodeLeak &&
+      quboolCheck.hasCredits &&
+      quboolCheck.hasVerbatimCaption &&
+      quboolCheck.noMinusOneLikes,
+    JSON.stringify({ homeHasQubool, ...quboolCheck }),
   )
 
   // ---- SUBMIT & CONTACT ACCESSIBLE VALIDATION & WRITER PROFILE QUOTES ----
@@ -182,6 +260,64 @@ async function run() {
     JSON.stringify(rosterAndHiring),
   )
 
+  // ---- FIXED FOOTER SPECIMEN, SINGLE GLOBAL FOOTER & ZERO TG DEMO RESIDUE ----
+  const standardRoutes = [
+    '/', '/articles', '/categories', '/creators', '/community',
+    '/about', '/ambassadors', '/submit', '/contact', '/article/the-quiet-grief', '/article/she-didnt-say-qubool-hai',
+  ]
+  let footerSpecimenOk = true
+  let noTgResidueOk = true
+  let singleFooterOk = true
+  for (const r of [...standardRoutes, '/room']) {
+    await page.goto(BASE + r, { waitUntil: 'networkidle' })
+    await page.waitForTimeout(250)
+    const fCheck = await page.evaluate((route) => {
+      const footers = document.querySelectorAll('footer[aria-label="Footer"]')
+      const bodyTxt = document.body.innerText || ''
+      const htmlTxt = document.body.textContent || ''
+      const hasTgCode =
+        /\bTG\d+\b/.test(bodyTxt) ||
+        /\bTG\d+\b/.test(htmlTxt) ||
+        document.querySelectorAll('[data-craft-dot-matrix], [data-craft-emblem]').length > 0
+      const hasDemoLabels = /herbarium colophon|inscribe phrase|foliage density|keep plate|oxblood\s*&\s*antique brass|tudor rose\s*&\s*warm ivory|nocturne\s*&\s*gilded leaf|mulberry velvet/i.test(htmlTxt)
+      if (route === '/room') {
+        return {
+          footerCountOk: footers.length === 0,
+          specimenOk: true,
+          noTg: !hasTgCode && !hasDemoLabels,
+        }
+      }
+      const footer = footers[0]
+      const specimen = footer?.querySelector('[data-footer-specimen="verlyse"]')
+      const specimenInteractive = specimen
+        ? specimen.querySelectorAll('input, select, textarea, button, a, [role="radio"], [role="button"], [download], [tabindex]:not([tabindex="-1"])').length
+        : 999
+      const nlInput = footer?.querySelector('input#nl-email[type="email"]')
+      const nlBtn = Array.from(footer?.querySelectorAll('button[type="submit"]') || []).find((b) => /take the letter/i.test(b.textContent || ''))
+      const navCount = footer?.querySelectorAll('a[href^="/"]').length || 0
+      return {
+        footerCountOk: footers.length === 1,
+        specimenOk:
+          !!specimen &&
+          specimen.getAttribute('aria-hidden') === 'true' &&
+          specimenInteractive === 0 &&
+          (specimen.textContent || '').trim() === 'Verlyse' &&
+          !!nlInput &&
+          !!nlBtn &&
+          navCount >= 9,
+        noTg: !hasTgCode && !hasDemoLabels,
+      }
+    }, r)
+    if (!fCheck.footerCountOk) singleFooterOk = false
+    if (!fCheck.specimenOk) footerSpecimenOk = false
+    if (!fCheck.noTg) noTgResidueOk = false
+  }
+  pass(
+    'footer-static-specimen-and-no-tg-residue',
+    singleFooterOk && footerSpecimenOk && noTgResidueOk,
+    JSON.stringify({ singleFooterOk, footerSpecimenOk, noTgResidueOk, checkedRoutes: standardRoutes.length + 1 }),
+  )
+
   // ---- 11-VIEWPORT MATRIX & 375PX MOBILE VIEWPORT CHECK ----
   const m375 = await browser.newContext({ viewport: { width: 375, height: 812 } })
   const p375 = await m375.newPage()
@@ -214,23 +350,65 @@ async function run() {
   pass('mobile-375px-no-overflow', ok375, details375.join(', ') + ' + 11 viewports clean')
   await m375.close()
 
-  // ---- REDUCED MOTION ----
+  // ---- REDUCED MOTION & LAZY CHUNK GATING ----
   const rctx = await browser.newContext({ viewport: { width: 1440, height: 900 }, reducedMotion: 'reduce' })
   const rp = await rctx.newPage()
+  const rmScripts = []
+  rp.on('request', (req) => {
+    if (req.resourceType() === 'script') rmScripts.push(req.url())
+  })
   await rp.goto(BASE + '/', { waitUntil: 'networkidle' })
-  await rp.waitForTimeout(1200)
-  const rmOk = await rp.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth && !!document.querySelector('h1'))
-  pass('reduced-motion-preserves', rmOk, 'reduced motion: h1 present, no overflow')
+  await rp.waitForTimeout(800)
+  await rp.goto(BASE + '/article/their-voices-matter', { waitUntil: 'networkidle' })
+  await rp.evaluate(() => document.getElementById('ending')?.scrollIntoView({ behavior: 'instant' }))
+  await rp.waitForTimeout(800)
+  const rmNoHeavyChunks = !rmScripts.some((u) =>
+    /animejs|anime-[A-Za-z0-9_-]+\.js|StoryEnding3D|SpatialArchive|\/deps\/three|@react-three|three-[A-Za-z0-9_-]+\.js/i.test(u)
+  )
+  const rmEndingState = await rp.evaluate(() => ({
+    h1: !!document.querySelector('h1'),
+    noOverflow: document.documentElement.scrollWidth <= window.innerWidth,
+    phase: document.querySelector('[data-ending]')?.getAttribute('data-phase') || null,
+    semanticSig: !!document.querySelector('[data-signature="their-voices-matter"]'),
+  }))
+  const rmOk = rmEndingState.h1 && rmEndingState.noOverflow && rmEndingState.phase === 'REDUCED' && rmEndingState.semanticSig && rmNoHeavyChunks
+  pass('reduced-motion-preserves', rmOk, `reduced motion: h1=${rmEndingState.h1}, phase=${rmEndingState.phase}, semanticSig=${rmEndingState.semanticSig}, heavyAnimationChunksRequested=${!rmNoHeavyChunks}`)
   await rctx.close()
 
-  // ---- WEBGL OFF ----
+  // ---- WEBGL OFF & NEAR-VIEWPORT GATING ----
   const gctx = await browser.newContext({ viewport: { width: 1440, height: 900 } })
   await gctx.addInitScript(() => { const o = HTMLCanvasElement.prototype.getContext; HTMLCanvasElement.prototype.getContext = function (t, ...a) { if (String(t).includes('webgl')) return null; return o.call(this, t, ...a) } })
   const gp = await gctx.newPage()
+  const glScripts = []
+  gp.on('request', (req) => {
+    if (req.resourceType() === 'script') glScripts.push(req.url())
+  })
   await gp.goto(BASE + '/', { waitUntil: 'networkidle' })
-  await gp.waitForTimeout(1200)
-  const glOk = await gp.evaluate(() => ({ h1: !!document.querySelector('h1'), canvases: document.querySelectorAll('canvas').length, scrollWidth: document.documentElement.scrollWidth, innerWidth: window.innerWidth }))
-  pass('no-webgl-fallback', glOk.h1 && glOk.canvases === 0 && glOk.scrollWidth <= glOk.innerWidth, JSON.stringify(glOk))
+  await gp.waitForTimeout(800)
+  const glHome = await gp.evaluate(() => ({ h1: !!document.querySelector('h1'), canvases: document.querySelectorAll('canvas').length, scrollWidth: document.documentElement.scrollWidth, innerWidth: window.innerWidth }))
+  await gp.goto(BASE + '/article/their-voices-matter', { waitUntil: 'networkidle' })
+  await gp.evaluate(() => document.getElementById('ending')?.scrollIntoView({ behavior: 'instant' }))
+  await gp.waitForTimeout(600)
+  const glArticle = await gp.evaluate(() => ({
+    canvases: document.querySelectorAll('canvas').length,
+    phase: document.querySelector('[data-ending]')?.getAttribute('data-phase') || null,
+    semanticSig: !!document.querySelector('[data-signature="their-voices-matter"]'),
+  }))
+  const glNoHeavy3D = !glScripts.some((u) =>
+    /StoryEnding3D|SpatialArchive|\/deps\/three|@react-three|three-[A-Za-z0-9_-]+\.js/i.test(u)
+  )
+  const glOk = {
+    ...glHome,
+    articleCanvases: glArticle.canvases,
+    endingPhase: glArticle.phase,
+    semanticSig: glArticle.semanticSig,
+    heavy3dChunksRequested: !glNoHeavy3D,
+  }
+  pass(
+    'no-webgl-fallback',
+    glOk.h1 && glOk.canvases === 0 && glOk.articleCanvases === 0 && glOk.endingPhase === 'FALLBACK' && glOk.semanticSig && glNoHeavy3D && glOk.scrollWidth <= glOk.innerWidth,
+    JSON.stringify(glOk),
+  )
   await gctx.close()
 
   fs.writeFileSync(path.join(OUT, 'interaction-audit.json'), JSON.stringify({ results, consoleErrorsCaptured: errors }, null, 2))

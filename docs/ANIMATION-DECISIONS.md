@@ -252,3 +252,20 @@ console/page/network errors, 0 horizontal overflow, reduced-motion PASS,
 WebGL-off PASS, 0 FAIL); `/room` 89/89; reduced-motion writes no transform on the
 reworked pages; `/creators`, `/community`, `/ambassadors`, `/submit`, `/contact`
 all have scrollWidth == innerWidth at desktop.
+
+## 2026-10-18 Skill Pack & Review Consolidation Update
+
+Under the Verlyse Arena Skill Pack (`docs/STACK_DECISION_MATRIX.md`,
+`docs/TOOL_DECISION_RECORD.md`, `docs/SKILLPACK-STACK-ASSESSMENT.md`):
+
+1. **`Magnetic` migrated off GSAP onto `motion/react` (`src/components/ui/Magnetic.tsx`)**:
+   `Header.tsx` previously imported `Magnetic` from `../cinematic`, pulling `gsap`
+   (`dist/assets/gsap-a3sj5zmn.js`, `114.01 kB` raw / `45.16 kB` gzip) into the blocking `index-*.js` entry bundle
+   on all 54 routes (`B2`). Moving `Magnetic` to `motion/react` (`useMotionValue` +
+   `useSpring` + `useReducedMotion`) and adding `gsap` and `anime` `manualChunks`
+   rules in `vite.config.ts` evicted `gsap` from `index-*.js` (dropping `index-*.js` from `252.87 kB` / `89.38 kB` gzip to `154.45 kB` / `51.49 kB` gzip before `EditorialCraftSystem`, and `dist/assets/index-Br7b5VOr.js` at `180.42 kB` / `58.04 kB` gzip with `EditorialCraftSystem` included). `BrassRule.tsx` dynamically imports `animejs` (`dist/assets/anime-CcJk6tc-.js`, `32.40 kB` / `13.15 kB` gzip) only when `!reduce && near`.
+2. **StringTune (`@fiddle-digital/string-tune@1.2.5`) 4-module allowlist & race-safe reduced-motion lifecycle**:
+   `src/lib/stringTune/boot.ts` registers only the **4 active modules** used by current surfaces (`UNIVERSAL_MODULES = [StringProgress, StringGlide]`, `POINTER_MODULES = [StringParallax, StringSpotlight]`, emitted as `dist/assets/boot-CfrjN6Gu.js` at `199.82 kB` raw / `51.65 kB` gzip), `drift()` pairs `progress|parallax[]` for native scroll mode, and `runtime.ts` + `StringTuneProvider.tsx` enforce generation-checked start/stop serialization so enabling `prefers-reduced-motion: reduce` or unmounting while `import('./boot')` is pending never leaves an active instance.
+3. **100% Reduced-Motion Coverage & Spatial Gating (`B1` & `D3` closed)**:
+   `src/App.tsx` wraps the application in `<MotionConfig reducedMotion="user">`, `src/components/ui/ArticleClosing.tsx` guards all 13 closing components with `useReducedMotion()`, and `EndingSpatialStage` in `src/pages/ArticleDetail.tsx` gates the lazy `StoryEnding3D` (`dist/assets/StoryEnding3D-CDvXr6Hv.js`, `10.93 kB` / `3.21 kB` gzip) on `glSupported && !reduce && near && tabVisible` inside the `EndingSpatialBoundary` React Error Boundary.
+
