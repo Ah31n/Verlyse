@@ -19,7 +19,7 @@ Everything enumerable is derived from `src/data/content.ts`. Four consumers read
 
 Node-side consumers load it through `scripts/lib/load-registry.mjs`, which bundles the TypeScript via Vite SSR — the same mechanism `ssr-smoke.mjs` uses, so build scripts and application resolve modules identically.
 
-### The 53 routes
+### The 54 routes
 
 | Kind | Pattern | Count | Derived from |
 |---|---|---|---|

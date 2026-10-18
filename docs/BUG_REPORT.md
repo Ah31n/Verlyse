@@ -55,8 +55,8 @@
 ---
 
 ## Defect 5 — `Header.tsx` Pulling `gsap` (`114 kB`) into the Blocking Entry Chunk (`B2`) & Pre-Import 3D Gating (`B1`)
-- **Summary:** (1) `Header.tsx` imported `Magnetic` from `../cinematic`, which re-exported `src/components/cinematic/primitives.tsx` (`import gsap from 'gsap'` + `ScrollTrigger`), forcing all 53 routes to download `gsap` inside the initial `index-*.js` entry bundle (`252.87 kB` raw / `89.38 kB` gzip). (2) `Home.tsx` mounted `<SpatialArchive>` before checking `useWebGLSupport()` and `useReducedMotion()`, downloading `three-*.js` (`770.49 kB`) on `/` even when WebGL was disabled or reduced motion was active.
-- **Environment / version:** Production Vite build across all 53 routes.
+- **Summary:** (1) `Header.tsx` imported `Magnetic` from `../cinematic`, which re-exported `src/components/cinematic/primitives.tsx` (`import gsap from 'gsap'` + `ScrollTrigger`), forcing all 54 routes to download `gsap` inside the initial `index-*.js` entry bundle (`252.87 kB` raw / `89.38 kB` gzip). (2) `Home.tsx` mounted `<SpatialArchive>` before checking `useWebGLSupport()` and `useReducedMotion()`, downloading `three-*.js` (`770.49 kB`) on `/` even when WebGL was disabled or reduced motion was active.
+- **Environment / version:** Production Vite build across all 54 routes.
 - **Route / feature:** Global `Header` / initial bundle load (`B2`) and `Home.tsx` `Cover` (`B1`).
 - **Expected:** `gsap` should only load on routes that mount `ScrollTrigger` camera primitives, and `SpatialArchive` should only lazy-import when `glSupported && !reduce`.
 - **Confirmed root cause:** `Magnetic` lived inside `src/components/cinematic/primitives.tsx` alongside `gsap` and `ScrollTrigger`; `Home.tsx` checked `useWebGLSupport()` inside `SpatialArchive` rather than before mounting the lazy component.

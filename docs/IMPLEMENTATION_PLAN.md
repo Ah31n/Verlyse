@@ -35,7 +35,7 @@
 - **Backup/rollback:** All changes are tracked on git branch `arena/741ed410-verlyse` and can be reverted per file via `git checkout -- <path>`.
 
 ## Verification
-- `npm run build` — `tsc -b` 0 errors, Vite bundle emitted, 53 prerendered shells, 53 sitemap URLs
+- `npm run build` — `tsc -b` 0 errors, Vite bundle emitted, 54 prerendered shells, 54 sitemap URLs
 - `npm run typecheck:api && npm run check:secrets` — 0 API type errors, 0 secret leaks
-- `npm run test:metadata && npm run test:smoke && npm run test:newsletter && npm run test:flows` — 53 shells verified, 20/20 SSR route cases rendered, 15/15 synthetic newsletter checks, 14/14 JSDOM flows
+- `npm run test:metadata && npm run test:smoke && npm run test:newsletter && npm run test:flows` — 54 shells verified, 21/21 SSR route cases rendered, 15/15 synthetic newsletter checks, 14/14 JSDOM flows
 - `node scripts/asset-audit.mjs && node scripts/interaction-audit.mjs && node scripts/verify-flags.mjs` — 45/45 role-subset assets & 104/104 full public media/font inventory, 17/17 Chromium interaction checks, 0 console errors

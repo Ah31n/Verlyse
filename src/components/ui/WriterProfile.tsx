@@ -187,7 +187,7 @@ export default function WriterProfile({ author }: { author: Author }) {
                   className="group flex items-center gap-6 border-b border-white/10 py-5 no-underline"
                 >
                   <div className="img-frame relative h-20 w-16 shrink-0 overflow-hidden">
-                    <img src={a.cover} alt="" loading="lazy" decoding="async" onError={(e) => handleImgError(e, a.title)} className="h-full w-full object-cover transition-transform duration-[1200ms] group-hover:scale-[1.1]" />
+                    <img src={a.cover} alt="" width={64} height={80} loading="lazy" decoding="async" onError={(e) => handleImgError(e, a.title)} className="h-full w-full object-cover transition-transform duration-[1200ms] group-hover:scale-[1.1]" />
                   </div>
                   <div className="min-w-0">
                     <MetaRow category={a.category} readingTime={a.readingTime} />
@@ -229,7 +229,7 @@ export default function WriterProfile({ author }: { author: Author }) {
                 {others.map((a) => (
                   <Link key={a.id} to={`/article/${a.id}`} className="group block no-underline">
                     <div {...spotlitGlide('restrained')} className="img-frame st-spotlit relative aspect-[4/5] overflow-hidden border border-white/10">
-                      <img src={a.cover} alt="" loading="lazy" decoding="async" onError={(e) => handleImgError(e, a.title)} className="h-full w-full object-cover transition-transform duration-[1400ms] group-hover:scale-[1.08]" />
+                      <img src={a.cover} alt="" width={320} height={400} loading="lazy" decoding="async" onError={(e) => handleImgError(e, a.title)} className="h-full w-full object-cover transition-transform duration-[1400ms] group-hover:scale-[1.08]" />
                     </div>
                     <p className="mt-2.5 font-serif text-base leading-snug text-ivory/90 transition-colors group-hover:text-[#E8D9A8]">“{a.title}”</p>
                     <p className="mt-1 font-mono text-[9px] uppercase tracking-[0.30em] text-white/60">{getAuthor(a.authorId)?.name}</p>

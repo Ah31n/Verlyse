@@ -57,16 +57,16 @@ export default function About() {
 
       <div className="relative mx-auto max-w-[1080px] px-[clamp(1.25rem,4vw,4.75rem)] pb-[clamp(4rem,9vh,7rem)] pt-[clamp(7rem,15vh,9.5rem)]">
         {/* ——— header — ghost COLOPHON, quiet ——— */}
-        <div className="text-center">
+        <div className="relative text-center">
+          {/* Beat 1 — CRASH ZOOM. The ghost imprint dollies through the lens
+              and dissolves as the visitor scrolls. GSAP owns this wrapper's
+              transform only; the h1's real text is untouched. */}
+          <CrashZoom className="pointer-events-none absolute inset-x-0 top-1/2 -translate-y-1/2">
+            <span aria-hidden="true" className="block select-none font-serif text-[clamp(4rem,11vw,8.5rem)] font-semibold leading-none text-transparent [-webkit-text-stroke:1px_rgba(184,145,70,0.08)]">
+              COLOPHON
+            </span>
+          </CrashZoom>
           <h1 className="relative font-serif text-[clamp(2.6rem,7vw,5.5rem)] font-light leading-[0.92] tracking-[-0.02em] text-ivory">
-            {/* Beat 1 — CRASH ZOOM. The ghost imprint dollies through the lens
-                and dissolves as the visitor scrolls. GSAP owns this wrapper's
-                transform only; the h1's real text is untouched. */}
-            <CrashZoom className="pointer-events-none absolute inset-x-0 top-1/2 -translate-y-1/2">
-              <span aria-hidden="true" className="block select-none font-serif text-[clamp(4rem,11vw,8.5rem)] font-semibold leading-none text-transparent [-webkit-text-stroke:1px_rgba(184,145,70,0.08)]">
-                COLOPHON
-              </span>
-            </CrashZoom>
             <span className="relative">The <FloralWord variant="camellia">colophon</FloralWord></span>
           </h1>
           <p className="mt-4 font-mono text-[10px] uppercase tracking-[0.34em] text-gold/80">

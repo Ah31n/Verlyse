@@ -146,14 +146,16 @@ export default function Community() {
       <div className="relative mx-auto max-w-[1440px] px-[clamp(1.25rem,4vw,4.75rem)] pb-[clamp(4rem,9vh,7rem)] pt-[clamp(7rem,15vh,9.5rem)]">
         {/* ——— header — ghost COMMONS + the reel's promise ——— */}
         <div className="text-center">
-          <h1 className="relative font-serif text-[clamp(2.8rem,8vw,6.5rem)] font-light leading-[0.9] tracking-[-0.02em] text-ivory">
+          <div className="relative">
             <CrashZoom className="pointer-events-none absolute inset-x-0 top-1/2 -translate-y-1/2">
               <span aria-hidden="true" className="block select-none font-serif text-[clamp(4rem,12vw,9.5rem)] font-semibold leading-none text-transparent [-webkit-text-stroke:1px_rgba(184,145,70,0.08)]">
                 COMMONS
               </span>
             </CrashZoom>
-            <span className="relative">The <FloralWord variant="marigold">commons</FloralWord></span>
-          </h1>
+            <h1 className="relative font-serif text-[clamp(2.8rem,8vw,6.5rem)] font-light leading-[0.9] tracking-[-0.02em] text-ivory">
+              <span className="relative">The <FloralWord variant="marigold">commons</FloralWord></span>
+            </h1>
+          </div>
           <p className="mt-4 font-mono text-[10px] uppercase tracking-[0.34em] text-gold/85">
             The feed in pictures — all {LEDGER.features} covers, held not driven
           </p>

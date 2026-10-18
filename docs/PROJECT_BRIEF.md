@@ -11,7 +11,7 @@
 - **Desired outcome:** Complete assessment and alignment of Verlyse Media's UI stack, motion/3D stack, StringTune runtime, accessibility/reduced-motion compliance, bundle architecture, and required `.md` engineering documentation under the Arena AI Development Skill Pack.
 
 ## Core journey
-1. **Entrance & Issue Discovery (`/`, `/articles`, `/categories/:slug`):** Visitor arrives at the Issue № 01 cover, explores the 20 folios or steps through the 7 department wings (`Essays`, `Art`, `Poetry`, `Social Issues`, `Horror`, `Lifestyle`, `Stories`), and filters or searches via `⌘K` / `Ctrl+K` (`SearchOverlay`) or saves folios to `The reading list` (`SavedDrawer`).
+1. **Entrance & Issue Discovery (`/`, `/articles`, `/categories/:slug`):** Visitor arrives at the Issue № 01 cover, explores the 21 folios or steps through the 7 department wings (`Essays`, `Art`, `Poetry`, `Social Issues`, `Horror`, `Lifestyle`, `Stories`), and filters or searches via `⌘K` / `Ctrl+K` (`SearchOverlay`) or saves folios to `The reading list` (`SavedDrawer`).
 2. **Feature Reading & Exhibition Inspection (`/article/:id`, `/creator/:authorId`, `/room`):** Reader reads full-text works in vibe-adaptive reading rooms (`ReadingRoom`), inspects multi-plate visual features in the keyboard-accessible lightbox (`ArtGallery`), explores contributor dossiers (`WriterProfile`), or walks the 3D spatial archive (`/room`).
 3. **Participation & Desk Correspondence (`/submit`, `/ambassadors`, `/contact`, Newsletter):** Reader subscribes to *The Verlyse Letter* (`POST /api/newsletter` with honest `mailto:` fallback), applies to official open roles (**Researcher**, **Palette Designer**, **Content Writer**) via the canonical Google Form, or submits original writing/art to the editorial desk.
 

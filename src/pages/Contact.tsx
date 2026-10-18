@@ -135,14 +135,16 @@ path: '/contact',
         </div>
         <div className="relative mx-auto w-full max-w-page px-[clamp(1.25rem,4vw,4.75rem)] text-center">
           <Reveal><p className="eyebrow">Verlyse Media — the desk</p></Reveal>
-          <h1 className="relative mt-8 font-serif text-[clamp(2.6rem,7vw,5.5rem)] font-light leading-[0.92] tracking-[-0.02em] text-ivory">
+          <div className="relative mt-8">
             <CrashZoom className="pointer-events-none absolute inset-x-0 top-1/2 -translate-y-1/2">
               <span aria-hidden="true" className="block select-none whitespace-nowrap font-serif text-[clamp(3.2rem,8.5vw,7rem)] font-semibold leading-none text-transparent [-webkit-text-stroke:1px_rgba(184,145,70,0.08)]">
                 THE CORRESPONDENCE DESK
               </span>
             </CrashZoom>
-            <span className="relative">The correspondence <FloralWord variant="wax-rose">desk</FloralWord></span>
-          </h1>
+            <h1 className="relative font-serif text-[clamp(2.6rem,7vw,5.5rem)] font-light leading-[0.92] tracking-[-0.02em] text-ivory">
+              <span className="relative">The correspondence <FloralWord variant="wax-rose">desk</FloralWord></span>
+            </h1>
+          </div>
           <Reveal delay={0.2}>
             <p className="mt-6 font-mono text-[10px] uppercase tracking-[0.3em] text-gold/85">
               Write to the publication — a letter, not a form

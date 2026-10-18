@@ -927,6 +927,8 @@ function Departments() {
                   <img
                     src={leadFolio.cover}
                     alt={`${leadFolio.title} — ${activeCat.name}`}
+                    width={640}
+                    height={400}
                     loading="lazy"
                     decoding="async"
                     onError={(e) => handleImgError(e, leadFolio.title, leadFolioNo)}
@@ -1067,7 +1069,7 @@ function Colophon() {
           </div>
           <Reveal className="relative">
             <div {...spotlitGlide('measured')} className="img-frame st-spotlit aspect-[4/5] max-w-[92%]">
-              <img src="/img/works/DaDY7WRkw0y-2.webp" alt="Plate II of the first feature, “Their Voices Matter”" className="h-full w-full object-cover" loading="lazy" decoding="async" onError={(e) => handleImgError(e, 'Their Voices Matter', folioNoOf('their-voices-matter'))} />
+              <img src="/img/works/DaDY7WRkw0y-2.webp" alt="Plate II of the first feature, “Their Voices Matter”" width={800} height={1000} className="h-full w-full object-cover" loading="lazy" decoding="async" onError={(e) => handleImgError(e, 'Their Voices Matter', folioNoOf('their-voices-matter'))} />
             </div>
             <div aria-hidden="true" className="absolute -bottom-7 -left-7 -right-7 top-7 border border-gold/50" />
           </Reveal>
@@ -1242,6 +1244,8 @@ function SpatialReading({ pickIdx, onSelect }: { pickIdx: number; onSelect: (i: 
                 <img
                   src={active.cover}
                   alt={`Selected plate — “${active.title}” by ${au?.name}`}
+                  width={800}
+                  height={1000}
                   loading="lazy"
                   decoding="async"
                   onError={(e) => handleImgError(e, active.title, folio)}

@@ -409,7 +409,10 @@ export default function ArticleDetail() {
   const vibe = VIBES[article.vibe ?? 'solemn']
   const v = REVEAL_VARIANTS[vibe.reveal]
   const figures = article.figures ?? []
-  const isVerse = article.body.length > 1 && article.body.reduce((a, p) => a + p.length, 0) / article.body.length < 135
+  const avgBodyLen = article.body.reduce((a, p) => a + p.length, 0) / Math.max(article.body.length, 1)
+  const isVerse =
+    article.body.length > 1 &&
+    ((article.category === 'Poetry' && avgBodyLen < 160) || article.id === 'a-students-worth')
   /* the golden point — a line from the feature itself, lifted mid-story */
   const pullIndex = Math.floor(article.body.length * 0.55)
   const pull =
@@ -543,8 +546,10 @@ export default function ArticleDetail() {
                   <img
                     src={article.cover}
                     alt={article.slideDescriptions?.[0]?.alt ?? coverAlt(article)}
+                    width={article.slideDescriptions?.[0]?.width ?? 1080}
+                    height={article.slideDescriptions?.[0]?.height ?? 1350}
                     className="aspect-[4/5] w-full object-contain"
-                    loading="lazy"
+                    loading="eager"
                     decoding="async"
                     onError={(e) => handleImgError(e, article.title, folio)}
                   />
@@ -580,10 +585,10 @@ export default function ArticleDetail() {
                     <img
                       src={article.cover}
                       alt={article.slideDescriptions?.[0]?.alt ?? coverAlt(article)}
-                      width={article.slideDescriptions?.[0]?.width}
-                      height={article.slideDescriptions?.[0]?.height}
+                      width={article.slideDescriptions?.[0]?.width ?? 1080}
+                      height={article.slideDescriptions?.[0]?.height ?? 1350}
                       className={article.slideDescriptions?.[0]?.width ? 'w-full object-contain' : 'aspect-[4/5] w-full object-cover'}
-                      loading="lazy"
+                      loading="eager"
                       decoding="async"
                       onError={(e) => handleImgError(e, article.title, folio)}
                     />
@@ -602,7 +607,16 @@ export default function ArticleDetail() {
         /* ——— CINEMATIC: the default full-bleed ——— */
         <section className="relative flex min-h-[92svh] items-end overflow-hidden pt-36">
           <div className="pointer-events-none absolute inset-0">
-            <img src={article.cover} alt={coverAlt(article)} className="h-full w-full object-cover" decoding="async" onError={(e) => handleImgError(e, article.title, folio)} />
+            <img
+              src={article.cover}
+              alt={coverAlt(article)}
+              width={1080}
+              height={1350}
+              loading="eager"
+              className="h-full w-full object-cover"
+              decoding="async"
+              onError={(e) => handleImgError(e, article.title, folio)}
+            />
           </div>
           <div aria-hidden="true" className={`absolute inset-0 ${vibe.overlay}`} />
           <VibeAmbient vibe={article.vibe ?? 'solemn'} section="hero" />
@@ -693,6 +707,11 @@ export default function ArticleDetail() {
             >
               <div className="st-measure h-px w-full origin-left bg-gold/70" />
             </div>
+            {article.editorialFormat === 'carousel-feature' && (
+              <p className="mb-4 font-mono text-[10px] uppercase tracking-[0.28em] text-gold">
+                Editorial Statement — Accompanying the Plates
+              </p>
+            )}
             {article.body.map((p, i) => (
               <motion.div
                 key={i}
@@ -846,7 +865,7 @@ export default function ArticleDetail() {
       </section>
 
       {/* the moment of reflection before the ending */}
-      {article.reflection && (
+      {article.reflection && article.editorialFormat !== 'carousel-feature' && (
         <section aria-hidden="true" className="relative py-[clamp(5rem,10vh,8rem)]">
           <div className="mx-auto max-w-[640px] px-[clamp(1.75rem,5.5vw,4.75rem)] text-center">
             <ReflectionLine>
@@ -927,6 +946,9 @@ export default function ArticleDetail() {
                   <img
                     src={related[0].cover}
                     alt=""
+                    width={1080}
+                    height={1350}
+                    loading="lazy"
                     decoding="async"
                     onError={(e) => handleImgError(e, related[0].title, folioNoOf(related[0].id))}
                     className="h-full w-full object-cover opacity-40 animate-vm-kenburns"
@@ -973,7 +995,7 @@ export default function ArticleDetail() {
                   <Reveal key={a.id}>
                     <Link to={`/article/${a.id}`} className="group flex items-center gap-6 border-t border-white/10 pt-6 no-underline">
                       <div className="img-frame relative h-24 w-20 shrink-0 overflow-hidden">
-                        <img src={a.cover} alt="" loading="lazy" decoding="async" onError={(e) => handleImgError(e, a.title, folioNoOf(a.id))} className="h-full w-full object-cover transition-transform duration-[1200ms] group-hover:scale-[1.1]" />
+                        <img src={a.cover} alt="" width={80} height={96} loading="lazy" decoding="async" onError={(e) => handleImgError(e, a.title, folioNoOf(a.id))} className="h-full w-full object-cover transition-transform duration-[1200ms] group-hover:scale-[1.1]" />
                       </div>
                       <div>
                         <MetaRow category={a.category} author={au?.name} readingTime={a.readingTime} />

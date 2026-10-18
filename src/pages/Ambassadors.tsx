@@ -97,14 +97,16 @@ export default function Ambassadors() {
           <HaikeiContourPlane tone="dark" seed={7} className="opacity-20" />
         </div>
         <div className="relative mx-auto w-full max-w-page px-[clamp(1.25rem,4vw,4.75rem)] text-center">
-          <h1 className="relative font-serif text-[clamp(2.8rem,8vw,6.5rem)] font-light leading-[0.9] tracking-[-0.02em] text-ivory">
+          <div className="relative">
             <CrashZoom className="pointer-events-none absolute inset-x-0 top-1/2 -translate-y-1/2">
               <span aria-hidden="true" className="block select-none font-serif text-[clamp(4rem,12vw,9.5rem)] font-semibold leading-none text-transparent [-webkit-text-stroke:1px_rgba(184,145,70,0.08)]">
                 PEOPLE
               </span>
             </CrashZoom>
-            <span className="relative">The people <FloralWord variant="astrolabe-bloom">in the room</FloralWord></span>
-          </h1>
+            <h1 className="relative font-serif text-[clamp(2.8rem,8vw,6.5rem)] font-light leading-[0.9] tracking-[-0.02em] text-ivory">
+              <span className="relative">The people <FloralWord variant="astrolabe-bloom">in the room</FloralWord></span>
+            </h1>
+          </div>
           <p className="mt-4 font-mono text-[10px] uppercase tracking-[0.34em] text-gold/85">
             The people — ambassadors · team · the open seat
           </p>

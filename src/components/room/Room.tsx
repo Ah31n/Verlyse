@@ -315,7 +315,7 @@ export default function Room() {
               A spatial archive of {count} folios
             </p>
             <h1 className="mt-4 max-w-[10ch] font-serif text-[clamp(2.7rem,13vw,7.5rem)] font-semibold leading-[0.94] md:max-w-none">
-              The Keeping<br />Room
+              The Keeping <br />Room
             </h1>
             <p className="mt-6 max-w-xl font-serif text-[clamp(1.1rem,2vw,1.5rem)] italic leading-snug text-cream/90">
               Enter quietly. Pull a plate when a title calls to you. Read, then return it

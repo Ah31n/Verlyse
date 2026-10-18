@@ -305,6 +305,8 @@ function Archive() {
                 <img
                   src={activeFolio.thumbnail ?? activeFolio.cover}
                   alt=""
+                  width={64}
+                  height={56}
                   loading="lazy"
                   decoding="async"
                   onError={(e) => handleImgError(e, activeFolio.title, activeFolioNum)}
@@ -401,6 +403,8 @@ function Archive() {
                         <img
                           src={a.thumbnail ?? a.cover}
                           alt=""
+                          width={320}
+                          height={118}
                           loading="lazy"
                           decoding="async"
                           onError={(e) => handleImgError(e, a.title, folioNoOf(a.id))}

@@ -149,12 +149,14 @@ export default function Categories() {
       >
         {/* ——— MID · header — ghost WINGS + real subtitle ——— */}
         <div className="text-center">
-          <h1 className="relative font-serif text-[clamp(3.4rem,10vw,8rem)] font-light leading-[0.85] tracking-[-0.02em] text-ivory">
+          <div className="relative">
             <span aria-hidden="true" className="pointer-events-none absolute inset-x-0 top-1/2 -translate-y-1/2 select-none font-serif text-[clamp(4rem,13vw,10.5rem)] font-semibold leading-none text-transparent [-webkit-text-stroke:1px_rgba(184,145,70,0.08)]">
               WINGS
             </span>
-            <span className="relative">The <FloralWord variant="iris">wings</FloralWord></span>
-          </h1>
+            <h1 className="relative font-serif text-[clamp(3.4rem,10vw,8rem)] font-light leading-[0.85] tracking-[-0.02em] text-ivory">
+              <span className="relative">The <FloralWord variant="iris">wings</FloralWord></span>
+            </h1>
+          </div>
           <p className="mt-4 font-mono text-[10px] uppercase tracking-[0.34em] text-gold/85">
             The wings — seven departments of Verlyse Media
           </p>
@@ -282,6 +284,7 @@ export default function Categories() {
                 <section
                   key={c.slug}
                   aria-label={`${c.name} wing shelf`}
+                  aria-hidden={ghosted || undefined}
                   className={`border transition-all duration-700 ${
                     isActive
                       ? 'border-gold/60 bg-[#240912]/90 p-6 shadow-[0_20px_50px_rgba(0,0,0,0.45)] md:p-8'
@@ -332,6 +335,8 @@ export default function Categories() {
                             <img
                               src={a.thumbnail ?? a.cover}
                               alt=""
+                              width={48}
+                              height={56}
                               loading="lazy"
                               decoding="async"
                               onError={(e) => handleImgError(e, a.title, folioNoOf(a.id))}
