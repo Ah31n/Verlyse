@@ -50,7 +50,7 @@
     },
     "qubool-hai-gallery-and-caption": {
       "status": "PASS",
-      "detail": "{\"plateCount\":9,\"noRawShortcodeLeak\":true,\"hasCredits\":true,\"hasVerbatimCaption\":true,\"noMinusOneLikes\":true}"
+      "detail": "{\"homeHasQubool\":true,\"plateCount\":8,\"noRawShortcodeLeak\":true,\"hasCredits\":true,\"hasVerbatimCaption\":true,\"noMinusOneLikes\":true}"
     },
     "forms-and-profile-a11y": {
       "status": "PASS",

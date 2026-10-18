@@ -451,6 +451,7 @@ function StoryCard({
           <img
             src={work.cover}
             alt={`${work.title} — ${work.category}`}
+            referrerPolicy="no-referrer"
             loading="lazy"
             decoding="async"
             onError={(e) => handleImgError(e, work.title, folioNoOf(work.id))}
@@ -496,7 +497,9 @@ function StoryCard({
             )}
           </h3>
           {au && (
-            <p className="mt-2 font-mono text-[9px] uppercase tracking-[0.26em] text-white/45">by {au.name} {au.handle}</p>
+            <p className="mt-2 font-mono text-[9px] uppercase tracking-[0.26em] text-white/45">
+              {work.credit ? work.credit : `by ${au.name} ${au.handle}`}
+            </p>
           )}
           {showExcerpt && (
             <p className="mt-4 max-w-[46ch] text-[15px] leading-[1.8] text-white/60">{work.excerpt}</p>
@@ -513,10 +516,8 @@ function StoryCard({
 }
 
 function WorksStrip() {
-  const hasPendingBinary = (a: (typeof ARTICLES)[number]) =>
-    Boolean(a.slideDescriptions?.some((d) => d.status === 'pending-source-binary'))
   const works = ARTICLES.slice()
-    .sort((a, b) => Number(hasPendingBinary(a)) - Number(hasPendingBinary(b)) || b.date.localeCompare(a.date))
+    .sort((a, b) => b.date.localeCompare(a.date))
     .slice(0, 8)
   const [cover, s1, s2, ...rest] = works
   const spread = rest.slice(0, 3)
@@ -567,8 +568,8 @@ function WorksStrip() {
                     Enter viewing room →
                   </Link>
                 </div>
-                <div className="grid grid-cols-5 gap-2.5">
-                  {cover.slides.slice(0, 5).map((src, idx) => (
+                <div className={`grid gap-2.5 ${cover.slides.length === 8 ? 'grid-cols-4' : 'grid-cols-5'}`}>
+                  {cover.slides.slice(0, cover.slides.length === 8 ? 8 : 5).map((src, idx) => (
                     <Link
                       key={src}
                       to={`/article/${cover.id}`}
@@ -579,6 +580,9 @@ function WorksStrip() {
                       <img
                         src={src}
                         alt=""
+                        width={cover.slideDescriptions?.[idx]?.width ?? 800}
+                        height={cover.slideDescriptions?.[idx]?.height ?? 1000}
+                        referrerPolicy="no-referrer"
                         loading="lazy"
                         decoding="async"
                         onError={(e) => handleImgError(e, cover.title, folioNoOf(cover.id))}

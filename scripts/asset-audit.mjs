@@ -18,6 +18,9 @@ const expected = {
     '/img/works/DciqQXTCilh-1.webp',
     '/img/works/DeUZFPTCjPU-1.webp', '/img/works/DeUZFPTCjPU-2.webp', '/img/works/DeUZFPTCjPU-3.webp',
     '/img/works/DeUZFPTCjPU-4.webp', '/img/works/DeUZFPTCjPU-5.webp',
+    '/img/works/Dehg27tE_hF-1.webp', '/img/works/Dehg27tE_hF-2.webp', '/img/works/Dehg27tE_hF-3.webp',
+    '/img/works/Dehg27tE_hF-4.webp', '/img/works/Dehg27tE_hF-5.webp', '/img/works/Dehg27tE_hF-6.webp',
+    '/img/works/Dehg27tE_hF-7.webp', '/img/works/Dehg27tE_hF-8.webp',
   ],
   inner: ['/img/inner/afghanistan-photo.webp', '/img/inner/balochistan-photo.webp', '/img/inner/kashmir-photo.webp', '/img/inner/khageena-dish.webp', '/img/inner/students-painting.webp', '/img/inner/tasbih-calligraphy.webp', '/img/inner/water-cat-art.webp'],
   signature: ['/img/signatures/tvm-hero.webp'],
@@ -115,17 +118,7 @@ async function run() {
   await scrollPageToTriggerLazyAssets(page)
   await page.waitForTimeout(1000)
 
-  const pendingSourceAssets = [
-    '/img/works/Dehg27tE_hF-1.webp',
-    '/img/works/Dehg27tE_hF-2.webp',
-    '/img/works/Dehg27tE_hF-3.webp',
-    '/img/works/Dehg27tE_hF-4.webp',
-    '/img/works/Dehg27tE_hF-5.webp',
-    '/img/works/Dehg27tE_hF-6.webp',
-    '/img/works/Dehg27tE_hF-7.webp',
-    '/img/works/Dehg27tE_hF-8.webp',
-    '/img/works/Dehg27tE_hF-9.webp',
-  ]
+  const pendingSourceAssets = []
   let totalRes = 0
   let totalExp = 0
   for (const f of Object.values(findings)) {

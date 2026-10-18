@@ -575,7 +575,7 @@ export default function ArticleDetail() {
                         className="aspect-[4/5] w-full object-contain"
                         loading="eager"
                         decoding="async"
-                        onError={(e) => handleImgError(e, `${article.title} — She didn’t say Qubool Hai`, `${folio} · 01`, 'Plate 01 / 09 · Opening Statement')}
+                        onError={(e) => handleImgError(e, `${article.title} — She didn’t say Qubool Hai`, `${folio} · 01`, 'Plate 01 / 08 · Opening Statement')}
                       />
                       <span aria-hidden="true" className="pointer-events-none absolute inset-2 border border-gold/35" />
                     </div>

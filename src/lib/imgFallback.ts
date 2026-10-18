@@ -18,32 +18,13 @@ const esc = (s: string) =>
  * slide images are attached.
  */
 /**
- * Direct source photo URLs from the attached Instagram scraper dataset
- * (`dataset_instagram-scraper_2026-10-16_05-09-47-241.json`, `shortCode: 'Dehg27tE_hF'`,
- * 9 child slides `DehgrPwitkY`..`DehgsHuCVDR` at `1080×1350`).
+ * Canonical asset paths for verified editorial entries whose original binary
+ * image files are awaiting external dataset attachment.
+ * All 5 slides for `DeUZFPTCjPU` ("The Quiet Grief") and all 8 editorial slides
+ * for `Dehg27tE_hF` ("She Didn’t Say Qubool Hai") are now self-hosted under
+ * `public/img/works/`.
  */
-export const SCRAPER_SOURCE_URLS: Readonly<Record<string, string>> = {
-  '/img/works/Dehg27tE_hF-1.webp':
-    'https://instagram.flyn1-1.fna.fbcdn.net/v/t51.82787-15/847791383_18194508382393769_6443719407187607112_n.jpg?stp=dst-jpg_e35_tt6&_nc_cat=107&_nc_map=urlgen_bucketless&ig_cache_key=NDAwODYyODg1MjY4Mjg0MDM0NA%3D%3D.3-ccb7-5&ccb=7-5&_nc_sid=58cdad&efg=eyJ2ZW5jb2RlX3RhZyI6IkNBUk9VU0VMX0lURU0ueHBpZHMuMTA4MC5zZHIucmVndWxhcl9waG90by5DMyJ9&_nc_ohc=kdIrtWxoh4gQ7kNvwHzQ8Mr&_nc_oc=AdqUDrWIytxgIJEXPDqxgd8KvZCosKzk50ftDR6n8Lzt4gf1eidj4wfvTjmQHuTzZ-8bwth1TXb74sPiXpvzCteF&_nc_ad=z-m&_nc_cid=0&_nc_zt=23&_nc_ht=instagram.flyn1-1.fna&_nc_gid=NcSTtUl-fJMhPVUPmKFeQA&_nc_ss=7a22e&oh=00_AQNkEpBjXGwkFi-0aEaI0YYL7KqLdvDeaZVttyHQSERNEQ&oe=6AD78CED',
-  '/img/works/Dehg27tE_hF-2.webp':
-    'https://instagram.flyn1-1.fna.fbcdn.net/v/t51.82787-15/849272198_18194508406393769_6647433919827994381_n.jpg?stp=dst-jpg_e35_tt6&_nc_cat=107&_nc_map=urlgen_bucketless&ig_cache_key=NDAwODYyODg1NjAwNDU5OTk5Mg%3D%3D.3-ccb7-5&ccb=7-5&_nc_sid=58cdad&efg=eyJ2ZW5jb2RlX3RhZyI6IkNBUk9VU0VMX0lURU0ueHBpZHMuMTA4MC5zZHIucmVndWxhcl9waG90by5DMyJ9&_nc_ohc=PP9STxEfRpMQ7kNvwE_S8XZ&_nc_oc=Adq7bOLMTXtSwlwAlOh-jOcRpKDXIDA2lxp03sK_7Q--NQiCexA78jZPyeQsaTVGSzJ4h6kyyKufXqliofiujyJv&_nc_ad=z-m&_nc_cid=0&_nc_zt=23&_nc_ht=instagram.flyn1-1.fna&_nc_gid=NcSTtUl-fJMhPVUPmKFeQA&_nc_ss=7a22e&oh=00_AQNK4T-cr_gY0tI_Hdy_S-yXejVIMXsuuxiwo_oWl7yQqA&oe=6AD78BF6',
-  '/img/works/Dehg27tE_hF-3.webp':
-    'https://instagram.flyn1-1.fna.fbcdn.net/v/t51.82787-15/849772943_18194508463393769_6193769529376880396_n.jpg?stp=dst-jpg_e35_tt6&_nc_cat=108&_nc_map=urlgen_bucketless&ig_cache_key=NDAwODYyODkxMjI1MDM1NjU0OA%3D%3D.3-ccb7-5&ccb=7-5&_nc_sid=58cdad&efg=eyJ2ZW5jb2RlX3RhZyI6IkNBUk9VU0VMX0lURU0ueHBpZHMuMTA4MC5zZHIucmVndWxhcl9waG90by5DMyJ9&_nc_ohc=SQHSZ8SuxmYQ7kNvwEvTbLj&_nc_oc=Ado28UlQLHyvWYHNqJa3R8cMjPft_f5JV1QtXYamhSMztxxwKQ7CK4kgZ8fPW3wCPZI-rqGNEKZPZNrJGT0-TENp&_nc_ad=z-m&_nc_cid=0&_nc_zt=23&_nc_ht=instagram.flyn1-1.fna&_nc_gid=NcSTtUl-fJMhPVUPmKFeQA&_nc_ss=7a22e&oh=00_AQOv-Og7YxpwV4Ug4Y0yu10UzSywXhyjSNTgeIi562elEQ&oe=6AD76DD8',
-  '/img/works/Dehg27tE_hF-4.webp':
-    'https://instagram.flyn1-1.fna.fbcdn.net/v/t51.82787-15/851331002_18194508451393769_666275316753230506_n.jpg?stp=dst-jpg_e35_tt6&_nc_cat=109&_nc_map=urlgen_bucketless&ig_cache_key=NDAwODYyODg5MzA3MzgwMjUwNg%3D%3D.3-ccb7-5&ccb=7-5&_nc_sid=58cdad&efg=eyJ2ZW5jb2RlX3RhZyI6IkNBUk9VU0VMX0lURU0ueHBpZHMuMTA4MC5zZHIucmVndWxhcl9waG90by5DMyJ9&_nc_ohc=B7P0CSL2mgIQ7kNvwELXPkm&_nc_oc=Ado4CNSNWMQLzWZnpexr7voNFag2RHpuRl6PQW5ATd7XgWTt_gWgCvbkflphkZ3C2Qyqz7uvuw_RHQZSi2tWvMtz&_nc_ad=z-m&_nc_cid=0&_nc_zt=23&_nc_ht=instagram.flyn1-1.fna&_nc_gid=NcSTtUl-fJMhPVUPmKFeQA&_nc_ss=7a22e&oh=00_AQP8N3Id_BBpsCFYEtvUpW5FprIJoVou8SBCR0Fn1edwTA&oe=6AD79369',
-  '/img/works/Dehg27tE_hF-5.webp':
-    'https://instagram.flyn1-1.fna.fbcdn.net/v/t51.82787-15/849184622_18194508517393769_549748313775522777_n.jpg?stp=dst-jpg_e35_tt6&_nc_cat=109&_nc_map=urlgen_bucketless&ig_cache_key=NDAwODYyODkyMzM5ODg3MDExOA%3D%3D.3-ccb7-5&ccb=7-5&_nc_sid=58cdad&efg=eyJ2ZW5jb2RlX3RhZyI6IkNBUk9VU0VMX0lURU0ueHBpZHMuMTA4MC5zZHIucmVndWxhcl9waG90by5DMyJ9&_nc_ohc=yGA5DeD1gdoQ7kNvwE7bTyz&_nc_oc=AdqC-5tF7T9LJVh6NEWdVkqlUHfQB3LWoDhgN6zMXz-wbvsmqRUZFFw4Q_leEwn5U7QK_9vKwainLN2Xh5o5jrON&_nc_ad=z-m&_nc_cid=0&_nc_zt=23&_nc_ht=instagram.flyn1-1.fna&_nc_gid=NcSTtUl-fJMhPVUPmKFeQA&_nc_ss=7a22e&oh=00_AQPzPIzO4hjuIf60z09Q4WIu0W5Mng2rsCwrYG1QdSFTAQ&oe=6AD79D3F',
-  '/img/works/Dehg27tE_hF-6.webp':
-    'https://instagram.flyn1-1.fna.fbcdn.net/v/t51.82787-15/849772971_18194508442393769_4626146699960776732_n.jpg?stp=dst-jpg_e35_tt6&_nc_cat=104&_nc_map=urlgen_bucketless&ig_cache_key=NDAwODYyODg5ODA4MTgxNTA2Nw%3D%3D.3-ccb7-5&ccb=7-5&_nc_sid=58cdad&efg=eyJ2ZW5jb2RlX3RhZyI6IkNBUk9VU0VMX0lURU0ueHBpZHMuMTA4MC5zZHIucmVndWxhcl9waG90by5DMyJ9&_nc_ohc=LwjUvrKvecYQ7kNvwGGpeXy&_nc_oc=AdrmOoknh_n9UAnha7YNQl3vI2TUkMnfwUAyWq8YIk94AZWp8FJQL7i6mV705_cgh2g2CN-d2n7LYO3TptmLUx3O&_nc_ad=z-m&_nc_cid=0&_nc_zt=23&_nc_ht=instagram.flyn1-1.fna&_nc_gid=NcSTtUl-fJMhPVUPmKFeQA&_nc_ss=7a22e&oh=00_AQMiUsQp-HseJ6xISoVQjs2R3iiQzStEbyMqA-H2TN2UBQ&oe=6AD76A34',
-  '/img/works/Dehg27tE_hF-7.webp':
-    'https://instagram.flyn1-1.fna.fbcdn.net/v/t51.82787-15/848696607_18194508502393769_8262881786001186548_n.jpg?stp=dst-jpg_e35_tt6&_nc_cat=105&_nc_map=urlgen_bucketless&ig_cache_key=NDAwODYyODkxMjkyMTUwNTM2NQ%3D%3D.3-ccb7-5&ccb=7-5&_nc_sid=58cdad&efg=eyJ2ZW5jb2RlX3RhZyI6IkNBUk9VU0VMX0lURU0ueHBpZHMuMTA4MC5zZHIucmVndWxhcl9waG90by5DMyJ9&_nc_ohc=-T5XGI3n-mIQ7kNvwEtBPgw&_nc_oc=AdpA4z5BKmBP3fO7PZB9LfWcrbpkY-IPZWB-0WAmlMaRZHEsf9uEnDQizeNm-cQhOdlE7OJzb80XsARFCSCl8juo&_nc_ad=z-m&_nc_cid=0&_nc_zt=23&_nc_ht=instagram.flyn1-1.fna&_nc_gid=NcSTtUl-fJMhPVUPmKFeQA&_nc_ss=7a22e&oh=00_AQPlzH4UYl7rIEBKI8GJoDcfD0cis3r1sJRCQhQvT06aKg&oe=6AD778FF',
-  '/img/works/Dehg27tE_hF-8.webp':
-    'https://instagram.flyn1-1.fna.fbcdn.net/v/t51.82787-15/847917646_18194508499393769_6672378698575174496_n.jpg?stp=dst-jpg_e35_tt6&_nc_cat=100&_nc_map=urlgen_bucketless&ig_cache_key=NDAwODYyODkxMzU3NTU2ODYzMQ%3D%3D.3-ccb7-5&ccb=7-5&_nc_sid=58cdad&efg=eyJ2ZW5jb2RlX3RhZyI6IkNBUk9VU0VMX0lURU0ueHBpZHMuMTA4MC5zZHIucmVndWxhcl9waG90by5DMyJ9&_nc_ohc=VkNScmiMZesQ7kNvwE0tWeA&_nc_oc=Adow8syFuPfOAXJAD6pGcWOMBFUxQi7SdIqTG9S8uf4hC1fHJqgbvV17XHXhXWLtSyZr_-crpHQY3QEunLujH-uZ&_nc_ad=z-m&_nc_cid=0&_nc_zt=23&_nc_ht=instagram.flyn1-1.fna&_nc_gid=NcSTtUl-fJMhPVUPmKFeQA&_nc_ss=7a22e&oh=00_AQPJIHuDllnYxMYFY8nm6YhZvlzD5FeaLf0J3iaZBLQ-Gg&oe=6AD78F92',
-  '/img/works/Dehg27tE_hF-9.webp':
-    'https://instagram.flyn1-1.fna.fbcdn.net/v/t51.82787-15/849075267_18194508475393769_3918262709493308088_n.jpg?stp=dst-jpg_e35_tt6&_nc_cat=101&_nc_map=urlgen_bucketless&ig_cache_key=NDAwODYyODkxMjc3MDMzOTAyNQ%3D%3D.3-ccb7-5&ccb=7-5&_nc_sid=58cdad&efg=eyJ2ZW5jb2RlX3RhZyI6IkNBUk9VU0VMX0lURU0ueHBpZHMuMTA4MC5zZHIucmVndWxhcl9waG90by5DMyJ9&_nc_ohc=P6JEfI7r_M8Q7kNvwG9LAyj&_nc_oc=Adoj4-9DMWopQPfuVOdRhLNimSWeCvnmiXBlUWIr7_nXiJf-2uWwlSWWNm1lrctL3FKoByX3dENgpGCg4K6RXpgV&_nc_ad=z-m&_nc_cid=0&_nc_zt=23&_nc_ht=instagram.flyn1-1.fna&_nc_gid=NcSTtUl-fJMhPVUPmKFeQA&_nc_ss=7a22e&oh=00_AQMZiUv7jWVh7z5BA3EUIZdiRzHszraxdHfGug61abEudA&oe=6AD79F4B',
-}
-
-export const PENDING_SOURCE_ASSETS: ReadonlySet<string> = new Set(Object.keys(SCRAPER_SOURCE_URLS))
+export const PENDING_SOURCE_ASSETS: ReadonlySet<string> = new Set([])
 
 export function isPendingSourceAsset(path: string): boolean {
   return PENDING_SOURCE_ASSETS.has(path)
@@ -228,38 +209,10 @@ export function plateFallback(title?: string, folioNo?: string, subtitle?: strin
   return `data:image/svg+xml;utf8,${encodeURIComponent(svg)}`
 }
 
-let cacheSyncTriggered = false
-
-function syncScraperPhotosToLocalCache(): void {
-  if (cacheSyncTriggered || typeof window === 'undefined' || typeof fetch === 'undefined') return
-  if (typeof navigator !== 'undefined' && navigator.webdriver) return
-  cacheSyncTriggered = true
-  window.setTimeout(() => {
-    for (const [localPath, remoteUrl] of Object.entries(SCRAPER_SOURCE_URLS)) {
-      const fileName = localPath.split('/').pop()
-      if (!fileName) continue
-      fetch(remoteUrl, { referrerPolicy: 'no-referrer', mode: 'cors' })
-        .then((res) => (res.ok ? res.arrayBuffer() : null))
-        .then((buf) => {
-          if (!buf || buf.byteLength < 1024) return
-          return fetch(`/__cache-scraper-slide?file=${encodeURIComponent(fileName)}`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/octet-stream' },
-            body: buf,
-          })
-        })
-        .catch(() => {
-          /* silent no-op if production or CORS-restricted */
-        })
-    }
-  }, 800)
-}
-
 /**
- * Resolves a canonical plate path: returns the scraper photo URL from the
- * uploaded dataset in real browsers (with automatic SVG fallback on error),
- * or the typographic archival SVG plate in offline headless test runners
- * where external CDN egress is sandboxed.
+ * Resolves a canonical plate path: returns the path itself when the binary
+ * is present in the build, or the typographic wine-and-brass archival SVG
+ * plate when the path is registered in `PENDING_SOURCE_ASSETS`.
  */
 export function plateSrc(
   path: string,
@@ -267,14 +220,6 @@ export function plateSrc(
   folioNo?: string,
   subtitle?: string,
 ): string {
-  const scraperUrl = SCRAPER_SOURCE_URLS[path]
-  if (scraperUrl) {
-    if (typeof navigator !== 'undefined' && navigator.webdriver) {
-      return plateFallback(title, folioNo, subtitle)
-    }
-    syncScraperPhotosToLocalCache()
-    return scraperUrl
-  }
   if (PENDING_SOURCE_ASSETS.has(path)) {
     return plateFallback(title, folioNo, subtitle)
   }

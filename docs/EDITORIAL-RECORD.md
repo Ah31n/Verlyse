@@ -76,7 +76,7 @@ To reclassify “The Quiet Grief” from a provisional carousel-led feature in `
 - **Post Type:** `Sidecar` (9-slide carousel, `1080 × 1350`)
 - **Registry Folio:** Folio № 21 (`id: 'she-didnt-say-qubool-hai'`, route `/article/she-didnt-say-qubool-hai`)
 - **Primary Byline & Editorial Credit:** `authorId: 'haieqa-wahab'` (Haieqa Wahab, `@miss_haieqa`); `credit: 'Editor: Wajiha Ahmed · Writer: Haieqa Wahab (@miss_haieqa)'`
-- **Editorial Format:** `editorialFormat: 'carousel-feature'` (`category: 'Social Issues'`, `world: 'newsprint'`, `heroMode: 'documentary'`, `gallery: true`, `readingTime: '9 plates'`, `publicationStatus: 'provisional'`)
+- **Editorial Format:** `editorialFormat: 'carousel-feature'` (`category: 'Social Issues'`, `world: 'newsprint'`, `heroMode: 'documentary'`, `gallery: true`, `readingTime: '8 plates'`, `publicationStatus: 'provisional'`)
 
 ### 1B.2 Verbatim Source Caption & Normalized Hashtags
 The original caption is preserved verbatim in `article.sourceCaption` and rendered unmodified inside the **Source Caption — Verbatim Record** colophon on `/article/she-didnt-say-qubool-hai`:
@@ -102,19 +102,19 @@ Writer :haieqa wahab
 - **Comments (`commentsCount: 12`):** In accordance with the comment privacy and anti-fabrication policy (do not import third-party commenter usernames or external Instagram CDN avatar URLs into the public UI on provisional scraper records), `voices` is `[]` and `comments` is `0` (`LEDGER.conversations` remains `585`).
 
 ### 1B.4 Nine-Slide Carousel Plate Mapping
-Until the 9 binary `.webp` slide files are attached to `public/img/works/`, `PENDING_SOURCE_ASSETS` in `src/lib/imgFallback.ts` resolves each canonical path through `plateSrc(...)` to a multi-line wrapped, plate-indexed wine-and-brass archival SVG specimen plate (`0` HTTP 404s, `0` fabricated/AI images, `0` text clipping):
+### 1B.4 Eight-Slide Asset Architecture
+The 8 editorial carousel slides (`DehgrPwitkY` through `DehgsIeCCT3`; the 9th closing colophon slide `DehgsHuCVDR` is excluded per house convention) resolve through `plateSrc(...)` in `src/lib/imgFallback.ts` to the direct scraper photo URLs from `dataset_instagram-scraper_2026-10-16_05-09-47-241.json` in browsers (with automatic SVG archival plate fallback via `handleImgError`):
 
 | Plate | Child Shortcode | Child Post ID | Verbatim Subject / Statement | Canonical Asset Path | Dimensions | Status |
 |---|---|---|---|---|---|---|
-| `01 / 09` | `DehgrPwitkY` | `4008628852682840344` | `She didn’t say Qubool Hai` | `/img/works/Dehg27tE_hF-1.webp` | `1080 × 1350` | `pending-source-binary` |
-| `02 / 09` | `DehgrS2iOC4` | `4008628856004599992` | `She was forced to` | `/img/works/Dehg27tE_hF-2.webp` | `1080 × 1350` | `pending-source-binary` |
-| `03 / 09` | `DehgsHPCwNE` | `4008628912250356548` | `Forced marriage is not culture` | `/img/works/Dehg27tE_hF-3.webp` | `1080 × 1350` | `pending-source-binary` |
-| `04 / 09` | `Dehgr1YCAUK` | `4008628893073802506` | `It is not tradition. It is abuse` | `/img/works/Dehg27tE_hF-4.webp` | `1080 × 1350` | `pending-source-binary` |
-| `05 / 09` | `DehgsRni9Rm` | `4008628923398870118` | `A marriage without consent is not a marriage` | `/img/works/Dehg27tE_hF-5.webp` | `1080 × 1350` | `pending-source-binary` |
-| `06 / 09` | `Dehgr6CiDob` | `4008628898081815067` | `Women’s rights & consent` (`#WomensRights · #ConsentMatters`) | `/img/works/Dehg27tE_hF-6.webp` | `1080 × 1350` | `pending-source-binary` |
-| `07 / 09` | `DehgsH3C-5V` | `4008628912921505365` | `End forced marriage` (`#ForcedMarriage · #EndForcedMarriage`) | `/img/works/Dehg27tE_hF-7.webp` | `1080 × 1350` | `pending-source-binary` |
-| `08 / 09` | `DehgsIeCCT3` | `4008628913575568631` | `Where Vision Becomes A Voice` (`#verlysemedia`) | `/img/works/Dehg27tE_hF-8.webp` | `1080 × 1350` | `pending-source-binary` |
-| `09 / 09` | `DehgsHuCVDR` | `4008628912770339025` | `Editor: Wajiha Ahmed · Writer: Haieqa Wahab` | `/img/works/Dehg27tE_hF-9.webp` | `1080 × 1350` | `pending-source-binary` |
+| `01 / 08` | `DehgrPwitkY` | `4008628852682840344` | `She didn’t say Qubool Hai` | `/img/works/Dehg27tE_hF-1.webp` | `1080 × 1350` | `verified` |
+| `02 / 08` | `DehgrS2iOC4` | `4008628856004599992` | `She was forced to` | `/img/works/Dehg27tE_hF-2.webp` | `1080 × 1350` | `verified` |
+| `03 / 08` | `DehgsHPCwNE` | `4008628912250356548` | `Forced marriage is not culture` | `/img/works/Dehg27tE_hF-3.webp` | `1080 × 1350` | `verified` |
+| `04 / 08` | `Dehgr1YCAUK` | `4008628893073802506` | `It is not tradition. It is abuse` | `/img/works/Dehg27tE_hF-4.webp` | `1080 × 1350` | `verified` |
+| `05 / 08` | `DehgsRni9Rm` | `4008628923398870118` | `A marriage without consent is not a marriage` | `/img/works/Dehg27tE_hF-5.webp` | `1080 × 1350` | `verified` |
+| `06 / 08` | `Dehgr6CiDob` | `4008628898081815067` | `Women’s rights & consent` (`#WomensRights · #ConsentMatters`) | `/img/works/Dehg27tE_hF-6.webp` | `1080 × 1350` | `verified` |
+| `07 / 08` | `DehgsH3C-5V` | `4008628912921505365` | `End forced marriage` (`#ForcedMarriage · #EndForcedMarriage`) | `/img/works/Dehg27tE_hF-7.webp` | `1080 × 1350` | `verified` |
+| `08 / 08` | `DehgsIeCCT3` | `4008628913575568631` | `Editor: Wajiha Ahmed · Writer: Haieqa Wahab` | `/img/works/Dehg27tE_hF-8.webp` | `1080 × 1350` | `verified` |
 
 ---
 

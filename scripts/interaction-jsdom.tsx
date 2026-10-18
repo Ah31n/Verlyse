@@ -165,7 +165,7 @@ export async function run() {
     assert(sd.likesCountRaw === -1 && !hasKnownLikes(sd), 'she-didnt-say-qubool-hai must treat likesCountRaw=-1 as unknown')
     assert(sd.authorId === 'haieqa-wahab', 'she-didnt-say-qubool-hai authorId must be haieqa-wahab')
     assert(sd.credit?.includes('Wajiha Ahmed') && sd.credit?.includes('Haieqa Wahab'), 'she-didnt-say-qubool-hai credit must name Editor Wajiha Ahmed and Writer Haieqa Wahab')
-    assert(sd.slides.length === 9 && sd.slideDescriptions?.length === 9, 'she-didnt-say-qubool-hai must have 9 slides and 9 slideDescriptions')
+    assert(sd.slides.length === 8 && sd.slideDescriptions?.length === 8, 'she-didnt-say-qubool-hai must have 8 slides and 8 slideDescriptions')
     assert(
       sd.sourceCaption?.includes('She didn’t say Qubool Hai.\nShe was forced to.') &&
         sd.sourceCaption?.includes('#ForcedMarriage #verlysemedia #EndForcedMarriage #WomensRights #ConsentMatters'),

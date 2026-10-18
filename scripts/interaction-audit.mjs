@@ -174,7 +174,13 @@ async function run() {
     JSON.stringify({ m375: gal375, t768: gal768, d1440: gal1440 }),
   )
 
-  // ---- SHE DIDN'T SAY QUBOOL HAI GALLERY, CREDITS & PROVENANCE ----
+  // ---- SHE DIDN'T SAY QUBOOL HAI GALLERY, CREDITS, HOME FEATURE & PROVENANCE ----
+  await page.goto(BASE + '/', { waitUntil: 'networkidle' })
+  await page.waitForTimeout(300)
+  const homeHasQubool = await page.evaluate(() => {
+    const txt = document.body.textContent || ''
+    return txt.includes('She Didn’t Say Qubool Hai') && txt.includes('In this folio — 8 plates')
+  })
   await page.goto(BASE + '/article/she-didnt-say-qubool-hai', { waitUntil: 'networkidle' })
   await page.waitForTimeout(600)
   const quboolCheck = await page.evaluate(() => {
@@ -193,12 +199,13 @@ async function run() {
   })
   pass(
     'qubool-hai-gallery-and-caption',
-    quboolCheck.plateCount === 9 &&
+    homeHasQubool &&
+      quboolCheck.plateCount === 8 &&
       quboolCheck.noRawShortcodeLeak &&
       quboolCheck.hasCredits &&
       quboolCheck.hasVerbatimCaption &&
       quboolCheck.noMinusOneLikes,
-    JSON.stringify(quboolCheck),
+    JSON.stringify({ homeHasQubool, ...quboolCheck }),
   )
 
   // ---- SUBMIT & CONTACT ACCESSIBLE VALIDATION & WRITER PROFILE QUOTES ----
