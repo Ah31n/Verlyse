@@ -14,7 +14,7 @@ Never treat earlier reports as proof of current state without re-running the rel
 
 1. **Build & Prerender (`npm run build`)**:
    - Runs `tsc -b && vite build && node scripts/prerender-metadata.mjs && node scripts/generate-sitemap.mjs`.
-   - Verifies TypeScript compilation (`0` errors), Rollup chunk isolation (`dist/assets/index-B4mHalN7.js` `177.64 kB` / `57.97 kB` gzip; `dist/assets/boot-CfrjN6Gu.js` `199.82 kB` / `51.65 kB` gzip; `dist/assets/gsap-a3sj5zmn.js` `114.01 kB` / `45.16 kB` gzip; `dist/assets/anime-CcJk6tc-.js` `32.40 kB` / `13.15 kB` gzip; `dist/assets/StoryEnding3D-C6ccyV-p.js` `10.93 kB` / `3.20 kB` gzip; `dist/assets/three-DF4bklDy.js` `770.49 kB` / `203.48 kB` gzip), `53` prerendered route shells, and `53` sitemap URLs.
+   - Verifies TypeScript compilation (`0` errors), Rollup chunk isolation (`dist/assets/index-BdTMAPn7.js` `172.89 kB` / `56.54 kB` gzip; `dist/assets/boot-CfrjN6Gu.js` `199.82 kB` / `51.65 kB` gzip; `dist/assets/gsap-a3sj5zmn.js` `114.01 kB` / `45.16 kB` gzip; `dist/assets/anime-CcJk6tc-.js` `32.40 kB` / `13.15 kB` gzip; `dist/assets/StoryEnding3D-CDvXr6Hv.js` `10.93 kB` / `3.21 kB` gzip; `dist/assets/three-DF4bklDy.js` `770.49 kB` / `203.48 kB` gzip), `53` prerendered route shells, and `53` sitemap URLs.
 2. **Serverless Typecheck (`npm run typecheck:api`)**:
    - Runs `tsc -p tsconfig.api.json` (`0` errors).
 3. **Secrets & Hygiene (`npm run check:secrets`)**:

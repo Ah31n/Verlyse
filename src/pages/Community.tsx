@@ -68,10 +68,8 @@ function FilmFrame({ article, folio }: { article: Article; folio: string }) {
  */
 import { CrashZoom, Magnetic, Tilt3D } from '../components/cinematic'
 import {
-  DotMatrixLedger,
   FloralWord,
   HaikeiContourPlane,
-  RouteEmblemSeal,
 } from '../components/ui/EditorialCraftSystem'
 
 export default function Community() {
@@ -148,14 +146,6 @@ export default function Community() {
       <div className="relative mx-auto max-w-[1440px] px-[clamp(1.25rem,4vw,4.75rem)] pb-[clamp(4rem,9vh,7rem)] pt-[clamp(7rem,15vh,9.5rem)]">
         {/* ——— header — ghost COMMONS + the reel's promise ——— */}
         <div className="text-center">
-          <div className="mb-4 flex flex-wrap items-center justify-center gap-3">
-            <RouteEmblemSeal variant="amphora" folioCode="COMMONS" tone="dark" />
-            <DotMatrixLedger
-              code={`0${COMMUNITY_VOICES.length}${LEDGER.features}`}
-              label={`${COMMUNITY_VOICES.length} Voices · ${LEDGER.features} Covers`}
-              tone="dark"
-            />
-          </div>
           <h1 className="relative font-serif text-[clamp(2.8rem,8vw,6.5rem)] font-light leading-[0.9] tracking-[-0.02em] text-ivory">
             <CrashZoom className="pointer-events-none absolute inset-x-0 top-1/2 -translate-y-1/2">
               <span aria-hidden="true" className="block select-none font-serif text-[clamp(4rem,12vw,9.5rem)] font-semibold leading-none text-transparent [-webkit-text-stroke:1px_rgba(184,145,70,0.08)]">

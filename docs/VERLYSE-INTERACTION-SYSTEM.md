@@ -76,7 +76,7 @@ This was the main design constraint, and it shaped every insertion point:
 
 ## 5 · GSAP isolation & `Magnetic` migration (`2026-10-18` update)
 
-Per §5 of the directive, GSAP remains for already-established `ScrollTrigger` camera sequences (`CrashZoom`, `DepthStage`, `DepthLayer`, `OrbitalDrift`, `PushIn`, `MaskReveal`, `Tilt3D`, `Rise3D` in `src/components/cinematic/primitives.tsx`) and no new GSAP scenes were added. However, `Magnetic` was migrated to `src/components/ui/Magnetic.tsx` (`motion/react` `useMotionValue` + `useSpring`), `vite.config.ts` isolates `gsap` (`dist/assets/gsap-a3sj5zmn.js`, `114.01 kB` / `45.16 kB` gzip) into a lazy chunk, and `BrassRule.tsx` dynamically imports `animejs` (`dist/assets/anime-CcJk6tc-.js`, `32.40 kB` / `13.15 kB` gzip) only when `!reduce && near`. As a result, `Header.tsx` no longer pulls `gsap` into the initial entry chunk (`252.87 kB` / `89.38 kB` gzip before `gsap` eviction; `154.45 kB` / `51.49 kB` gzip immediately after `gsap` eviction prior to `EditorialCraftSystem`; `dist/assets/index-B4mHalN7.js` at `177.64 kB` / `57.97 kB` gzip in the current build with `EditorialCraftSystem`), and 46 of 53 routes never download `gsap`.
+Per §5 of the directive, GSAP remains for already-established `ScrollTrigger` camera sequences (`CrashZoom`, `DepthStage`, `DepthLayer`, `OrbitalDrift`, `PushIn`, `MaskReveal`, `Tilt3D`, `Rise3D` in `src/components/cinematic/primitives.tsx`) and no new GSAP scenes were added. However, `Magnetic` was migrated to `src/components/ui/Magnetic.tsx` (`motion/react` `useMotionValue` + `useSpring`), `vite.config.ts` isolates `gsap` (`dist/assets/gsap-a3sj5zmn.js`, `114.01 kB` / `45.16 kB` gzip) into a lazy chunk, and `BrassRule.tsx` dynamically imports `animejs` (`dist/assets/anime-CcJk6tc-.js`, `32.40 kB` / `13.15 kB` gzip) only when `!reduce && near`. As a result, `Header.tsx` no longer pulls `gsap` into the initial entry chunk (`252.87 kB` / `89.38 kB` gzip before `gsap` eviction; `154.45 kB` / `51.49 kB` gzip immediately after `gsap` eviction prior to `EditorialCraftSystem`; `dist/assets/index-BdTMAPn7.js` at `172.89 kB` / `56.54 kB` gzip in the current build with `EditorialCraftSystem`), and 46 of 53 routes never download `gsap`.
 
 ---
 
@@ -114,7 +114,7 @@ Measured, gzipped, from the current production build (`arena/741ed410-verlyse`, 
 
 | Chunk | Historical baseline (`gsap` in `index`) | Current build (`npm run build`) |
 |---|---|---|
-| entry (`dist/assets/index-B4mHalN7.js`) | `252.87 kB` (`89.38 kB` gzip) | **`177.64 kB` (`57.97 kB` gzip)** (`gsap` evicted; includes shared `EditorialCraftSystem`; was `154.45 kB` / `51.49 kB` gzip prior to `EditorialCraftSystem`) |
+| entry (`dist/assets/index-BdTMAPn7.js`) | `252.87 kB` (`89.38 kB` gzip) | **`172.89 kB` (`56.54 kB` gzip)** (`gsap` evicted; includes shared `EditorialCraftSystem`; was `154.45 kB` / `51.49 kB` gzip prior to `EditorialCraftSystem`) |
 | StringTune (`dist/assets/boot-CfrjN6Gu.js`, lazy) | `233.36 kB` (`59.09 kB` gzip, 7 modules) | **`199.82 kB` (`51.65 kB` gzip)** (4 active modules in `boot.ts`) |
 | `dist/assets/gsap-a3sj5zmn.js` (lazy on secondary camera routes) | bundled in `index` | **`114.01 kB` (`45.16 kB` gzip)** |
 | `dist/assets/anime-CcJk6tc-.js` (lazy inside `BrassRule` when `!reduce && near`) | bundled in `About` | **`32.40 kB` (`13.15 kB` gzip)** |

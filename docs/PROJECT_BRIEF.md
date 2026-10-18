@@ -35,7 +35,7 @@
 
 ## Acceptance criteria
 - [x] Every installed UI/motion library and every cataloged external UI/design tool is assessed with an explicit decision (`USE`, `OPTIONAL`, `RESEARCH FURTHER`, `DO NOT USE`).
-- [x] `index-*.js` entry bundle no longer includes `gsap` (`252.87 kB / 89.38 kB gzip` before `gsap` eviction; `dist/assets/index-B4mHalN7.js` at `177.64 kB / 57.97 kB gzip` in the current build with `EditorialCraftSystem` included).
+- [x] `index-*.js` entry bundle no longer includes `gsap` (`252.87 kB / 89.38 kB gzip` before `gsap` eviction; `dist/assets/index-BdTMAPn7.js` at `172.89 kB / 56.54 kB gzip` in the current build with `EditorialCraftSystem` included).
 - [x] `dist/assets/boot-CfrjN6Gu.js` StringTune chunk registers only the 4 active modules in `src/lib/stringTune/boot.ts` (`199.82 kB / 51.65 kB gzip`), pairs `progress|parallax[]` in `drift()`, and stops/restarts safely on `prefers-reduced-motion: reduce`.
 - [x] All 32 animated components respect `prefers-reduced-motion: reduce`, and all 5 modal/drawer surfaces lock body scroll via `useBodyScrollLock`.
 - [x] All required `.md` files exist in `docs/` and agree with the actual codebase and build output.

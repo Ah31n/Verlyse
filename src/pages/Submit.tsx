@@ -17,10 +17,8 @@ function FieldHint({ id, show, children }: { id: string; show: boolean; children
 
 import { CrashZoom } from '../components/cinematic'
 import {
-  DotMatrixLedger,
   FloralWord,
   HaikeiContourPlane,
-  RouteEmblemSeal,
 } from '../components/ui/EditorialCraftSystem'
 
 export default function Submit() {
@@ -179,14 +177,6 @@ path: '/submit',
           <span aria-hidden="true" className="absolute left-1/2 top-0 h-[3px] w-[34vw] max-w-[520px] -translate-x-1/2 bg-gradient-to-b from-gold/50 to-transparent" />
         </div>
         <div className="relative mx-auto w-full max-w-page px-[clamp(1.25rem,4vw,4.75rem)]">
-          <div className="mb-4 flex flex-wrap items-center gap-3">
-            <RouteEmblemSeal variant="crosshair" folioCode="SUBMISSIONS" tone="dark" />
-            <DotMatrixLedger
-              code={`0${CATEGORIES.length}04`}
-              label={`${CATEGORIES.length} Wings · 04 Editorial Steps`}
-              tone="dark"
-            />
-          </div>
           <Reveal><p className="eyebrow">Submissions — open · writer → work → piece → desk</p></Reveal>
           <h1 className="relative mt-8 font-serif text-[clamp(2.8rem,7.5vw,6rem)] font-light leading-[0.92] tracking-[-0.02em] text-ivory">
             <CrashZoom className="pointer-events-none absolute inset-x-0 top-1/2 -translate-y-1/2">

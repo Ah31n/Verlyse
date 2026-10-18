@@ -2,7 +2,7 @@ import { useRef, useState, type FormEvent, type ReactNode } from 'react'
 import { motion } from 'motion/react'
 import { useSeo } from '../hooks/useSeo'
 import Reveal from '../components/ui/Reveal'
-import { BRAND, LEDGER } from '../data/content'
+import { BRAND } from '../data/content'
 
 /** A quiet note beneath a letter-line — shown only when the line needs attention.
     Linked to its input via aria-describedby; the form's single status region
@@ -25,10 +25,8 @@ function LetterHint({ id, show, children }: { id: string; show: boolean; childre
  */
 import { CrashZoom } from '../components/cinematic'
 import {
-  DotMatrixLedger,
   FloralWord,
   HaikeiContourPlane,
-  RouteEmblemSeal,
 } from '../components/ui/EditorialCraftSystem'
 
 export default function Contact() {
@@ -136,14 +134,6 @@ path: '/contact',
           <HaikeiContourPlane tone="dark" seed={9} className="opacity-20" />
         </div>
         <div className="relative mx-auto w-full max-w-page px-[clamp(1.25rem,4vw,4.75rem)] text-center">
-          <div className="mb-4 flex flex-wrap items-center justify-center gap-3">
-            <RouteEmblemSeal variant="wax-seal" folioCode="CORRESPONDENCE" tone="dark" />
-            <DotMatrixLedger
-              code={`03${LEDGER.issueNo}`}
-              label="03 Channels · Every Letter Read"
-              tone="dark"
-            />
-          </div>
           <Reveal><p className="eyebrow">Verlyse Media — the desk</p></Reveal>
           <h1 className="relative mt-8 font-serif text-[clamp(2.6rem,7vw,5.5rem)] font-light leading-[0.92] tracking-[-0.02em] text-ivory">
             <CrashZoom className="pointer-events-none absolute inset-x-0 top-1/2 -translate-y-1/2">

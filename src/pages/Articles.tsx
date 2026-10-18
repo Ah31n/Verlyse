@@ -8,10 +8,8 @@ import SaveButton from '../components/ui/SaveButton'
 import { handleImgError } from '../lib/imgFallback'
 import { ImmersiveShell, BrassThread } from '../components/immersive'
 import {
-  DotMatrixLedger,
   FloralWord,
   HaikeiContourPlane,
-  RouteEmblemSeal,
 } from '../components/ui/EditorialCraftSystem'
 
 const ROOM_PARAM = 'room'
@@ -211,14 +209,6 @@ function Archive() {
             </span>
           </div>
           <div className="relative z-10 min-w-0">
-            <div className="mb-3 flex flex-wrap items-center gap-3">
-              <RouteEmblemSeal variant="rosette" folioCode="ARCHIVE" tone="dark" />
-              <DotMatrixLedger
-                code={`${LEDGER.features}${String(LEDGER.departments).padStart(2, '0')}`}
-                label={`${LEDGER.features} Folios · ${LEDGER.departments} Wings`}
-                tone="dark"
-              />
-            </div>
             <p className="font-mono text-[10px] uppercase tracking-[0.34em] text-gold">
               The Archive — {LEDGER.features} features · {LEDGER.creators} creators · {LEDGER.departments} departments
             </p>

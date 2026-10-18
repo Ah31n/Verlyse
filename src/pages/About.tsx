@@ -9,10 +9,8 @@ import { CrashZoom, DepthStage, DepthLayer, OrbitalDrift, PushIn } from '../comp
 import { handleImgError } from '../lib/imgFallback'
 import { spotlight } from '../lib/stringTune/attrs'
 import {
-  DotMatrixLedger,
   FloralWord,
   HaikeiContourPlane,
-  RouteEmblemSeal,
 } from '../components/ui/EditorialCraftSystem'
 
 /**
@@ -60,14 +58,6 @@ export default function About() {
       <div className="relative mx-auto max-w-[1080px] px-[clamp(1.25rem,4vw,4.75rem)] pb-[clamp(4rem,9vh,7rem)] pt-[clamp(7rem,15vh,9.5rem)]">
         {/* ——— header — ghost COLOPHON, quiet ——— */}
         <div className="text-center">
-          <div className="mb-4 flex flex-wrap items-center justify-center gap-3">
-            <RouteEmblemSeal variant="pillars" folioCode="COLOPHON" tone="dark" />
-            <DotMatrixLedger
-              code={`04${LEDGER.features}`}
-              label={`04 Principles · ${LEDGER.features} Folios`}
-              tone="dark"
-            />
-          </div>
           <h1 className="relative font-serif text-[clamp(2.6rem,7vw,5.5rem)] font-light leading-[0.92] tracking-[-0.02em] text-ivory">
             {/* Beat 1 — CRASH ZOOM. The ghost imprint dollies through the lens
                 and dissolves as the visitor scrolls. GSAP owns this wrapper's

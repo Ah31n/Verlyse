@@ -318,6 +318,10 @@ export async function run() {
     )
     const floralSpan = document.querySelector('[data-craft-floral-word]')
     assert(!!floralSpan && !floralSpan.className.includes('cursor-pointer'), 'FloralWord should be decorative without cursor-pointer')
+    assert(
+      document.querySelectorAll('[data-craft-dot-matrix], [data-craft-emblem]').length === 0,
+      'Generic DotMatrixLedger / RouteEmblemSeal placeholder badges must not render'
+    )
     cleanup()
 
     wrap(<Footer />)

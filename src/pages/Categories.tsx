@@ -7,10 +7,8 @@ import { handleImgError } from '../lib/imgFallback'
 import { ImmersiveShell, BrassThread } from '../components/immersive'
 import { spotlight } from '../lib/stringTune/attrs'
 import {
-  DotMatrixLedger,
   FloralWord,
   HaikeiContourPlane,
-  RouteEmblemSeal,
 } from '../components/ui/EditorialCraftSystem'
 
 /**
@@ -151,14 +149,6 @@ export default function Categories() {
       >
         {/* ——— MID · header — ghost WINGS + real subtitle ——— */}
         <div className="text-center">
-          <div className="mb-4 flex flex-wrap items-center justify-center gap-3">
-            <RouteEmblemSeal variant="prism" folioCode="07 WINGS" tone="dark" />
-            <DotMatrixLedger
-              code={`0${LEDGER.departments}${LEDGER.features}`}
-              label={`${LEDGER.departments} Curatorial Wings · ${LEDGER.features} Folios`}
-              tone="dark"
-            />
-          </div>
           <h1 className="relative font-serif text-[clamp(3.4rem,10vw,8rem)] font-light leading-[0.85] tracking-[-0.02em] text-ivory">
             <span aria-hidden="true" className="pointer-events-none absolute inset-x-0 top-1/2 -translate-y-1/2 select-none font-serif text-[clamp(4rem,13vw,10.5rem)] font-semibold leading-none text-transparent [-webkit-text-stroke:1px_rgba(184,145,70,0.08)]">
               WINGS

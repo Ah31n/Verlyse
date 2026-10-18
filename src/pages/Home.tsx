@@ -20,7 +20,7 @@ import { handleImgError } from '../lib/imgFallback'
 import { useWebGLSupport } from '../lib/three/useWebGLSupport'
 import { introSeen, onIntroResolved } from '../lib/intro'
 import { drift, spotlight, spotlitGlide } from '../lib/stringTune/attrs'
-import { DotMatrixLedger, FloralWord, RouteEmblemSeal } from '../components/ui/EditorialCraftSystem'
+import { FloralWord } from '../components/ui/EditorialCraftSystem'
 // The spatial engine is loaded on demand so its heavy chunk (three) never
 // ships with the initial publication shell.
 const SpatialArchive = lazy(() => import('../components/spatial/SpatialArchive'))
@@ -178,19 +178,14 @@ function Cover({ selectedId, state }: { selectedId: string | null; state: Spatia
         <div className="grid grid-cols-1 items-center gap-12 lg:grid-cols-12 lg:gap-12 xl:gap-16">
           {/* LEFT WING (7 cols): Single Primary Editorial Headline, Deck & Archive Entry */}
           <div className="lg:col-span-7">
-            <motion.div
+            <motion.p
               initial={reduce ? false : { opacity: 0, y: 12 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: D(0.95), delay: T.mast, ease: E }}
-              className="mb-3 flex flex-wrap items-center gap-3"
+              className="mb-3 font-mono text-[9px] uppercase tracking-[0.34em] text-gold/85 md:text-[10px]"
             >
-              <RouteEmblemSeal variant="octagram" folioCode={`ISSUE № ${LEDGER.issueNo}`} tone="dark" />
-              <DotMatrixLedger
-                code={`${LEDGER.features}${String(LEDGER.departments).padStart(2, '0')}`}
-                label={`${LEDGER.features} Folios · ${LEDGER.creators} Creators · ${LEDGER.departments} Wings`}
-                tone="dark"
-              />
-            </motion.div>
+              Issue № {LEDGER.issueNo} — {LEDGER.features} folios · {LEDGER.creators} creators · {LEDGER.departments} departments
+            </motion.p>
 
             <motion.h1
               initial={reduce ? false : { opacity: 0, y: 26 }}

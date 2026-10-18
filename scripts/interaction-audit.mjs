@@ -240,7 +240,10 @@ async function run() {
       const footers = document.querySelectorAll('footer[aria-label="Footer"]')
       const bodyTxt = document.body.innerText || ''
       const htmlTxt = document.body.textContent || ''
-      const hasTgCode = /\bTG\d+\b/.test(bodyTxt) || /\bTG\d+\b/.test(htmlTxt) || !!document.querySelector('[data-craft-dot-matrix^="TG"]')
+      const hasTgCode =
+        /\bTG\d+\b/.test(bodyTxt) ||
+        /\bTG\d+\b/.test(htmlTxt) ||
+        document.querySelectorAll('[data-craft-dot-matrix], [data-craft-emblem]').length > 0
       const hasDemoLabels = /herbarium colophon|inscribe phrase|foliage density|keep plate|oxblood\s*&\s*antique brass|tudor rose\s*&\s*warm ivory|nocturne\s*&\s*gilded leaf|mulberry velvet/i.test(htmlTxt)
       if (route === '/room') {
         return {
