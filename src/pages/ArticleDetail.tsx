@@ -571,10 +571,11 @@ export default function ArticleDetail() {
                         alt={article.slideDescriptions?.[0]?.alt ?? coverAlt(article)}
                         width={article.slideDescriptions?.[0]?.width ?? 1080}
                         height={article.slideDescriptions?.[0]?.height ?? 1350}
+                        referrerPolicy="no-referrer"
                         className="aspect-[4/5] w-full object-contain"
                         loading="eager"
                         decoding="async"
-                        onError={(e) => handleImgError(e, article.title, folio)}
+                        onError={(e) => handleImgError(e, `${article.title} — She didn’t say Qubool Hai`, `${folio} · 01`, 'Plate 01 / 09 · Opening Statement')}
                       />
                       <span aria-hidden="true" className="pointer-events-none absolute inset-2 border border-gold/35" />
                     </div>
@@ -614,6 +615,7 @@ export default function ArticleDetail() {
                       alt={article.slideDescriptions?.[0]?.alt ?? coverAlt(article)}
                       width={article.slideDescriptions?.[0]?.width ?? 1080}
                       height={article.slideDescriptions?.[0]?.height ?? 1350}
+                      referrerPolicy="no-referrer"
                       className="aspect-[4/5] w-full object-contain"
                       loading="eager"
                       decoding="async"
@@ -654,6 +656,7 @@ export default function ArticleDetail() {
                       alt={article.slideDescriptions?.[0]?.alt ?? coverAlt(article)}
                       width={article.slideDescriptions?.[0]?.width ?? 1080}
                       height={article.slideDescriptions?.[0]?.height ?? 1350}
+                      referrerPolicy="no-referrer"
                       className={article.slideDescriptions?.[0]?.width ? 'w-full object-contain' : 'aspect-[4/5] w-full object-cover'}
                       loading="eager"
                       decoding="async"

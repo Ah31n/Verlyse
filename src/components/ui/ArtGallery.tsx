@@ -123,16 +123,6 @@ export default function ArtGallery({ article }: { article: Article }) {
             {slides.length} {slides.length === 1 ? 'plate' : 'plates'} · use ← → in lightbox
           </span>
         </div>
-        {descriptions.some((d) => d.status === 'pending-source-binary') && (
-          <div className="mb-8 flex flex-wrap items-center justify-between gap-3 border border-gold/30 bg-[#1B060D]/80 px-4 py-3">
-            <p className="font-mono text-[9px] uppercase tracking-[0.24em] text-gold">
-              Archival Specimen Edition · Folio № {folio}
-            </p>
-            <p className="font-serif text-sm italic text-ivory/75">
-              All {slides.length} carousel plates are catalogued from the source publication and rendered as typographic archival plates while original slide binaries await attachment.
-            </p>
-          </div>
-        )}
       </Reveal>
 
       <div
@@ -192,11 +182,17 @@ export default function ArtGallery({ article }: { article: Article }) {
                       }
                       width={desc?.width}
                       height={desc?.height}
+                      referrerPolicy="no-referrer"
                       loading="lazy"
                       decoding="async"
                       onError={(e) => {
                         setFailedSlides((prev) => ({ ...prev, [i]: true }))
-                        handleImgError(e, `${article.title} — Plate ${plateNum}`, `${folio} · ${plateNum}`)
+                        handleImgError(
+                          e,
+                          `${article.title} — ${desc?.subject || `Plate ${plateNum}`}`,
+                          `${folio} · ${plateNum}`,
+                          `Plate ${plateNum} / ${totalNum}`,
+                        )
                       }}
                       className={`h-full w-full ${desc?.width && desc?.height ? 'object-contain' : 'object-cover'} transition-transform duration-[1400ms] ease-out group-hover:scale-[1.02] motion-reduce:transition-none motion-reduce:group-hover:scale-100`}
                     />
@@ -281,10 +277,16 @@ export default function ArtGallery({ article }: { article: Article }) {
                     }
                     width={activeDesc?.width}
                     height={activeDesc?.height}
+                    referrerPolicy="no-referrer"
                     decoding="async"
                     onError={(e) => {
                       setFailedSlides((prev) => ({ ...prev, [open]: true }))
-                      handleImgError(e, `${article.title} — Plate ${String(open + 1).padStart(2, '0')}`, folio)
+                      handleImgError(
+                        e,
+                        `${article.title} — ${activeDesc?.subject || `Plate ${String(open + 1).padStart(2, '0')}`}`,
+                        `${folio} · ${String(open + 1).padStart(2, '0')}`,
+                        `Plate ${String(open + 1).padStart(2, '0')} / ${String(slides.length).padStart(2, '0')}`,
+                      )
                     }}
                     className="max-h-[60vh] w-auto max-w-full border border-gold/40 object-contain shadow-[0_30px_90px_rgba(0,0,0,0.9)] md:max-h-[76vh]"
                   />
