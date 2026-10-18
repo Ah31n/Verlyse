@@ -77,6 +77,7 @@ const SIGNATURE_MAP: Record<string, { label: string; kind: EndingSceneKind }> = 
   'the-garden-beyond-my-tower': { label: 'she prays', kind: 'prayer' },
   'mir-raza-ali': { label: 'the cart', kind: 'candle' },
   'the-quiet-grief': { label: 'the colours never faded', kind: 'painting' },
+  'she-didnt-say-qubool-hai': { label: 'consent matters', kind: 'voices' },
 }
 
 function endingFor(article: Article): ArticleEndingDefinition {

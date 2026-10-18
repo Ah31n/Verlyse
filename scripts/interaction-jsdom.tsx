@@ -160,10 +160,22 @@ export async function run() {
   await check('art gallery: hides internal asset paths and traps focus inside lightbox', async () => {
     const qg = ARTICLES.find((a) => a.id === 'the-quiet-grief')!
     assert(qg.likesCountRaw === -1 && !hasKnownLikes(qg), 'the-quiet-grief must treat likesCountRaw=-1 as unknown')
+    const sd = ARTICLES.find((a) => a.id === 'she-didnt-say-qubool-hai')!
+    assert(!!sd, 'she-didnt-say-qubool-hai article missing from ARTICLES')
+    assert(sd.likesCountRaw === -1 && !hasKnownLikes(sd), 'she-didnt-say-qubool-hai must treat likesCountRaw=-1 as unknown')
+    assert(sd.authorId === 'haieqa-wahab', 'she-didnt-say-qubool-hai authorId must be haieqa-wahab')
+    assert(sd.credit?.includes('Wajiha Ahmed') && sd.credit?.includes('Haieqa Wahab'), 'she-didnt-say-qubool-hai credit must name Editor Wajiha Ahmed and Writer Haieqa Wahab')
+    assert(sd.slides.length === 9 && sd.slideDescriptions?.length === 9, 'she-didnt-say-qubool-hai must have 9 slides and 9 slideDescriptions')
+    assert(
+      sd.sourceCaption?.includes('She didn’t say Qubool Hai.\nShe was forced to.') &&
+        sd.sourceCaption?.includes('#ForcedMarriage #verlysemedia #EndForcedMarriage #WomensRights #ConsentMatters'),
+      'she-didnt-say-qubool-hai verbatim sourceCaption mismatch',
+    )
     const mostAppreciated = sortArticles('most-appreciated')
     assert(
-      mostAppreciated.findIndex((a) => a.id === 'the-quiet-grief') >= mostAppreciated.length - 2,
-      'unknown likesCountRaw=-1 article should sort after known-likes articles in most-appreciated',
+      mostAppreciated.findIndex((a) => a.id === 'the-quiet-grief') >= mostAppreciated.length - 3 &&
+        mostAppreciated.findIndex((a) => a.id === 'she-didnt-say-qubool-hai') >= mostAppreciated.length - 3,
+      'unknown likesCountRaw=-1 articles should sort after known-likes articles in most-appreciated',
     )
     wrap(<ArtGallery article={qg} />)
 
@@ -301,9 +313,9 @@ export async function run() {
 
   /* ---- EDITORIAL COUNTS, FOOTER NEWSLETTER & CRAFT CONTROLS A11Y ------- */
   await check('editorial counts, footer newsletter guidance, and craft system a11y', async () => {
-    assert(LEDGER.features === 20, `expected 20 catalogued features, got ${LEDGER.features}`)
+    assert(LEDGER.features === 21, `expected 21 catalogued features, got ${LEDGER.features}`)
     assert(LEDGER.publishedFeatures === 19, `expected 19 published features, got ${LEDGER.publishedFeatures}`)
-    assert(LEDGER.provisionalFeatures === 1, `expected 1 provisional feature, got ${LEDGER.provisionalFeatures}`)
+    assert(LEDGER.provisionalFeatures === 2, `expected 2 provisional features, got ${LEDGER.provisionalFeatures}`)
     assert(
       resolveNewsletterEndpoint('verlysemedia.kesug.com') === 'https://verlyse-react.vercel.app/api/newsletter',
       'static canonical host did not resolve to Vercel newsletter endpoint'
@@ -313,7 +325,7 @@ export async function run() {
     wrap(<Creators />)
     const creatorsText = document.body.textContent ?? ''
     assert(
-      creatorsText.includes('20 catalogued features (19 published folios and 1 provisional record)'),
+      creatorsText.includes('21 catalogued features (19 published folios and 2 provisional records)'),
       'Creators page did not distinguish published vs provisional counts'
     )
     const floralSpan = document.querySelector('[data-craft-floral-word]')

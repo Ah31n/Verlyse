@@ -513,7 +513,11 @@ function StoryCard({
 }
 
 function WorksStrip() {
-  const works = ARTICLES.slice().sort((a, b) => b.date.localeCompare(a.date)).slice(0, 8)
+  const hasPendingBinary = (a: (typeof ARTICLES)[number]) =>
+    Boolean(a.slideDescriptions?.some((d) => d.status === 'pending-source-binary'))
+  const works = ARTICLES.slice()
+    .sort((a, b) => Number(hasPendingBinary(a)) - Number(hasPendingBinary(b)) || b.date.localeCompare(a.date))
+    .slice(0, 8)
   const [cover, s1, s2, ...rest] = works
   const spread = rest.slice(0, 3)
   const bottom = rest.slice(3, 5)
@@ -564,7 +568,7 @@ function WorksStrip() {
                   </Link>
                 </div>
                 <div className="grid grid-cols-5 gap-2.5">
-                  {cover.slides.map((src, idx) => (
+                  {cover.slides.slice(0, 5).map((src, idx) => (
                     <Link
                       key={src}
                       to={`/article/${cover.id}`}
@@ -622,7 +626,7 @@ function WorksStrip() {
                 </div>
                 <div className="mt-6 flex flex-wrap items-center justify-between gap-4 border-t border-white/10 pt-4">
                   <span className="font-mono text-[9px] uppercase tracking-[0.26em] text-white/50">
-                    {LEDGER.publishedFeatures} published · {LEDGER.provisionalFeatures} provisional record
+                    {LEDGER.publishedFeatures} published · {LEDGER.provisionalFeatures} provisional {LEDGER.provisionalFeatures === 1 ? 'record' : 'records'}
                   </span>
                   <Link
                     to="/submit"

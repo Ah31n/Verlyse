@@ -13,8 +13,21 @@ const esc = (s: string) =>
  * image files are awaiting external dataset attachment.
  * All five original WebP slides for `DeUZFPTCjPU` ("The Quiet Grief") are now
  * self-hosted under `public/img/works/DeUZFPTCjPU-1.webp`..`-5.webp`.
+ * The nine carousel slide paths for `Dehg27tE_hF` ("She Didn’t Say Qubool Hai")
+ * resolve to typographic wine-and-brass archival SVG plates until the binary
+ * slide images are attached.
  */
-export const PENDING_SOURCE_ASSETS: ReadonlySet<string> = new Set([])
+export const PENDING_SOURCE_ASSETS: ReadonlySet<string> = new Set([
+  '/img/works/Dehg27tE_hF-1.webp',
+  '/img/works/Dehg27tE_hF-2.webp',
+  '/img/works/Dehg27tE_hF-3.webp',
+  '/img/works/Dehg27tE_hF-4.webp',
+  '/img/works/Dehg27tE_hF-5.webp',
+  '/img/works/Dehg27tE_hF-6.webp',
+  '/img/works/Dehg27tE_hF-7.webp',
+  '/img/works/Dehg27tE_hF-8.webp',
+  '/img/works/Dehg27tE_hF-9.webp',
+])
 
 export function isPendingSourceAsset(path: string): boolean {
   return PENDING_SOURCE_ASSETS.has(path)

@@ -20,7 +20,7 @@
 - [x] Production build/artifact inspected (`npm run build` on `arena/741ed410-verlyse`, branched from `ea6392572d2481ef3f197799ac0ac2917e9e135a`):
   - `dist/index.html`: `3.98 kB` (`1.55 kB` gzip)
   - `dist/assets/index-ciNLODvz.css`: `142.46 kB` (`24.88 kB` gzip)
-  - `dist/assets/index-BdTMAPn7.js`: `172.89 kB` (`56.54 kB` gzip — `gsap` evicted; includes shared `EditorialCraftSystem`; was `252.87 kB` / `89.38 kB` gzip prior to `gsap` eviction and `154.45 kB` / `51.49 kB` gzip before `EditorialCraftSystem`)
+  - `dist/assets/index-Br7b5VOr.js`: `180.42 kB` (`58.04 kB` gzip — `gsap` evicted; includes shared `EditorialCraftSystem`; was `252.87 kB` / `89.38 kB` gzip prior to `gsap` eviction and `154.45 kB` / `51.49 kB` gzip before `EditorialCraftSystem`)
   - `dist/assets/boot-CfrjN6Gu.js`: `199.82 kB` (`51.65 kB` gzip — 4 active modules in `boot.ts`)
   - `dist/assets/gsap-a3sj5zmn.js`: `114.01 kB` (`45.16 kB` gzip — isolated lazy chunk)
   - `dist/assets/anime-CcJk6tc-.js`: `32.40 kB` (`13.15 kB` gzip — dynamically imported inside `BrassRule-BG91pKcx.js` only when `!reduce && near`)

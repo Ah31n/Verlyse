@@ -133,7 +133,7 @@ export default function Creators() {
             The contributor wall — {LEDGER.wallRecords} records · {LEDGER.creators} bylined in the archive · {ARTICLES.length} folios
           </p>
           <p className="mx-auto mt-2 max-w-[70ch] font-mono text-[9px] uppercase leading-[1.9] tracking-[0.22em] text-white/45">
-            {LEDGER.creators} bylined voices and one co-credited poet across {LEDGER.features} catalogued features ({LEDGER.publishedFeatures} published folios and {LEDGER.provisionalFeatures} provisional record) in Issue № {LEDGER.issueNo}
+            {LEDGER.creators} bylined voices and one co-credited poet across {LEDGER.features} catalogued features ({LEDGER.publishedFeatures} published folios and {LEDGER.provisionalFeatures} provisional {LEDGER.provisionalFeatures === 1 ? 'record' : 'records'}) in Issue № {LEDGER.issueNo}
           </p>
         </div>
 

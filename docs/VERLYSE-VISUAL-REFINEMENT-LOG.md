@@ -118,12 +118,12 @@ Required by the Visual + Interaction Override, §20. One entry per change: what 
 | Check | Result |
 |---|---|
 | `tsc -b` & `npm run typecheck:api` | pass |
-| `vite build` | pass — 53 shells, 53 sitemap URLs |
-| `test:metadata` | pass — registry coherent (53 shells, 53 sitemap URLs) |
+| `vite build` | pass — 54 shells, 54 sitemap URLs |
+| `test:metadata` | pass — registry coherent (54 shells, 54 sitemap URLs) |
 | `test:smoke` | pass — 20/20 SSR route cases render (18 valid routes across all 11 `<Route>` patterns + 2 missing-slug 404 fallbacks) |
 | `test:flows` (jsdom) | 14/14 — dialog semantics, search keyboard contract, focus restoration, save persistence + single-item removal sync, `ArtGallery` layout & transform ownership, editorial published/provisional counts, craft `aria-pressed` states, StringTune pending-boot race safety, 12× mount/unmount clean |
 | `test:newsletter` | pass (15/15 synthetic checks; live production verification pending / blocked in sandbox) |
 | `check:secrets` | pass |
 | Chromium `asset-audit`, `interaction-audit`, `verify-flags` | pass — 45/45 role subset & 104/104 full public media/font inventory, 17/17 interaction checks, 0 console errors |
-| entry chunk (`dist/assets/index-BdTMAPn7.js`) | `89.38 kB` gzip (`gsap` bundled) → `51.49 kB` gzip (`gsap` evicted) → **`56.54 kB` gzip** (`172.89 kB` raw, including `EditorialCraftSystem`) |
+| entry chunk (`dist/assets/index-Br7b5VOr.js`) | `89.38 kB` gzip (`gsap` bundled) → `51.49 kB` gzip (`gsap` evicted) → **`58.04 kB` gzip** (`180.42 kB` raw, including `EditorialCraftSystem`) |
 | StringTune chunk (`dist/assets/boot-CfrjN6Gu.js`) | `130 kB` → `60.60 kB` (7 modules) → **`51.65 kB` gzip** (`199.82 kB` raw, 4 active modules only) |

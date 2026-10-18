@@ -42,7 +42,7 @@ This document consolidates the complete UI and Motion Stack Assessment for Verly
 ### Acceptance criteria
 - [x] Every installed UI/motion package and every cataloged external UI/design resource is evaluated with explicit status (`USE`, `OPTIONAL`, `RESEARCH FURTHER`, `DO NOT USE`).
 - [x] No two animation engines write to the same DOM property or scroll container.
-- [x] `index-*.js` initial entry bundle no longer ships `gsap` (`252.87 kB / 89.38 kB gzip` before `gsap` eviction; `dist/assets/index-BdTMAPn7.js` at `172.89 kB / 56.54 kB gzip` in the current build with `EditorialCraftSystem` included).
+- [x] `index-*.js` initial entry bundle no longer ships `gsap` (`252.87 kB / 89.38 kB gzip` before `gsap` eviction; `dist/assets/index-Br7b5VOr.js` at `180.42 kB / 58.04 kB gzip` in the current build with `EditorialCraftSystem` included).
 - [x] `dist/assets/boot-CfrjN6Gu.js` StringTune bundle registers only the 4 active modules in `src/lib/stringTune/boot.ts` (`199.82 kB / 51.65 kB gzip`), pairs `progress|parallax[]` in `drift()`, and stops/restarts safely on `prefers-reduced-motion: reduce` changes.
 - [x] All 32 animated components respect `prefers-reduced-motion: reduce` (`<MotionConfig reducedMotion="user">` + `ArticleClosing.tsx` explicit guards).
 - [x] All build, metadata (`53` shells), SSR smoke (`20/20` route cases), newsletter (`15/15` synthetic checks), JSDOM (`14/14` flows), and headless Chromium (`asset-audit` `45/45` role subset + `104/104` full inventory, `interaction-audit` `17/17`, `verify-flags`) checks pass with `0` errors.
@@ -119,7 +119,7 @@ This document consolidates the complete UI and Motion Stack Assessment for Verly
 - **Compatibility checks:** React `18.3.1`, TypeScript `5.6.3` (`tsc -b` 0 errors), SSR `renderToString` (`20/20` routes), JSDOM (`14/14`), headless Chromium (`17/17`).
 - **License, attribution, privacy, pricing/cost, and account limits:** `motion@13.2.0` is MIT. `gsap@3.15.0` uses GreenSock's Standard "no charge" license and remains isolated to lazy route chunks.
 - **Decision:** `USE` `motion/react` for `Magnetic` (`src/components/ui/Magnetic.tsx`), `<MotionConfig reducedMotion="user">` in `src/App.tsx`, and explicit `useReducedMotion()` guards in `src/components/ui/ArticleClosing.tsx`; isolate `gsap` and `animejs` into dedicated Rollup chunks.
-- **Reason / rejected options:** Keeping `Magnetic` on `gsap.quickTo` forced every visitor on `/articles`, `/article/:id` (20 routes), `/categories/:slug` (8 routes), `/creator/:id` (16 routes), and `/room` to download `gsap` + `ScrollTrigger` in `index-*.js`. Moving `Magnetic` to `motion/react` evicted `gsap` from `index-*.js` (`252.87 kB` / `89.38 kB` gzip before `gsap` eviction; `dist/assets/index-BdTMAPn7.js` at `172.89 kB` / `56.54 kB` gzip in the current build with `EditorialCraftSystem` included).
+- **Reason / rejected options:** Keeping `Magnetic` on `gsap.quickTo` forced every visitor on `/articles`, `/article/:id` (20 routes), `/categories/:slug` (8 routes), `/creator/:id` (16 routes), and `/room` to download `gsap` + `ScrollTrigger` in `index-*.js`. Moving `Magnetic` to `motion/react` evicted `gsap` from `index-*.js` (`252.87 kB` / `89.38 kB` gzip before `gsap` eviction; `dist/assets/index-Br7b5VOr.js` at `180.42 kB` / `58.04 kB` gzip in the current build with `EditorialCraftSystem` included).
 - **Integration scope and risks:** `src/components/cinematic/primitives.tsx` re-exports `Magnetic` from `../ui/Magnetic`, preserving backward compatibility for all existing import sites.
 - **Validation performed and results:** `PASS` — `npm run build`, `npm run test:smoke`, `npm run test:flows`, Chromium `interaction-audit.mjs` & `verify-flags.mjs`.
 - **Known limitations / unknowns:** Secondary routes (`/about`, `/ambassadors`, `/community`, `/creators`, `/submit`, `/contact`, `/`) still lazy-load `gsap-*.js` for their established `ScrollTrigger` camera wrappers.
@@ -161,7 +161,7 @@ This document consolidates the complete UI and Motion Stack Assessment for Verly
 - **Backup/rollback:** All changes are tracked on git branch `arena/741ed410-verlyse` and can be reverted per file via `git checkout -- <path>`.
 
 ### Verification
-- `npm run build` — `tsc -b` 0 errors, Vite bundle emitted, 53 prerendered shells, 53 sitemap URLs
+- `npm run build` — `tsc -b` 0 errors, Vite bundle emitted, 54 prerendered shells, 54 sitemap URLs
 - `npm run typecheck:api && npm run check:secrets` — 0 API type errors, 0 secret leaks
 - `npm run test:metadata && npm run test:smoke && npm run test:newsletter && npm run test:flows` — 53 shells verified, 20/20 SSR route cases rendered, 15/15 synthetic newsletter checks, 14/14 JSDOM flows
 - `node scripts/asset-audit.mjs && node scripts/interaction-audit.mjs && node scripts/verify-flags.mjs` — 45/45 role-subset assets & 104/104 full public media/font inventory, 17/17 Chromium interaction checks, 0 console errors
@@ -208,7 +208,7 @@ This document consolidates the complete UI and Motion Stack Assessment for Verly
 - **Route / feature:** Global `Header` / initial bundle load.
 - **Expected:** `gsap` should only load on routes that mount `ScrollTrigger` camera primitives; the initial `index-*.js` entry chunk should not contain `gsap`.
 - **Actual (before fix):** Recorded as High-priority defect **B2** in `audit/CODEBASE-AND-SITE-ASSESSMENT.md`.
-- **Resolution:** Implemented `Magnetic` in `src/components/ui/Magnetic.tsx` using `motion/react` (`useMotionValue` + `useSpring`), re-exported it from `src/components/cinematic/primitives.tsx`, updated `Header.tsx` to import from `../ui/Magnetic`, and added dedicated `gsap` and `anime` chunk rules in `vite.config.ts`. `gsap` (`dist/assets/gsap-a3sj5zmn.js`, `114.01 kB` / `45.16 kB` gzip) is completely evicted from `index-*.js` (`252.87 kB` / `89.38 kB` gzip before `gsap` eviction; `dist/assets/index-BdTMAPn7.js` at `172.89 kB` / `56.54 kB` gzip in the current build with `EditorialCraftSystem` included).
+- **Resolution:** Implemented `Magnetic` in `src/components/ui/Magnetic.tsx` using `motion/react` (`useMotionValue` + `useSpring`), re-exported it from `src/components/cinematic/primitives.tsx`, updated `Header.tsx` to import from `../ui/Magnetic`, and added dedicated `gsap` and `anime` chunk rules in `vite.config.ts`. `gsap` (`dist/assets/gsap-a3sj5zmn.js`, `114.01 kB` / `45.16 kB` gzip) is completely evicted from `index-*.js` (`252.87 kB` / `89.38 kB` gzip before `gsap` eviction; `dist/assets/index-Br7b5VOr.js` at `180.42 kB` / `58.04 kB` gzip in the current build with `EditorialCraftSystem` included).
 
 ### Defect 6 — `Ambassadors.tsx` Modal Record Missing Scroll Lock (`D4`), `ArticleDetail.tsx` Missing `EndingSpatialBoundary` (`E1`), and `api/newsletter.ts` + `Footer.tsx` Canonical Origin & Endpoint (`A4`)
 - **Summary:** (1) Opening a team member's record dialog on `/ambassadors` did not lock body scroll (`useBodyScrollLock`); (2) `<StoryEnding3D>` on `/article/:id` lacked a local React Error Boundary around `<Suspense>`, risking whole-page fallback on a WebGL error; (3) `Footer.tsx` posted to relative `/api/newsletter` on static canonical host `verlysemedia.kesug.com` and `api/newsletter.ts` included `localhost` in production default origins.
@@ -225,7 +225,7 @@ This document consolidates the complete UI and Motion Stack Assessment for Verly
 
 ### Verification
 - [x] Actual project typecheck/lint/tests run; results recorded (`npm run build`, `npm run typecheck:api`, `npm run check:secrets`, `npm run test:metadata`, `npm run test:smoke`, `npm run test:newsletter`, `npm run test:flows`).
-- [x] Production build/artifact inspected (`dist/` — `index-BdTMAPn7.js` `172.89 kB / 56.54 kB gzip`, `boot-CfrjN6Gu.js` `199.82 kB / 51.65 kB gzip`, `gsap-a3sj5zmn.js` isolated at `114.01 kB / 45.16 kB gzip`, `anime-CcJk6tc-.js` isolated at `32.40 kB / 13.15 kB gzip`).
+- [x] Production build/artifact inspected (`dist/` — `index-Br7b5VOr.js` `180.42 kB / 58.04 kB gzip`, `boot-CfrjN6Gu.js` `199.82 kB / 51.65 kB gzip`, `gsap-a3sj5zmn.js` isolated at `114.01 kB / 45.16 kB gzip`, `anime-CcJk6tc-.js` isolated at `32.40 kB / 13.15 kB gzip`).
 - [x] Critical routes/forms/API flows smoke-tested (`node scripts/asset-audit.mjs`, `node scripts/interaction-audit.mjs`, `node scripts/verify-flags.mjs`).
 - [x] Accessibility, responsive behavior, security and secret checks run (`0` console errors, `0` horizontal overflow across 8 viewports × 11 routes = `88/88`, `0` secret leaks).
 - [x] Environment variables and headers/redirects match target host (`public/.htaccess` and `vercel.json` aligned; `api/newsletter.ts` `PRODUCTION_ALLOWED_ORIGINS` includes `https://verlysemedia.kesug.com` and `https://verlyse-react.vercel.app`; live deployment verification pending / blocked in sandbox).

@@ -142,7 +142,7 @@ export default function ArtGallery({ article }: { article: Article }) {
                 : i === 3
                   ? 'sm:col-span-3 lg:col-span-3'
                   : 'sm:col-span-6 lg:col-span-3'
-              : slides.length === 3 && i === 2
+              : slides.length % 2 === 1 && slides.length !== 5 && i === slides.length - 1
                 ? 'sm:col-span-2 lg:col-span-1'
                 : ''
           return (

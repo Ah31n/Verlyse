@@ -800,7 +800,9 @@ export default function ArticleDetail() {
                     Source Caption — Verbatim Record
                   </p>
                   <span className="font-mono text-[9px] uppercase tracking-[0.22em] text-white/60">
-                    {article.editorialFormat === 'carousel-feature' ? `Five-plate sequence · Folio № ${folio}` : `Folio № ${folio}`}
+                    {article.editorialFormat === 'carousel-feature'
+                      ? `${article.slides.length === 5 ? 'Five' : article.slides.length === 9 ? 'Nine' : article.slides.length}-plate sequence · Folio № ${folio}`
+                      : `Folio № ${folio}`}
                   </span>
                 </div>
                 <pre className="mt-5 whitespace-pre-wrap break-words font-serif text-[15px] italic leading-[1.75] text-ivory/88">

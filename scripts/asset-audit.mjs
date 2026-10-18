@@ -111,8 +111,21 @@ async function run() {
   await page.goto(BASE + '/article/the-quiet-grief', { waitUntil: 'networkidle' })
   await scrollPageToTriggerLazyAssets(page)
   await page.waitForTimeout(1000)
+  await page.goto(BASE + '/article/she-didnt-say-qubool-hai', { waitUntil: 'networkidle' })
+  await scrollPageToTriggerLazyAssets(page)
+  await page.waitForTimeout(1000)
 
-  const pendingSourceAssets = []
+  const pendingSourceAssets = [
+    '/img/works/Dehg27tE_hF-1.webp',
+    '/img/works/Dehg27tE_hF-2.webp',
+    '/img/works/Dehg27tE_hF-3.webp',
+    '/img/works/Dehg27tE_hF-4.webp',
+    '/img/works/Dehg27tE_hF-5.webp',
+    '/img/works/Dehg27tE_hF-6.webp',
+    '/img/works/Dehg27tE_hF-7.webp',
+    '/img/works/Dehg27tE_hF-8.webp',
+    '/img/works/Dehg27tE_hF-9.webp',
+  ]
   let totalRes = 0
   let totalExp = 0
   for (const f of Object.values(findings)) {

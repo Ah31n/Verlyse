@@ -333,8 +333,8 @@ function Archive() {
         })()}
 
         {/* ——— FRONT · the folios — solid ivory plates on the shelf.
-            Desktop uses a balanced 5-column (4 × 5 = 20) / 4-column (5 × 4 = 20)
-            shelf rhythm so every row is full and every folio plate has room for
+            Desktop and tablet use a balanced 3-column (7 × 3 = 21) shelf
+            rhythm so every row is full and every folio plate has room for
             its complete date, reading time, and selection badge. ——— */}
         <div
           role="group"
@@ -347,7 +347,7 @@ function Archive() {
             className="pointer-events-none absolute bottom-0 left-1/2 top-0 z-0 hidden w-px -translate-x-1/2 bg-gradient-to-b from-transparent via-[#D9B978]/30 to-transparent xl:block"
           />
           <div
-            className="relative z-10 mx-auto mt-[clamp(1.5rem,3.5vh,2.5rem)] grid grid-cols-1 items-stretch gap-x-[clamp(1rem,1.5vw,1.5rem)] gap-y-[clamp(1.4rem,3vh,2.2rem)] pb-16 sm:grid-cols-2 md:mt-[clamp(2rem,4.5vh,2.75rem)] md:grid-cols-3 md:pb-0 lg:grid-cols-4 xl:grid-cols-5 xl:[perspective:1500px]"
+            className="relative z-10 mx-auto mt-[clamp(1.5rem,3.5vh,2.5rem)] grid grid-cols-1 items-stretch gap-x-[clamp(1rem,1.8vw,1.75rem)] gap-y-[clamp(1.4rem,3vh,2.2rem)] pb-16 sm:grid-cols-2 md:mt-[clamp(2rem,4.5vh,2.75rem)] md:grid-cols-3 md:pb-0 xl:[perspective:1500px]"
             onKeyDown={onKeyDown}
           >
             {ordered.map((a, pos) => {
@@ -372,7 +372,12 @@ function Archive() {
                   transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
                   className={`contents ${receded ? 'opacity-25 transition-all duration-700' : 'transition-all duration-700'}`}
                 >
-                  <span className="group/plate relative block" style={{ opacity: inner }}>
+                  <span
+                    className={`group/plate relative block ${
+                      ordered.length % 2 === 1 && pos === ordered.length - 1 ? 'sm:col-span-2 md:col-span-1' : ''
+                    }`}
+                    style={{ opacity: inner }}
+                  >
                     <Link
                       id={`folio-${a.id}`}
                       to={isMatch ? `/article/${a.id}` : '#'}

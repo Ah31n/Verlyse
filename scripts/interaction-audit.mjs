@@ -74,7 +74,7 @@ async function run() {
   // and the `fin.` mark appears after the scene settles (~6s — wait for it
   // instead of sampling early; fixes the known "Their Voices Matter" flake).
   const endings = {}
-  for (const slug of ['their-voices-matter', '3-13', 'the-quiet-grief']) {
+  for (const slug of ['their-voices-matter', '3-13', 'the-quiet-grief', 'she-didnt-say-qubool-hai']) {
     await page.goto(BASE + '/article/' + slug, { waitUntil: 'networkidle' })
     let fin = false
     const deadline = Date.now() + 8000
@@ -90,6 +90,7 @@ async function run() {
   pass('ending-voices', endings['their-voices-matter'].hasSig && endings['their-voices-matter'].scene?.includes('their-voices-matter'), JSON.stringify(endings['their-voices-matter']))
   pass('ending-wait', endings['3-13'].hasSig && endings['3-13'].scene?.includes('3-13'), JSON.stringify(endings['3-13']))
   pass('ending-quiet-grief', endings['the-quiet-grief'].hasSig && endings['the-quiet-grief'].scene?.includes('the-quiet-grief'), JSON.stringify(endings['the-quiet-grief']))
+  pass('ending-qubool-hai', endings['she-didnt-say-qubool-hai'].hasSig && endings['she-didnt-say-qubool-hai'].scene?.includes('she-didnt-say-qubool-hai'), JSON.stringify(endings['she-didnt-say-qubool-hai']))
 
   // ---- THE QUIET GRIEF GALLERY, FOCUS TRAP & PROVENANCE ----
   await page.goto(BASE + '/article/the-quiet-grief', { waitUntil: 'networkidle' })
@@ -228,7 +229,7 @@ async function run() {
   // ---- FIXED FOOTER SPECIMEN, SINGLE GLOBAL FOOTER & ZERO TG DEMO RESIDUE ----
   const standardRoutes = [
     '/', '/articles', '/categories', '/creators', '/community',
-    '/about', '/ambassadors', '/submit', '/contact', '/article/the-quiet-grief',
+    '/about', '/ambassadors', '/submit', '/contact', '/article/the-quiet-grief', '/article/she-didnt-say-qubool-hai',
   ]
   let footerSpecimenOk = true
   let noTgResidueOk = true

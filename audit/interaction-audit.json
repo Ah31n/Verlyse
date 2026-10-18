@@ -36,6 +36,10 @@
       "status": "PASS",
       "detail": "{\"hasSig\":true,\"scene\":\"ending-the-quiet-grief\"}"
     },
+    "ending-qubool-hai": {
+      "status": "PASS",
+      "detail": "{\"hasSig\":true,\"scene\":\"ending-she-didnt-say-qubool-hai\"}"
+    },
     "quiet-grief-gallery-and-caption": {
       "status": "PASS",
       "detail": "plate1=true, noLeak=true, lightbox=true, trap=true, plate2=true, closed=true, focusRestored=true, verbatim=true"
@@ -54,7 +58,7 @@
     },
     "footer-static-specimen-and-no-tg-residue": {
       "status": "PASS",
-      "detail": "{\"singleFooterOk\":true,\"footerSpecimenOk\":true,\"noTgResidueOk\":true,\"checkedRoutes\":11}"
+      "detail": "{\"singleFooterOk\":true,\"footerSpecimenOk\":true,\"noTgResidueOk\":true,\"checkedRoutes\":12}"
     },
     "mobile-375px-no-overflow": {
       "status": "PASS",
