@@ -135,7 +135,7 @@ export default function About() {
               {milestones.map((m) => (
                 <div key={m.date} className="grid grid-cols-1 items-baseline gap-1 border-b border-white/10 py-5 sm:grid-cols-[110px_1fr] sm:gap-6">
                   <p className="font-mono text-[9px] uppercase tracking-[0.26em] text-gold-lit/90">{m.date}</p>
-                  <p className="text-[15px] leading-[1.75] text-white/75">
+                  <p className="max-w-[68ch] text-[15px] leading-[1.75] text-white/75">
                     <span className="font-serif italic text-ivory/90">{m.title}</span> — {m.desc}
                   </p>
                 </div>
@@ -197,7 +197,7 @@ export default function About() {
 
         {/* the shelf — the catalogue card of this magazine, kept at the end
             of the sheets the way a pocket card is kept in the back pocket */}
-        <div className="mt-[clamp(3rem,8vh,5rem)] flex flex-col items-center gap-4">
+        <div className="mt-[clamp(2rem,5vh,3.25rem)] flex flex-col items-center gap-3">
           <p className="font-mono text-[9px] uppercase tracking-[0.3em] text-white/65">The shelf — catalogue record</p>
           <LibraryCard to="/articles" linkLabel="Browse the shelf →" />
         </div>
@@ -205,12 +205,12 @@ export default function About() {
         {/* the brass rule — a single hairline that draws itself outward from
             the centre, closing the sheets before the imprint. Anime.js owns
             only this SVG's stroke-dash pair; nothing else animates it. */}
-        <BrassRule className="mt-[clamp(2.5rem,7vh,4.5rem)]" />
+        <BrassRule className="mt-[clamp(1.75rem,4vh,2.75rem)]" />
 
         {/* ——— FRONT · the colophon imprint ———
             Beat 4 — PUSH IN. The imprint settles toward the lens as it arrives,
             so the sequence ends rather than merely stopping. */}
-        <PushIn className="mt-[clamp(3.5rem,9vh,6rem)]">
+        <PushIn className="mt-[clamp(2.25rem,5.5vh,3.5rem)]">
         <motion.section
           initial={{ opacity: 0, y: 18 }}
           whileInView={{ opacity: 1, y: 0 }}

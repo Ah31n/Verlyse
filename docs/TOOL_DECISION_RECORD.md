@@ -873,3 +873,83 @@ each sit at a single 1440 measure. No width-token system was introduced; the
 census is the prerequisite evidence for one.
 
 **No dependency added.** `verlysemedia.kesug.com` remains **NOT TESTED**.
+
+---
+
+## Record 15 — Phase 15: the six outstanding routes, honestly resolved (2026-10-28)
+
+Two routes were changed. Four were inspected and deliberately left alone, and
+the reasons matter more than the diffs.
+
+### `/articles` and `/creators` — the "0 sections" finding was a measurement artifact
+
+Record 14 reported zero `<section>` elements on both and implied a structural
+deficiency. **That was wrong, and the challenge to it was correct.** Actual DOM:
+
+- `/articles` — `h1 "The folio shelf"`, a `searchbox`, and one
+  `ul aria-label="The archive — 21 of 21 folios shown"`. An archive *is* one
+  labelled list; wrapping it in decorative `<section>`s would add nothing.
+- `/creators` — `h1 "The wall of names"` → `article aria-label="Dossier —
+  Alina Javed"` → `h2 "Every name"`. A featured dossier plus an index. It uses
+  `<article>`, which is more correct here than `<section>`.
+
+Neither is structurally deficient. **Element counts are not a quality proxy.**
+No change to either.
+
+### `/about` — two real defects, both fixed
+
+1. **Prose measure.** Two milestone paragraphs in "The record" ran to 789 px of
+   15 px text (~105ch) because the `sm:grid-cols-[110px_1fr]` track let the
+   `1fr` column stretch to the full 1440 container. Capped at `max-w-[68ch]`;
+   the widest prose measure on the route drops to ~82ch by the same estimator.
+2. **The marooned catalogue card.** `LibraryCard` — a real artifact carrying
+   real data (Dewey 808.8, Accession VM·2026·01–21, Issue № 01 opened
+   26.06.2026) — sat alone in a 503 px gap between the founder sheet and the
+   colophon imprint. A quiet beat has to read as deliberate, not as a card
+   someone lost. Surrounding margins tightened (`8vh→5vh` before, `7vh→4vh` on
+   the brass rule, `9vh→5.5vh` on the imprint). Gap **503 → 413 px**, of which
+   ~230 px is the card itself, so true void fell from ~270 to ~180 px.
+
+Verified rendered at 1440: before/after in `docs/evidence/r16/`.
+
+### `/ambassadors` — a phantom defect, caught before editing
+
+The 0.42-scale full-page capture appeared to show ~1,200 px of emptiness after
+the leadership roster. A 250 px-band leaf-node census found **no empty band
+anywhere on the route** — every band holds 1–20 nodes; the sparsest (1750, 2000,
+3750) contain the hiring marquee, which is wide and sparse *by design*.
+
+The apparent void was the same scale/latch artifact already logged twice in this
+project. **No change.** This is the second time this pass that a measurement or
+a downscaled screenshot recommended damaging a page that was fine.
+
+### `/community`, `/submit`, `/contact` — measured, no change warranted
+
+- The "294ch" paragraph on `/community` and the "128ch" one on `/ambassadors`
+  are **9 px mono uppercase lines with 0.22–0.28em tracking** — an index ticker
+  and a fine-print note. The `width / (fontSize × 0.5)` estimator overstates
+  tracked mono badly. Neither is body prose.
+- `/submit` and `/contact` forms measure **640 px and 661 px** with body prose
+  at ~64ch — already comfortable. Their "single 1440 measure" in the Record 14
+  census was the outer page container, not the content.
+
+### The content-width system — deliberately not introduced
+
+Phase 15 asked for narrow / standard / wide / full-bleed measure tokens. After
+measuring, the evidence did not support them: the forms are already well
+measured, the full-bleed case exists once on Home and is intentionally singular,
+and the only genuine prose overflow was two paragraphs on `/about`, fixed
+locally with `max-w-[68ch]`. Adding four global tokens that nothing needs would
+be exactly the "arbitrary differences merely to increase the number of layout
+variants" the directive forbids. **Recorded as deferred, not done**, with the
+trigger for revisiting: a third route needing a non-default prose measure.
+
+### Verified
+
+`npm run build` **PASS** (54 shells) · `typecheck:api` · `check:secrets` ·
+`test:metadata` · `test:flows` all **PASS** · full matrix **53 routes × 3
+viewports: 0 console/page/network errors, 0 horizontal overflow, 0 footers off
+true bottom**. Regression guard: `/categories` and `/categories/:slug` still
+render 7 wings at 58/37/26 px, spread **2.23×**, all **21** folio links intact.
+
+**No dependency added.** Not deployed; `verlysemedia.kesug.com` **NOT TESTED**.

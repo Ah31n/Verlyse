@@ -544,3 +544,36 @@ right answer on that page; it was the wrong answer on categories.
 Six routes were measured and not yet rebuilt. Two of them, articles and
 creators, turn out to have no section elements at all, which is where their work
 has to start.
+
+---
+
+## Brief № 10 — Four routes we did not touch (2026-10-28)
+
+This pass changed one route and defended four.
+
+About had two real problems. Its milestone prose stretched to 789 pixels of
+fifteen-pixel text because a grid track let it run the full width of the page,
+and its catalogue card — a genuine library register with real accession numbers
+— was stranded in five hundred pixels of burgundy with nothing near it. Both are
+fixed: the prose is capped at a readable measure, and the card now sits close
+enough to the sheet above and the imprint below to read as a deliberate pause
+rather than an orphan.
+
+Ambassadors looked like it had the same disease. A downscaled capture showed a
+long dark emptiness after the roster. It was not empty: a band-by-band count
+found content in every single band, and the sparse stretch is the hiring
+marquee, which is supposed to be wide and quiet. We left it alone. That is the
+second time in this pass that a measurement recommended vandalising a page that
+was working.
+
+Articles and creators were reported as having no sections at all. They do have
+structure — an archive is one labelled list, and the creators page already
+leads with a featured dossier before its index of every name. The earlier
+finding counted elements and mistook that for quality.
+
+Submit and contact measure 640 and 661 pixels at the form, with prose around
+sixty-four characters. They were already right.
+
+We also did not build the four-tier width system that was asked for. After
+measuring, nothing needed it except two paragraphs on About, which got a local
+cap instead. Four global tokens serving one problem would be decoration.
