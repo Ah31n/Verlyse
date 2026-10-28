@@ -1137,7 +1137,7 @@ function Invitation() {
             <p className="kicker">Submissions — open</p>
           </Reveal>
           <Reveal delay={0.1}>
-            <h2 className="mt-6 max-w-[16ch] font-serif text-[clamp(2.6rem,5.4vw,4.6rem)] font-light leading-[1.04] tracking-[-0.02em] text-ivory">
+            <h2 className="mt-6 max-w-[16ch] font-serif text-[clamp(2.9rem,6.6vw,5.8rem)] font-light leading-[1.01] tracking-[-0.02em] text-ivory">
               Have something <FloralWord variant="magnolia">worth sharing?</FloralWord>
             </h2>
           </Reveal>
@@ -1168,13 +1168,13 @@ function Invitation() {
 /** The colophon teaser. */
 function Colophon() {
   return (
-    <section className="border-t border-white/10 bg-charcoal py-[clamp(6rem,14vh,11rem)]">
+    <section className="border-t border-white/10 bg-charcoal py-[clamp(4rem,9vh,7rem)]">
       <div className="mx-auto max-w-page px-[clamp(1.75rem,5.5vw,4.75rem)]">
         <div className="grid grid-cols-1 items-center gap-[clamp(3rem,7vw,8rem)] lg:grid-cols-[1fr_1fr]">
           <div>
             <Reveal><p className="kicker">About Verlyse Media</p></Reveal>
             <Reveal delay={0.08}>
-              <h2 className="mt-6 font-serif text-[clamp(2.6rem,5.4vw,4.8rem)] font-light leading-[1.04] tracking-[-0.02em]">
+              <h2 className="mt-6 font-serif text-[clamp(1.8rem,3.2vw,2.6rem)] font-light leading-[1.12] tracking-[-0.01em]">
                 Where <FloralWord variant="camellia">vision</FloralWord> becomes a voice
               </h2>
             </Reveal>
@@ -1436,7 +1436,7 @@ export default function Home() {
       <VoiceCarousel />
       <MotifDivider id="chapter-invitation" no="IV" label="The invitation" motif="feather" />
       <Invitation />
-      <HiringMarquee />
+      <HiringMarquee scale="muted" />
       <Colophon />
     </ImmersiveShell>
   )

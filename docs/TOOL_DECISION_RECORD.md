@@ -953,3 +953,62 @@ true bottom**. Regression guard: `/categories` and `/categories/:slug` still
 render 7 wings at 58/37/26 px, spread **2.23×**, all **21** folio links intact.
 
 **No dependency added.** Not deployed; `verlysemedia.kesug.com` **NOT TESTED**.
+
+---
+
+## Record 16 — Phase 17: the closing cadence (2026-10-28)
+
+**The defect, confirmed at readable scale in the browser** (1440, not inferred
+from a downscaled sheet): Home ended with three consecutive sections whose
+headings measured **74, 74 and 77 px** — a 1.04× spread across 5.6 screens,
+followed by a 1,346 px footer. Three different editorial jobs (the submission
+ask, the recruitment classified, the imprint) were all shouting at the same
+volume, so the page stopped rather than resolved.
+
+**Reference principle applied.** Reopened `shopify.com/editions/winter2026`
+(chunk 14, the ending). After a dense developer changelog it resolves into
+*one* closing action — "Get notified" — preceded by a "Back to navigation"
+return. A long page earns its ending by narrowing to a single ask, not by
+stacking several. Not copied: wording, the notify modal, the changelog format.
+
+**What changed — a diminuendo.** Scale now steps down as the page resolves:
+
+| Closing beat | Before | After |
+|---|---|---|
+| Invitation — "Have something worth sharing?" | 74 px | **93 px** |
+| Classified — "The next voice could be yours." | 74 px | **48 px** |
+| Colophon — "Where vision becomes a voice" | 77 px | **42 px** |
+
+Spread across the closing run: **1.04× → 2.21×**. Colophon padding tightened
+from `clamp(6rem,14vh,11rem)` to `clamp(4rem,9vh,7rem)`. Home document height
+18,724 → 18,542 px. No content removed, no artwork touched.
+
+**Shared-component safety.** `HiringMarquee` is used on **Home, /about and
+/ambassadors**. Rather than change it globally, it gained an opt-in
+`scale?: 'full' | 'muted'` prop defaulting to `'full'`. Only Home passes
+`"muted"`. Verified by control measurement: `/about` and `/ambassadors` still
+render that heading at **74 px**, unchanged.
+
+**Why the colophon got smaller rather than larger.** A colophon is an imprint;
+in print it is the smallest type on the page. The footer's
+`VerlyseBackCoverSpecimen` already carries the wordmark at scale. Rendered
+check confirmed the real benefit: at 42 px the heading stops competing with the
+uncropped founding artwork beside it, and the plate leads the section.
+
+**Verified.** `npm run build` **PASS** (54 shells) · `typecheck:api` ·
+`check:secrets` · `test:metadata` · `test:flows` all **PASS** · full matrix
+**53 routes × 3 viewports: 0 console/page/network errors, 0 horizontal
+overflow, 0 footers off true bottom**. Home inspected rendered at 1440 and 390:
+heading wraps cleanly to two lines on mobile, no overflow, 1 footer, 0 page
+errors. Evidence in `docs/evidence/r17/`.
+
+**Not changed, deliberately.** No new dependency, no motion added — this is a
+static-composition fix and passes the animation-disabled test by construction.
+The four-tier width token system remains deferred (Record 15): still only one
+route has needed a non-default prose measure.
+
+**Remaining known weakness.** Nine Home sections still share the 1440
+container; the single full-bleed moment is the only break. That is the next
+highest-value item on this route.
+
+Not deployed; `verlysemedia.kesug.com` **NOT TESTED**.

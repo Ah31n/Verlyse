@@ -37,7 +37,16 @@ function renderPhrase({ text, italicWord }: (typeof MARQUEE_PHRASES)[number]) {
  *   Layer C — Explicit application invitation ("Explore the roles & apply ↗")
  *             linking directly to the official Google Forms application.
  */
-export default function HiringMarquee({ className = '' }: { className?: string }) {
+export default function HiringMarquee({
+  className = '',
+  scale = 'full',
+}: {
+  className?: string
+  /** 'muted' steps the classified down so it reads as the middle beat of a
+   *  closing cadence rather than a third full-scale ending. Home passes it;
+   *  /about and /ambassadors close ON this section, so they keep 'full'. */
+  scale?: 'full' | 'muted'
+}) {
   const reduce = useReducedMotion() === true
   const { hiring, hiringForm } = BRAND
 
@@ -45,7 +54,9 @@ export default function HiringMarquee({ className = '' }: { className?: string }
     <section
       aria-labelledby="hiring-next-byline-heading"
       data-hiring-section="the-next-byline"
-      className={`relative overflow-hidden border-t border-white/10 bg-[radial-gradient(95%_70%_at_50%_0%,rgba(92,18,36,0.34),transparent_65%),linear-gradient(180deg,#260812_0%,#1A050B_100%)] py-[clamp(5.5rem,12vh,9.5rem)] ${className}`}
+      className={`relative overflow-hidden border-t border-white/10 bg-[radial-gradient(95%_70%_at_50%_0%,rgba(92,18,36,0.34),transparent_65%),linear-gradient(180deg,#260812_0%,#1A050B_100%)] ${
+        scale === 'muted' ? 'py-[clamp(3.5rem,8vh,6rem)]' : 'py-[clamp(5.5rem,12vh,9.5rem)]'
+      } ${className}`}
     >
       {/* Subtle architectural hairlines */}
       <div
@@ -77,7 +88,11 @@ export default function HiringMarquee({ className = '' }: { className?: string }
               <MaskReveal>
                 <h2
                   id="hiring-next-byline-heading"
-                  className="max-w-[18ch] pb-2 font-serif text-[clamp(2.5rem,5.4vw,4.6rem)] font-light leading-[1.06] tracking-[-0.02em] text-ivory"
+                  className={`max-w-[18ch] pb-2 font-serif font-light leading-[1.06] tracking-[-0.02em] text-ivory ${
+                    scale === 'muted'
+                      ? 'text-[clamp(1.9rem,3.6vw,3rem)]'
+                      : 'text-[clamp(2.5rem,5.4vw,4.6rem)]'
+                  }`}
                 >
                   The next voice <em className="italic text-gold">could be yours.</em>
                 </h2>
