@@ -518,3 +518,29 @@ and you can finally read it.
 What is still unfinished is said plainly in Record 13: nine sections still share
 one container, the palette still alternates across three backgrounds, and eight
 other routes have not been put through this same treatment census.
+
+---
+
+## Brief № 09 — Seven wings, one size (2026-10-28)
+
+The categories page held seven wings and gave every one of them the same box,
+the same numeral, the same 37-pixel name and the same five-column shelf. Poetry
+has seven folios in it. Horror has one. The page could not tell you that.
+
+Now it can. Tier comes from the actual count, so Poetry and Social Issues get a
+raised plate, a large numeral and bigger covers, while the single-folio wings
+drop to a hairline rule and a compact row. Nothing was invented and nothing was
+reordered — the hierarchy was already in the archive, the page just wasn't
+showing it. Because the tier is computed rather than hard-coded, the shelf will
+re-rank itself as the collection changes.
+
+We left the articles wall alone, deliberately. It looks like the same failure —
+twenty-one identical cards — but its plates are locked to the artwork's own 4:5
+with a standing rule against cropping contributors' work to suit a grid. Making
+the first folio twice as wide would have produced a thousand-pixel tower and
+forced exactly the crop that rule exists to prevent. Equal treatment is the
+right answer on that page; it was the wrong answer on categories.
+
+Six routes were measured and not yet rebuilt. Two of them, articles and
+creators, turn out to have no section elements at all, which is where their work
+has to start.

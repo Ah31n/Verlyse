@@ -279,18 +279,30 @@ export default function Categories() {
               const isActive = active === c.name
               const ghosted = !!active && !isActive
               const items = foliosOf(c.name)
+              /* R15 — the shelf follows the collection, not the template.
+                 The wings are not equal: Poetry holds 7 folios, Social Issues
+                 5, Art 4, while Stories, Lifestyle and Horror hold one each.
+                 Rendering all seven at identical scale was the defect — a
+                 one-folio wing was given the same weight as a seven-folio one.
+                 Tier is derived from the real count, so the page re-ranks
+                 itself as the archive grows. */
+              const tier = items.length >= 5 ? 'lead' : items.length >= 2 ? 'standard' : 'slim'
 
               return (
                 <section
                   key={c.slug}
                   aria-label={`${c.name} wing shelf`}
                   aria-hidden={ghosted || undefined}
-                  className={`border transition-all duration-700 ${
+                  className={`transition-all duration-700 ${
                     isActive
-                      ? 'border-gold/60 bg-[#240912]/90 p-6 shadow-[0_20px_50px_rgba(0,0,0,0.45)] md:p-8'
+                      ? 'border border-gold/60 bg-[#240912]/90 p-6 shadow-[0_20px_50px_rgba(0,0,0,0.45)] md:p-8'
                       : ghosted
-                        ? 'pointer-events-none border-white/5 bg-white/[0.01] p-4 opacity-20'
-                        : 'border-white/10 bg-[#1E070F]/65 p-5 hover:border-gold/30 md:p-6'
+                        ? 'pointer-events-none border border-white/5 bg-white/[0.01] p-4 opacity-20'
+                        : tier === 'lead'
+                          ? 'border-y border-gold/25 bg-[#240912]/55 px-5 py-9 hover:border-gold/45 md:px-8 md:py-12'
+                          : tier === 'standard'
+                            ? 'border-t border-white/12 bg-transparent px-1 py-7 hover:border-gold/25 md:px-2'
+                            : 'border-t border-white/[0.07] bg-transparent px-1 py-5 hover:border-gold/20 md:px-2'
                   }`}
                 >
                   {/* R10 — the departmental plate: the wing numeral is set as a
@@ -298,7 +310,13 @@ export default function Categories() {
                   <div className="flex flex-wrap items-start gap-x-6 gap-y-3 border-b border-gold/20 pb-5">
                     <span
                       aria-hidden="true"
-                      className="font-serif text-[clamp(2.1rem,4vw,3.2rem)] font-light leading-[0.8] tracking-[-0.03em] text-gold-lit/45"
+                      className={`font-serif font-light leading-[0.8] tracking-[-0.03em] ${
+                        tier === 'lead'
+                          ? 'text-[clamp(3.2rem,6.4vw,5.6rem)] text-gold-lit/70'
+                          : tier === 'standard'
+                            ? 'text-[clamp(2.1rem,4vw,3.2rem)] text-gold-lit/45'
+                            : 'text-[clamp(1.4rem,2.4vw,1.9rem)] text-gold-lit/35'
+                      }`}
                     >
                       {['I', 'II', 'III', 'IV', 'V', 'VI', 'VII'][wingIdx]}
                     </span>
@@ -306,7 +324,13 @@ export default function Categories() {
                       <p className="font-mono text-[9px] uppercase tracking-[0.3em] text-gold-lit/90">
                         Wing {['I', 'II', 'III', 'IV', 'V', 'VI', 'VII'][wingIdx]} · {folioWord(c.count)}
                       </p>
-                      <h2 className="mt-1.5 flex items-baseline gap-2.5 font-serif text-[clamp(1.6rem,3vw,2.3rem)] font-normal italic leading-tight text-ivory">
+                      <h2 className={`mt-1.5 flex items-baseline gap-2.5 font-serif font-normal italic leading-tight text-ivory ${
+                        tier === 'lead'
+                          ? 'text-[clamp(2.3rem,4.6vw,3.6rem)]'
+                          : tier === 'standard'
+                            ? 'text-[clamp(1.6rem,3vw,2.3rem)]'
+                            : 'text-[clamp(1.25rem,2.2vw,1.6rem)]'
+                      }`}>
                         {c.name}
                         <span aria-hidden="true" className="text-base not-italic leading-none" style={{ color: c.accent }}>
                           {c.motif}
@@ -319,7 +343,13 @@ export default function Categories() {
                   </div>
 
                   <ul
-                    className="mt-6 grid grid-cols-2 gap-x-4 gap-y-6 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5"
+                    className={`grid gap-x-4 gap-y-6 ${
+                      tier === 'lead'
+                        ? 'mt-8 grid-cols-2 sm:grid-cols-3 lg:grid-cols-4'
+                        : tier === 'standard'
+                          ? 'mt-6 grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5'
+                          : 'mt-5 grid-cols-3 sm:grid-cols-4 lg:grid-cols-6 xl:grid-cols-8'
+                    }`}
                     aria-label={`Folios in the ${c.name} wing`}
                   >
                     {items.map(({ a, i }) => {

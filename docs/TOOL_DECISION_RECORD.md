@@ -794,3 +794,82 @@ navigation, Canela, the book metaphor, Hello Monday's wording.
 
 **No dependency added.** The install requirement remains closed as "evaluated,
 none qualified" (Record 12).
+
+---
+
+## Record 14 — Treatment census across all routes; /categories recomposed (2026-10-28)
+
+**Census (1440, outermost sections).** The eight previously unreviewed routes
+were finally measured on the same axes used for Home:
+
+| Route | Secs | Distinct measures | Full-bleed | Heading sizes | Spread |
+|---|---|---|---|---|---|
+| `/categories` | 7 | **1270 only** | 0 | **37 ×7** | **1.00×** |
+| `/categories/:slug` | 7 | 1260/1290 | 0 | 37 ×7 | 1.00× |
+| `/articles` | **0** | — | 0 | — | — |
+| `/creators` | **0** | — | 0 | — | — |
+| `/about` | 6 | 780/900/920/940/950/1440 | 0 | 74,66,66,66 | 1.12× |
+| `/community` | 5 | 770/900/1220/1320 | 0 | 66,50,10 | 6.60× |
+| `/ambassadors` | 4 | 1440 only | 0 | 104,74,51,35 | 2.97× |
+| `/submit` | 2 | 1440 only | 0 | 96 | — |
+| `/contact` | 2 | 1440 only | 0 | 88 | — |
+
+`/categories` was the clear worst: seven sections at one width with seven
+identical 37 px headings.
+
+### What changed — `src/pages/Categories.tsx`
+
+The wings are not equal. Real counts: **Poetry 7, Social Issues 5, Art 4,
+Essays 2, Stories 1, Lifestyle 1, Horror 1** — 21 folios. The page rendered a
+one-folio wing with exactly the weight of a seven-folio wing.
+
+Tier is now derived from `items.length` (`lead` ≥5, `standard` ≥2, `slim` else)
+and drives four things: the container treatment (raised plate / rule / hairline
+instead of seven identical bordered cards), the wing numeral, the wing name,
+and the plate grid density. Because the tier is computed from live data, the
+shelf re-ranks itself as the archive grows rather than encoding today's order.
+
+Measured result, both `/categories` and `/categories/:slug` (one component
+serves both):
+
+| | Before | After |
+|---|---|---|
+| Distinct heading sizes | 1 | **3** (58 / 37 / 26) |
+| Heading spread | 1.00× | **2.23×** |
+| Cover width, lead vs slim | identical | **289 px vs 136 px** |
+| Section height, lead vs slim | identical | **1149 px vs 384 px** |
+
+Active/ghosted filtering behaviour, folio links, `aria-label`s, covers,
+credits and the uncropped `object-contain` plates are unchanged.
+
+### Reasoned no-change — `/articles`
+
+`/articles` renders all 21 folios through one `.map` into a uniform grid, which
+looks like the "same generic card" failure. It was **not** changed, on
+evidence: `.plate-thumb img` is locked to `aspect-[4/5] object-contain` under an
+explicit documented contract — *"Cropping a contributor's published work to suit
+a grid is exactly what this redesign set out to stop."* Spanning the first
+folio across two of three columns would make that cell ~1075 px tall and wreck
+the wall rhythm; widening the frame instead would crop the artwork. The equal
+treatment of every contributor's plate is a defensible editorial value here, not
+laziness. Revisit only with a separate featured block above the wall, which is
+a larger change than this pass allowed.
+
+### Verified
+
+`npm run build` **PASS** (54 shells) · `typecheck:api` · `check:secrets` ·
+`test:metadata` · `test:flows` all **PASS** · full matrix audit **53 routes × 3
+viewports: 0 console/page/network errors, 0 horizontal overflow, 0 footers off
+true bottom**. `/categories` inspected rendered at 1440 and 390 — screenshots in
+`docs/evidence/r15/`.
+
+### Not done in this pass
+
+`/about`, `/creators`, `/community`, `/ambassadors`, `/submit`, `/contact` were
+**measured but not recomposed**. `/creators` and `/articles` have **zero
+`<section>` elements**, so they have no outermost structure to compose against —
+that is the first thing to fix there. `/submit`, `/contact` and `/ambassadors`
+each sit at a single 1440 measure. No width-token system was introduced; the
+census is the prerequisite evidence for one.
+
+**No dependency added.** `verlysemedia.kesug.com` remains **NOT TESTED**.
