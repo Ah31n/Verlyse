@@ -483,3 +483,38 @@ the DOM outline, which was verified directly.
 
 Evidence: `docs/evidence/r13b/` — article, creator and 404 at desktop and phone,
 plus an at-rest close-up of the "Conversations" heading showing visual parity.
+
+---
+
+## Brief № 08 — One thing on the page is allowed to be big (2026-10-28)
+
+Home had eleven sections and ten of them were exactly the same width. Not one
+image, anywhere on a visual magazine, ever broke out of its box. The nine
+headings ran 61 to 89 pixels — close enough that nothing led. That is what makes
+a page feel templated: not the colours, not the type, but the fact that every
+section is granted the same amount of room and the same frame.
+
+We tried to fix it as a height problem first and were wrong twice. Pulse looked
+airy at 22% ink but holds four real metrics. The hiring section looked
+oversized but carries a headline, an info box, a marquee and a call to action.
+Compressing either would have been cutting content to flatter a measurement.
+
+So the lead feature was given the page's one expansive moment instead. Its plate
+band leaves the 1440 measure and runs to both edges, and its title became the
+largest thing on the page. Everything else stays contained — which is the point.
+A break only reads as emphasis if it happens once.
+
+The first attempt cropped the plate to a 21:9 cinematic band. The build passed
+and every number improved. Then we looked at it: the artwork is a 4:5 collage
+with its lettering at the top and its two subjects at the bottom, and the wide
+crop had cut through both — "Border, Just" sliced in half, both faces gone. The
+numbers approved of something that had quietly vandalised the art. It now sits
+whole inside the full-bleed band, projected rather than trimmed.
+
+On a phone this is the clearest gain. That plate used to be a half-width
+thumbnail in a two-column grid; it now fills the screen at its true proportion
+and you can finally read it.
+
+What is still unfinished is said plainly in Record 13: nine sections still share
+one container, the palette still alternates across three backgrounds, and eight
+other routes have not been put through this same treatment census.

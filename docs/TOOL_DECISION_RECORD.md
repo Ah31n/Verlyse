@@ -680,3 +680,117 @@ Heights: article 11,357 → **11,284** px phone and 10,333 → **10,263** px des
 **No new dependency. No copied source. No generated or altered artwork. No
 invented content** — every promoted label is a string that was already rendering
 on the page.
+
+---
+
+## Record 13 — Art direction: measure, bleed and typographic peak (2026-10-28)
+
+**Brief.** A master redesign directive restated the goal: the site must read as
+art-directed, not as a template with a better palette. It named the test
+explicitly — *with all animation disabled, would the static composition still
+look exceptional?*
+
+### The diagnosis — and the two wrong answers discarded first
+
+Record 11 had logged "flat rhythm (8 of 11 sections 1,386–1,914 px)" as an
+unaddressed defect. Phase E began by trying to fix that as a **height** problem
+and abandoned it twice, on evidence:
+
+1. **Pulse is not a dead band.** 22% ink, but it carries four real `LEDGER`
+   metrics, a headline and a link. The low figure is large numerals and wide
+   gaps, not emptiness. Compressing it would have been content truncation.
+2. **HiringMarquee is not a classified.** 30% ink across headline, body, info
+   box, marquee and CTA. Also not compressible.
+
+Shrinking either would have violated the standing rule against reducing Home's
+height by truncation. Height was the wrong lever.
+
+### The real defect, measured
+
+A treatment census at 1440 (background, inner measure, full-bleed count,
+heading size per outermost section) found:
+
+| Signal | Before |
+|---|---|
+| Distinct inner measures across 11 sections | **2** — ten sections identical at 1440 px, only THE LETTERS differs at 980 |
+| Sections with a full-bleed image | **0 of 11**, on a visual magazine whose WorksStrip alone holds 16 images |
+| Heading sizes | 89, 84, 77, 74, 74, 67, 67, 64, 61 — a **1.46× spread**, no dominant |
+| Distinct backgrounds | 3, weakly alternating |
+
+Uniform measure + nothing ever breaking the box + a compressed type scale is
+what produces the template feel. None of it requires removing content to fix.
+
+### What changed — `FeatureSection` in `src/pages/Home.tsx`
+
+The lead feature is now Home's single expansive image moment. The plate band
+leaves the 1440 measure and runs edge to edge; the remaining plates and the
+story block stay contained beneath it. Because every other section on Home is
+contained, the one break reads as emphasis rather than as a style. The feature
+title moves from `clamp(2.9rem,6.2vw,5.6rem)` to `clamp(3.1rem,7.6vw,6.8rem)`,
+making it the page's typographic peak.
+
+**Plate numbering, captions, credits, alt text, `onError` fallback, MetaRow,
+excerpt, byline and the article link are all preserved.** The lead plate is
+destructured off the front and the remainder re-indexed (`j + 1`) so "Plate 02 /
+04" and friends stay correct.
+
+### The correction pass — and why `object-cover` was reverted
+
+The first implementation set the full-bleed band to `sm:aspect-[16/9]
+lg:aspect-[21/9]` with `object-cover`. The numbers improved (full-bleed 0 → 1,
+peak 89 → 109 px) and the build passed. **The rendered screenshot showed it was
+wrong.** These plates are 4:5 artwork whose composition runs to all four edges:
+the collage lettering sits at the top and the two figures at the bottom. A
+cinematic crop guillotined both — "Border, Just" was sliced through and both
+faces were cut off.
+
+That is altering artwork to fit a visual device, which the brief forbids. The
+band was changed to `object-contain` at `h-[min(84svh,660px)]`, so the plate is
+**projected whole** inside a full-bleed surround rather than trimmed to fit.
+
+This is the single most important entry in this record: **the measurements said
+the change was good and the measurements were not sufficient.** Only looking at
+the render caught it.
+
+### Verified
+
+| Check | Result |
+|---|---|
+| `npm run build` | **PASS** — 54 shells, 54 sitemap URLs |
+| `typecheck:api` / `check:secrets` / `test:metadata` / `test:flows` | **PASS** |
+| Full matrix audit, 53 routes × 3 viewports | **PASS** — 0 console/page/network errors, 0 horizontal overflow, 0 footers off true bottom |
+| Lead plate, desktop 1440 | 562 × 702, ratio **0.80** — the artwork's true 4:5, nothing cropped |
+| Lead plate, phone 390 | full viewport width, natural ratio, nothing cropped |
+| Full-bleed sections | 0 → **1 of 11** |
+| Heading spread | 1.46× → **1.79×** (peak 89 → 109 px) |
+
+Responsive art direction: on desktop the plate is a projected slide in a dark
+full-bleed band; on a phone it fills the viewport width and the collage is
+legible for the first time — previously it was a half-width thumbnail in a
+two-column grid.
+
+### Still open, stated plainly
+
+- **Measure rhythm is only partly solved.** Nine sections still share the 1440
+  container. One full-bleed moment has been introduced, not a full width system.
+- **Backgrounds remain at 3 values.**
+- Routes `/about`, `/creators`, `/community`, `/ambassadors`, `/categories`,
+  `/articles`, `/submit`, `/contact` were **not** re-examined under this
+  treatment census; their Task 10/11 compositions stand unreviewed against it.
+- `verlysemedia.kesug.com` remains **NOT TESTED** — unreachable from this
+  sandbox. Nothing is deployed.
+
+### Resources
+
+Opened fresh this turn: **shopify.com/editions/winter2026** — reconfirmed as an
+AI product-feature catalogue; the transferable pacing mechanism is that one
+named chapter holds *differently sized* evidence blocks (full-bleed video, small
+cards, a marquee), so rhythm comes from size variety within a chapter.
+**howtotalktowhitekidsaboutracism.com** — live; a book with page-turn
+navigation, seven short imperative chapters, and a deliberately tiny dedication
+page set against the content pages. Principle adopted: a composition needs a
+quiet, small moment to make the large ones read as large. Not copied: page-turn
+navigation, Canela, the book metaphor, Hello Monday's wording.
+
+**No dependency added.** The install requirement remains closed as "evaluated,
+none qualified" (Record 12).

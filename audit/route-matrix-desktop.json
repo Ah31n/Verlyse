@@ -2,11 +2,11 @@
   "home|desktop": {
     "title": "Where Vision Becomes A Voice — Verlyse Media",
     "h1": "“Where Vision Becomes A Voice”",
-    "scrollHeight": 17963,
-    "footerTop": 16616,
-    "footerBottom": 17963,
+    "scrollHeight": 18724,
+    "footerTop": 17378,
+    "footerBottom": 18724,
     "footerAtBottom": true,
-    "footerIsFixedOffset": 0.4375,
+    "footerIsFixedOffset": 0.140625,
     "overflowX": false,
     "scrollWidth": 1440,
     "innerWidth": 1440,
@@ -604,7 +604,7 @@
     "innerWidth": 1440,
     "route": "/creator/alina-javed",
     "viewport": "desktop",
-    "recordStart": 12,
+    "recordStart": 9,
     "issues": []
   },
   "creator-anshujit-singh|desktop": {
@@ -620,7 +620,7 @@
     "innerWidth": 1440,
     "route": "/creator/anshujit-singh",
     "viewport": "desktop",
-    "recordStart": 12,
+    "recordStart": 9,
     "issues": []
   },
   "creator-haieqa-wahab|desktop": {
@@ -636,7 +636,7 @@
     "innerWidth": 1440,
     "route": "/creator/haieqa-wahab",
     "viewport": "desktop",
-    "recordStart": 12,
+    "recordStart": 9,
     "issues": []
   },
   "creator-shaza-fatima|desktop": {
@@ -652,7 +652,7 @@
     "innerWidth": 1440,
     "route": "/creator/shaza-fatima",
     "viewport": "desktop",
-    "recordStart": 12,
+    "recordStart": 9,
     "issues": []
   },
   "creator-adeena-irfan|desktop": {
@@ -668,7 +668,7 @@
     "innerWidth": 1440,
     "route": "/creator/adeena-irfan",
     "viewport": "desktop",
-    "recordStart": 12,
+    "recordStart": 9,
     "issues": []
   },
   "creator-craft-with-bro|desktop": {
@@ -684,7 +684,7 @@
     "innerWidth": 1440,
     "route": "/creator/craft-with-bro",
     "viewport": "desktop",
-    "recordStart": 12,
+    "recordStart": 9,
     "issues": []
   },
   "creator-munkashay-javed|desktop": {
@@ -700,7 +700,7 @@
     "innerWidth": 1440,
     "route": "/creator/munkashay-javed",
     "viewport": "desktop",
-    "recordStart": 12,
+    "recordStart": 9,
     "issues": []
   },
   "creator-abheesha-ghosh|desktop": {
@@ -716,7 +716,7 @@
     "innerWidth": 1440,
     "route": "/creator/abheesha-ghosh",
     "viewport": "desktop",
-    "recordStart": 12,
+    "recordStart": 9,
     "issues": []
   },
   "creator-kenza-imene|desktop": {
@@ -732,7 +732,7 @@
     "innerWidth": 1440,
     "route": "/creator/kenza-imene",
     "viewport": "desktop",
-    "recordStart": 12,
+    "recordStart": 9,
     "issues": []
   },
   "creator-hadia-raza|desktop": {
@@ -748,7 +748,7 @@
     "innerWidth": 1440,
     "route": "/creator/hadia-raza",
     "viewport": "desktop",
-    "recordStart": 12,
+    "recordStart": 9,
     "issues": []
   },
   "creator-zuha-farhan|desktop": {
@@ -764,7 +764,7 @@
     "innerWidth": 1440,
     "route": "/creator/zuha-farhan",
     "viewport": "desktop",
-    "recordStart": 12,
+    "recordStart": 9,
     "issues": []
   },
   "creator-haiqa-nafees|desktop": {
@@ -780,7 +780,7 @@
     "innerWidth": 1440,
     "route": "/creator/haiqa-nafees",
     "viewport": "desktop",
-    "recordStart": 12,
+    "recordStart": 9,
     "issues": []
   },
   "creator-syeda-tasbeeha-noman|desktop": {
@@ -796,7 +796,7 @@
     "innerWidth": 1440,
     "route": "/creator/syeda-tasbeeha-noman",
     "viewport": "desktop",
-    "recordStart": 12,
+    "recordStart": 9,
     "issues": []
   },
   "creator-kazi-fatimataz-zahra|desktop": {
@@ -812,7 +812,7 @@
     "innerWidth": 1440,
     "route": "/creator/kazi-fatimataz-zahra",
     "viewport": "desktop",
-    "recordStart": 12,
+    "recordStart": 9,
     "issues": []
   },
   "creator-mochjixx|desktop": {
@@ -828,7 +828,7 @@
     "innerWidth": 1440,
     "route": "/creator/mochjixx",
     "viewport": "desktop",
-    "recordStart": 12,
+    "recordStart": 9,
     "issues": []
   },
   "creator-verlyse-media|desktop": {
@@ -844,7 +844,7 @@
     "innerWidth": 1440,
     "route": "/creator/verlyse-media",
     "viewport": "desktop",
-    "recordStart": 12,
+    "recordStart": 9,
     "issues": []
   }
 }

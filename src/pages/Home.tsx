@@ -776,14 +776,49 @@ function WorksStrip() {
 /** The current feature — four plates in a balanced 2x2 editorial quad. */
 function FeatureSection({ feature, authorName }: { feature: (typeof ARTICLES)[number]; authorName: string }) {
   const plates = feature.slides ?? []
+  /* The lead plate leaves the 1440 measure and runs edge to edge. It is the
+     page's single expansive image moment: every other section on Home is
+     contained, so this one break reads as emphasis rather than as a style.
+     The crop is art-directed per viewport — upright on a phone where a wide
+     band would collapse to a letterbox, cinematic from sm up. */
+  const [lead, ...rest] = plates
   return (
-    <section className="border-t border-white/10 py-[clamp(8rem,16vh,12rem)]">
+    <section className="border-t border-white/10 pb-[clamp(8rem,16vh,12rem)] pt-[clamp(5rem,10vh,7rem)]">
       <div className="mx-auto max-w-page px-[clamp(1.75rem,5.5vw,4.75rem)]">
         <SectionHead eyebrow="The first feature" />
+      </div>
+
+      {lead && (
+        <Reveal className="mt-[clamp(2rem,4vh,3.5rem)]">
+          <figure className="group/lead relative overflow-hidden border-y border-white/10 bg-[#140409]">
+            {/* object-contain, not cover. These plates are 4:5 artwork whose
+                composition runs to all four edges — the collage lettering sits
+                at the top and the faces at the bottom. A cinematic crop would
+                cut both. The band bleeds full width and the plate is presented
+                whole inside it, projected rather than trimmed. */}
+            <img
+              src={lead}
+              alt={`${feature.title} — plate 1 of ${plates.length}`}
+              loading="lazy"
+              decoding="async"
+              onError={(e) => handleImgError(e, feature.title, folioNoOf(feature.id))}
+              className="mx-auto block h-[min(84svh,660px)] w-auto max-w-full object-contain transition-transform duration-[1600ms] ease-out group-hover/lead:scale-[1.02] sm:h-[min(78svh,720px)]"
+            />
+            <figcaption className="mx-auto flex max-w-page items-center justify-between px-[clamp(1.75rem,5.5vw,4.75rem)] py-3 font-mono text-[9px] uppercase tracking-[0.26em] text-white/60">
+              <span>Plate 01 — the feature as published on the feed</span>
+              <span className="text-gold-lit/85">01 / {String(plates.length).padStart(2, '0')}</span>
+            </figcaption>
+          </figure>
+        </Reveal>
+      )}
+
+      <div className="mx-auto max-w-page px-[clamp(1.75rem,5.5vw,4.75rem)] pt-[clamp(3.5rem,8vh,6rem)]">
         <div className="grid grid-cols-1 items-center gap-[clamp(3rem,7vw,8rem)] lg:grid-cols-[1.02fr_0.98fr]">
           <Reveal>
             <div className="grid grid-cols-2 items-start gap-4 sm:gap-5">
-              {plates.map((src, i) => (
+              {rest.map((src, j) => {
+                const i = j + 1
+                return (
                 <figure key={src} {...spotlitGlide(i % 2 === 1 ? 'measured' : 'restrained')} className="img-frame st-spotlit overflow-hidden border border-white/10 bg-[#140409]">
                   <img
                     src={src}
@@ -798,7 +833,8 @@ function FeatureSection({ feature, authorName }: { feature: (typeof ARTICLES)[nu
                     <span className="text-gold-lit/85">{String(i + 1).padStart(2, '0')} / {String(plates.length).padStart(2, '0')}</span>
                   </figcaption>
                 </figure>
-              ))}
+                )
+              })}
             </div>
             <p className="mt-5 font-mono text-[10px] uppercase tracking-[0.28em] text-white/65">
               The feature as presented — {plates.length} plates, 4:5 · as published on the feed
@@ -810,7 +846,7 @@ function FeatureSection({ feature, authorName }: { feature: (typeof ARTICLES)[nu
               <p className="kicker">Feature — presented by Verlyse Media</p>
             </Reveal>
             <Reveal delay={0.08}>
-              <h2 className="mt-6 font-serif text-[clamp(2.9rem,6.2vw,5.6rem)] font-light leading-[1.02] tracking-[-0.02em]">
+              <h2 className="mt-6 font-serif text-[clamp(3.1rem,7.6vw,6.8rem)] font-light leading-[0.98] tracking-[-0.025em]">
                 “{feature.title}”
               </h2>
             </Reveal>
