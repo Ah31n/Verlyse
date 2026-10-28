@@ -15,7 +15,7 @@ import { MetaRow, SectionHead, UnderlineLink } from '../components/ui/primitives
 import { ImmersiveShell, BrassThread } from '../components/immersive'
 import { Magnetic, MaskReveal } from '../components/cinematic'
 import SaveButton from '../components/ui/SaveButton'
-import { ARTICLES, BRAND, CATEGORIES, LEDGER, folioNoOf, getAuthor } from '../data/content'
+import { ARTICLES, BRAND, CATEGORIES, COMMUNITY_VOICES, LEDGER, folioNoOf, getAuthor } from '../data/content'
 import { handleImgError } from '../lib/imgFallback'
 import { useWebGLSupport } from '../lib/three/useWebGLSupport'
 import { introSeen, onIntroResolved } from '../lib/intro'
@@ -351,7 +351,7 @@ function IssueBand() {
     { idx: '05', value: `${LEDGER.conversations}`, unit: 'conversations', note: 'Archive letters & notes' },
   ]
   return (
-    <section className="border-b border-white/12 bg-gradient-to-r from-[#21060E] via-wine to-[#21060E]" aria-label="The magazine in numbers">
+    <section className="border-b border-white/12 bg-gradient-to-r from-[#21060E] via-wine to-[#21060E]" aria-label="This issue — ledger and contents">
       <div className="mx-auto grid max-w-page grid-cols-2 px-[clamp(1.75rem,5.5vw,4.75rem)] sm:grid-cols-6 lg:grid-cols-5 lg:divide-x lg:divide-white/10">
         {items.map((it, i) => {
           const spanCls =
@@ -389,7 +389,88 @@ function IssueBand() {
           )
         })}
       </div>
+
+      <IssueContents />
     </section>
+  )
+}
+
+/* ------------------------------------------------------------------ */
+/* The contents page — Home runs to roughly thirty phone screens, and  */
+/* until now it opened straight into the archive with no way to see    */
+/* its shape or skip ahead. The issue was always built in four         */
+/* movements (the MotifDividers already named three of them); this     */
+/* prints them as a magazine's contents and anchors each one. Native   */
+/* in-page anchors only — no scroll library, no sticky second nav.     */
+/* Every figure is read from the ledger or the live arrays.            */
+/* ------------------------------------------------------------------ */
+const CHAPTERS = [
+  {
+    no: 'I',
+    id: 'chapter-issue',
+    name: 'The issue',
+    of: () => `${LEDGER.features} folios · ${LEDGER.publishedFeatures} published, ${LEDGER.provisionalFeatures} provisional`,
+  },
+  {
+    no: 'II',
+    id: 'chapter-feature',
+    name: 'The feature',
+    of: () => `“${ARTICLES[0].title}” · ${getAuthor(ARTICLES[0].authorId)?.name ?? ''}`,
+  },
+  {
+    no: 'III',
+    id: 'chapter-room',
+    name: 'The room',
+    of: () => `${LEDGER.departments} departments · ${COMMUNITY_VOICES.length} letters · ${LEDGER.conversations} conversations`,
+  },
+  {
+    no: 'IV',
+    id: 'chapter-invitation',
+    name: 'The invitation',
+    of: () => 'Submissions open · the desk, and the open call',
+  },
+] as const
+
+function IssueContents() {
+  return (
+    <div className="mx-auto max-w-page border-t border-white/10 px-[clamp(1.75rem,5.5vw,4.75rem)] py-[clamp(2.5rem,5vh,4rem)]">
+      <div className="flex flex-wrap items-baseline justify-between gap-x-6 gap-y-2 border-b border-gold/25 pb-4">
+        <h2 className="kicker mb-0">Contents</h2>
+        <p className="font-mono text-[9px] uppercase tracking-[0.28em] text-white/60">
+          {LEDGER.issueLabel} · four movements
+        </p>
+      </div>
+
+      <ol className="mt-1">
+        {/* No Reveal wrapper here on purpose: the contents is wayfinding, not
+            scenery. It sits just below the fold, so gating it behind a
+            whileInView fade would hide the one element whose whole job is to
+            tell a thirty-screen page what shape it has. It is present at rest;
+            the chapter marks it points to carry the motion instead. */}
+        {CHAPTERS.map((c) => (
+          <li key={c.id}>
+            <a
+                href={`#${c.id}`}
+                className="group grid grid-cols-[2.25rem_1fr] items-baseline gap-x-4 gap-y-1 border-b border-white/10 py-4 no-underline transition-colors duration-300 hover:border-gold/40 focus-visible:border-gold/60 md:grid-cols-[2.75rem_minmax(0,17ch)_1fr_auto] md:gap-x-7"
+              >
+                <span className="tnum font-mono text-[11px] uppercase tracking-[0.26em] text-gold-lit">{c.no}</span>
+                <span className="font-serif text-[clamp(1.35rem,2.4vw,1.85rem)] font-light leading-[1.15] text-ivory transition-colors duration-300 group-hover:text-gold-lit">
+                  {c.name}
+                </span>
+                <span className="col-start-2 font-mono text-[9px] uppercase leading-relaxed tracking-[0.22em] text-white/60 md:col-start-3">
+                  {c.of()}
+                </span>
+                <span
+                  aria-hidden="true"
+                  className="hidden font-mono text-[11px] text-gold/60 transition-transform duration-300 group-hover:translate-x-1 md:block"
+                >
+                  ↓
+                </span>
+            </a>
+          </li>
+        ))}
+      </ol>
+    </div>
   )
 }
 
@@ -628,16 +709,15 @@ function WorksStrip() {
                     <p className="mt-1 font-mono text-[8px] uppercase tracking-[0.24em] text-white/55">Conversations</p>
                   </div>
                 </div>
-                <div className="mt-6 flex flex-wrap items-center justify-between gap-4 border-t border-white/10 pt-4">
+                {/* R13: the fourth “send your work” link on this page used to sit
+                    here, buried in a statistics panel. The desk already has a
+                    primary CTA in <Invitation> and a contextual one at the end of
+                    the departments list; this one repeated the job without
+                    adding a reason, so the row is now purely the ledger. */}
+                <div className="mt-6 border-t border-white/10 pt-4">
                   <span className="font-mono text-[9px] uppercase tracking-[0.26em] text-white/65">
                     {LEDGER.publishedFeatures} published · {LEDGER.provisionalFeatures} provisional {LEDGER.provisionalFeatures === 1 ? 'record' : 'records'}
                   </span>
-                  <Link
-                    to="/submit"
-                    className="font-mono text-[9px] uppercase tracking-[0.28em] text-gold no-underline transition-colors hover:text-ivory"
-                  >
-                    Send your work to the desk →
-                  </Link>
                 </div>
               </div>
             </Reveal>
@@ -1309,15 +1389,16 @@ export default function Home() {
     <ImmersiveShell>
       <Cover selectedId={selectedId} state={spatialState} />
       <IssueBand />
+      <MotifDivider id="chapter-issue" no="I" label="The issue" motif="✦" />
       <WorksStrip />
-      <MotifDivider label="The feature" motif="quote" />
+      <MotifDivider id="chapter-feature" no="II" label="The feature" motif="quote" />
       <FeatureSection feature={feature} authorName={author.name} />
       <SpatialReading pickIdx={pickIdx} onSelect={select} />
-      <MotifDivider label="The room" motif="voices" />
+      <MotifDivider id="chapter-room" no="III" label="The room" motif="voices" />
       <Pulse />
       <Departments />
       <VoiceCarousel />
-      <MotifDivider label="The invitation" motif="feather" />
+      <MotifDivider id="chapter-invitation" no="IV" label="The invitation" motif="feather" />
       <Invitation />
       <HiringMarquee />
       <Colophon />

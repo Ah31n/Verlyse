@@ -114,18 +114,39 @@ export function Signature({ name, align = 'left' }: { name: string; delay?: numb
 /* Used between the body, the plates, and the ending so the ornament   */
 /* becomes the reader's cue that one movement of the story has closed. */
 /* ------------------------------------------------------------------ */
-export function MotifDivider({ label, motif }: { label?: string; motif?: string }) {
+export function MotifDivider({
+  label,
+  motif,
+  id,
+  no,
+  heading,
+}: {
+  label?: string
+  motif?: string
+  /** Anchor target. When set, the divider becomes a real chapter mark the
+   *  issue contents can jump to, and stops being hidden from assistive tech. */
+  id?: string
+  /** Chapter numeral, e.g. "II". Printed beside the label. */
+  no?: string
+  /** Render the label as a real <h2>. Long reading routes need a navigable
+   *  outline; without this the only headings on an article are the titles of
+   *  OTHER articles, which strands anyone navigating by heading. */
+  heading?: boolean
+}) {
   const reduce = useReducedMotion() === true
+  const isChapter = Boolean(id) || Boolean(heading)
+  const Label = heading ? motion.h2 : motion.span
   return (
     <motion.div
-      aria-hidden="true"
+      id={id}
+      aria-hidden={isChapter ? undefined : 'true'}
       initial={reduce ? false : { opacity: 0 }}
       whileInView={{ opacity: 1 }}
       viewport={{ once: true, margin: '0px 0px -10% 0px' }}
       transition={reduce ? { duration: 0 } : { duration: 0.9, ease: EASE }}
-      className="my-16 flex flex-col items-center gap-4"
+      className={`my-16 flex flex-col items-center gap-4 ${isChapter ? 'scroll-mt-28' : ''}`}
     >
-      <div className="flex items-center gap-4">
+      <div aria-hidden="true" className="flex items-center gap-4">
         <motion.span
           initial={reduce ? false : { scaleX: 0 }}
           whileInView={{ scaleX: 1 }}
@@ -150,15 +171,16 @@ export function MotifDivider({ label, motif }: { label?: string; motif?: string 
         />
       </div>
       {label && (
-        <motion.span
+        <Label
           initial={reduce ? false : { opacity: 0, y: 6 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true, margin: '0px 0px -10% 0px' }}
           transition={reduce ? { duration: 0 } : { duration: 0.7, ease: EASE, delay: 0.5 }}
-          className="font-mono text-[9px] uppercase tracking-[0.30em] text-white/65"
+          className="flex items-baseline gap-3 font-mono text-[10px] uppercase tracking-[0.30em] text-white/70"
         >
-          {label}
-        </motion.span>
+          {no && <span className="tnum text-gold-lit">{no}</span>}
+          <span>{label}</span>
+        </Label>
       )}
     </motion.div>
   )

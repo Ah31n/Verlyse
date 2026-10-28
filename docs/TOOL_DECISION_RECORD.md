@@ -425,3 +425,258 @@ mistaken for a regression or for a silenced defect.
 3. **The live site `verlysemedia.kesug.com` was NOT tested** this session. Everything here
    is local preview only.
 4. **Home page length unchanged** (owner decision, unchanged since Record 08).
+
+---
+
+## Record 11 — The contents page: giving a thirty-screen Home a spine
+
+**Date:** 2026-10-28 · **Branch:** `arena/9f76f00e-verlyse` · **Base commit:** `d93ce18`
+**Scope:** `/` (Home) composition + `MotifDivider` (shared owner).
+
+### Why this and not another token pass
+
+Record 10 redesigned five route families. Home — the longest route on the site and
+the one that establishes publication identity — was never compositionally touched.
+Measured on the running preview before any edit:
+
+| Route | desktop | tablet | phone |
+|---|---|---|---|
+| **home** | **17,333 px** | **23,991 px** | **25,423 px (30.1 screens)** |
+| article (next longest) | 10,333 | 11,023 | 11,354 |
+| everything else | ≤ 6,540 | ≤ 8,319 | ≤ 9,215 |
+
+Home is 2.5× the next longest route and had **no contents, no wayfinding and no
+semantic chapter structure**. That is the defect this record addresses.
+
+### Two findings I measured, then retracted
+
+Honesty about the audit itself, because both nearly became design decisions:
+
+1. **"THE LETTERS is a 5%-ink dead band."** FALSE. My first density probe counted
+   `p,h1..h4,li,img,a,button,input,textarea` and omitted `blockquote`, `cite` and
+   `span` — which is precisely what `VoiceCarousel` is built from. Re-measured with
+   those included: **25% ink**, mid-range for the page. No change was made to it.
+2. **"Home has four duplicate submit CTAs."** OVERSTATED. Source review of all four
+   `/submit` links: `Invitation` L1037 is the primary CTA (`btn btn-gold`);
+   `Departments` L884 is a deliberate contextual invitation (source comment: "it is
+   not an eighth room"); `Cover` L230 is inline masthead prose. Only the fourth —
+   a mono repeat buried inside the archive **statistics panel** — repeated the job
+   without adding a reason. **One** link removed, not four.
+
+### What changed
+
+| Owner | Change |
+|---|---|
+| `src/pages/Home.tsx` | New `IssueContents` region **inside the existing `IssueBand` section** (no new section, no new route). Four chapters, every figure derived from `LEDGER` / live arrays. |
+| `src/pages/Home.tsx` | `MotifDivider`s given `id` + roman numeral, so the four movements the page already had become anchor targets. |
+| `src/pages/Home.tsx` | Removed the redundant `/submit` link from the archive statistics row. |
+| `src/components/ui/ArticleClosing.tsx` | `MotifDivider` gains optional `id` / `no`. When `id` is set the wrapper stops being `aria-hidden` (the ornament row keeps it), so chapter marks are exposed to assistive technology. |
+
+### Resource classification
+
+| Resource | Class | Used how |
+|---|---|---|
+| Shopify Editions Winter '26 — `shopify.com/editions/winter2026` | **Reference only** (opened 2026-10-28) | Observed: a long catalogue is paced by *stance-named* chapters ("Insights, proactively delivered", "Complexity, delegated", "Designs, refined") rather than numbered labels, each followed by evidence. Verlyse translation: the four movements are named as editorial stances the publication already used ("The issue / feature / room / invitation") and printed as a contents page. **Not copied:** its brand, campaign copy, product architecture, artwork, e-commerce patterns. |
+| Two Much Studio — `twomuch.studio` | **Reference only** (opened 2026-10-28) | Observed: a binary hierarchy — one lead work gets the full plate, then a flat **uncapped** title-first index of all 52 projects, no cards, no pagination. Verlyse translation: the contents lists all four movements with honest counts and caps nothing; no folio was removed to shorten the page. **Not copied:** its wordmark, mascot, view/online counters, shop/play, 3D loader, grid or type. |
+| `motion/react` 13.2.0 | **Existing dependency** | `MotifDivider`'s existing reveal carries the chapter marks. No new engine. |
+| Native CSS `scroll-behavior: smooth` (`src/index.css:26`) | **Existing capability** | Anchor navigation. Verified disabled under `prefers-reduced-motion` at `index.css:71`. |
+| GSAP / ScrollTrigger | **Rejected** | `src/components/cinematic/index.ts` states Home is in the **protected manifest** and GSAP "must not" be wired into it without an explicit per-route decision and re-baseline. Respected. |
+| Lenis | **Rejected** | Not installed, and no scrolling requirement native scroll cannot meet. Confirmed absent from manifest and lockfile. |
+| shadcn/ui, ThreeUI | **Rejected** | No missing UI primitive and no spatial need. A contents list is a semantic `<ol>` of anchors. |
+
+**Dependency delta: zero.** No package added, removed or upgraded; lockfile untouched.
+
+### Verification (run 2026-10-28 against this worktree)
+
+| Check | Result |
+|---|---|
+| `npm run build` | **PASS** — 54 shells / 54 sitemap URLs (unchanged) |
+| `npm run typecheck:api` | **PASS** |
+| `npm run check:secrets` | **PASS** |
+| `npm run test:flows` | **PASS** — 14/14 jsdom flows |
+| `npm run test:metadata` | **PASS** — 54 shells, registry coherent |
+| `npm test` (full matrix + interaction + flags + asset) | **PASS except one** — see below. 0 console errors; assets 112/112 |
+| Route sweep 14 routes × 3 viewports, before **and** after | **PASS** — 0 overflow, exactly 1 `footer[aria-label="Footer"]` on ordinary routes (0 on `/room`), 1 `h1`, 0 page errors, both phases |
+| Contents present at rest (no scroll, no reveal) | **PASS** — 4/4 rows `opacity: 1` at 1440 and 390 |
+| Anchor navigation | **PASS** — click → `location.hash = #chapter-room`, settles with target at **112 px** (= `scroll-mt-28`, clearing the fixed header) |
+| Chapter marks exposed to AT | **PASS** — `aria-hidden` is `null` on anchored dividers; ornament row still hidden |
+| `submit-and-contact-binary-delivery` | **BLOCKED (environment)** — not a regression |
+
+**On the one blocked check.** `liveEndpoint503Ok` expects `POST /api/submit` and
+`/api/newsletter` to answer **503 `provider-unconfigured` / `not-configured`**.
+`api/*.ts` are Vercel serverless functions; `vite dev` does not serve them. Verified
+directly with `curl`: both return **404**. The committed `audit/interaction-audit.json`
+records this check as `true`, i.e. it passes in a runtime that serves `api/*`. Every
+other assertion inside the same check passed (multipart boundary, PNG magic bytes,
+filename, failed-state preservation, `noFalseSent`). **Nothing in the submit/contact
+delivery path was modified this session**, and per standing instruction a visual task
+does not rewrite delivery. I reverted `audit/interaction-audit.json` rather than commit
+an environment-dependent FAIL verdict into a tracked artifact.
+
+### Limitations
+
+1. **`verlysemedia.kesug.com` NOT TESTED** — unreachable from this sandbox. All
+   evidence is local preview (`vite dev`, port 5173).
+2. **Full-page before/after sheets under-represent below-fold content.** Sections
+   below the first screen are gated by `whileInView` reveals that a programmatic
+   full-page capture does not reliably latch, so those regions read dark in *both*
+   columns of `docs/evidence/r13/*`. The at-rest contents captures and the numeric
+   sweep are the reliable evidence.
+3. **Home is still long** (17,963 / 24,612 / 26,083 px, +630/+621/+660). The contents
+   page adds height deliberately: no folio was removed, per standing instruction. The
+   fix for length here is navigability, not truncation.
+4. Three routes remain deliberately unredesigned from Record 10 (`/creator/:id`,
+   `/article/:id`, `/room`); that judgement is unchanged and unre-examined this pass.
+5. **12 of 14 route families were audited but not changed** this pass. `/article/:id`
+   moved +3 px purely from the `MotifDivider` label markup; everything else is
+   byte-identical in height.
+
+---
+
+## Record 12 — Phase D: leaving no route unfinished (2026-10-28)
+
+**Scope.** The user directed: *"leave no route unfinished."* Four of the 14 route
+families had never received a disposition in this redesign: `/article/:id`,
+`/creator/:authorId`, `/room`, and `*` (404). Each is resolved below. A reasoned
+no-change is a valid disposition, but it had to be re-earned with fresh evidence
+— the Phase-2 no-changes are stale and were not reused.
+
+### Component-install requirement — CLOSED as "evaluated, none qualified"
+
+Closed by explicit user decision this turn. Candidates evaluated against the
+verified stack (`node -e` manifest probe, 2026-10-28: **tailwindcss ^3.4.15 →
+3.4.19, react/react-dom 18.3.1, vite 7.3.6, typescript 5.9.3, npm +
+package-lock.json, no components.json**):
+
+| Candidate | Gate failed |
+|---|---|
+| Watermelon UI | Tailwind v4 + React 19; docs explicitly warn against v3 |
+| KokonutUI | Tailwind v4 required |
+| Dot Matrix | Custom Proprietary License + shadcn `components.json` prerequisite |
+| OriginKit | License unverified for copied source; sign-in/paid |
+| shadcn/ui | MIT and v3-viable, but registry host unreachable from this sandbox **and no missing primitive to justify it** |
+| ThreeUI | 52 MB, dual `three` aliases, no spatial need on these routes |
+| Lenis | Native scrolling is mandated; a second scroll controller is forbidden |
+
+`UI_RESOURCE_PLAYBOOK` §4 backs the outcome: *"Use native HTML when it already
+provides the needed behavior."* **No package was installed. Dependency delta is
+zero.** Per the user's instruction, if a genuine interaction gap appears later it
+will be proposed — exact component, why it fits — *before* any integration.
+
+### The finding that drove Phase D
+
+A section census (`scripts/.r13probe.mjs`, 390×844, outermost-section filter,
+leaf-node ink selector) measured the four routes. The defect was not decorative;
+it was **document structure**:
+
+| Route | Height | Headings found in `<main>` | Visible section labels that were *not* headings |
+|---|---|---|---|
+| `/article/:id` | 11,357 px (13.5 screens) | H1, then **H2/H3 that are the titles of OTHER articles** | "Within the post", "Conversations", "Up next" |
+| `/creator/:authorId` | 7,633 px (9.0 screens) | **H1 only** | "How they write", "Published works", "Stories beside theirs" |
+
+Anyone navigating by heading on a 13.5-screen story left the article and landed
+inside other articles' titles with no signal that the story had ended. On the
+creator dossier there was no outline at all. The labels already existed and were
+already visible — they were simply marked up as `<p class="kicker">`.
+
+A second, separate defect: `ArticleDetail` printed **"Within the post" twice,
+roughly 40 px apart** — once as the `MotifDivider` label, once as a `p.kicker`
+immediately beneath it.
+
+### Two findings retracted before acting
+
+1. **`/article/:id` section idx 4 — "912 px at 2% ink" is NOT a dead band.** It
+   carries `aria-hidden="true"` and contains the single word **"FIN."**. The
+   silence around it is the editorial point. **Untouched.**
+2. Section idx 2 (284 px, 35% ink) is likewise `aria-hidden="true"` — the
+   pull-quote band. **Untouched.**
+
+### What changed
+
+- `src/components/ui/ArticleClosing.tsx` — `MotifDivider` gains one optional
+  prop, `heading`. When set, the label renders as `motion.h2` instead of
+  `motion.span` and the divider stops being hidden from assistive tech. No new
+  component, no new owner, no visual change.
+- `src/pages/ArticleDetail.tsx` — the duplicated `p.kicker` "Within the post" is
+  **removed**; the divider now carries that label as the heading. "The ending"
+  divider also becomes a heading. "Conversations" `p` → `h2`. "Up next" `p` →
+  `h2`, and the next feature's title `h2` → `h3`, so it nests under "Up next"
+  instead of competing with the story's own H1.
+- `src/components/ui/WriterProfile.tsx` — the three real section labels become
+  `h2`.
+
+**Deliberately NOT done:** no chapter numerals were added to `/article/:id`.
+Numbering belongs to the *issue* (Home), not to a single story; repeating the
+chapter opener here would be the mechanical repetition the brief forbids. The
+issue has chapters; a story has movements.
+
+**`.kicker` is unchanged** (`@apply block font-mono text-[11px] uppercase
+text-gold-lit` + brass `::before` rule). Because it sets font, size, weight and
+colour explicitly and Tailwind preflight resets heading defaults, `<p
+class="kicker">` → `<h2 class="kicker">` is **pixel-identical**. Verified: the
+"Conversations" label still computes to 11 px `rgb(217,185,120)` after the change.
+
+### Dispositions for the two remaining families — reasoned no-change
+
+- **`*` (404).** There is **no `src/pages/NotFound.tsx`**; the 404 is an inline
+  `function NotFound()` at `src/App.tsx:170`, routed at L159. Its copy is already
+  genuinely Verlyse — *"A page that wasn't written" / "This page is still waiting
+  for its feature"* — and it renders inside `Layout`, so the **shared footer
+  already owns site navigation**. Adding a department index to the body would
+  duplicate a job the footer owns and violate single-ownership. Content block is
+  591 px at 23% ink inside a 2,885 px page; nothing overflows. **No change.**
+- **`/room`.** 844 px, viewport-locked, 0 document sections — it is the WebGL
+  scene with its own permitted scene-local HUD, and it is on the **protected
+  manifest** (GSAP must not be wired in). The known `FAIL (accepted, documented)`
+  for 106/118 nodes at effective opacity 0.05–0.26 is **by design** in
+  `src/lib/room/geometry.ts`. Touching it for visual novelty would break a
+  deliberate spatial composition. **No change.**
+
+### Verification (named checks, this turn)
+
+| Check | Result |
+|---|---|
+| `npm run build` | **PASS** — 54 shells (core 9 / spatial 1 / category 7 / article 21 / creator 16), 54 sitemap URLs |
+| `typecheck:api` | **PASS** |
+| `check:secrets` | **PASS** |
+| `test:metadata` | **PASS** — registry coherent |
+| `test:flows` | **PASS** — 14/14 |
+| `test:routes` | **PASS** |
+| Rendered outline, article @390 + @1440 | **PASS** — H1 → H2×4 → H3×3, correct nesting |
+| Rendered outline, creator @390 + @1440 | **PASS** — H1 → H2×3 |
+| Duplicate "Within the post" | **PASS** — 0 occurrences |
+| Overflow / footer count / page errors | **PASS** — 0 / exactly 1 / 0 on both routes, both viewports |
+| Visual parity | **PASS** — label font sizes and colours unchanged |
+
+Heights: article 11,357 → **11,284** px phone and 10,333 → **10,263** px desktop
+(the −73/−70 px is the removed duplicate). Creator **unchanged** at 7,633 / 4,155
+— a purely structural change, as intended.
+
+### Limitations
+
+1. `verlysemedia.kesug.com` is **unreachable from this sandbox** — **NOT TESTED**.
+   Nothing here has been deployed.
+2. `vite dev` does not serve `api/*.ts`; any live-endpoint assertion remains
+   **BLOCKED (environment)**.
+3. Full-page sheets under-represent below-fold content because `whileInView` does
+   not latch for programmatic capture; the at-rest close-up and the numeric
+   outline probe are the reliable evidence.
+4. Only one article and one creator were probed in depth
+   (`their-voices-matter`, `alina-javed`); both render from shared components, so
+   the fix applies to all 21 article and 16 creator shells, but only these two
+   were measured.
+5. No screen-reader software was run. The claim is about **document structure**,
+   verified in the DOM — not about a specific AT product's behaviour.
+
+### Resource classification
+
+| Resource | Class | Used? |
+|---|---|---|
+| Existing `MotifDivider` in `ArticleClosing.tsx` | existing capability | **Yes** — extended with one prop |
+| Existing `.kicker` class in `index.css` | existing capability | **Yes** — unchanged, reused |
+| Native HTML heading elements | existing capability | **Yes** |
+| Watermelon UI / KokonutUI / Dot Matrix / OriginKit / shadcn / ThreeUI / Lenis | rejected alternative | **No** — see table above |
+
+**No new dependency. No copied source. No generated or altered artwork. No
+invented content** — every promoted label is a string that was already rendering
+on the page.

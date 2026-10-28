@@ -831,10 +831,9 @@ export default function ArticleDetail() {
           {/* ---------- Within the post — the pictures inside the slides ---------- */}
           {figures.length > 0 && (
             <>
-            <MotifDivider label="Within the post" motif={article.motif} />
+            <MotifDivider label="Within the post" motif={article.motif} heading />
             <Reveal className="mt-4">
               <div className="border-t border-white/10 pt-8">
-                <p className="kicker mb-8">Within the post</p>
                 <div className={`grid grid-cols-1 gap-10 ${figures.length > 1 ? 'sm:grid-cols-2' : ''}`}>
                   {figures.map((f, i) => (
                     <figure key={f.src}>
@@ -943,7 +942,7 @@ export default function ArticleDetail() {
       )}
 
       {/* ---------- The ending — the story closes, the credits follow ---------- */}
-      <MotifDivider label="The ending" motif={article.motif} />
+      <MotifDivider label="The ending" motif={article.motif} heading />
       <section id="ending" className="relative border-t border-white/10 py-[clamp(6rem,14vh,11rem)]">
         {/* the bounded spatial atmosphere — sits BEHIND the canonical signature
             and closing copy, which always render as semantic HTML on top. */}
@@ -969,7 +968,7 @@ export default function ArticleDetail() {
         <section className="border-t border-white/10 py-[clamp(5rem,10vh,8rem)]">
           <div className="mx-auto max-w-[720px] px-[clamp(1.75rem,5.5vw,4.75rem)]">
             <EditorialWipe>
-              <p className="kicker">Conversations</p>
+              <h2 className="kicker">Conversations</h2>
               <p className="mt-3 font-mono text-[10px] uppercase tracking-[0.28em] text-white/55">
                 {article.comments} conversations beneath this feature — all of them read
               </p>
@@ -1022,16 +1021,16 @@ export default function ArticleDetail() {
                 </div>
 
                 <div className="relative px-[clamp(1.75rem,5.5vw,4.75rem)] py-[clamp(5rem,10vh,8rem)] text-center">
-                  <p className="font-mono text-[10px] uppercase tracking-[0.28em] text-gold">Up next — the same room, another voice</p>
+                  <h2 className="font-mono text-[10px] uppercase tracking-[0.28em] text-gold">Up next — the same room, another voice</h2>
                   <span aria-hidden="true" className="mt-6 flex items-center justify-center gap-4">
                     <span className="h-px w-16 bg-gold/40" />
                     <span className="text-gold">✦</span>
                     <span className="h-px w-16 bg-gold/40" />
                   </span>
                   <Link to={`/article/${related[0].id}`} className="group mt-8 block no-underline">
-                    <h2 className="mx-auto max-w-[18ch] font-serif text-[clamp(2.6rem,5.6vw,4.8rem)] font-light leading-[1.04] tracking-[-0.02em] text-ivory transition-all duration-700 group-hover:italic group-hover:text-[#E8D9A8]">
+                    <h3 className="mx-auto max-w-[18ch] font-serif text-[clamp(2.6rem,5.6vw,4.8rem)] font-light leading-[1.04] tracking-[-0.02em] text-ivory transition-all duration-700 group-hover:italic group-hover:text-[#E8D9A8]">
                       “{related[0].title}”
-                    </h2>
+                    </h3>
                   </Link>
                   <div className="mt-6 flex justify-center">
                     <MetaRow

@@ -381,3 +381,105 @@ failures** (81 earlier hits were all `aria-hidden` decorative nodes — scope st
 Record 10) · sub-8px text **0** · tiny touch targets **0**.
 
 Zero dependencies added. Live site not tested. Nothing committed, pushed or deployed.
+
+---
+
+## Brief № 06 — "The bound issue": a contents page for Home
+
+**Date:** 2026-10-28 · **Branch:** `arena/9f76f00e-verlyse` · **Route:** `/`
+
+**Visual thesis.** Home is not a scroll; it is a *bound issue*. It already ran in four
+movements — the `MotifDivider`s named three of them — but those marks were decorative,
+`aria-hidden`, and unreachable. The issue had chapters and no contents page. Now it has
+one, printed directly under the masthead ledger, and the movements are real places you
+can go.
+
+**Primary focal point.** Unchanged: the cover and the lead folio. The contents sits
+*below* the ledger band so it informs the descent without competing with the masthead.
+
+**Reading hierarchy.** Cover → ledger (what the issue holds) → contents (what shape it
+has) → I The issue → II The feature → III The room → IV The invitation.
+
+**Design principles.**
+1. *Derived, never invented.* Every figure — 21 folios, 19 published, 2 provisional,
+   7 departments, 7 letters, 585 conversations, the lead title and its author — is read
+   from `LEDGER` and the live arrays at render time.
+2. *Present at rest.* The contents carries no `Reveal`. Wayfinding must not be gated
+   behind a scroll-triggered fade; it is the one element whose job is to tell a
+   thirty-screen page what shape it has.
+3. *Numerals carry the spine.* Roman I–IV in the contents and again on each chapter
+   mark, so the reader's position is legible from either end.
+4. *Native scroll only.* In-page anchors and CSS `scroll-behavior`, already disabled
+   under `prefers-reduced-motion`. No scroll library, no sticky second nav.
+5. *Subtract while adding.* The one genuinely redundant `/submit` link — buried in the
+   archive statistics row — came out in the same pass.
+
+**Route signature.** Home is now the only route with a contents page, because it is the
+only route long enough to need one. The chapter-mark language is shared; the contents is
+not stamped onto other routes.
+
+**Existing owners used.** `IssueBand` (the contents lives inside its `<section>` — no new
+section), `MotifDivider` in `ArticleClosing.tsx` (extended with `id`/`no`), `motion/react`
+(already the divider's engine), native CSS smooth scroll.
+
+**Not added.** No new route. No new section. No second nav, footer, CTA, newsletter,
+logo or specimen. No sticky progress bar. No scroll-spy. No new dependency. No GSAP on
+Home — `src/components/cinematic/index.ts` places Home in the protected manifest and
+forbids it without an explicit per-route decision.
+
+**Acceptance checks — all run 2026-10-28, results in Record 11.** Build / typecheck /
+secrets / flows / metadata PASS; 14 routes × 3 viewports before *and* after with 0
+overflow, 1 footer, 1 `h1`, 0 errors; contents 4/4 rows at `opacity: 1` with no scroll;
+anchors land at 112 px under the fixed header; chapter marks no longer `aria-hidden`.
+`submit-and-contact-binary-delivery` is **BLOCKED (environment)** — `vite dev` does not
+serve `api/*`; verified 404 by curl; untouched by this change.
+
+**Evidence.** `docs/evidence/r13/home-{desktop,tablet,phone}.png` plus
+`articles-phone.png` as an unchanged control. Live host `verlysemedia.kesug.com`
+NOT TESTED — unreachable from this sandbox.
+
+---
+
+## Brief № 07 — The deep routes get a spine (2026-10-28)
+
+**The thesis, continued.** Phase C gave the issue a visible contents: Home now
+opens onto four named chapters you can jump to. Phase D carries the same idea
+inward, at the right scale for each route — because the thing that was missing
+on the deep routes was not ornament, it was *structure you could navigate.*
+
+**What was actually wrong.** A 13.5-screen story had one heading of its own. Its
+other headings were the titles of *different* articles, sitting at the same level
+as the story's own title. A 9-screen creator dossier had no outline at all. The
+section labels were there and visible — "Within the post", "Conversations", "Up
+next", "How they write", "Published works", "Stories beside theirs" — they were
+just paragraphs wearing a heading's clothes. And on the article, the words
+"Within the post" printed twice, forty pixels apart.
+
+**The move.** Promote the labels that were already on the page into the document
+outline, and delete the repeat. `MotifDivider` learned a single prop — `heading`
+— so the brass rule, glyph and label that already marked each movement now *are*
+the heading rather than decoration beside one. Nothing was invented and nothing
+moved: `.kicker` already owned font, size and colour, so the change is
+pixel-identical. The only height difference on the whole route is the 73 px of
+the duplicate coming out.
+
+**What we refused to do.** No chapter numerals on `/article/:id`. The issue has
+chapters; a story has movements. Numbering a single feature would have been the
+chapter opener repeated mechanically, which is exactly the failure mode the brief
+warns against. And the 912 px band at 2% ink that looked like dead space on the
+census turned out to be `aria-hidden` and to contain one word — **FIN.** The
+silence is the point. It stays.
+
+**Two routes deliberately left alone, with reasons.** The 404 already speaks in
+the magazine's voice — *"a page that wasn't written"* — and it renders inside the
+shared footer, which already owns navigation; putting an index in its body would
+have duplicated that job. `/room` is the WebGL scene, viewport-locked and on the
+protected manifest; its low-opacity nodes are a composition, not a bug.
+
+**Honest limits.** Nothing is deployed; `verlysemedia.kesug.com` was not reached
+from this sandbox. One article and one creator were measured in depth, though
+both render from shared components. No screen reader was run — the claim is about
+the DOM outline, which was verified directly.
+
+Evidence: `docs/evidence/r13b/` — article, creator and 404 at desktop and phone,
+plus an at-rest close-up of the "Conversations" heading showing visual parity.
