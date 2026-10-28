@@ -128,7 +128,7 @@ function SceneClock() {
           </g>
           <circle cx="60" cy="60" r="2" fill="#B89146" />
         </svg>
-        <p aria-hidden="true" className="font-serif text-2xl font-light italic text-gold/80">3:13</p>
+        <p aria-hidden="true" className="font-serif text-2xl font-light italic text-gold-lit/85">3:13</p>
       </div>
     </Stage>
   )
@@ -303,7 +303,7 @@ function SceneCode() {
   return (
     <Stage label="the blank page">
       <div className="flex flex-col items-center gap-7">
-        <p aria-hidden="true" className="font-mono text-[11px] tracking-[0.24em] text-white/40">// think beyond</p>
+        <p aria-hidden="true" className="font-mono text-[11px] tracking-[0.24em] text-white/60">// think beyond</p>
         <svg viewBox="0 0 240 300" className="h-[clamp(190px,32vh,340px)] w-auto" aria-hidden="true">
           <rect x="20" y="20" width="200" height="260" fill="rgba(248,246,242,0.05)" stroke="rgba(184,145,70,0.4)" strokeWidth="1.2" />
           {[0, 1, 2, 3, 4, 5].map((i) => (
@@ -403,7 +403,7 @@ function SceneFeather() {
   return (
     <Stage label="hope">
       <div className="relative h-[clamp(200px,34vh,360px)] w-[min(70vw,300px)] overflow-hidden">
-        <svg viewBox="0 0 40 48" className="sig-feather h-16 w-auto text-gold/80" aria-hidden="true">
+        <svg viewBox="0 0 40 48" className="sig-feather h-16 w-auto text-gold-lit/85" aria-hidden="true">
           <path d="M18 2 C 26 14, 28 28, 14 46" fill="none" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" />
           <path d="M20 10 L6 14 M22 18 L8 22 M22 26 L10 30 M20 34 L12 36" stroke="currentColor" strokeWidth="0.9" strokeLinecap="round" />
           <path d="M20 10 L30 12 M22 18 L32 20 M22 26 L30 28 M18 34 L24 34" stroke="currentColor" strokeWidth="0.9" strokeLinecap="round" />
@@ -504,7 +504,7 @@ function SceneHeadline({ anim }: { anim: boolean }) {
             onError={(e) => { e.currentTarget.style.display = 'none' }}
             className="h-full w-full border border-white/12 object-cover"
           />
-          <figcaption className="mt-3 text-center font-mono text-[9px] uppercase tracking-[0.30em] text-white/50">
+          <figcaption className="mt-3 text-center font-mono text-[9px] uppercase tracking-[0.30em] text-white/65">
             Kashmir — the people protesting
           </figcaption>
         </motion.figure>

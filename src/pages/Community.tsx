@@ -2,6 +2,7 @@ import { useRef } from 'react'
 import { Link } from 'react-router-dom'
 import { motion, useReducedMotion } from 'motion/react'
 import { useSeo } from '../hooks/useSeo'
+import { ChapterOpener } from '../components/ui/primitives'
 import { ARTICLES, BRAND, COMMUNITY_STATS, COMMUNITY_VOICES, LEDGER, stampDate, type Article } from '../data/content'
 import { handleImgError } from '../lib/imgFallback'
 import { spotlight } from '../lib/stringTune/attrs'
@@ -42,7 +43,7 @@ function FilmFrame({ article, folio }: { article: Article; folio: string }) {
           Watch the feature →
         </span>
       </div>
-      <p className="mt-2.5 font-mono text-[8px] uppercase tracking-[0.28em] text-gold/90">№ {folio}</p>
+      <p className="mt-2.5 font-mono text-[8px] uppercase tracking-[0.28em] text-gold-lit/90">№ {folio}</p>
       <p className="mt-1 font-serif text-[15px] font-light italic leading-snug text-ivory/80 transition-colors duration-500 group-hover:text-[#E8D9A8]">
         “{article.title}”
       </p>
@@ -156,7 +157,7 @@ export default function Community() {
               <span className="relative">The <FloralWord variant="marigold">commons</FloralWord></span>
             </h1>
           </div>
-          <p className="mt-4 font-mono text-[10px] uppercase tracking-[0.34em] text-gold/85">
+          <p className="mt-4 font-mono text-[10px] uppercase tracking-[0.34em] text-gold-lit/85">
             The feed in pictures — all {LEDGER.features} covers, held not driven
           </p>
         </div>
@@ -164,7 +165,7 @@ export default function Community() {
         {/* ——— MID · the film strip — all nineteen real covers, in order ——— */}
         <section aria-labelledby="reel-title" className="mt-[clamp(2.5rem,7vh,4.5rem)]">
           <div className="flex flex-wrap items-end justify-between gap-4">
-            <h2 id="reel-title" className="font-mono text-[10px] uppercase tracking-[0.3em] text-gold/85">
+            <h2 id="reel-title" className="font-mono text-[10px] uppercase tracking-[0.3em] text-gold-lit/85">
               The feed in pictures — {covers.length} covers
             </h2>
             <div className="flex items-center gap-2" role="group" aria-label="Move the cover reel">
@@ -209,14 +210,14 @@ export default function Community() {
             ))}
           </div>
           <FilmRail />
-          <p className="mt-3 font-mono text-[9px] uppercase tracking-[0.28em] text-white/45">
+          <p className="mt-3 font-mono text-[9px] uppercase tracking-[0.28em] text-white/60">
             № 01 — “{covers[0].title}” → № {covers.length} — “{covers[covers.length - 1].title}” · drag the reel or focus it and use ← →, Home and End
           </p>
         </section>
 
         {/* ——— FRONT · the ledger — real numbers, engraved not estimated ——— */}
         <section aria-label="The commons in numbers" className="mt-[clamp(3.5rem,9vh,6rem)] border-t border-white/10 pt-10">
-          <p className="text-center font-mono text-[10px] uppercase tracking-[0.3em] text-gold/85">
+          <p className="text-center font-mono text-[10px] uppercase tracking-[0.3em] text-gold-lit/85">
             The commons in numbers — read from the feed, nothing invented
           </p>
           <div className="mt-10 grid grid-cols-2 gap-x-6 gap-y-12 lg:grid-cols-4">
@@ -233,7 +234,7 @@ export default function Community() {
                   0{idx + 1}
                 </span>
                 <p className="relative z-[1] font-serif text-[clamp(2.6rem,5vw,4.2rem)] font-light leading-[0.95] text-ivory">{st.value}</p>
-                <p className="relative z-[1] mt-3 font-mono text-[9px] uppercase tracking-[0.28em] text-gold/90">{st.label}</p>
+                <p className="relative z-[1] mt-3 font-mono text-[9px] uppercase tracking-[0.28em] text-gold-lit/90">{st.label}</p>
                 <p className="relative z-[1] mt-3 max-w-[30ch] text-sm leading-[1.7] text-white/60">{st.note}</p>
               </motion.div>
             ))}
@@ -261,7 +262,7 @@ export default function Community() {
             {otherVoices.map((v) => (
               <p key={v.handle + v.text.slice(0, 8)} className="border border-white/10 bg-[#2A0F18]/50 px-5 py-4 text-left last:sm:col-span-2 last:lg:col-span-1">
                 <span className="block font-serif text-sm italic leading-[1.55] text-ivory/80">“{v.text}”</span>
-                <span className="mt-2 block font-mono text-[8px] uppercase tracking-[0.24em] text-white/50">
+                <span className="mt-2 block font-mono text-[8px] uppercase tracking-[0.24em] text-white/65">
                   {v.handle} · beneath “{v.post}”
                 </span>
               </p>
@@ -272,30 +273,32 @@ export default function Community() {
         {/* ——— FRONT · recent responses — the newest replies, read backwards
             from the latest folio; the shelf's living margin ——— */}
         <section aria-label="Recent reader responses" className="mt-[clamp(3.5rem,9vh,6rem)] border-t border-white/10 pt-12">
-          <div className="flex flex-wrap items-end justify-between gap-4">
-            <p className="font-mono text-[10px] uppercase tracking-[0.3em] text-gold">Recent responses — from the folios back</p>
-            <p className="font-mono text-[9px] uppercase tracking-[0.26em] text-white/45">
-              {responses.length > 0
-                ? `The reel is quiet between features — the last folio opened ${stampDate(LEDGER.latestOn)}`
-                : 'Nothing replied to yet — the commons keeps an honest empty shelf'}
-            </p>
-          </div>
+          <ChapterOpener
+            num="02"
+            label="From the folios back"
+            title={<>Recent <em>responses</em></>}
+            aside={
+              responses.length > 0
+                ? `Last folio opened ${stampDate(LEDGER.latestOn)}`
+                : 'An honest empty shelf'
+            }
+          />
           {responses.length > 0 ? (
             <ul className="mt-6 grid grid-cols-1 gap-px bg-white/10 sm:grid-cols-2 lg:grid-cols-3">
               {responses.map((r) => (
                 <li key={`${r.post}-${r.handle}-${r.text.slice(0, 12)}`} className="bg-[#22060D] p-5">
-                  <p className="font-mono text-[9px] uppercase tracking-[0.26em] text-gold/90">
+                  <p className="font-mono text-[9px] uppercase tracking-[0.26em] text-gold-lit/90">
                     № {folioOf(r.article.id)} · {r.article.title} · {stampDate(r.article.date)}
                   </p>
                   <p className="mt-2.5 font-serif text-[15px] italic leading-[1.65] text-ivory/85">“{r.text}”</p>
-                  <p className="mt-2 font-mono text-[9px] uppercase tracking-[0.24em] text-white/50">
+                  <p className="mt-2 font-mono text-[9px] uppercase tracking-[0.24em] text-white/65">
                     {r.handle.startsWith('@') ? r.handle : `@${r.handle}`}
                   </p>
                 </li>
               ))}
               {/* the sixth cell — the honest invitation in the margin */}
               <li className="flex flex-col items-start justify-center gap-3 bg-[#1B0610] p-5">
-                <p className="font-mono text-[9px] uppercase tracking-[0.26em] text-white/45">The next response could answer you</p>
+                <p className="font-mono text-[9px] uppercase tracking-[0.26em] text-white/60">The next response could answer you</p>
                 <Link to="/submit" className="border-b border-gold/60 pb-0.5 font-mono text-[9px] uppercase tracking-[0.28em] text-gold no-underline transition-colors hover:text-ivory">
                   Send your work →
                 </Link>
@@ -311,14 +314,18 @@ export default function Community() {
         {/* ——— FRONT · the letter from the desk ——— */}
         <section className="mt-[clamp(3.5rem,9vh,6rem)] border-t border-white/10 pt-12">
           <div className="mx-auto flex max-w-3xl flex-col items-center text-center">
-            <p className="font-mono text-[10px] uppercase tracking-[0.3em] text-gold">A letter from the desk</p>
-            <p className="mt-5 max-w-[52ch] font-serif text-lg font-light italic leading-[1.8] text-ivory/80">
+            <span aria-hidden="true" className="chapter-rule mx-auto w-24" />
+            <p className="mt-6 font-mono text-[10px] uppercase tracking-[0.3em] text-gold-lit/90">A letter from the desk</p>
+            <h2 className="chapter-title mt-4 text-[clamp(1.9rem,4vw,3.1rem)]">
+              On the <em>record</em>
+            </h2>
+            <p className="mt-7 max-w-[52ch] font-serif text-lg font-light italic leading-[1.8] text-ivory/80">
               {BRAND.disclosure}
             </p>
             <Magnetic><Link to="/submit" className="btn btn-gold mt-8">
               Send your work →
             </Link></Magnetic>
-            <p className="mt-4 font-mono text-[9px] uppercase tracking-[0.3em] text-white/50">
+            <p className="mt-4 font-mono text-[9px] uppercase tracking-[0.3em] text-white/65">
               {BRAND.handle} — the conversation is the magazine · the desk writes back
             </p>
           </div>

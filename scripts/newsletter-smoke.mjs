@@ -12,7 +12,7 @@ const compiled = ts.transpileModule(source, {
   compilerOptions: { target: ts.ScriptTarget.ES2022, module: ts.ModuleKind.ES2022 },
 }).outputText
 await writeFile(join(temp, 'newsletter.mjs'), compiled)
-const { default: handler } = await import(`file://${temp}/newsletter.mjs?${Date.now()}`)
+const { default: handler, resetNewsletterRateLimitForTests } = await import(`file://${temp}/newsletter.mjs?${Date.now()}`)
 process.env.BUTTONDOWN_API_KEY = ''
 
 function call({ method, origin, body, headers: extra = {} } = {}) {
@@ -33,8 +33,12 @@ expect('allowed OPTIONS returns 204', allowed.statusCode === 204)
 expect('allowed origin is echoed', allowed.headers['Access-Control-Allow-Origin'] === 'https://verlyse-react.vercel.app')
 const kesugAllowed = await call({ method: 'OPTIONS', origin: 'https://verlysemedia.kesug.com' })
 expect('canonical kesug.com origin is echoed', kesugAllowed.headers['Access-Control-Allow-Origin'] === 'https://verlysemedia.kesug.com')
+const wwwKesugAllowed = await call({ method: 'OPTIONS', origin: 'https://www.verlysemedia.kesug.com' })
+expect('www.verlysemedia.kesug.com alias is echoed', wwwKesugAllowed.headers['Access-Control-Allow-Origin'] === 'https://www.verlysemedia.kesug.com')
 const blocked = await call({ method: 'OPTIONS', origin: 'https://example.invalid' })
 expect('disallowed origin is not echoed', !blocked.headers['Access-Control-Allow-Origin'])
+const blockedPost = await call({ method: 'POST', origin: 'https://example.invalid', body: { email: 'synthetic@example.test' } })
+expect('disallowed origin POST is rejected with 403', blockedPost.statusCode === 403 && blockedPost.body?.error === 'forbidden-origin')
 
 // Verify localhost is allowed in development fallback but excluded in production fallback
 process.env.NODE_ENV = 'development'
@@ -95,6 +99,91 @@ for (let i = 0; i < 12; i += 1) {
   }))
 }
 expect('non-address header text shares one bucket', garbage.some((r) => r.statusCode === 429))
+
+// Provider-mocked tests for Buttondown 201, duplicate, spam-block, 502 error, 504 timeout, and Buffer body parsing
+resetNewsletterRateLimitForTests()
+const realFetch = globalThis.fetch
+process.env.BUTTONDOWN_API_KEY = 'test-configured'
+
+let lastNewsletterPayload = null
+globalThis.fetch = async (_url, init) => {
+  lastNewsletterPayload = init?.body ? JSON.parse(String(init.body)) : null
+  return new Response(JSON.stringify({ id: 'sub_01' }), { status: 201 })
+}
+const createdRes = await call({
+  method: 'POST',
+  origin: 'https://verlysemedia.kesug.com',
+  body: Buffer.from(JSON.stringify({ email: 'reader@example.test' }), 'utf8'),
+})
+expect(
+  'Buffer JSON body is parsed and Buttondown 201 returns 201 { ok: true }',
+  createdRes.statusCode === 201 &&
+    createdRes.body?.ok === true &&
+    lastNewsletterPayload?.email_address === 'reader@example.test',
+)
+
+globalThis.fetch = async () =>
+  new Response('Email already exists in subscriber list', { status: 409 })
+const dupRes = await call({
+  method: 'POST',
+  origin: 'https://verlysemedia.kesug.com',
+  body: { email: 'reader@example.test' },
+})
+expect(
+  'Buttondown 409 duplicate returns 200 { ok: true, duplicate: true }',
+  dupRes.statusCode === 200 &&
+    dupRes.body?.ok === true &&
+    dupRes.body?.duplicate === true,
+)
+
+globalThis.fetch = async () =>
+  new Response('Blocked by spam firewall', { status: 400 })
+const spamRes = await call({
+  method: 'POST',
+  origin: 'https://verlysemedia.kesug.com',
+  body: { email: 'spamtrap@example.test' },
+})
+expect(
+  'Buttondown 400 spam-firewall block returns 422 { ok: false, error: "blocked", blocked: true }',
+  spamRes.statusCode === 422 &&
+    spamRes.body?.ok === false &&
+    spamRes.body?.error === 'blocked' &&
+    spamRes.body?.blocked === true,
+)
+
+globalThis.fetch = async () => new Response('Server error', { status: 500 })
+const errRes = await call({
+  method: 'POST',
+  origin: 'https://verlysemedia.kesug.com',
+  body: { email: 'reader@example.test' },
+})
+expect(
+  'Buttondown 500 returns 502 { error: "provider" }',
+  errRes.statusCode === 502 && errRes.body?.error === 'provider',
+)
+
+process.env.VERLYSE_NEWSLETTER_TIMEOUT_MS = '60'
+globalThis.fetch = async (_url, init) =>
+  new Promise((_resolve, reject) => {
+    init?.signal?.addEventListener('abort', () => {
+      const err = new Error('Aborted')
+      err.name = 'AbortError'
+      reject(err)
+    })
+  })
+const timeoutRes = await call({
+  method: 'POST',
+  origin: 'https://verlysemedia.kesug.com',
+  body: { email: 'reader@example.test' },
+})
+expect(
+  'Buttondown timeout returns 504 { error: "timeout" }',
+  timeoutRes.statusCode === 504 && timeoutRes.body?.error === 'timeout',
+)
+
+process.env.VERLYSE_NEWSLETTER_TIMEOUT_MS = ''
+process.env.BUTTONDOWN_API_KEY = ''
+globalThis.fetch = realFetch
 
 const failures = checks.filter(([, ok]) => !ok).map(([name]) => name)
 if (failures.length) {

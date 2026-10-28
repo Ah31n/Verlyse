@@ -29,7 +29,7 @@ Pick the lowest tier that does the job. Moving *up* a tier requires a reason wri
 | Hover / focus / active states, colour + opacity | **CSS** | sitewide; the reduced-motion clamp in `index.css` covers these |
 | Route transitions (`PageTransition`, archival veil) | **motion** | `<MotionConfig reducedMotion="user">` + `AnimatePresence`, keyed on pathname |
 | Search overlay, saved drawer, mobile menu, lightbox, ambassador dialog | **motion** | presence + focus trap + `useBodyScrollLock` |
-| Reveals (`Reveal`, `RevealImage`, `SplitText`, `ArticleClosing`) | **motion** | `useInView`, `once: true`, `useReducedMotion()` |
+| Reveals (`Reveal`, `SplitText`, `ArticleClosing`) | **motion** | `useInView`, `once: true`, `useReducedMotion()` |
 | `Magnetic` (`src/components/ui/Magnetic.tsx`) | **motion** | `useMotionValue` + `useSpring` (re-exported by `src/components/cinematic` for backward compatibility) |
 | Scroll progress bar, header condense | **CSS**, driven by a passive listener in `Layout` | reads `window.scrollY`; writes class names only |
 | Home scroll transforms, `ImmersiveShell`, `DossierRoom`, `ScrollBeat` | **motion** `useScroll` | read-only on scroll |

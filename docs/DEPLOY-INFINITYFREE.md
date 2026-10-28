@@ -2,8 +2,8 @@
 
 Production build: `npm run build` (runs `tsc -b && vite build` plus
 `scripts/prerender-metadata.mjs`, which writes per-route metadata shells into
-`dist/` — 50 shells covering every core route, department, folio, and creator
-page). The deployable tree is `dist/`, published to the account's `/htdocs`.
+`dist/` — 54 shells covering every core route, spatial route, department, folio,
+and creator page). The deployable tree is `dist/`, published to the account's `/htdocs`.
 
 ## What must be on the server
 

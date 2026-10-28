@@ -233,7 +233,7 @@ export default function SearchOverlay() {
               </div>
             )}
 
-            <p className="mt-4 font-mono text-[9px] uppercase tracking-[0.24em] text-white/45">
+            <p className="mt-4 font-mono text-[9px] uppercase tracking-[0.24em] text-white/60">
               {shown.length ? '↑ ↓ to move · Enter to pull the folio · Esc to return' : 'Type to turn the pages — the archive dims, the index stays above'}
             </p>
           </motion.div>

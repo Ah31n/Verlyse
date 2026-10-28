@@ -89,7 +89,7 @@ export default function WriterProfile({ author }: { author: Author }) {
                 </div>
               )}
               <figcaption className="mt-4 flex items-center justify-between border-t border-white/10 pt-3">
-                <span className="fig-cap text-white/50">{author.portrait && !author.hideArticlePhoto ? 'Portrait — from the feature' : 'Portrait — the monogram'}</span>
+                <span className="fig-cap text-white/65">{author.portrait && !author.hideArticlePhoto ? 'Portrait — from the feature' : 'Portrait — the monogram'}</span>
                 <span className="fig-cap text-gold">✦ the writer</span>
               </figcaption>
             </figure>
@@ -104,7 +104,7 @@ export default function WriterProfile({ author }: { author: Author }) {
               </div>
               <div className="mt-6 space-y-2">
                 <p className="font-serif text-xl text-ivory">{author.name}</p>
-                <p className="font-mono text-[10px] uppercase tracking-[0.28em] text-white/50">{author.handle} · {author.role}</p>
+                <p className="font-mono text-[10px] uppercase tracking-[0.28em] text-white/65">{author.handle} · {author.role}</p>
                 <a
                   href={socialOf(author)}
                   target="_blank" rel="noopener noreferrer"
@@ -121,7 +121,7 @@ export default function WriterProfile({ author }: { author: Author }) {
         <div>
           {/* philosophy */}
           <Reveal>
-            <p className="kicker">How they write</p>
+            <h2 className="kicker">How they write</h2>
             <p className="mt-5 max-w-[56ch] font-serif text-[clamp(1.3rem,2vw,1.6rem)] font-light leading-[1.7] text-ivory/88 drop-cap">
               {author.philosophy ?? author.bio}
             </p>
@@ -172,13 +172,13 @@ export default function WriterProfile({ author }: { author: Author }) {
 
           {/* published works — or the folios this name is co-credited in */}
           <Reveal className="mt-14">
-            <p className="kicker">
+            <h2 className="kicker">
               {isCoCredit
                 ? 'Co-credited in the archive'
                 : listedWorks.some((w) => w.publicationStatus === 'provisional')
                   ? 'Catalogued works'
                   : 'Published works'}
-            </p>
+            </h2>
             <div className="mt-7 space-y-0 border-t border-white/10">
               {listedWorks.map((a) => (
                 <Link
@@ -216,7 +216,7 @@ export default function WriterProfile({ author }: { author: Author }) {
           {/* related stories — the room beside theirs */}
           {others.length > 0 && (
             <Reveal className="mt-14">
-              <p className="kicker">Stories beside theirs</p>
+              <h2 className="kicker">Stories beside theirs</h2>
               <div
                 className={`mt-6 grid gap-4 ${
                   others.length === 1

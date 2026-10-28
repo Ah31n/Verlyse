@@ -114,18 +114,39 @@ export function Signature({ name, align = 'left' }: { name: string; delay?: numb
 /* Used between the body, the plates, and the ending so the ornament   */
 /* becomes the reader's cue that one movement of the story has closed. */
 /* ------------------------------------------------------------------ */
-export function MotifDivider({ label, motif }: { label?: string; motif?: string }) {
+export function MotifDivider({
+  label,
+  motif,
+  id,
+  no,
+  heading,
+}: {
+  label?: string
+  motif?: string
+  /** Anchor target. When set, the divider becomes a real chapter mark the
+   *  issue contents can jump to, and stops being hidden from assistive tech. */
+  id?: string
+  /** Chapter numeral, e.g. "II". Printed beside the label. */
+  no?: string
+  /** Render the label as a real <h2>. Long reading routes need a navigable
+   *  outline; without this the only headings on an article are the titles of
+   *  OTHER articles, which strands anyone navigating by heading. */
+  heading?: boolean
+}) {
   const reduce = useReducedMotion() === true
+  const isChapter = Boolean(id) || Boolean(heading)
+  const Label = heading ? motion.h2 : motion.span
   return (
     <motion.div
-      aria-hidden="true"
+      id={id}
+      aria-hidden={isChapter ? undefined : 'true'}
       initial={reduce ? false : { opacity: 0 }}
       whileInView={{ opacity: 1 }}
       viewport={{ once: true, margin: '0px 0px -10% 0px' }}
       transition={reduce ? { duration: 0 } : { duration: 0.9, ease: EASE }}
-      className="my-16 flex flex-col items-center gap-4"
+      className={`my-16 flex flex-col items-center gap-4 ${isChapter ? 'scroll-mt-28' : ''}`}
     >
-      <div className="flex items-center gap-4">
+      <div aria-hidden="true" className="flex items-center gap-4">
         <motion.span
           initial={reduce ? false : { scaleX: 0 }}
           whileInView={{ scaleX: 1 }}
@@ -150,15 +171,16 @@ export function MotifDivider({ label, motif }: { label?: string; motif?: string 
         />
       </div>
       {label && (
-        <motion.span
+        <Label
           initial={reduce ? false : { opacity: 0, y: 6 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true, margin: '0px 0px -10% 0px' }}
           transition={reduce ? { duration: 0 } : { duration: 0.7, ease: EASE, delay: 0.5 }}
-          className="font-mono text-[9px] uppercase tracking-[0.30em] text-white/50"
+          className="flex items-baseline gap-3 font-mono text-[10px] uppercase tracking-[0.30em] text-white/70"
         >
-          {label}
-        </motion.span>
+          {no && <span className="tnum text-gold-lit">{no}</span>}
+          <span>{label}</span>
+        </Label>
       )}
     </motion.div>
   )
@@ -209,7 +231,7 @@ export function MissionClosing({ kicker = 'About us' }: { kicker?: string }) {
             whileInView={{ opacity: 1 }}
             viewport={{ once: true, margin: '0px 0px -8% 0px' }}
             transition={reduce ? { duration: 0 } : { duration: 0.8, delay: 0.45 }}
-            className="mt-8 max-w-[52ch] font-serif text-base font-light italic leading-relaxed text-gold/90"
+            className="mt-8 max-w-[52ch] font-serif text-base font-light italic leading-relaxed text-gold-lit/90"
           >
             {BRAND.submitCta}
           </motion.p>
@@ -221,9 +243,9 @@ export function MissionClosing({ kicker = 'About us' }: { kicker?: string }) {
             transition={reduce ? { duration: 0 } : { duration: 0.8, delay: 0.4 }}
             className="mt-10 flex flex-wrap items-center gap-5"
           >
-            <span className="font-mono text-[10px] uppercase tracking-[0.28em] text-white/50">{BRAND.handle}</span>
+            <span className="font-mono text-[10px] uppercase tracking-[0.28em] text-white/65">{BRAND.handle}</span>
             <span className="font-mono text-[10px] uppercase tracking-[0.28em] text-white/55">·</span>
-            <span className="font-mono text-[10px] uppercase tracking-[0.28em] text-white/50">{BRAND.email}</span>
+            <span className="font-mono text-[10px] uppercase tracking-[0.28em] text-white/65">{BRAND.email}</span>
           </motion.div>
         </div>
       </div>
@@ -389,7 +411,7 @@ export function ArtworkClosing({
               <span aria-hidden="true" className="pointer-events-none absolute inset-3 border border-gold/40" />
             </div>
             <figcaption className="mt-5 flex items-center justify-between border-t border-white/10 pt-3">
-              <span className="fig-cap text-white/50">{work.label}</span>
+              <span className="fig-cap text-white/65">{work.label}</span>
               <span className="fig-cap text-gold">✦ the work</span>
             </figcaption>
           </motion.figure>
@@ -568,7 +590,7 @@ export function PassageClosing({ paragraphs, kicker }: { paragraphs: string[]; k
         >
           <span className="h-px w-16 bg-gold/60" />
           <span className="text-gold">✦</span>
-          <span className="font-mono text-[10px] uppercase tracking-[0.28em] text-white/50">The essay ends</span>
+          <span className="font-mono text-[10px] uppercase tracking-[0.28em] text-white/65">The essay ends</span>
         </motion.div>
       </div>
     </Reveal>

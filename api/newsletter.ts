@@ -1,36 +1,30 @@
 /**
- * Verlyse Media — "The Verlyse Letter" newsletter signup.
+ * Verlyse Media — "The Verlyse Letter" newsletter signup (`/api/newsletter`).
  *
  * Vercel serverless function: adds an email to the Buttondown subscriber
  * list. The API key lives ONLY in the server environment
- * (BUTTONDOWN_API_KEY) — never in client code.
+ * (`BUTTONDOWN_API_KEY`) — never in client code.
  *
- * CORS is enabled so the form works from any domain that serves the site
- * (Vercel production, the InfinityFree mirror, local previews).
+ * CORS is restricted to the canonical Kesug origins (`https://verlysemedia.kesug.com`,
+ * `https://www.verlysemedia.kesug.com`) and the Vercel deployment origin
+ * (`https://verlyse-react.vercel.app`), overridable via `ALLOWED_ORIGINS`.
  *
  * An in-memory rate limit (per attributed caller) protects the endpoint from
- * brute-force/abuse, with the standard X-RateLimit-* headers. Two properties to
- * keep in mind: the caller address is derived from platform-set headers rather
- * than the caller-controlled leftmost x-forwarded-for entry (see clientIp), and
- * the limiter is instance-local, so it is NOT distributed protection across
- * serverless instances. A shared rate-limit store remains the follow-up step.
+ * brute-force/abuse, with the standard X-RateLimit-* headers.
  */
 
 /** Fixed-window limiter: 10 requests per minute per attributed caller. */
 const RATE_LIMIT = 10
 const RATE_WINDOW_MS = 60_000
-/** Hard bound on distinct keys held at once. The limiter is per-instance, so
- *  this caps worst-case memory growth; it is not a distributed guarantee. */
+/** Hard bound on distinct keys held at once. */
 const MAX_TRACKED_KEYS = 5_000
-/** Bucket for callers that cannot be attributed to an address. Fail closed:
- *  they share ONE limit instead of each minting a fresh one. */
+/** Bucket for callers that cannot be attributed to an address. */
 const UNATTRIBUTED = 'unattributed'
 const hits = new Map<string, { count: number; resetAt: number }>()
 
 /** Accept address literals only, so arbitrary header text cannot become a key. */
 function isAddressLiteral(value: string): boolean {
   if (/^\d{1,3}(?:\.\d{1,3}){3}$/.test(value)) return true
-  // IPv6 (including IPv4-mapped) — hex digits, colons and at most one dotted quad.
   return value.includes(':') && /^[0-9a-fA-F:.]+$/.test(value)
 }
 
@@ -39,25 +33,6 @@ function headerText(value: string | string[] | undefined): string {
   return typeof value === 'string' ? value : ''
 }
 
-/**
- * Client address for rate limiting.
- *
- * This previously returned x-forwarded-for[0], which the caller supplies:
- * rotating that single header minted a fresh bucket on every request and
- * bypassed the limit entirely (CWE-290 — the same flaw fixed upstream in
- * go-chi GHSA-9g5q-2w5x-hmxf).
- *
- * Preference order, most to least trustworthy:
- *   1. x-vercel-forwarded-for — set by the Vercel edge from the real connection
- *      and preserved even when an upstream proxy overwrote x-forwarded-for.
- *   2. the RIGHTMOST x-forwarded-for entry — appended by the nearest hop, unlike
- *      the caller-controlled leftmost one.
- *   3. the socket peer address.
- *   4. a single shared bucket.
- *
- * Every candidate must parse as an address literal, so header text can neither
- * select a bucket nor inflate the map.
- */
 function clientIp(req: HandlerRequest): string {
   const candidates: string[] = []
   const vercel = headerText(req.headers['x-vercel-forwarded-for']).trim()
@@ -75,8 +50,6 @@ function clientIp(req: HandlerRequest): string {
   return UNATTRIBUTED
 }
 
-/** Read the live entry, dropping it once its window has closed so idle callers
- *  stop occupying memory. */
 function liveEntry(ip: string, now: number): { count: number; resetAt: number } | undefined {
   const entry = hits.get(ip)
   if (!entry) return undefined
@@ -87,7 +60,6 @@ function liveEntry(ip: string, now: number): { count: number; resetAt: number } 
   return entry
 }
 
-/** Opportunistic sweep, only once the map exceeds its bound. */
 function boundMemory(now: number): void {
   if (hits.size <= MAX_TRACKED_KEYS) return
   for (const key of Array.from(hits.keys())) {
@@ -95,6 +67,10 @@ function boundMemory(now: number): void {
     if (!entry || entry.resetAt <= now) hits.delete(key)
     if (hits.size <= MAX_TRACKED_KEYS) return
   }
+}
+
+export function resetNewsletterRateLimitForTests(): void {
+  hits.clear()
 }
 
 function rateLimit(req: HandlerRequest, res: HandlerResponse): boolean {
@@ -117,13 +93,12 @@ function rateLimit(req: HandlerRequest, res: HandlerResponse): boolean {
   return entry.count > RATE_LIMIT
 }
 
-/** Minimal structural types for the Vercel-compatible handler, so the API is
- *  type-safe without pulling the whole @vercel/node runtime in. */
 interface HandlerRequest {
   method?: string
   headers: Record<string, string | string[] | undefined>
   body?: unknown
   socket?: { remoteAddress?: string }
+  [Symbol.asyncIterator]?: () => AsyncIterator<Uint8Array | Buffer | string>
 }
 interface HandlerResponse {
   setHeader(name: string, value: string | number | readonly string[]): void
@@ -132,6 +107,7 @@ interface HandlerResponse {
 
 const PRODUCTION_ALLOWED_ORIGINS = [
   'https://verlysemedia.kesug.com',
+  'https://www.verlysemedia.kesug.com',
   'https://verlyse-react.vercel.app',
 ]
 
@@ -149,15 +125,6 @@ function isProductionRuntime(): boolean {
   )
 }
 
-/**
- * Effective CORS allowlist:
- * - If `ALLOWED_ORIGINS` is set in the server environment, its comma-separated
- *   list overrides the built-in default (in production runtime, any `localhost`
- *   or `127.0.0.1` entries are excluded).
- * - Otherwise, production runtime allows only `PRODUCTION_ALLOWED_ORIGINS`
- *   (`https://verlysemedia.kesug.com`, `https://verlyse-react.vercel.app`),
- *   while non-production runtimes additionally allow `DEV_ALLOWED_ORIGINS`.
- */
 function allowedOrigins(): Set<string> {
   const prod = isProductionRuntime()
   const configured = process.env.ALLOWED_ORIGINS
@@ -175,19 +142,64 @@ function allowedOrigins(): Set<string> {
   return new Set(filtered)
 }
 
-function applyCors(req: HandlerRequest, res: HandlerResponse) {
-  const origin = req.headers.origin
-  if (typeof origin === 'string' && allowedOrigins().has(origin)) {
+function applyCors(req: HandlerRequest, res: HandlerResponse): boolean {
+  const origin = headerText(req.headers.origin).trim()
+  const allowed = allowedOrigins()
+  const isAllowed = Boolean(origin && allowed.has(origin))
+  if (isAllowed) {
     res.setHeader('Access-Control-Allow-Origin', origin)
     res.setHeader('Vary', 'Origin')
   }
   res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS')
-  res.setHeader('Access-Control-Allow-Headers', 'Content-Type')
+  res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Accept')
+  return !origin || isAllowed
+}
+
+async function readJsonBody(req: HandlerRequest): Promise<Record<string, unknown>> {
+  if (
+    req.body &&
+    typeof req.body === 'object' &&
+    !Buffer.isBuffer(req.body) &&
+    !(req.body instanceof Uint8Array)
+  ) {
+    return req.body as Record<string, unknown>
+  }
+  if (typeof req.body === 'string') {
+    try {
+      return JSON.parse(req.body) as Record<string, unknown>
+    } catch {
+      return {}
+    }
+  }
+  if (Buffer.isBuffer(req.body) || req.body instanceof Uint8Array) {
+    try {
+      return JSON.parse(Buffer.from(req.body).toString('utf8')) as Record<string, unknown>
+    } catch {
+      return {}
+    }
+  }
+  if (typeof req[Symbol.asyncIterator] === 'function') {
+    const chunks: Buffer[] = []
+    let total = 0
+    for await (const chunk of req as AsyncIterable<Uint8Array | Buffer | string>) {
+      const buf = typeof chunk === 'string' ? Buffer.from(chunk, 'utf8') : Buffer.from(chunk)
+      total += buf.byteLength
+      if (total > 16_384) return {}
+      chunks.push(buf)
+    }
+    if (chunks.length > 0) {
+      try {
+        return JSON.parse(Buffer.concat(chunks).toString('utf8')) as Record<string, unknown>
+      } catch {
+        return {}
+      }
+    }
+  }
+  return {}
 }
 
 export default async function handler(req: HandlerRequest, res: HandlerResponse) {
-  applyCors(req, res)
-  // Hardening headers
+  const originPermitted = applyCors(req, res)
   res.setHeader('X-Content-Type-Options', 'nosniff')
   res.setHeader('X-Frame-Options', 'SAMEORIGIN')
   res.setHeader('Referrer-Policy', 'strict-origin-when-cross-origin')
@@ -195,19 +207,27 @@ export default async function handler(req: HandlerRequest, res: HandlerResponse)
   if (req.method === 'OPTIONS') return res.status(204).end()
   if (req.method !== 'POST') return res.status(405).json({ error: 'method-not-allowed' })
 
+  if (!originPermitted) {
+    return res.status(403).json({ error: 'forbidden-origin' })
+  }
+
   // Rate limit before doing any work
   if (rateLimit(req, res)) {
     return res.status(429).json({ error: 'too-many-requests' })
   }
 
-  const body = (req.body ?? {}) as Record<string, unknown>
+  const body = await readJsonBody(req)
   const email = String(body.email ?? '').trim().toLowerCase()
-  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+  if (!email || email.length > 254 || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
     return res.status(400).json({ error: 'invalid-email' })
   }
 
-  const apiKey = process.env.BUTTONDOWN_API_KEY
+  const apiKey = (process.env.BUTTONDOWN_API_KEY ?? '').trim()
   if (!apiKey) return res.status(503).json({ error: 'not-configured' })
+
+  const timeoutMs = Math.max(50, Number(process.env.VERLYSE_NEWSLETTER_TIMEOUT_MS) || 8_000)
+  const controller = new AbortController()
+  const timer = setTimeout(() => controller.abort(), timeoutMs)
 
   try {
     const r = await fetch('https://api.buttondown.email/v1/subscribers', {
@@ -217,25 +237,27 @@ export default async function handler(req: HandlerRequest, res: HandlerResponse)
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({ email_address: email }),
+      signal: controller.signal,
     })
 
     if (r.ok) return res.status(201).json({ ok: true })
 
     const text = await r.text()
-    // A duplicate address is not an error — it is already on the list.
     if (r.status === 400 || r.status === 409) {
       if (/already|exist|subscribed|duplicate|collision/i.test(text)) {
         return res.status(200).json({ ok: true, duplicate: true })
       }
-      // The provider's spam firewall declined this address (spam-trap
-      // domains, disposable addresses, or a blocked sender). Tell the
-      // visitor plainly — the desk still reads the form submission.
       if (/blocked|firewall|spam/i.test(text)) {
-        return res.status(200).json({ ok: true, blocked: true })
+        return res.status(422).json({ ok: false, error: 'blocked', blocked: true })
       }
     }
     return res.status(502).json({ error: 'provider' })
-  } catch {
-    return res.status(502).json({ error: 'provider' })
+  } catch (err) {
+    const isAbort =
+      err instanceof Error &&
+      (err.name === 'AbortError' || /aborted|timeout/i.test(err.message))
+    return res.status(isAbort ? 504 : 502).json({ error: isAbort ? 'timeout' : 'provider' })
+  } finally {
+    clearTimeout(timer)
   }
 }

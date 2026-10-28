@@ -56,14 +56,16 @@ function EndingSpatialStage({ article }: { article: Article }) {
   const wrapRef = useRef<HTMLDivElement>(null)
   const ending = getEndingStatic(article)
 
-  const [near, setNear] = useState(false)
+  const [activated, setActivated] = useState(false)
+  const [inView, setInView] = useState(false)
   const [settled, setSettled] = useState(false)
   const [tabVisible, setTabVisible] = useState(() =>
     typeof document === 'undefined' ? true : document.visibilityState !== 'hidden'
   )
 
   useEffect(() => {
-    setNear(false)
+    setActivated(false)
+    setInView(false)
     setSettled(false)
   }, [article.id])
 
@@ -75,36 +77,27 @@ function EndingSpatialStage({ article }: { article: Article }) {
   }, [])
 
   useEffect(() => {
-    if (reduce || !glSupported || near) return undefined
+    if (reduce || !glSupported) return undefined
     const el = wrapRef.current
     if (!el || typeof window === 'undefined') return undefined
 
-    let done = false
-    const activate = () => {
-      if (done) return
-      done = true
-      setNear(true)
-    }
-
     const checkRect = () => {
-      if (done || !wrapRef.current) return
+      if (!wrapRef.current) return
       const r = wrapRef.current.getBoundingClientRect()
-      if (r.top < window.innerHeight * 1.15 && r.bottom > -60) {
-        activate()
-      }
+      const visible = r.top < window.innerHeight * 1.15 && r.bottom > -60
+      setInView(visible)
+      if (visible) setActivated(true)
     }
 
     checkRect()
-    if (done) return undefined
 
     let io: IntersectionObserver | null = null
     if ('IntersectionObserver' in window) {
       io = new IntersectionObserver(
         (entries) => {
-          if (entries.some((entry) => entry.isIntersecting)) {
-            activate()
-            io?.disconnect()
-          }
+          const hit = entries.some((entry) => entry.isIntersecting)
+          setInView(hit)
+          if (hit) setActivated(true)
         },
         { rootMargin: '240px 0px' }
       )
@@ -120,31 +113,33 @@ function EndingSpatialStage({ article }: { article: Article }) {
       window.removeEventListener('scroll', checkRect)
       window.removeEventListener('resize', checkRect)
     }
-  }, [article.id, glSupported, near, reduce])
+  }, [article.id, glSupported, reduce])
 
   useEffect(() => {
-    if (!near || reduce || !glSupported || settled) return undefined
+    if (!activated || reduce || !glSupported || settled) return undefined
     const id = window.setTimeout(() => setSettled(true), ending.motion.revealMs)
     return () => window.clearTimeout(id)
-  }, [ending.motion.revealMs, glSupported, near, reduce, settled])
+  }, [activated, ending.motion.revealMs, glSupported, reduce, settled])
 
   const phase = reduce
     ? 'REDUCED'
     : !glSupported
       ? 'FALLBACK'
-      : !near
+      : !activated
         ? 'RESTING'
         : !settled
           ? 'ENTERING'
           : 'ALIVE'
 
-  const eligible = glSupported && !reduce && near && tabVisible
+  const eligible = glSupported && !reduce && activated && tabVisible
+  const activelyRendering = eligible && inView
 
   return (
     <div
       ref={wrapRef}
       data-ending={ending.endingId}
       data-phase={phase}
+      data-ending-loop={activelyRendering ? 'active' : activated ? 'paused' : 'idle'}
       data-scene-kind={ending.sceneKind}
       className="pointer-events-none absolute inset-0 z-0"
       aria-hidden="true"
@@ -152,7 +147,7 @@ function EndingSpatialStage({ article }: { article: Article }) {
       {eligible ? (
         <EndingSpatialBoundary key={article.id}>
           <Suspense fallback={null}>
-            <StoryEnding3D article={article} activePhase={phase} />
+            <StoryEnding3D article={article} activePhase={phase} inView={activelyRendering} />
           </Suspense>
         </EndingSpatialBoundary>
       ) : null}
@@ -623,7 +618,7 @@ export default function ArticleDetail() {
                     />
                     <span aria-hidden="true" className="absolute inset-2 border border-gold/30" />
                   </div>
-                  <figcaption className="mt-3 flex items-center justify-between font-mono text-[9px] uppercase tracking-[0.30em] text-white/50">
+                  <figcaption className="mt-3 flex items-center justify-between font-mono text-[9px] uppercase tracking-[0.30em] text-white/65">
                     <span>Plate 01 — the cover</span>
                     <span className="text-gold">✦</span>
                   </figcaption>
@@ -664,7 +659,7 @@ export default function ArticleDetail() {
                     />
                     <span aria-hidden="true" className="absolute inset-2 border border-gold/40" />
                   </div>
-                  <figcaption className="mt-3 flex items-center justify-between font-mono text-[9px] uppercase tracking-[0.30em] text-white/50">
+                  <figcaption className="mt-3 flex items-center justify-between font-mono text-[9px] uppercase tracking-[0.30em] text-white/65">
                     <span>Plate 01 — the work</span>
                     <span className="text-gold">✦ view the gallery</span>
                   </figcaption>
@@ -746,7 +741,7 @@ export default function ArticleDetail() {
                 )}
                 <div>
                   <p className="font-serif text-2xl font-light tracking-[-0.01em] text-ivory">{author?.name}</p>
-                  <p className="mt-1.5 font-mono text-[10px] uppercase tracking-[0.28em] text-white/50">{author?.handle} · {author?.role}</p>
+                  <p className="mt-1.5 font-mono text-[10px] uppercase tracking-[0.28em] text-white/65">{author?.handle} · {author?.role}</p>
                 </div>
               </motion.div>
               {author && <Signature name={author.name} delay={0.3} />}
@@ -836,10 +831,9 @@ export default function ArticleDetail() {
           {/* ---------- Within the post — the pictures inside the slides ---------- */}
           {figures.length > 0 && (
             <>
-            <MotifDivider label="Within the post" motif={article.motif} />
+            <MotifDivider label="Within the post" motif={article.motif} heading />
             <Reveal className="mt-4">
               <div className="border-t border-white/10 pt-8">
-                <p className="kicker mb-8">Within the post</p>
                 <div className={`grid grid-cols-1 gap-10 ${figures.length > 1 ? 'sm:grid-cols-2' : ''}`}>
                   {figures.map((f, i) => (
                     <figure key={f.src}>
@@ -948,7 +942,7 @@ export default function ArticleDetail() {
       )}
 
       {/* ---------- The ending — the story closes, the credits follow ---------- */}
-      <MotifDivider label="The ending" motif={article.motif} />
+      <MotifDivider label="The ending" motif={article.motif} heading />
       <section id="ending" className="relative border-t border-white/10 py-[clamp(6rem,14vh,11rem)]">
         {/* the bounded spatial atmosphere — sits BEHIND the canonical signature
             and closing copy, which always render as semantic HTML on top. */}
@@ -974,7 +968,7 @@ export default function ArticleDetail() {
         <section className="border-t border-white/10 py-[clamp(5rem,10vh,8rem)]">
           <div className="mx-auto max-w-[720px] px-[clamp(1.75rem,5.5vw,4.75rem)]">
             <EditorialWipe>
-              <p className="kicker">Conversations</p>
+              <h2 className="kicker">Conversations</h2>
               <p className="mt-3 font-mono text-[10px] uppercase tracking-[0.28em] text-white/55">
                 {article.comments} conversations beneath this feature — all of them read
               </p>
@@ -1027,16 +1021,16 @@ export default function ArticleDetail() {
                 </div>
 
                 <div className="relative px-[clamp(1.75rem,5.5vw,4.75rem)] py-[clamp(5rem,10vh,8rem)] text-center">
-                  <p className="font-mono text-[10px] uppercase tracking-[0.28em] text-gold">Up next — the same room, another voice</p>
+                  <h2 className="font-mono text-[10px] uppercase tracking-[0.28em] text-gold">Up next — the same room, another voice</h2>
                   <span aria-hidden="true" className="mt-6 flex items-center justify-center gap-4">
                     <span className="h-px w-16 bg-gold/40" />
                     <span className="text-gold">✦</span>
                     <span className="h-px w-16 bg-gold/40" />
                   </span>
                   <Link to={`/article/${related[0].id}`} className="group mt-8 block no-underline">
-                    <h2 className="mx-auto max-w-[18ch] font-serif text-[clamp(2.6rem,5.6vw,4.8rem)] font-light leading-[1.04] tracking-[-0.02em] text-ivory transition-all duration-700 group-hover:italic group-hover:text-[#E8D9A8]">
+                    <h3 className="mx-auto max-w-[18ch] font-serif text-[clamp(2.6rem,5.6vw,4.8rem)] font-light leading-[1.04] tracking-[-0.02em] text-ivory transition-all duration-700 group-hover:italic group-hover:text-[#E8D9A8]">
                       “{related[0].title}”
-                    </h2>
+                    </h3>
                   </Link>
                   <div className="mt-6 flex justify-center">
                     <MetaRow

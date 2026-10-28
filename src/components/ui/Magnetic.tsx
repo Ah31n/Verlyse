@@ -1,10 +1,18 @@
-import { useRef, type ReactNode } from 'react'
+import { useRef, useState, type ReactNode } from 'react'
 import { motion, useMotionValue, useReducedMotion, useSpring } from 'motion/react'
 
 export interface MagneticProps {
   children: ReactNode
   className?: string
   strength?: number
+}
+
+function isCoarsePointer(): boolean {
+  return (
+    typeof window !== 'undefined' &&
+    typeof window.matchMedia === 'function' &&
+    window.matchMedia('(pointer: coarse)').matches
+  )
 }
 
 /**
@@ -15,7 +23,7 @@ export interface MagneticProps {
  *
  * Single-owner rule: only the inner `<motion.span>` receives `x`/`y` spring
  * transforms; under `prefers-reduced-motion: reduce` or coarse pointers no
- * movement occurs.
+ * movement occurs and `will-change-transform` is never applied.
  */
 export function Magnetic({
   children,
@@ -24,22 +32,24 @@ export function Magnetic({
 }: MagneticProps) {
   const rootRef = useRef<HTMLSpanElement>(null)
   const reduce = useReducedMotion() === true
+  const [engaged, setEngaged] = useState(false)
   const rawX = useMotionValue(0)
   const rawY = useMotionValue(0)
   const x = useSpring(rawX, { stiffness: 220, damping: 22, mass: 0.5 })
   const y = useSpring(rawY, { stiffness: 220, damping: 22, mass: 0.5 })
 
   const onMouseMove = (e: React.MouseEvent<HTMLSpanElement>) => {
-    if (reduce) return
-    if (typeof window.matchMedia === 'function' && window.matchMedia('(pointer: coarse)').matches) return
+    if (reduce || isCoarsePointer()) return
     const root = rootRef.current
     if (!root) return
+    if (!engaged) setEngaged(true)
     const r = root.getBoundingClientRect()
     rawX.set((e.clientX - (r.left + r.width / 2)) * strength)
     rawY.set((e.clientY - (r.top + r.height / 2)) * strength)
   }
 
   const onMouseLeave = () => {
+    if (engaged) setEngaged(false)
     rawX.set(0)
     rawY.set(0)
   }
@@ -52,8 +62,12 @@ export function Magnetic({
       className={`inline-block ${className}`}
     >
       <motion.span
-        style={reduce ? undefined : { x, y }}
-        className="inline-block will-change-transform"
+        style={reduce || !engaged ? undefined : { x, y }}
+        className={
+          engaged && !reduce
+            ? 'inline-block will-change-transform'
+            : 'inline-block'
+        }
       >
         {children}
       </motion.span>

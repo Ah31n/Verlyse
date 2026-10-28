@@ -293,7 +293,7 @@ export default function Room() {
           <p className="font-mono text-[10px] font-medium uppercase tracking-[0.28em] text-gold md:text-[11px] md:tracking-[0.32em]">
             Verlyse Media
           </p>
-          <p className="font-mono text-[10px] font-medium uppercase tracking-[0.28em] text-gold/70 md:text-[11px] md:tracking-[0.32em]">
+          <p className="font-mono text-[10px] font-medium uppercase tracking-[0.28em] text-gold-lit/80 md:text-[11px] md:tracking-[0.32em]">
             The Keeping Room
           </p>
         </div>
@@ -329,7 +329,7 @@ export default function Room() {
             >
               Enter the archive
             </button>
-            <p className="mt-4 font-mono text-[11px] uppercase tracking-[0.28em] text-ivory/50">
+            <p className="mt-4 font-mono text-[11px] uppercase tracking-[0.28em] text-ivory/65">
               Press Enter · PULL → READ → RETURN
             </p>
           </Overlay>
@@ -366,7 +366,7 @@ export default function Room() {
               <p className="mt-5 font-mono text-[13px] uppercase tracking-[0.14em] text-[#D9B978]">
                 — {focusedFolio.author}
               </p>
-              <p className="mt-14 font-mono text-[11px] uppercase tracking-[0.26em] text-ivory/45">
+              <p className="mt-14 font-mono text-[11px] uppercase tracking-[0.26em] text-ivory/60">
                 The room re-forms around the plate
               </p>
               <div className="mt-7 flex flex-wrap items-center gap-x-8 gap-y-3">
@@ -456,7 +456,7 @@ export default function Room() {
                   <span className="block font-serif text-xl text-cream group-hover:text-gold">
                     №{f.folio} · {f.title}
                   </span>
-                  <span className="block font-mono text-[10px] uppercase tracking-[0.16em] text-ivory/50">
+                  <span className="block font-mono text-[10px] uppercase tracking-[0.16em] text-ivory/65">
                     {f.category} · {f.readingTime}
                   </span>
                 </button>
@@ -510,7 +510,7 @@ export default function Room() {
                       <span className="font-mono text-base font-semibold text-gold">{f.folio}</span>
                       <span className="flex-1">
                         <span className="block font-serif text-xl font-semibold text-[#241D18]">{f.title}</span>
-                        <span className="block font-mono text-[10px] uppercase tracking-[0.12em] text-gold/80">
+                        <span className="block font-mono text-[10px] uppercase tracking-[0.12em] text-gold-lit/85">
                           {f.author} · {f.category}
                         </span>
                       </span>
@@ -518,12 +518,12 @@ export default function Room() {
                   </li>
                 ))}
                 {query.trim() && searchResults.length === 0 && (
-                  <li className="text-center font-mono text-[11px] uppercase tracking-[0.2em] text-ivory/50">
+                  <li className="text-center font-mono text-[11px] uppercase tracking-[0.2em] text-ivory/65">
                     No folios on the thread match “{query}”.
                   </li>
                 )}
               </ul>
-              <p className="mt-6 text-center font-mono text-[11px] uppercase tracking-[0.24em] text-ivory/50">
+              <p className="mt-6 text-center font-mono text-[11px] uppercase tracking-[0.24em] text-ivory/65">
                 Esc to return · or <Link to="/articles" className="text-gold underline underline-offset-4">browse the full archive</Link>
               </p>
             </div>
@@ -539,7 +539,7 @@ export default function Room() {
             <button
               type="button"
               onClick={() => openDossier(FEATURED.authorId)}
-              className="rounded-full border border-gold/50 px-3 py-1 font-mono text-[10px] uppercase tracking-[0.16em] text-gold/90 transition-colors hover:border-gold hover:text-gold"
+              className="rounded-full border border-gold/50 px-3 py-1 font-mono text-[10px] uppercase tracking-[0.16em] text-gold-lit/90 transition-colors hover:border-gold hover:text-gold"
             >
               Dossier · {FEATURED.author}
             </button>
@@ -595,7 +595,7 @@ export default function Room() {
 
       {/* ---- footer meta (hidden during the wine takeover beats) ---- */}
       {state !== 'entry' && state !== 'ending' && (
-      <footer className="pointer-events-none absolute inset-x-0 bottom-0 z-[300] flex items-end justify-between p-4 font-mono text-[10px] uppercase tracking-[0.2em] text-ivory/40 md:p-6">
+      <footer className="pointer-events-none absolute inset-x-0 bottom-0 z-[300] flex items-end justify-between p-4 font-mono text-[10px] uppercase tracking-[0.2em] text-ivory/60 md:p-6">
         <span>State {String(roomProgress).padStart(2, '0')} · {STATE_HINT[state]}</span>
         <span className="hidden md:inline">Folio {focusedFolio.folio} / {String(count).padStart(2, '0')}</span>
       </footer>

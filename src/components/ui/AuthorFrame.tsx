@@ -45,7 +45,7 @@ export function AuthorFrame({
         {children}
       </div>
       {caption && (
-        <figcaption className="mt-3 px-1 text-center font-mono text-[9px] uppercase tracking-[0.30em] text-gold/80">
+        <figcaption className="mt-3 px-1 text-center font-mono text-[9px] uppercase tracking-[0.30em] text-gold-lit/85">
           {caption}
         </figcaption>
       )}

@@ -1,14 +1,19 @@
 /**
- * Verlyse Media — static preview server.
- * Serves the production build (dist/) with SPA fallback on 0.0.0.0 so the
- * live-preview environment can reach it. Run:  node scripts/serve.mjs
+ * Verlyse Media — static preview & local API server.
+ * Serves the production build (dist/) with SPA fallback AND mounts the local
+ * `/api/submit` and `/api/newsletter` serverless boundaries on 0.0.0.0 so the
+ * live-preview and Playwright environments can exercise them end-to-end.
+ * Run:  node scripts/serve.mjs
  */
 import http from 'node:http'
 import { createReadStream, existsSync, statSync } from 'node:fs'
+import { mkdir, readFile, writeFile } from 'node:fs/promises'
 import { join, extname, normalize } from 'node:path'
 import { fileURLToPath } from 'node:url'
+import ts from 'typescript'
 
-const DIST = join(fileURLToPath(new URL('.', import.meta.url)), '..', 'dist')
+const ROOT = join(fileURLToPath(new URL('.', import.meta.url)), '..')
+const DIST = join(ROOT, 'dist')
 const PORT = Number(process.env.PORT || 4173)
 
 const MIME = {
@@ -26,8 +31,67 @@ const MIME = {
   '.json': 'application/json',
 }
 
-const server = http.createServer((req, res) => {
-  let p = decodeURIComponent((req.url || '/').split('?')[0])
+const apiCache = new Map()
+async function loadApiHandler(name) {
+  if (apiCache.has(name)) return apiCache.get(name)
+  const tmpDir = '/tmp/verlyse-local-api'
+  await mkdir(tmpDir, { recursive: true })
+  const srcPath = join(ROOT, 'api', `${name}.ts`)
+  const src = await readFile(srcPath, 'utf8')
+  const compiled = ts.transpileModule(src, {
+    compilerOptions: {
+      target: ts.ScriptTarget.ES2022,
+      module: ts.ModuleKind.ES2022,
+    },
+  }).outputText
+  const outPath = join(tmpDir, `${name}.mjs`)
+  await writeFile(outPath, compiled)
+  const mod = await import(`file://${outPath}?v=${Date.now()}`)
+  apiCache.set(name, mod.default)
+  return mod.default
+}
+
+function adaptResponse(res) {
+  let code = 200
+  const headers = {}
+  return {
+    setHeader(k, v) {
+      headers[k] = v
+      res.setHeader(k, v)
+    },
+    status(c) {
+      code = c
+      return {
+        end() {
+          res.writeHead(code, headers)
+          res.end()
+        },
+        json(obj) {
+          headers['Content-Type'] = 'application/json; charset=utf-8'
+          res.writeHead(code, headers)
+          res.end(JSON.stringify(obj))
+        },
+      }
+    },
+  }
+}
+
+const server = http.createServer(async (req, res) => {
+  const pathname = decodeURIComponent((req.url || '/').split('?')[0])
+
+  if (pathname === '/api/submit' || pathname === '/api/newsletter') {
+    try {
+      const apiName = pathname === '/api/submit' ? 'submit' : 'newsletter'
+      const handler = await loadApiHandler(apiName)
+      await handler(req, adaptResponse(res))
+    } catch {
+      res.writeHead(500, { 'Content-Type': 'application/json; charset=utf-8' })
+      res.end(JSON.stringify({ ok: false, error: 'internal-error' }))
+    }
+    return
+  }
+
+  let p = pathname
   if (p === '/') p = '/index.html'
   const file = normalize(join(DIST, p))
   if (!file.startsWith(normalize(DIST))) {
@@ -35,10 +99,11 @@ const server = http.createServer((req, res) => {
     return res.end('Forbidden')
   }
   let target = file
-  if (!existsSync(target) || statSync(target).isDirectory()) target = join(DIST, 'index.html')
+  if (!existsSync(target) || statSync(target).isDirectory()) {
+    const dirIndex = join(target, 'index.html')
+    target = existsSync(dirIndex) ? dirIndex : join(DIST, 'index.html')
+  }
   const ext = extname(target)
-  // Preview server: never let the browser serve a stale page — HTML is
-  // no-store; everything else is revalidated each request.
   const headers = {
     'Content-Type': MIME[ext] || 'application/octet-stream',
     'Cache-Control': ext === '.html' ? 'no-store' : 'no-cache',

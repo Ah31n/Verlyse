@@ -3,6 +3,12 @@ import { motion } from 'motion/react'
 import { useSeo } from '../hooks/useSeo'
 import Reveal from '../components/ui/Reveal'
 import { BRAND } from '../data/content'
+import { CrashZoom } from '../components/cinematic'
+import {
+  FloralWord,
+  HaikeiContourPlane,
+} from '../components/ui/EditorialCraftSystem'
+import { resolveSubmitEndpoint } from './Submit'
 
 /** A quiet note beneath a letter-line — shown only when the line needs attention.
     Linked to its input via aria-describedby; the form's single status region
@@ -16,69 +22,79 @@ function LetterHint({ id, show, children }: { id: string; show: boolean; childre
   )
 }
 
+export function resolveContactEndpoint(hostname?: string): string {
+  return resolveSubmitEndpoint(hostname)
+}
+
+interface ContactDraft {
+  name: string
+  email: string
+  subject: string
+  message: string
+}
+
+export function buildContactMailtoHref(draft: ContactDraft): string {
+  const params = new URLSearchParams({
+    subject: `Letter — ${draft.subject || 'Correspondence'}`,
+    body: [
+      `Name: ${draft.name}`,
+      `Email: ${draft.email}`,
+      `Subject: ${draft.subject}`,
+      '',
+      draft.message,
+    ].join('\n'),
+  })
+  return `mailto:${BRAND.email}?${params.toString()}`
+}
+
+type ContactUiState = 'idle' | 'invalid' | 'sending' | 'accepted' | 'failed'
+
 /**
  * Contact — write to the desk.
  * The form is a letter: a sheet of paper, fields set as letter-lines,
  * a signature that fills as the writer types their name, and a seal
- * that is pressed when the letter is sent. When the seal is pressed,
- * the letter becomes its acknowledgement.
+ * that is pressed only when the server accepts the letter.
  */
-import { CrashZoom } from '../components/cinematic'
-import {
-  FloralWord,
-  HaikeiContourPlane,
-} from '../components/ui/EditorialCraftSystem'
-
 export default function Contact() {
   useSeo({
-path: '/contact',
+    path: '/contact',
     title: 'Contact',
     description: 'Write to Verlyse Media — submissions, questions, or a note about a feature that stayed with you.',
   })
 
   const formRef = useRef<HTMLFormElement>(null)
+  const inFlightRef = useRef(false)
+  const [uiState, setUiState] = useState<ContactUiState>('idle')
   const [errors, setErrors] = useState<string[]>([])
   const [name, setName] = useState('')
-  const [sealed, setSealed] = useState(false)
-  const [sending, setSending] = useState(false)
-  const [viaBackend, setViaBackend] = useState(true)
+  const [deliveryError, setDeliveryError] = useState('')
+  const [draftOpened, setDraftOpened] = useState(false)
+  const [lastDraft, setLastDraft] = useState<ContactDraft | null>(null)
+
+  const sending = uiState === 'sending'
+  const sealed = uiState === 'accepted'
 
   const clearFieldError = (field: string) => {
     setErrors((prev) => (prev.includes(field) ? prev.filter((k) => k !== field) : prev))
     formRef.current?.querySelector<HTMLElement>(`[name="${field}"]`)?.classList.remove('is-invalid')
   }
 
-  /** Deliver the letter to the desk — posts to the forwarding service so it
-      arrives in the Verlyse Media inbox; if the network path fails, the
-      writer's mail app opens with everything prefilled instead. */
-  const sendLetter = async (payload: Record<string, string>): Promise<boolean> => {
-    try {
-      const res = await fetch('https://formsubmit.co/ajax/Verlysemedia.09@gmail.com', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
-        body: JSON.stringify({ _subject: `Letter — ${payload.subject}`, _captcha: 'false', ...payload }),
-      })
-      if (res.ok) return true
-    } catch {
-      /* fall through to the mail fallback */
+  const describeContactError = (status: number, code?: string): string => {
+    if (code === 'provider-unconfigured' || status === 503) {
+      return 'The correspondence service is currently unconfigured on this deployment — your letter remains intact on this page. Retry once configured, or open an email draft below.'
     }
-    const params = new URLSearchParams({
-      subject: `Letter — ${payload.subject}`,
-      body: [
-        `Name: ${payload.name}`,
-        `Email: ${payload.email}`,
-        `Subject: ${payload.subject}`,
-        '',
-        payload.message,
-      ].join('\n'),
-    })
-    window.location.href = `mailto:${BRAND.email}?${params.toString()}`
-    return false
+    if (code === 'too-many-requests' || status === 429) {
+      return 'Too many messages sent in a short window — please wait a few minutes and retry, or open an email draft below.'
+    }
+    if (code === 'invalid-fields' || status === 422) {
+      return 'Some required lines were rejected by the server — please check your letter and retry.'
+    }
+    return 'The letter could not be delivered to the server right now — your words remain intact below. Please retry or open an email draft.'
   }
 
   const onSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault()
-    if (sending || sealed) return
+    if (inFlightRef.current || sending || sealed) return
     const form = e.currentTarget
     const data = new FormData(form)
     const fields: Array<[string, string]> = [
@@ -87,6 +103,7 @@ path: '/contact',
       ['subject', String(data.get('subject') ?? '').trim()],
       ['message', String(data.get('message') ?? '').trim()],
     ]
+    const gotcha = String(data.get('_gotcha') ?? '').trim()
 
     const bad: string[] = []
     const email = fields.find(([k]) => k === 'email')?.[1] ?? ''
@@ -99,35 +116,75 @@ path: '/contact',
     bad.forEach((k) => form.querySelector<HTMLElement>(`[name="${k}"]`)?.classList.add('is-invalid'))
     setErrors(bad)
 
-    if (bad.length) {
-      setSealed(false)
+    if (bad.length > 0) {
+      setUiState('invalid')
+      setDeliveryError('')
       form.querySelector<HTMLElement>(`[name="${bad[0]}"]`)?.focus()
       return
     }
 
-    setErrors([])
-    setSending(true)
-    const ok = await sendLetter({
+    const draft: ContactDraft = {
       name: fields[0][1],
       email: fields[1][1],
       subject: fields[2][1],
       message: fields[3][1],
-    })
-    setSending(false)
-    setViaBackend(ok)
-    setSealed(true)
+    }
+    inFlightRef.current = true
+    setLastDraft(draft)
+    setErrors([])
+    setDeliveryError('')
+    setDraftOpened(false)
+    setUiState('sending')
+
+    const outbound = new FormData()
+    outbound.append('kind', 'contact')
+    outbound.append('name', draft.name)
+    outbound.append('email', draft.email)
+    outbound.append('subject', draft.subject)
+    outbound.append('message', draft.message)
+    if (gotcha) outbound.append('_gotcha', gotcha)
+
+    try {
+      const res = await fetch(resolveContactEndpoint(), {
+        method: 'POST',
+        headers: {
+          Accept: 'application/json',
+        },
+        body: outbound,
+      })
+      const payload = (await res.json().catch(() => ({}))) as {
+        ok?: boolean
+        error?: string
+      }
+
+      if (res.ok && payload.ok === true) {
+        setUiState('accepted')
+        return
+      }
+
+      setDeliveryError(describeContactError(res.status, payload.error))
+      setUiState('failed')
+    } catch {
+      setDeliveryError(describeContactError(0))
+      setUiState('failed')
+    } finally {
+      inFlightRef.current = false
+    }
   }
 
   const resetLetter = () => {
     formRef.current?.reset()
     setName('')
     setErrors([])
-    setSealed(false)
+    setDeliveryError('')
+    setDraftOpened(false)
+    setLastDraft(null)
+    setUiState('idle')
   }
 
   return (
     <>
-      <section className="relative flex min-h-[58svh] items-end overflow-hidden border-b border-white/10 bg-wine-deep pb-20 pt-[clamp(7rem,15vh,10rem)]">
+      <section className="relative flex min-h-[42svh] items-end overflow-hidden border-b border-white/10 bg-wine-deep pb-16 pt-[clamp(6rem,12vh,8rem)]">
         {/* the quietest of the two desks — low light, intimate */}
         <div aria-hidden="true" className="pointer-events-none absolute inset-0">
           <div className="absolute inset-0 bg-[radial-gradient(70%_50%_at_50%_0%,rgba(232,217,168,0.12),transparent_60%),radial-gradient(110%_85%_at_50%_0%,rgba(92,18,36,0.32),transparent_62%),linear-gradient(175deg,#3E0D17_0%,#2A0F18_58%,#15050B_100%)]" />
@@ -146,7 +203,7 @@ path: '/contact',
             </h1>
           </div>
           <Reveal delay={0.2}>
-            <p className="mt-6 font-mono text-[10px] uppercase tracking-[0.3em] text-gold/85">
+            <p className="mt-6 font-mono text-[10px] uppercase tracking-[0.3em] text-gold-lit/85">
               Write to the publication — a letter, not a form
             </p>
           </Reveal>
@@ -158,13 +215,13 @@ path: '/contact',
         </div>
       </section>
 
-      <section className="border-t border-white/10 py-[clamp(6rem,14vh,11rem)]">
+      <section className="border-t border-white/10 pb-[clamp(5rem,12vh,9rem)] pt-[clamp(3rem,7vh,5rem)]">
         <div className="mx-auto grid max-w-page grid-cols-1 gap-[clamp(3rem,6vw,7rem)] px-[clamp(1.75rem,5.5vw,4.75rem)] lg:grid-cols-[0.9fr_1.1fr]">
           {/* The desk */}
           <div>
             <Reveal><p className="kicker">The desk — contact notes</p></Reveal>
             <Reveal delay={0.05}>
-              <p className="mt-3 font-mono text-[9px] uppercase tracking-[0.3em] text-white/50">Letters — read, answered</p>
+              <p className="mt-3 font-mono text-[9px] uppercase tracking-[0.3em] text-white/65">Letters — read, answered</p>
             </Reveal>
             <ul className="mt-8 border-t border-white/10">
               {[
@@ -192,14 +249,20 @@ path: '/contact',
               <p className="mt-8 max-w-[40ch] font-serif text-base font-light italic leading-[1.7] text-ivory/65">
                 The desk is small, and it answers everything — a question, a note about a feature that stayed with you, or the beginning of the next one.
               </p>
-              <p className="mt-4 font-mono text-[10px] uppercase tracking-[0.28em] leading-[2] text-white/50">
+              <p className="mt-4 font-mono text-[10px] uppercase tracking-[0.28em] leading-[2] text-white/65">
                 Every letter is read · every conversation is answered · nothing is invented
               </p>
             </Reveal>
           </div>
 
           {/* The letter */}
-          <form ref={formRef} onSubmit={onSubmit} noValidate aria-label="Write a letter to the desk">
+          <form
+            ref={formRef}
+            onSubmit={onSubmit}
+            data-contact-state={uiState}
+            noValidate
+            aria-label="Write a letter to the desk"
+          >
             <Reveal>
               <div className="relative max-w-[640px] border border-wine/15 bg-[#F2EADA] px-6 py-10 text-wine shadow-[0_60px_140px_rgba(0,0,0,0.55)] sm:px-10 md:px-12 md:py-14 sm:rotate-[-0.6deg] sm:transition-transform sm:duration-700 sm:ease-[cubic-bezier(0.16,1,0.3,1)] sm:focus-within:rotate-0">
                 {/* the wax seal on the flap — a quiet promise, pressed in wine */}
@@ -208,8 +271,8 @@ path: '/contact',
                 </span>
 
                 {sealed ? (
-                  /* ——— the acknowledgement — the letter is sealed and received ——— */
-                  <div className="flex flex-col items-center py-6 text-center">
+                  /* ——— Verified server acceptance screen ——— */
+                  <div role="status" aria-live="polite" className="flex flex-col items-center py-6 text-center">
                     <motion.span
                       aria-hidden="true"
                       initial={{ scale: 2.1, opacity: 0, rotate: -16 }}
@@ -219,27 +282,28 @@ path: '/contact',
                     >
                       <span className="font-serif text-lg italic leading-none text-[#F2EADA]">VM</span>
                     </motion.span>
-                    <p className="mt-8 font-mono text-[9px] uppercase tracking-[0.30em] text-wine/70">The seal is pressed</p>
+                    <p className="mt-8 font-mono text-[9px] uppercase tracking-[0.30em] text-wine/70">Accepted by the correspondence system</p>
                     <h2 className="mt-4 font-serif text-[clamp(1.9rem,3vw,2.6rem)] font-light italic leading-[1.2] text-wine">
-                      Letter sealed
+                      Letter received by the server
                     </h2>
                     <p className="mt-4 max-w-[40ch] font-serif text-base font-light italic leading-[1.8] text-wine/80">
-                      Your correspondence has been received by Verlyse Media.
+                      Your correspondence has been accepted by the Verlyse Media server and queued for the editorial desk ({BRAND.email}).
                     </p>
                     <p className="mt-3 font-mono text-[8px] uppercase tracking-[0.30em] text-wine/60">
-                      Read · Answered · Read again
+                      Accepted · Read · Answered
                     </p>
-                    {!viaBackend && (
-                      <p className="mt-5 max-w-[38ch] text-sm italic leading-[1.8] text-wine/75">
-                        Your mail app should have opened with the letter written out — if it didn’t, send it directly to {BRAND.email}.
-                      </p>
-                    )}
                     <button type="button" onClick={resetLetter} className="btn btn-seal mt-10">
                       Write another letter
                     </button>
                   </div>
                 ) : (
                   <>
+                    {/* Honeypot field — hidden from humans and assistive tech */}
+                    <div aria-hidden="true" className="sr-only">
+                      <label htmlFor="cf-gotcha">Leave this field blank</label>
+                      <input id="cf-gotcha" name="_gotcha" type="text" tabIndex={-1} autoComplete="off" />
+                    </div>
+
                     {/* letterhead */}
                     <div className="flex items-end justify-between gap-6 border-b border-wine/15 pb-5">
                       <p className="font-mono text-[9px] uppercase tracking-[0.30em] text-wine/80">Verlyse Media — the desk</p>
@@ -322,7 +386,11 @@ path: '/contact',
                       </div>
                       <div className="flex flex-col items-start gap-4">
                         <button type="submit" disabled={sending} aria-busy={sending} className="btn btn-seal disabled:pointer-events-none disabled:opacity-60">
-                          {sending ? 'Sealing the letter…' : 'Seal the letter — send'}
+                          {sending
+                            ? 'Sealing the letter…'
+                            : uiState === 'failed'
+                              ? 'Retry sending letter'
+                              : 'Seal the letter — send'}
                         </button>
                         {errors.length > 0 && (
                           <p role="alert" className="font-mono text-[10px] uppercase tracking-[0.28em] text-[#B33A3A]">
@@ -331,6 +399,40 @@ path: '/contact',
                         )}
                       </div>
                     </div>
+
+                    {errors.length === 0 && uiState === 'failed' && deliveryError && (
+                      <div
+                        role="alert"
+                        data-testid="contact-delivery-alert"
+                        className="mt-6 border border-[#B33A3A]/55 bg-wine/5 px-5 py-4 text-left text-wine"
+                      >
+                        <p className="font-mono text-[9px] uppercase tracking-[0.24em] text-[#B33A3A]">
+                          Letter not yet delivered — action needed
+                        </p>
+                        <p className="mt-2 text-sm leading-[1.7] text-wine/90">
+                          {deliveryError}
+                        </p>
+                        {lastDraft && (
+                          <div className="mt-3 flex flex-col items-start gap-2 border-t border-wine/15 pt-3">
+                            <a
+                              href={buildContactMailtoHref(lastDraft)}
+                              onClick={() => setDraftOpened(true)}
+                              className="inline-flex items-center gap-2 border border-wine/60 px-3.5 py-1.5 font-mono text-[9px] uppercase tracking-[0.24em] text-wine no-underline transition-colors hover:bg-wine hover:text-[#F2EADA]"
+                            >
+                              Open email draft in your mail app ({BRAND.email})
+                            </a>
+                            <p className="text-xs leading-[1.6] text-wine/75">
+                              Opening an email draft does not send your message automatically: you must still press <strong>Send</strong> in your mail app.
+                            </p>
+                            {draftOpened && (
+                              <p role="status" className="font-mono text-[9px] uppercase tracking-[0.22em] text-wine">
+                                Email draft requested — press Send in your mail client to complete delivery.
+                              </p>
+                            )}
+                          </div>
+                        )}
+                      </div>
+                    )}
                   </>
                 )}
               </div>

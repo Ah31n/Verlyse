@@ -2,6 +2,7 @@ import { useMemo, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { motion, AnimatePresence, useReducedMotion } from 'motion/react'
 import { useSeo } from '../hooks/useSeo'
+import { ChapterOpener } from '../components/ui/primitives'
 import { ARTICLES, AUTHORS, LEDGER, authorPhoto, coCreditedWorks, folioNoOf, hasKnownLikes, stampDate } from '../data/content'
 import { handleImgError } from '../lib/imgFallback'
 
@@ -131,10 +132,10 @@ export default function Creators() {
               <span className="relative">The wall <FloralWord variant="lotus">of names</FloralWord></span>
             </h1>
           </div>
-          <p className="mt-4 font-mono text-[10px] uppercase tracking-[0.34em] text-gold/85">
+          <p className="mt-4 font-mono text-[10px] uppercase tracking-[0.34em] text-gold-lit/85">
             The contributor wall — {LEDGER.wallRecords} records · {LEDGER.creators} bylined in the archive · {ARTICLES.length} folios
           </p>
-          <p className="mx-auto mt-2 max-w-[70ch] font-mono text-[9px] uppercase leading-[1.9] tracking-[0.22em] text-white/45">
+          <p className="mx-auto mt-2 max-w-[70ch] font-mono text-[9px] uppercase leading-[1.9] tracking-[0.22em] text-white/60">
             {LEDGER.creators} bylined voices and one co-credited poet across {LEDGER.features} catalogued features ({LEDGER.publishedFeatures} published folios and {LEDGER.provisionalFeatures} provisional {LEDGER.provisionalFeatures === 1 ? 'record' : 'records'}) in Issue № {LEDGER.issueNo}
           </p>
         </div>
@@ -171,7 +172,7 @@ export default function Creators() {
                     <p className="mt-4 max-w-[56ch] font-serif text-xl font-light italic leading-[1.6] text-ivory/80">
                       {selected.role}
                     </p>
-                    <p className="mt-2 max-w-[56ch] font-mono text-[10px] uppercase tracking-[0.26em] text-gold/90">
+                    <p className="mt-2 max-w-[56ch] font-mono text-[10px] uppercase tracking-[0.26em] text-gold-lit/90">
                       {folios.length > 0
                         ? `${folios.length} folio${folios.length === 1 ? '' : 's'} in the archive — ${folioNums}`
                         : coCredits.length > 0
@@ -180,7 +181,7 @@ export default function Creators() {
                     </p>
                     {theirCats.length > 0 && (
                       <p className="mt-3 flex flex-wrap items-center gap-2" aria-label="Rooms this name writes in">
-                        <span className="font-mono text-[9px] uppercase tracking-[0.24em] text-white/45">Rooms</span>
+                        <span className="font-mono text-[9px] uppercase tracking-[0.24em] text-white/60">Rooms</span>
                         {theirCats.map((c) => (
                           <Link
                             key={c}
@@ -222,7 +223,7 @@ export default function Creators() {
                             “{selectedFeature.title}”
                           </span>
                         </span>
-                        <span aria-hidden="true" className="ml-auto shrink-0 self-center whitespace-nowrap font-mono text-[9px] uppercase tracking-[0.24em] text-white/45 transition-colors group-hover:text-gold">
+                        <span aria-hidden="true" className="ml-auto shrink-0 self-center whitespace-nowrap font-mono text-[9px] uppercase tracking-[0.24em] text-white/60 transition-colors group-hover:text-gold">
                           Read →
                         </span>
                       </Link>
@@ -255,7 +256,7 @@ export default function Creators() {
                             “{coCredits[0].title}”
                           </span>
                         </span>
-                        <span aria-hidden="true" className="ml-auto shrink-0 self-center whitespace-nowrap font-mono text-[9px] uppercase tracking-[0.24em] text-white/45 transition-colors group-hover:text-gold">
+                        <span aria-hidden="true" className="ml-auto shrink-0 self-center whitespace-nowrap font-mono text-[9px] uppercase tracking-[0.24em] text-white/60 transition-colors group-hover:text-gold">
                           Read →
                         </span>
                       </Link>
@@ -265,7 +266,7 @@ export default function Creators() {
                       <Magnetic><Link to={`/creator/${selected.id}`} className="btn btn-gold">
                         Open the dossier →
                       </Link></Magnetic>
-                      <p className="font-mono text-[9px] uppercase tracking-[0.24em] text-white/45">
+                      <p className="font-mono text-[9px] uppercase tracking-[0.24em] text-white/60">
                         Record {String(recordNo).padStart(2, '0')} / {AUTHORS.length}
                       </p>
                     </div>
@@ -315,7 +316,7 @@ export default function Creators() {
                             <span className="flex-1 font-serif text-base text-ivory/90 transition-colors group-hover:text-gold">
                               “{f.title}”
                             </span>
-                            <span className="font-mono text-[9px] uppercase tracking-[0.16em] text-white/45">{f.category}</span>
+                            <span className="font-mono text-[9px] uppercase tracking-[0.16em] text-white/60">{f.category}</span>
                           </Link>
                         </li>
                       )
@@ -329,10 +330,13 @@ export default function Creators() {
 
         {/* ——— MID · the wall of names — the other fifteen, architectural ——— */}
         <div className="mt-[clamp(3rem,8vh,5rem)] border-t border-white/10 pt-8">
-          <p className="font-mono text-[10px] uppercase tracking-[0.3em] text-gold/80">
-            {resting ? 'The wall — choose a name' : `The wall — ${LEDGER.wallRecords} names, every credit real`}
-          </p>
-          <div className="mt-6 grid grid-cols-1 gap-x-8 gap-y-[clamp(1.4rem,3vh,2rem)] sm:grid-cols-2 lg:grid-cols-4">
+          <ChapterOpener
+            num="02"
+            label="The wall"
+            title={<>Every <em>name</em></>}
+            aside={resting ? 'Choose a name' : `${LEDGER.wallRecords} names · every credit real`}
+          />
+          <div className="mt-9 grid grid-cols-1 gap-x-8 gap-y-[clamp(1.4rem,3vh,2rem)] sm:grid-cols-2 lg:grid-cols-4">
             {AUTHORS.map((a) => {
               const isSel = a.id === selected.id
               const n = foliosOf(a.id).length
@@ -355,14 +359,14 @@ export default function Creators() {
                     !resting && isSel
                       ? 'border-gold bg-gradient-to-r from-gold/[0.08] to-transparent'
                       : 'border-white/10 hover:border-gold/50'
-                  } ${faded ? 'opacity-60' : 'opacity-100'} ${resting ? 'hover:opacity-100' : ''}`}
+                  } ${faded ? 'opacity-80' : 'opacity-100'} ${resting ? 'hover:opacity-100' : ''}`}
                 >
                   <span className={`block font-serif text-[clamp(1.3rem,1.9vw,1.65rem)] font-normal leading-[1.1] transition-all duration-500 ${
                     !resting && isSel ? 'italic text-gold' : 'text-ivory/90 group-hover:text-gold'
                   }`}>
                     {a.name}
                   </span>
-                  <span className="mt-1.5 block font-mono text-[9px] uppercase tracking-[0.22em] text-white/50">
+                  <span className="mt-1.5 block font-mono text-[9px] uppercase tracking-[0.22em] text-white/65">
                     {a.handle} · {tileLine}
                   </span>
                   {!resting && isSel && (

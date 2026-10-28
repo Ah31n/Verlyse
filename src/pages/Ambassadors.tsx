@@ -107,7 +107,7 @@ export default function Ambassadors() {
               <span className="relative">The people <FloralWord variant="astrolabe-bloom">in the room</FloralWord></span>
             </h1>
           </div>
-          <p className="mt-4 font-mono text-[10px] uppercase tracking-[0.34em] text-gold/85">
+          <p className="mt-4 font-mono text-[10px] uppercase tracking-[0.34em] text-gold-lit/85">
             The people — ambassadors · team · the open seat
           </p>
           <Reveal delay={0.2}>
@@ -124,13 +124,16 @@ export default function Ambassadors() {
           {CLUSTERS.map((cluster) => (
             <div key={cluster.label} className="border-t border-white/10 py-10 first:border-t-0 first:pt-0">
               <Rise3D>
-              <div className="mb-6 border-b border-white/10 pb-4">
-                <MaskReveal><h2 className="font-serif text-[clamp(1.6rem,3vw,2.4rem)] font-light text-ivory">{cluster.label}</h2></MaskReveal>
-                <p className="mt-2 font-mono text-[9px] uppercase tracking-[0.28em] text-white/50">{cluster.caption}</p>
+              {/* R10 — the masthead band: a journal credits page sets its
+                  department on one rule, not as a stacked heading. */}
+              <div className="mb-8 flex flex-wrap items-baseline gap-x-5 gap-y-2 border-b border-gold/25 pb-3">
+                <MaskReveal><h2 className="font-serif text-[clamp(1.5rem,2.8vw,2.2rem)] font-light leading-none text-ivory">{cluster.label}</h2></MaskReveal>
+                <span aria-hidden="true" className="hidden h-px min-w-[2rem] flex-1 bg-[linear-gradient(to_right,rgba(217,185,120,0.45),rgba(217,185,120,0.06))] sm:block" />
+                <p className="font-mono text-[9px] uppercase tracking-[0.28em] text-white/70">{cluster.caption}</p>
               </div>
               </Rise3D>
 
-              <div className={`grid grid-cols-2 gap-5 ${cluster.members.length === 3 ? 'sm:grid-cols-3' : 'sm:grid-cols-2 md:grid-cols-4'}`}>
+              <div className="grid grid-cols-1 gap-x-10 gap-y-7 sm:grid-cols-2 lg:grid-cols-3">
                 {cluster.members.map((m) => {
                   const no = ALL_MEMBERS.findIndex((x) => x.name === m.name) + 1
                   const isSel = selectedId === m.name
@@ -142,32 +145,32 @@ export default function Ambassadors() {
                       onClick={() => setSelectedId(isSel ? null : m.name)}
                       aria-expanded={isSel}
                       aria-label={`№${String(no).padStart(2, '0')} — ${m.name}, ${m.role}${isSel ? '. Record open.' : ''}`}
-                      className={`group relative flex flex-col items-center px-2 pb-5 text-center transition-transform duration-500 ${
-                        cluster.members.length === 3 ? 'last:col-span-2 sm:last:col-span-1' : ''
-                      } ${
-                        isSel ? 'z-10 -translate-y-2' : 'hover:-translate-y-1'
+                      className={`group relative flex items-center gap-4 border-b border-white/[0.07] py-3 pr-2 text-left transition-all duration-500 ${
+                        isSel ? 'z-10 border-gold/35' : 'hover:border-gold/25'
                       }`}
                     >
                       {/* the numbered diamond medallion — the same diamond that signs each feature */}
-                      <span className="relative grid h-[104px] w-[104px] place-items-center" aria-hidden="true">
+                      <span className="relative grid h-[64px] w-[64px] shrink-0 place-items-center" aria-hidden="true">
                         <span
                           className={`absolute inset-0 rotate-45 border transition-all duration-700 ease-[cubic-bezier(0.16,1,0.3,1)] ${
                             isSel ? 'border-gold bg-[#2A0F18]' : 'border-gold/40 bg-transparent group-hover:border-gold/80 group-hover:bg-[#2A0F18]/60'
                           }`}
                         />
                         <span className={`absolute inset-[7px] rotate-45 border transition-colors duration-700 ${isSel ? 'border-gold/50' : 'border-gold/15 group-hover:border-gold/35'}`} />
-                        <span className="relative font-serif text-2xl italic text-gold">{mono}</span>
+                        <span className="relative font-serif text-base italic text-gold">{mono}</span>
                         {/* the number — riveted at the diamond's corner */}
-                        <span className="absolute -bottom-1 left-1/2 -translate-x-1/2 bg-wine-deep px-1.5 font-mono text-[9px] tracking-[0.2em] text-gold">
+                        <span className="absolute -bottom-1.5 left-1/2 -translate-x-1/2 bg-wine-deep px-1 font-mono text-[8px] tracking-[0.18em] text-gold">
                           №{String(no).padStart(2, '0')}
                         </span>
                       </span>
 
-                      <span className={`mt-4 font-serif text-lg leading-tight transition-colors duration-300 ${isSel ? 'italic text-gold' : 'text-ivory group-hover:text-gold'}`}>
+                      <span className="flex min-w-0 flex-col">
+                      <span className={`font-serif text-[1.15rem] leading-tight transition-colors duration-300 ${isSel ? 'italic text-gold' : 'text-ivory group-hover:text-gold'}`}>
                         {m.name}
                       </span>
-                      <span className="mt-1 font-mono text-[8.5px] uppercase tracking-[0.22em] text-white/50">
+                      <span className="mt-1 font-mono text-[8.5px] uppercase tracking-[0.22em] text-white/70">
                         {m.role}
+                      </span>
                       </span>
                     </button>
                   )
@@ -179,9 +182,9 @@ export default function Ambassadors() {
           {/* the open seat — the next ambassador */}
           <div className="mt-4 border border-dashed border-gold/40 bg-[#2A0F18]/60 p-8 md:p-10">
             <div className="flex flex-col items-start gap-6 md:flex-row md:items-center">
-              <span aria-hidden="true" className="relative grid h-[104px] w-[104px] shrink-0 place-items-center">
+              <span aria-hidden="true" className="relative grid h-[80px] w-[80px] shrink-0 place-items-center">
                 <span className="absolute inset-0 rotate-45 border border-dashed border-gold/60" />
-                <span className="relative font-serif text-2xl italic text-gold/70">{ALL_MEMBERS.length + 1}</span>
+                <span className="relative font-serif text-2xl italic text-gold-lit/80">{ALL_MEMBERS.length + 1}</span>
                 <span className="absolute -bottom-1 left-1/2 -translate-x-1/2 bg-[#2A0F18] px-1.5 font-mono text-[9px] tracking-[0.2em] text-gold">
                   №{String(ALL_MEMBERS.length + 1).padStart(2, '0')}
                 </span>
@@ -257,7 +260,7 @@ export default function Ambassadors() {
               <div className="relative mt-7 h-px w-24 bg-gold" aria-hidden="true" />
               <p className="relative mt-5 max-w-[58ch] text-[15px] leading-[1.8] text-white/75">{selected.description}</p>
 
-              <p className="relative mt-6 font-mono text-[9px] uppercase tracking-[0.24em] text-white/45">
+              <p className="relative mt-6 font-mono text-[9px] uppercase tracking-[0.24em] text-white/60">
                 №{String(selectedNo).padStart(2, '0')} of {ALL_MEMBERS.length} — the room of people, Verlyse Media
               </p>
 
@@ -291,7 +294,7 @@ export default function Ambassadors() {
                   <blockquote className="font-serif text-[clamp(1.15rem,1.8vw,1.5rem)] font-light italic leading-[1.7] text-ivory/85">
                     “{BRAND.ambassadorProgram.role}”
                   </blockquote>
-                  <figcaption className="mt-4 font-mono text-[9px] uppercase tracking-[0.26em] text-white/45">
+                  <figcaption className="mt-4 font-mono text-[9px] uppercase tracking-[0.26em] text-white/60">
                     The role, word for word from the top of the application form
                   </figcaption>
                 </figure>
@@ -321,7 +324,7 @@ export default function Ambassadors() {
               </Reveal>
 
               <Reveal delay={0.2} className="mt-8 border border-white/10 bg-[#F8F6F2]/[0.04] p-5">
-                <p className="font-mono text-[9px] uppercase leading-[1.9] tracking-[0.22em] text-white/50">
+                <p className="font-mono text-[9px] uppercase leading-[1.9] tracking-[0.22em] text-white/65">
                   The form states no stipend, no closing deadline, no fixed term, and no list of campuses — so neither do we. Where the form is silent, the magazine is silent; nothing on this page is promised on the programme’s behalf.
                 </p>
               </Reveal>
@@ -352,7 +355,7 @@ export default function Ambassadors() {
                     or send your work →
                   </Link>
                 </div>
-                <p className="relative mt-6 font-mono text-[9px] uppercase tracking-[0.22em] text-white/40">
+                <p className="relative mt-6 font-mono text-[9px] uppercase tracking-[0.22em] text-white/60">
                   Questions? Write to {BRAND.handle} on Instagram
                 </p>
               </div>

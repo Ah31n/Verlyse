@@ -218,6 +218,12 @@ export default function Header() {
             </button>
           </div>
         </div>
+        {/* R09 — the masthead closes on the same brass press rule the
+            chapters open on, so the shell belongs to the edition too. */}
+        <span
+          aria-hidden="true"
+          className="pointer-events-none absolute inset-x-0 bottom-0 h-px bg-[linear-gradient(to_right,transparent,rgba(217,185,120,0.5)_18%,rgba(217,185,120,0.5)_82%,transparent)]"
+        />
       </header>
 
       {/* ---------- Fullscreen menu ---------- */}

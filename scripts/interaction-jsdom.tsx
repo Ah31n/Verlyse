@@ -22,10 +22,12 @@ import WriterProfile, { formatQuotedNote } from '../src/components/ui/WriterProf
 import Footer, { resolveNewsletterEndpoint } from '../src/components/layout/Footer'
 import Creators from '../src/pages/Creators'
 import Ambassadors from '../src/pages/Ambassadors'
-import Submit from '../src/pages/Submit'
-import Contact from '../src/pages/Contact'
-import StringTuneProvider from '../src/lib/stringTune/StringTuneProvider'
+import Submit, { resolveSubmitEndpoint } from '../src/pages/Submit'
+import Contact, { resolveContactEndpoint } from '../src/pages/Contact'
+import StringTuneProvider, { shouldSuspendStringTune } from '../src/lib/stringTune/StringTuneProvider'
 import { isStringTuneRunning, startStringTune, stopStringTune } from '../src/lib/stringTune/runtime'
+import { Magnetic } from '../src/components/ui/Magnetic'
+import { MAX_ARCHIVE_PLATES, selectArchiveArticles } from '../src/components/spatial/SpatialArchive'
 import { ARTICLES, AUTHORS, BRAND, LEDGER, folioNoOf, hasKnownLikes, sortArticles } from '../src/data/content'
 
 interface Result { name: string; ok: boolean; detail: string }
@@ -213,10 +215,10 @@ export async function run() {
   cleanup()
   document.body.style.overflow = ''
 
-  /* ---- SUBMIT & CONTACT FORMS: aria-invalid, aria-describedby, single alert, cover honesty ---- */
-  await check('submit & contact forms: accessible validation and truthful cover filename handling', async () => {
+  /* ---- SUBMIT & CONTACT FORMS: aria-invalid, aria-describedby, binary cover upload, failure recovery, retry & acceptance ---- */
+  await check('submit & contact forms: accessible validation, binary cover upload, failure preservation, manual draft fallback, and server acceptance', async () => {
     wrap(<Submit />)
-    const nameInput = screen.getByLabelText(/Full name/i)
+    const nameInput = screen.getByLabelText(/Full name/i) as HTMLInputElement
     assert(nameInput.getAttribute('aria-invalid') === null, 'untouched valid field should not have aria-invalid')
 
     const submitBtn = screen.getByRole('button', { name: /Submit the piece/i })
@@ -228,29 +230,196 @@ export async function run() {
     assert(alerts.length === 1, `expected a single form-level role="alert", got ${alerts.length}`)
 
     const fileInput = document.querySelector<HTMLInputElement>('#sf-cover')!
-    const file = new File(['dummy'], 'painting.webp', { type: 'image/webp' })
+    // 1. Reject invalid file type
+    const badFile = new File(['plain text'], 'notes.txt', { type: 'text/plain' })
+    await act(async () => {
+      fireEvent.change(fileInput, { target: { files: [badFile] } })
+    })
+    assert(
+      document.querySelector('#sf-cover-err')?.textContent?.includes('JPG, PNG, WEBP, AVIF or GIF'),
+      'invalid MIME type did not display #sf-cover-err',
+    )
+
+    // 2. Reject oversized file (> 4 MB)
+    const hugeFile = new File(['x'], 'huge.png', { type: 'image/png' })
+    Object.defineProperty(hugeFile, 'size', { value: 4 * 1024 * 1024 + 100 })
+    await act(async () => {
+      fireEvent.change(fileInput, { target: { files: [hugeFile] } })
+    })
+    assert(
+      document.querySelector('#sf-cover-err')?.textContent?.includes('over 4 MB'),
+      'oversized file did not display 4 MB error',
+    )
+
+    // 3. Select valid binary cover image
+    const validBytes = new Uint8Array([0x52, 0x49, 0x46, 0x46, 0x24, 0x00, 0x00, 0x00, 0x57, 0x45, 0x42, 0x50])
+    const file = new File([validBytes], 'painting.webp', { type: 'image/webp' })
     await act(async () => {
       fireEvent.change(fileInput, { target: { files: [file] } })
     })
-    assert(document.body.textContent?.includes('not uploaded'), 'selected cover file did not clearly state it is not uploaded')
+    assert(
+      document.querySelector('#sf-cover-status')?.textContent?.includes('Cover ready to upload (painting.webp'),
+      'selected cover file did not display ready-to-upload status',
+    )
 
+    // Fill required fields
     await act(async () => {
-      fireEvent.input(nameInput, { target: { value: 'Alina' } })
+      fireEvent.input(nameInput, { target: { value: 'Alina Javed' } })
     })
     assert(nameInput.getAttribute('aria-invalid') === null, 'correcting field did not clear aria-invalid')
+
+    const emailInput = screen.getByLabelText(/^Email$/i) as HTMLInputElement
+    const titleInput = screen.getByLabelText(/Title of the work/i) as HTMLInputElement
+    const catSelect = screen.getByLabelText(/Category/i) as HTMLSelectElement
+    const workInput = screen.getByLabelText(/Full submission \/ article/i) as HTMLTextAreaElement
+    const origCheck = document.querySelector<HTMLInputElement>('#sf-original')!
+
+    emailInput.value = 'alina@example.test'
+    titleInput.value = 'The Quiet Lantern'
+    catSelect.value = 'Stories'
+    workInput.value = 'Full manuscript text for submission verification.'
+    await act(async () => {
+      fireEvent.input(emailInput, { target: { value: 'alina@example.test' } })
+      fireEvent.input(titleInput, { target: { value: 'The Quiet Lantern' } })
+      fireEvent.change(catSelect, { target: { value: 'Stories' } })
+      fireEvent.input(workInput, { target: { value: 'Full manuscript text for submission verification.' } })
+      fireEvent.click(origCheck)
+    })
+
+    // 4. Test pending state, double-submit prevention, and 503 failure preserving values & file
+    const origFetch = globalThis.fetch
+    const calls: Array<{ url: string; body: FormData }> = []
+    let resolveFirstFetch!: (res: Response) => void
+    globalThis.fetch = ((url: string, init?: RequestInit) => {
+      calls.push({ url: String(url), body: init?.body as FormData })
+      return new Promise<Response>((resolve) => {
+        resolveFirstFetch = resolve
+      })
+    }) as typeof fetch
+
+    await act(async () => {
+      fireEvent.click(submitBtn)
+      // Attempt immediate second click while in-flight
+      fireEvent.click(submitBtn)
+    })
+    assert(calls.length === 1, `double-submit guard failed: expected 1 fetch call, got ${calls.length}`)
+    assert(submitBtn.hasAttribute('disabled') && submitBtn.getAttribute('aria-busy') === 'true', 'submit button not disabled/aria-busy while sending')
+
+    await act(async () => {
+      resolveFirstFetch(
+        new Response(JSON.stringify({ ok: false, error: 'provider-unconfigured' }), {
+          status: 503,
+          headers: { 'Content-Type': 'application/json' },
+        }),
+      )
+    })
+
+    // Must NOT claim "Accepted by the submission system" or "Sent to the desk" on failure
+    assert(!document.body.textContent?.includes('Accepted by the submission system'), 'falsely showed acceptance on 503 failure')
+    assert(!document.body.textContent?.includes('Sent to the desk'), 'falsely showed Sent to the desk on 503 failure')
+    // Must keep form fields and cover selection intact
+    assert(titleInput.value === 'The Quiet Lantern', 'title input was lost on failure')
+    assert(workInput.value.includes('Full manuscript text'), 'work input was lost on failure')
+    assert(document.body.textContent?.includes('Selected cover: painting.webp'), 'selected cover file was lost on failure')
+
+    const failureAlerts = screen.getAllByRole('alert')
+    assert(failureAlerts.length === 1, `expected 1 role="alert" on delivery failure, got ${failureAlerts.length}`)
+    assert(failureAlerts[0].textContent?.includes('unconfigured'), 'failure alert did not explain unconfigured service')
+
+    const draftLink = screen.getByRole('link', { name: /Open email draft in your mail app/i })
+    assert(draftLink.getAttribute('href')?.startsWith('mailto:Verlysemedia.09@gmail.com?'), 'manual fallback link missing mailto href')
+    assert(
+      failureAlerts[0].textContent?.includes('manually attach "painting.webp"'),
+      'manual fallback did not warn that mailto cannot attach local image files automatically',
+    )
+
+    // 5. Retry with preserved values and selected file -> Server acceptance (200)
+    globalThis.fetch = (async (url: string, init?: RequestInit) => {
+      calls.push({ url: String(url), body: init?.body as FormData })
+      return new Response(
+        JSON.stringify({
+          ok: true,
+          accepted: true,
+          attachmentIncluded: true,
+          attachmentName: 'painting.webp',
+        }),
+        { status: 200, headers: { 'Content-Type': 'application/json' } },
+      )
+    }) as typeof fetch
+
+    const retryBtn = screen.getByRole('button', { name: /Retry submission/i })
+    await act(async () => {
+      fireEvent.click(retryBtn)
+    })
+
+    assert(calls.length === 2, 'retry button did not trigger a second fetch call')
+    const sentFormData = calls[1].body
+    assert(sentFormData instanceof FormData, 'outbound submission body was not FormData')
+    const uploadedCover = sentFormData.get('cover') as File | null
+    assert(uploadedCover instanceof File, 'FormData did not include binary File under "cover"')
+    assert(uploadedCover?.name === 'painting.webp', `expected cover filename painting.webp, got ${uploadedCover?.name}`)
+    assert(uploadedCover?.size === validBytes.byteLength, 'uploaded File byte length mismatch')
+
+    assert(document.body.textContent?.includes('Accepted by the submission system'), 'missing accepted screen after 200 ok')
+    assert(document.body.textContent?.includes('Cover image uploaded & attached: painting.webp'), 'missing uploaded cover confirmation')
+
+    globalThis.fetch = origFetch
   })
 
   cleanup()
 
-  await check('contact form: accessible validation and single role="alert"', async () => {
+  await check('contact form: accessible validation, single role="alert", failure preservation, and server acceptance', async () => {
     wrap(<Contact />)
     const sendBtn = screen.getByRole('button', { name: /Seal the letter/i })
     await act(async () => { fireEvent.click(sendBtn) })
     const alerts = screen.getAllByRole('alert')
     assert(alerts.length === 1, `expected 1 alert on Contact form, got ${alerts.length}`)
-    const emailInput = screen.getByLabelText(/Email/i)
+    const emailInput = screen.getByLabelText(/Email/i) as HTMLInputElement
     assert(emailInput.getAttribute('aria-invalid') === 'true', 'Contact email missing aria-invalid="true"')
     assert(emailInput.getAttribute('aria-describedby') === 'cf-email-err', 'Contact email missing aria-describedby')
+
+    const nameInput = screen.getByLabelText(/Your name/i) as HTMLInputElement
+    const subjInput = screen.getByLabelText(/Subject/i) as HTMLInputElement
+    const msgInput = screen.getByLabelText(/The letter itself/i) as HTMLTextAreaElement
+
+    emailInput.value = 'reader@example.test'
+    subjInput.value = 'Editorial inquiry'
+    msgInput.value = 'A note to the editors.'
+    await act(async () => {
+      fireEvent.change(nameInput, { target: { value: 'Reader Name' } })
+      fireEvent.input(emailInput, { target: { value: 'reader@example.test' } })
+      fireEvent.input(subjInput, { target: { value: 'Editorial inquiry' } })
+      fireEvent.input(msgInput, { target: { value: 'A note to the editors.' } })
+    })
+
+    const origFetch = globalThis.fetch
+    const contactBodies: FormData[] = []
+    globalThis.fetch = (async (_url: string, init?: RequestInit) => {
+      contactBodies.push(init?.body as FormData)
+      return new Response(JSON.stringify({ ok: false, error: 'provider-unconfigured' }), {
+        status: 503,
+        headers: { 'Content-Type': 'application/json' },
+      })
+    }) as typeof fetch
+
+    await act(async () => { fireEvent.click(sendBtn) })
+    assert(!document.body.textContent?.includes('Letter received by the server'), 'Contact form falsely showed success on 503')
+    assert(subjInput.value === 'Editorial inquiry', 'Contact subject was lost on 503 failure')
+    assert(screen.getAllByRole('alert').length === 1, 'Contact failure did not render single role="alert"')
+    assert(contactBodies[0] instanceof FormData && contactBodies[0].get('kind') === 'contact', 'Contact form did not send multipart FormData with kind=contact')
+
+    globalThis.fetch = (async (_url: string, init?: RequestInit) => {
+      contactBodies.push(init?.body as FormData)
+      return new Response(JSON.stringify({ ok: true, accepted: true, kind: 'contact' }), {
+        status: 200,
+        headers: { 'Content-Type': 'application/json' },
+      })
+    }) as typeof fetch
+
+    const retryBtn = screen.getByRole('button', { name: /Retry sending letter/i })
+    await act(async () => { fireEvent.click(retryBtn) })
+    assert(document.body.textContent?.includes('Letter received by the server'), 'Contact form did not show accepted screen after 200 ok')
+    globalThis.fetch = origFetch
   })
 
   cleanup()
@@ -339,10 +508,50 @@ export async function run() {
     wrap(<Footer />)
     const footerEl = document.querySelector('footer[aria-label="Footer"]')
     assert(!!footerEl, 'Footer landmark missing')
-    const nlInput = screen.getByLabelText(/Email address for The Verlyse Letter/i)
+    const nlInput = screen.getByLabelText(/Email address for The Verlyse Letter/i) as HTMLInputElement
     assert(nlInput.getAttribute('placeholder') === 'Enter your email address…', 'Newsletter email input missing visible placeholder guidance')
     const nlSubmitBtn = screen.getByRole('button', { name: /Take the letter/i })
     assert(!!nlSubmitBtn, 'Newsletter submit button missing')
+
+    // Newsletter validation & failure/retry/acceptance flow
+    const origFetch = globalThis.fetch
+    await act(async () => {
+      fireEvent.change(nlInput, { target: { value: 'reader@example.test' } })
+    })
+    globalThis.fetch = (async () =>
+      new Response(JSON.stringify({ error: 'not-configured' }), {
+        status: 503,
+        headers: { 'Content-Type': 'application/json' },
+      })) as typeof fetch
+    await act(async () => {
+      fireEvent.click(nlSubmitBtn)
+    })
+    assert(nlInput.value === 'reader@example.test', 'Newsletter cleared email input on 503 failure')
+    assert(!document.body.textContent?.includes("You're on the list."), 'Newsletter falsely claimed subscription on 503 failure')
+    assert(!!screen.getByRole('button', { name: /Retry letter/i }), 'Newsletter did not offer Retry letter button after 503 failure')
+
+    globalThis.fetch = (async () =>
+      new Response(JSON.stringify({ ok: false, error: 'blocked', blocked: true }), {
+        status: 422,
+        headers: { 'Content-Type': 'application/json' },
+      })) as typeof fetch
+    await act(async () => {
+      fireEvent.click(screen.getByRole('button', { name: /Retry letter/i }))
+    })
+    assert(nlInput.value === 'reader@example.test', 'Newsletter cleared email input on 422 spam-block failure')
+    assert(!document.body.textContent?.includes("We’ll send the next letter"), 'Newsletter showed success subtitle on 422 spam-block')
+
+    globalThis.fetch = (async () =>
+      new Response(JSON.stringify({ ok: true }), {
+        status: 201,
+        headers: { 'Content-Type': 'application/json' },
+      })) as typeof fetch
+    await act(async () => {
+      fireEvent.click(screen.getByRole('button', { name: /Retry letter/i }))
+    })
+    assert(nlInput.value === '', 'Newsletter did not clear email input after 201 ok')
+    assert(document.body.textContent?.includes("You're on the list."), 'Newsletter did not show confirmed subscription after 201 ok')
+    globalThis.fetch = origFetch
 
     const specimen = document.querySelector('[data-footer-specimen="verlyse"]')
     assert(!!specimen, 'Fixed Verlyse footer specimen missing')
@@ -380,6 +589,15 @@ export async function run() {
     const view = wrap(<StringTuneProvider />)
     view.unmount()
     assert(!isStringTuneRunning(), 'StringTune remained running after provider unmount')
+    assert(shouldSuspendStringTune('/room') === true, 'StringTune should suspend on /room')
+    assert(resolveSubmitEndpoint('verlysemedia.kesug.com') === 'https://verlyse-react.vercel.app/api/submit', 'resolveSubmitEndpoint did not map kesug.com to Vercel API')
+    assert(resolveSubmitEndpoint('localhost') === '/api/submit', 'resolveSubmitEndpoint did not map localhost to /api/submit')
+    assert(resolveContactEndpoint('verlysemedia.kesug.com') === 'https://verlyse-react.vercel.app/api/submit', 'resolveContactEndpoint did not map kesug.com to Vercel API')
+    assert(selectArchiveArticles(null).length === MAX_ARCHIVE_PLATES && MAX_ARCHIVE_PLATES === 9, 'SpatialArchive did not cap cover textures to curated 9-plate subset')
+
+    const magView = wrap(<Magnetic><span>Hover target</span></Magnetic>)
+    assert(!magView.container.innerHTML.includes('will-change-transform'), 'Magnetic applied persistent will-change-transform at rest')
+    magView.unmount()
   })
 
   const failed = results.filter((r) => !r.ok)

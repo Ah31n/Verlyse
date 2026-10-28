@@ -28,6 +28,80 @@ export function SectionHead({
   )
 }
 
+/* ---------- R09 · THE CHAPTER OPENER ----------------------------------
+ * The single owner for how a section announces itself across the
+ * publication. Replaces the ad-hoc "mono kicker + h2" that each page
+ * had hand-rolled, so every route opens with the same printed-journal
+ * masthead: a brass numeral in the gutter, a double rule, an oversized
+ * Cormorant title with one italic accent word, and a deck held to a
+ * reading measure.
+ *
+ * `title` accepts a ReactNode so a page can mark its accent word with
+ * <em>, which the .chapter-title rule renders in italic brass.
+ * -------------------------------------------------------------------- */
+export function ChapterOpener({
+  num,
+  label,
+  title,
+  deck,
+  aside,
+  as: As = 'h2',
+  id,
+  className = '',
+}: {
+  /** Section numeral, e.g. "03" — set in the left gutter on desktop. */
+  num?: string
+  /** Short standfirst above the title, e.g. "The feed · Issue № 01". */
+  label?: string
+  title: ReactNode
+  deck?: ReactNode
+  /** Optional right-aligned counter, e.g. "21 folios". */
+  aside?: ReactNode
+  as?: 'h1' | 'h2'
+  id?: string
+  className?: string
+}) {
+  return (
+    <Reveal as="header" className={`chapter ${className}`}>
+      {num && (
+        <span aria-hidden="true" className="chapter-num mb-3 lg:mb-0">
+          § {num}
+        </span>
+      )}
+      <span aria-hidden="true" className="chapter-rule" />
+      {/* running head: the label and its counter share one line, the way a
+          printed page carries folio and section together. */}
+      {(label || aside) && (
+        <div className="mt-5 flex flex-wrap items-baseline justify-between gap-x-8 gap-y-1.5 md:mt-6">
+          {label && (
+            <p className="font-mono text-[9px] uppercase tracking-[0.34em] text-gold-lit/90 md:text-[10px]">
+              {label}
+            </p>
+          )}
+          {aside && (
+            <p className="font-mono text-[9px] uppercase tracking-[0.26em] text-ivory/65">
+              {aside}
+            </p>
+          )}
+        </div>
+      )}
+      <As id={id} className="chapter-title mt-3.5">
+        {title}
+      </As>
+      {deck && <p className="chapter-deck mt-5 md:mt-6">{deck}</p>}
+    </Reveal>
+  )
+}
+
+/* ---------- R09 · the mark that closes a chapter ---------- */
+export function ChapterClose({ mark = '✦', className = '' }: { mark?: string; className?: string }) {
+  return (
+    <div aria-hidden="true" className={`chapter-close ${className}`}>
+      <span className="text-[11px] leading-none">{mark}</span>
+    </div>
+  )
+}
+
 /* ---------- Meta row: category ✦ author ✦ reading time ✦ date ---------- */
 export function MetaRow({ category, author, readingTime, date, className = '' }: { category: string; author?: string; readingTime?: string; date?: string; className?: string }) {
   return (

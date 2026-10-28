@@ -35,7 +35,12 @@ export default {
         wine: { DEFAULT: '#5C1224', deep: '#3B0D17', ink: '#2E0913', night: '#1C1C1C' },
         ivory: '#F8F6F2',
         cream: '#EFE8DD',
-        gold: '#B89146',
+        /* R09 — '#B89146' stays the Verlyse gold for rules, borders and seals.
+           'lit' is the approved Record-5 antique brass, introduced on /articles
+           for the Desk-pick badge. It is the token for TEXT on oxblood: the base
+           gold cannot reach WCAG AA 4.5:1 on wine #5C1224 even at full opacity
+           (4.58:1), while lit clears it from 0.75 up. */
+        gold: { DEFAULT: '#B89146', lit: '#D9B978' },
         charcoal: '#1C1C1C',
       },
       fontFamily: {

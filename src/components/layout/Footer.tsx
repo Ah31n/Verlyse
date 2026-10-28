@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom'
-import { useState, type FormEvent } from 'react'
+import { useRef, useState, type FormEvent } from 'react'
 import { BRAND, LEDGER } from '../../data/content'
 import Reveal from '../ui/Reveal'
 import { UnderlineLink } from '../ui/primitives'
@@ -35,44 +35,82 @@ export function resolveNewsletterEndpoint(hostname?: string): string {
 }
 
 function Newsletter() {
+  const inFlightRef = useRef(false)
   const [email, setEmail] = useState('')
   const [sending, setSending] = useState(false)
   const [status, setStatus] = useState<{ kind: 'ok' | 'dup' | 'err'; text: string } | null>(null)
+
+  const describeNewsletterError = (httpStatus: number, code?: string, blocked?: boolean): string => {
+    if (blocked || code === 'blocked') {
+      return 'This address could not be added — the list guards itself against spam. Your address is still in the field above if you wish to try another.'
+    }
+    if (code === 'not-configured' || httpStatus === 503) {
+      return 'The newsletter service is currently unconfigured on this deployment — your address is preserved above so you can retry or write to the desk.'
+    }
+    if (code === 'too-many-requests' || httpStatus === 429) {
+      return 'Too many subscription attempts in a short window — please wait a moment and retry.'
+    }
+    if (code === 'timeout' || httpStatus === 504) {
+      return 'The newsletter service timed out — your address is preserved above so you can retry.'
+    }
+    return 'The letter could not be sent — your address is preserved above so you can retry in a moment.'
+  }
 
   /** Deliver the address to the desk's letter list — the Vercel serverless
       function (never an API key in the client) adds it to the subscriber list. */
   const subscribe = async (e: FormEvent) => {
     e.preventDefault()
+    if (inFlightRef.current || sending) return
     const v = email.trim()
     if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v)) {
       setStatus({ kind: 'err', text: 'Please enter a valid email address.' })
       return
     }
-    if (sending) return
+    inFlightRef.current = true
     setSending(true)
     setStatus(null)
     try {
       const res = await fetch(resolveNewsletterEndpoint(), {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
         body: JSON.stringify({ email: v }),
       })
-      const data = await res.json().catch(() => ({}))
-      if (res.ok && data.ok) {
+      const data = (await res.json().catch(() => ({}))) as {
+        ok?: boolean
+        duplicate?: boolean
+        blocked?: boolean
+        error?: string
+      }
+      if (res.ok && data.ok === true && !data.blocked) {
         setStatus({
-          kind: data.duplicate || data.blocked ? 'dup' : 'ok',
-          text: data.duplicate ? "You're already on the list." : data.blocked ? 'This address could not be added — the list guards itself against spam.' : "You're on the list.",
+          kind: data.duplicate ? 'dup' : 'ok',
+          text: data.duplicate ? "You're already on the list." : "You're on the list.",
         })
         setEmail('')
       } else {
-        setStatus({ kind: 'err', text: 'The letter could not be sent — try again in a moment.' })
+        setStatus({
+          kind: 'err',
+          text: describeNewsletterError(res.status, data.error, data.blocked),
+        })
       }
     } catch {
-      setStatus({ kind: 'err', text: 'The letter could not be sent — try again in a moment.' })
+      setStatus({
+        kind: 'err',
+        text: describeNewsletterError(0),
+      })
     } finally {
+      inFlightRef.current = false
       setSending(false)
     }
   }
+
+  const newsletterState = sending
+    ? 'sending'
+    : status?.kind === 'ok' || status?.kind === 'dup'
+      ? 'accepted'
+      : status?.kind === 'err'
+        ? 'failed'
+        : 'idle'
 
   return (
     <div {...spotlight()} className="st-spotlit grid grid-cols-1 gap-8 p-4 -m-4 lg:grid-cols-12 lg:items-end lg:gap-12">
@@ -89,7 +127,12 @@ function Newsletter() {
         >
           Email address for The Verlyse Letter
         </label>
-        <form onSubmit={subscribe} noValidate className="flex w-full flex-col gap-3 border-b border-gold/40 pb-1.5 sm:flex-row sm:items-stretch">
+        <form
+          onSubmit={subscribe}
+          noValidate
+          data-newsletter-state={newsletterState}
+          className="flex w-full flex-col gap-3 border-b border-gold/40 pb-1.5 sm:flex-row sm:items-stretch"
+        >
           <input
             id="nl-email"
             type="email"
@@ -98,7 +141,8 @@ function Newsletter() {
             placeholder="Enter your email address…"
             autoComplete="email"
             disabled={sending}
-            className="min-w-0 flex-1 bg-transparent px-1 py-2 font-serif text-lg italic text-ivory outline-none placeholder:text-ivory/40 disabled:opacity-60"
+            aria-invalid={status?.kind === 'err' ? 'true' : undefined}
+            className="min-w-0 flex-1 bg-transparent px-1 py-2 font-serif text-lg italic text-ivory outline-none placeholder:text-ivory/60 disabled:opacity-60"
           />
           <button
             type="submit"
@@ -106,11 +150,11 @@ function Newsletter() {
             aria-busy={sending}
             className="btn btn-gold shrink-0 whitespace-nowrap !px-10 disabled:pointer-events-none disabled:opacity-60"
           >
-            Take the letter
+            {sending ? 'Sending…' : status?.kind === 'err' ? 'Retry letter' : 'Take the letter'}
           </button>
         </form>
         {status && (
-          <div role="status" className="mt-4 space-y-1.5">
+          <div role={status.kind === 'err' ? 'alert' : 'status'} className="mt-4 space-y-1.5">
             <p className={`font-mono text-[10px] uppercase tracking-[0.28em] ${status.kind === 'err' ? 'text-[#E8A2A2]' : 'text-[#A8C9A2]'}`}>
               {status.text}
             </p>
@@ -156,7 +200,7 @@ export default function Footer() {
           <Reveal>
             <div className="grid grid-cols-1 items-end gap-10 lg:grid-cols-12 lg:gap-12">
               <div className="lg:col-span-7">
-                <p className="mb-4 font-mono text-[10px] uppercase tracking-[0.3em] text-gold/80">
+                <p className="mb-4 font-mono text-[10px] uppercase tracking-[0.3em] text-gold-lit/85">
                   Colophon · Issue № {LEDGER.issueNo}
                 </p>
                 <p className="max-w-[22ch] font-serif text-[clamp(2.2rem,4.8vw,4.1rem)] font-light leading-[1.06] tracking-[-0.015em] text-ivory">
@@ -229,16 +273,16 @@ export default function Footer() {
                     <li key={to}>
                       <Link to={to} className="group relative inline-flex items-center gap-2 font-serif text-lg font-light text-ivory/85 no-underline transition-colors hover:text-gold max-[767px]:py-1">
                         <span>{label}</span>
-                        <span aria-hidden="true" className="font-mono text-xs text-gold/0 transition-all duration-300 group-hover:translate-x-1 group-hover:text-gold/80">→</span>
+                        <span aria-hidden="true" className="font-mono text-xs text-gold/0 transition-all duration-300 group-hover:translate-x-1 group-hover:text-gold-lit/85">→</span>
                         <span aria-hidden="true" className="absolute -bottom-0.5 left-0 h-px w-full origin-left scale-x-0 bg-gold/60 transition-transform duration-500 ease-out group-hover:scale-x-100" />
                       </Link>
                     </li>
                   ))}
                 </ul>
                 {col.label === 'The desk' && (
-                  <p className="mt-6 border-t border-white/10 pt-4 font-mono text-[9px] uppercase leading-[1.9] tracking-[0.22em] text-white/45">
+                  <p className="mt-6 border-t border-white/10 pt-4 font-mono text-[9px] uppercase leading-[1.9] tracking-[0.22em] text-white/60">
                     Issue № {LEDGER.issueNo} · {LEDGER.features} Folios
-                    <span className="mt-1 block text-gold/80">Submissions open for Issue № 02</span>
+                    <span className="mt-1 block text-gold-lit/85">Submissions open for Issue № 02</span>
                   </p>
                 )}
               </Reveal>
@@ -247,7 +291,7 @@ export default function Footer() {
         </div>
 
         {/* Small print — the imprint */}
-        <div className="mt-16 flex flex-wrap items-center justify-between gap-4 border-t border-white/10 pt-6 font-mono text-[10px] uppercase tracking-[0.28em] text-white/50">
+        <div className="mt-16 flex flex-wrap items-center justify-between gap-4 border-t border-white/10 pt-6 font-mono text-[10px] uppercase tracking-[0.28em] text-white/65">
           <p>© {new Date().getFullYear()} Verlyse Media · {BRAND.handle}</p>
           <p className="hidden md:inline">{LEDGER.features} features · {LEDGER.creators} creators · one room</p>
           <button
