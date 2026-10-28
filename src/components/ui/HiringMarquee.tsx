@@ -92,7 +92,7 @@ export default function HiringMarquee({ className = '' }: { className?: string }
 
           <Reveal delay={0.18}>
             <div className="border-l border-gold/45 bg-[#F8F6F2]/[0.03] py-4 pl-5 pr-4">
-              <p className="font-mono text-[9px] uppercase tracking-[0.28em] text-gold/90">
+              <p className="font-mono text-[9px] uppercase tracking-[0.28em] text-gold-lit/90">
                 Open to new voices
               </p>
               <p className="mt-2 max-w-[44ch] text-sm leading-[1.75] text-white/70">
@@ -120,7 +120,7 @@ export default function HiringMarquee({ className = '' }: { className?: string }
               <span key={item.text} className="inline-flex items-center gap-6">
                 {renderPhrase(item)}
                 {i < MARQUEE_PHRASES.length - 1 && (
-                  <span className="font-serif text-base text-gold/65">✦</span>
+                  <span className="font-serif text-base text-gold-lit/80">✦</span>
                 )}
               </span>
             ))}
@@ -137,7 +137,7 @@ export default function HiringMarquee({ className = '' }: { className?: string }
                   {MARQUEE_PHRASES.map((item) => (
                     <span key={`${copyIdx}-${item.text}`} className="inline-flex items-center gap-8 whitespace-nowrap md:gap-12">
                       {renderPhrase(item)}
-                      <span className="font-serif text-lg text-gold/65">✦</span>
+                      <span className="font-serif text-lg text-gold-lit/80">✦</span>
                     </span>
                   ))}
                 </div>

@@ -157,7 +157,7 @@ export default function Categories() {
               <span className="relative">The <FloralWord variant="iris">wings</FloralWord></span>
             </h1>
           </div>
-          <p className="mt-4 font-mono text-[10px] uppercase tracking-[0.34em] text-gold/85">
+          <p className="mt-4 font-mono text-[10px] uppercase tracking-[0.34em] text-gold-lit/85">
             The wings — seven departments of Verlyse Media
           </p>
           {/* A live status line, not a section heading. As an <h2> it put a
@@ -189,7 +189,7 @@ export default function Categories() {
                 transition={{ duration: 0.9, ease: [0.16, 1, 0.3, 1], delay: Math.min(i * 0.05, 0.3) }}
                 className={i === 0 ? 'col-span-2 md:col-span-1' : ''}
               >
-                <div className={`flex h-full flex-col items-center transition-all duration-700 ${active && !isActive ? 'opacity-35' : 'opacity-100'}`}>
+                <div className={`flex h-full flex-col items-center transition-all duration-700 ${active && !isActive ? 'opacity-85' : 'opacity-100'}`}>
                   <button
                     type="button"
                     onClick={() => select(c.name)}
@@ -231,7 +231,7 @@ export default function Categories() {
                     <div className="relative flex flex-col items-center">
                       <span
                         className={`font-mono text-[8px] uppercase tracking-[0.3em] ${
-                          isPlate ? 'text-[#7C6338]' : 'text-gold'
+                          isPlate ? 'text-[#7C6338]' : 'text-gold-lit'
                         }`}
                       >
                         Wing {['I', 'II', 'III', 'IV', 'V', 'VI', 'VII'][i]}
@@ -256,8 +256,8 @@ export default function Categories() {
                         {c.count} folio{c.count === 1 ? '' : 's'}
                       </span>
                       <span
-                        className={`mt-1.5 font-mono text-[7px] uppercase tracking-[0.22em] ${
-                          isPlate ? 'text-[#7C6338]' : 'text-gold/65 group-hover:text-gold'
+                        className={`mt-1.5 font-mono text-[8px] uppercase tracking-[0.22em] ${
+                          isPlate ? 'text-[#7C6338]' : 'text-gold-lit/80 group-hover:text-gold'
                         }`}
                       >
                         {isActive ? 'Showing room ↓' : `Lead · № ${leadFolioNum}`}
@@ -293,28 +293,33 @@ export default function Categories() {
                         : 'border-white/10 bg-[#1E070F]/65 p-5 hover:border-gold/30 md:p-6'
                   }`}
                 >
-                  <div className="flex flex-wrap items-center justify-between gap-4 border-b border-white/10 pb-4">
-                    <div className="flex flex-wrap items-center gap-3">
-                      <span className="font-mono text-[9px] uppercase tracking-[0.3em] text-gold">
-                        Wing {['I', 'II', 'III', 'IV', 'V', 'VI', 'VII'][wingIdx]}
-                      </span>
-                      <span aria-hidden="true" className="text-base leading-none" style={{ color: c.accent }}>
-                        {c.motif}
-                      </span>
-                      <h2 className="font-serif text-2xl font-normal italic text-ivory">
+                  {/* R10 — the departmental plate: the wing numeral is set as a
+                      printed department mark, not a 9px label beside the name. */}
+                  <div className="flex flex-wrap items-start gap-x-6 gap-y-3 border-b border-gold/20 pb-5">
+                    <span
+                      aria-hidden="true"
+                      className="font-serif text-[clamp(2.1rem,4vw,3.2rem)] font-light leading-[0.8] tracking-[-0.03em] text-gold-lit/45"
+                    >
+                      {['I', 'II', 'III', 'IV', 'V', 'VI', 'VII'][wingIdx]}
+                    </span>
+                    <div className="min-w-0 flex-1">
+                      <p className="font-mono text-[9px] uppercase tracking-[0.3em] text-gold-lit/90">
+                        Wing {['I', 'II', 'III', 'IV', 'V', 'VI', 'VII'][wingIdx]} · {folioWord(c.count)}
+                      </p>
+                      <h2 className="mt-1.5 flex items-baseline gap-2.5 font-serif text-[clamp(1.6rem,3vw,2.3rem)] font-normal italic leading-tight text-ivory">
                         {c.name}
+                        <span aria-hidden="true" className="text-base not-italic leading-none" style={{ color: c.accent }}>
+                          {c.motif}
+                        </span>
                       </h2>
-                      <span className="font-mono text-[9px] uppercase tracking-[0.26em] text-white/50">
-                        · {folioWord(c.count)}
-                      </span>
                     </div>
-                    <p className="max-w-[54ch] font-serif text-sm italic text-ivory/65">
+                    <p className="max-w-[46ch] font-serif text-sm italic leading-[1.7] text-ivory/70">
                       {c.blurb}
                     </p>
                   </div>
 
                   <ul
-                    className="mt-5 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4"
+                    className="mt-6 grid grid-cols-2 gap-x-4 gap-y-6 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5"
                     aria-label={`Folios in the ${c.name} wing`}
                   >
                     {items.map(({ a, i }) => {
@@ -330,28 +335,30 @@ export default function Categories() {
                             to={`/article/${a.id}`}
                             tabIndex={ghosted ? -1 : undefined}
                             aria-label={`Folio ${folio} — ${a.title}, ${c.name}`}
-                            className="group flex h-full items-center gap-3.5 border border-white/10 bg-black/25 p-3 no-underline transition-all duration-300 hover:border-gold/55 hover:bg-gold/[0.05] focus-visible:outline focus-visible:outline-2 focus-visible:outline-gold/70"
+                            className="group flex h-full flex-col no-underline focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-gold/70"
                           >
-                            <img
-                              src={a.thumbnail ?? a.cover}
-                              alt=""
-                              width={48}
-                              height={56}
-                              loading="lazy"
-                              decoding="async"
-                              onError={(e) => handleImgError(e, a.title, folioNoOf(a.id))}
-                              className="h-14 w-12 shrink-0 border border-white/15 object-cover"
-                            />
-                            <span className="min-w-0 flex-1">
-                              <span className="block font-mono text-[8px] uppercase tracking-[0.28em] text-gold/90">
-                                № {folio} · {a.readingTime}
-                              </span>
-                              <span className="mt-1 block truncate font-serif text-base leading-[1.2] text-ivory transition-colors duration-300 group-hover:text-gold">
-                                {a.title}
-                              </span>
-                              <span className="mt-1 block truncate font-mono text-[8px] uppercase tracking-[0.22em] text-white/55">
-                                {c.name} · {author?.name}
-                              </span>
+                            {/* R10 — the mounted plate: the cover is the content,
+                                shown whole on a cream pad, never cropped. */}
+                            <span className="block border border-white/[0.12] bg-[#F1EDE6] p-1.5 transition-all duration-500 group-hover:border-gold/60 group-hover:shadow-[0_14px_32px_rgba(0,0,0,0.42)]">
+                              <img
+                                src={a.cover}
+                                alt=""
+                                width={320}
+                                height={400}
+                                loading="lazy"
+                                decoding="async"
+                                onError={(e) => handleImgError(e, a.title, folioNoOf(a.id))}
+                                className="block aspect-[4/5] w-full object-contain"
+                              />
+                            </span>
+                            <span className="mt-2.5 block font-mono text-[8px] uppercase tracking-[0.28em] text-gold-lit/90">
+                              № {folio} · {a.readingTime}
+                            </span>
+                            <span className="mt-1 block font-serif text-[0.98rem] leading-[1.25] text-ivory transition-colors duration-300 group-hover:text-gold">
+                              {a.title}
+                            </span>
+                            <span className="mt-1 block truncate font-mono text-[8px] uppercase tracking-[0.22em] text-white/65">
+                              {author?.name}
                             </span>
                           </Link>
                         </li>

@@ -2,7 +2,7 @@ import { useEffect, useRef, useMemo, useState, Suspense } from 'react'
 import { Canvas, useFrame, useThree, useLoader } from '@react-three/fiber'
 import * as THREE from 'three'
 import { useReducedMotion } from 'motion/react'
-import { ARTICLES } from '../../data/content'
+import { ARTICLES, type Article } from '../../data/content'
 import { useWebGLSupport } from '../../lib/three/useWebGLSupport'
 import { hash01 } from '../../lib/three/seed'
 import { spatialIntensity, type SpatialState } from '../../lib/three/spatialState'
@@ -32,19 +32,28 @@ import { DUR } from '../../lib/motion'
 const WINE_DEEP = '#3B0D17'
 const GOLD = '#B89146'
 const IVORY = '#F8F6F2'
+export const MAX_ARCHIVE_PLATES = 9
 
 /** Curated subset of canonical covers to texture a handful of planes (lazy, low cost). */
-function coverUrlFor(index: number): string {
-  const a = ARTICLES[index % ARTICLES.length]
-  return a?.cover ?? '/img/poster-3-13-1.webp'
+export function selectArchiveArticles(selectedId: string | null): Article[] {
+  const base = ARTICLES.slice(0, MAX_ARCHIVE_PLATES)
+  if (selectedId && !base.some((a) => a.id === selectedId)) {
+    const sel = ARTICLES.find((a) => a.id === selectedId)
+    if (sel) {
+      const next = base.slice(0, MAX_ARCHIVE_PLATES - 1)
+      next.splice(Math.floor(MAX_ARCHIVE_PLATES / 2), 0, sel)
+      return next
+    }
+  }
+  return base
 }
 
 /** A standing plate textured with its canonical cover, with editorial depth falloff. */
-function CoverPlane({ index, total, selected, intensity }: { index: number; total: number; selected: boolean; intensity: number }) {
-  const url = coverUrlFor(index)
+function CoverPlane({ article, index, total, selected, intensity }: { article: Article; index: number; total: number; selected: boolean; intensity: number }) {
+  const url = article.cover ?? '/img/poster-3-13-1.webp'
   const tex = useLoader(THREE.TextureLoader, url)
   useEffect(() => () => { tex.dispose() }, [tex])
-  const id = ARTICLES[index % ARTICLES.length]?.id ?? `p${index}`
+  const id = article.id ?? `p${index}`
   const seed = hash01(id)
   const t = total > 1 ? index / (total - 1) : 0
   const baseRay = 7.2 + seed * 3.2
@@ -202,6 +211,7 @@ function Rig({ active, state, selectedId }: { active: boolean; state: SpatialSta
 function Scene({ active, state, selectedId }: { active: boolean; state: SpatialState; selectedId: string | null }) {
   const intensity = spatialIntensity(state)
   const light = Math.max(intensity, 0.28)
+  const plates = useMemo(() => selectArchiveArticles(selectedId), [selectedId])
   return (
     <>
       <color attach="background" args={['#000000']} />
@@ -214,8 +224,8 @@ function Scene({ active, state, selectedId }: { active: boolean; state: SpatialS
       <pointLight position={[0, 1.5, 2]} intensity={0.6 * light} color={GOLD} distance={18} />
       {/* cool counter-fill to keep the wine field readable, never neon */}
       <hemisphereLight args={[IVORY, WINE_DEEP, 0.18 * light]} />
-      {ARTICLES.map((a, i) => (
-        <CoverPlane key={a.id} index={i} total={ARTICLES.length} selected={selectedId === a.id} intensity={intensity} />
+      {plates.map((a, i) => (
+        <CoverPlane key={a.id} article={a} index={i} total={plates.length} selected={selectedId === a.id} intensity={intensity} />
       ))}
       <SignalThread intensity={intensity} />
       <Rig active={active} state={state} selectedId={selectedId} />
@@ -235,32 +245,43 @@ export default function SpatialArchive({ selectedId = null, state = 'threshold' 
   const { supported } = useWebGLSupport()
   const [mounted, setMounted] = useState(false)
   const wrap = useRef<HTMLDivElement>(null)
-  const [active, setActive] = useState(false)
+  const [activated, setActivated] = useState(false)
+  const [inView, setInView] = useState(false)
   const [tabVisible, setTabVisible] = useState(true)
 
   useEffect(() => setMounted(true), [])
 
-  // Gate the scene to the hero region + visible tab.
+  // Gate the scene to the hero/archive region + visible tab (bidirectional).
   useEffect(() => {
     if (!mounted) return
     const el = wrap.current
     if (!el) return
-    let done = false
     const check = () => {
-      if (done) return
       const r = el.getBoundingClientRect()
-      if (r.top < window.innerHeight * 1.05 && r.bottom > -120) {
-        done = true
-        setActive(true)
-      }
+      const visible = r.top < window.innerHeight * 1.05 && r.bottom > -120
+      setInView(visible)
+      if (visible) setActivated(true)
     }
     check()
     const t = setTimeout(check, 400)
+    let io: IntersectionObserver | null = null
+    if ('IntersectionObserver' in window) {
+      io = new IntersectionObserver(
+        (entries) => {
+          const hit = entries.some((entry) => entry.isIntersecting)
+          setInView(hit)
+          if (hit) setActivated(true)
+        },
+        { rootMargin: '160px 0px' },
+      )
+      io.observe(el)
+    }
     window.addEventListener('scroll', check, { passive: true })
     window.addEventListener('resize', check)
     const onVis = () => setTabVisible(document.visibilityState === 'visible')
     document.addEventListener('visibilitychange', onVis)
     return () => {
+      io?.disconnect()
       clearTimeout(t)
       window.removeEventListener('scroll', check)
       window.removeEventListener('resize', check)
@@ -269,12 +290,18 @@ export default function SpatialArchive({ selectedId = null, state = 'threshold' 
   }, [mounted])
 
   const show = mounted && supported && !reduce && tabVisible && state !== 'quiet'
+  const running = show && inView
 
   return (
-    <div ref={wrap} className="pointer-events-none absolute inset-0 z-[1]" aria-hidden="true">
-      {show && active ? (
+    <div
+      ref={wrap}
+      data-spatial-archive={running ? 'active' : activated ? 'paused' : 'idle'}
+      className="pointer-events-none absolute inset-0 z-[1]"
+      aria-hidden="true"
+    >
+      {show && activated ? (
         <Canvas
-          frameloop="always"
+          frameloop={running ? 'always' : 'demand'}
           dpr={[1, 1.5]}
           style={{ position: 'absolute', inset: 0 }}
           /*
@@ -295,7 +322,7 @@ export default function SpatialArchive({ selectedId = null, state = 'threshold' 
           camera={{ position: [0, 0.2, 13.5], fov: 42, near: 0.1, far: 40 }}
         >
           <Suspense fallback={null}>
-            <Scene active={active} state={state} selectedId={selectedId} />
+            <Scene active={running} state={state} selectedId={selectedId} />
           </Suspense>
         </Canvas>
       ) : null}

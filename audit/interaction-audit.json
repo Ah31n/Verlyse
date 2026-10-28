@@ -56,9 +56,21 @@
       "status": "PASS",
       "detail": "submitA11y=true, creatorQuotesOk=true"
     },
+    "submit-and-contact-binary-delivery": {
+      "status": "PASS",
+      "detail": "{\"liveEndpoint503Ok\":true,\"multipartBoundary\":true,\"hasPngMagicBytes\":true,\"hasFilename\":true,\"contactMultipart\":true,\"failedState\":\"failed\",\"preservedCover\":true,\"noFalseSent\":true,\"accepted\":true,\"contactAccepted\":true,\"nlFailedPreserved\":true,\"nlAccepted\":true}"
+    },
     "hiring-marquee-and-roster-removal": {
       "status": "PASS",
       "detail": "{\"ctaPresent\":true,\"targetBlank\":true,\"relSafe\":true,\"noRemovedTeam\":true,\"noPlaceholderLabels\":true,\"hasRoles\":true,\"hasHeadline\":true}"
+    },
+    "archive-wall-whole-covers-and-keyboard": {
+      "status": "PASS",
+      "detail": "{\"covers\":18,\"worstVisibleFraction\":1,\"objectFit\":\"contain\",\"largestPaperMargin\":0,\"wholeCovers\":true,\"tabStopsAtRest\":21,\"totalFolios\":21,\"allFoliosTabbable\":true,\"hoverKeepsTabStops\":true,\"searchCaretKept\":true,\"total\":21,\"reachable\":1,\"hiddenFromAT\":20,\"reachableIsMatch\":true,\"statusAgrees\":true}"
+    },
+    "archive-wall-contrast-and-visible-provenance": {
+      "status": "PASS",
+      "detail": "{\"checked\":91,\"failures\":[],\"inkMarks\":2,\"ariaMarks\":2}"
     },
     "footer-static-specimen-and-no-tg-residue": {
       "status": "PASS",

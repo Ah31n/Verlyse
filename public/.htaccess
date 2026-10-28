@@ -42,9 +42,9 @@ AddDefaultCharset UTF-8
   Header always set Referrer-Policy "strict-origin-when-cross-origin"
   Header always set Strict-Transport-Security "max-age=31536000; includeSubDomains"
   Header always set Permissions-Policy "geolocation=(), camera=(), microphone=(), payment=(), usb=(), bluetooth=(), magnetometer=(), gyroscope=(), accelerometer=(), interest-cohort=()"
-  # form-action allows formsubmit.co so that the no-JS <form action> fallback
-  # on /submit and /contact keeps working; the JS path uses connect-src.
-  Header always set Content-Security-Policy "default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self'; connect-src 'self' https://verlyse-react.vercel.app https://formsubmit.co; frame-ancestors 'self'; base-uri 'self'; form-action 'self' https://formsubmit.co; object-src 'none'; upgrade-insecure-requests"
+  # form-action and connect-src permit same-origin and the Vercel serverless API
+  # boundary (/api/submit and /api/newsletter) plus manual mailto: drafts.
+  Header always set Content-Security-Policy "default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self'; connect-src 'self' https://verlyse-react.vercel.app; frame-ancestors 'self'; base-uri 'self'; form-action 'self' https://verlyse-react.vercel.app mailto:; object-src 'none'; upgrade-insecure-requests"
 
   # ---- Caching -----------------------------------------------------------
   # Hashed build assets and fonts are immutable; non-hashed images revalidate

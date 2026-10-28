@@ -139,7 +139,7 @@ export default function SavedDrawer() {
               </button>
             </div>
 
-            <p className="mt-4 font-mono text-[9px] uppercase tracking-[0.26em] text-white/45">
+            <p className="mt-4 font-mono text-[9px] uppercase tracking-[0.26em] text-white/60">
               kept {saved.length} of {LEDGER.features} · this list lives on your device, not on a server
             </p>
 
@@ -192,7 +192,7 @@ export default function SavedDrawer() {
                     setSaved([])
                     window.dispatchEvent(new CustomEvent('verlyse:saved-updated'))
                   }}
-                  className="font-mono text-[9px] uppercase tracking-[0.26em] text-white/50 underline-offset-4 transition-colors hover:text-ivory hover:underline"
+                  className="font-mono text-[9px] uppercase tracking-[0.26em] text-white/65 underline-offset-4 transition-colors hover:text-ivory hover:underline"
                 >
                   Clear the bookmarks
                 </button>

@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { Link, useSearchParams } from 'react-router-dom'
-import { spotlight, spotlitGlide } from '../lib/stringTune/attrs'
+import { spotlitGlide } from '../lib/stringTune/attrs'
 import { motion } from 'motion/react'
 import { useSeo } from '../hooks/useSeo'
 import { getAuthor, ARTICLES, LEDGER, sortArticles, stampDate, isEditorsPick, folioNoOf, articleSearchText, SORTS, type SortKey } from '../data/content'
@@ -73,7 +73,6 @@ function Archive() {
   const [sort, setSort] = useState<SortKey | 'registry'>(
     SORT_KEYS.has(initialSort) ? initialSort : 'registry',
   )
-  const [selId, setSelId] = useState<string>(ARTICLES[0].id)
   const [busy, setBusy] = useState(false)
   const railRef = useRef<HTMLDivElement>(null)
 
@@ -107,11 +106,6 @@ function Archive() {
       .map((a) => a.id)
   }, [ordered, query, cat])
 
-  /* keep the selection inside the visible set */
-  useEffect(() => {
-    if (visibleIds.length > 0 && !visibleIds.includes(selId)) setSelId(visibleIds[0])
-  }, [visibleIds, selId])
-
   const filtered = visibleIds.length > 0
 
   /* a momentary "reading the index" state while a query settles — honest,
@@ -123,25 +117,39 @@ function Archive() {
     return () => clearTimeout(t)
   }, [query, cat, sort])
 
+  /* RETURN — one reset, shared by Escape, the empty state and the ledger,
+     so the shelf can only come back to rest in one way. */
+  const resetShelf = () => {
+    setCat('All')
+    setQuery('')
+    setSort('registry')
+  }
+
   const moveTo = (id: string) => {
-    setSelId(id)
     document.getElementById(`folio-${id}`)?.focus()
   }
 
+  /* The shelf's own keys. The cursor is read from whatever folio actually
+     holds focus — never from a hover — so a mouse passing over the shelf
+     can no longer move the keyboard's place in it. */
   const onKeyDown = (e: React.KeyboardEvent) => {
     const n = visibleIds.length
     if (n === 0) return
-    const pos = Math.max(0, visibleIds.indexOf(selId))
+    const active = typeof document === 'undefined' ? null : document.activeElement
+    const activeId = active?.id?.startsWith('folio-') ? active.id.slice('folio-'.length) : null
+    /* −1 means the shelf is entered from outside: the first key lands on
+       the nearest end rather than skipping the folio it should open on. */
+    const pos = activeId ? visibleIds.indexOf(activeId) : -1
     switch (e.key) {
       case 'ArrowRight':
       case 'ArrowDown':
         e.preventDefault()
-        moveTo(visibleIds[(pos + 1) % n])
+        moveTo(pos < 0 ? visibleIds[0] : visibleIds[(pos + 1) % n])
         break
       case 'ArrowLeft':
       case 'ArrowUp':
         e.preventDefault()
-        moveTo(visibleIds[(pos - 1 + n) % n])
+        moveTo(pos < 0 ? visibleIds[n - 1] : visibleIds[(pos - 1 + n) % n])
         break
       case 'Home':
         e.preventDefault()
@@ -155,13 +163,22 @@ function Archive() {
         /* RETURN — clear filter and search, restore the shelf */
         if (cat !== 'All' || query || sort !== 'registry') {
           e.preventDefault()
-          setCat('All')
-          setQuery('')
-          setSort('registry')
-          setSelId(ARTICLES[0].id)
+          resetShelf()
           railRef.current?.focus()
         }
         break
+    }
+  }
+
+  /* The search field owns its own keys. ← and → must move the caret inside
+     the input; the shelf's arrow navigation belongs to the shelf. Only
+     Escape is shared, because returning the shelf is the same act wherever
+     the reader is standing. */
+  const onSearchKeyDown = (e: React.KeyboardEvent) => {
+    if (e.key !== 'Escape') return
+    if (cat !== 'All' || query || sort !== 'registry') {
+      e.preventDefault()
+      resetShelf()
     }
   }
 
@@ -209,10 +226,16 @@ function Archive() {
             </span>
           </div>
           <div className="relative z-10 min-w-0">
-            <p className="font-mono text-[10px] uppercase tracking-[0.34em] text-gold">
+            {/* R10 — the archive masthead: the shelf announces itself at
+                publication scale, on the same press rule as every chapter. */}
+            <span
+              aria-hidden="true"
+              className="mb-4 block h-[4px] w-[clamp(3.5rem,14vw,9rem)] bg-[linear-gradient(to_bottom,rgba(217,185,120,0.52)_0_1px,transparent_1px)_top/100%_1px_no-repeat,linear-gradient(to_bottom,rgba(217,185,120,0.17)_0_1px,transparent_1px)_bottom/100%_1px_no-repeat]"
+            />
+            <p className="font-mono text-[10px] uppercase tracking-[0.34em] text-gold-lit">
               The Archive — {LEDGER.features} features · {LEDGER.creators} creators · {LEDGER.departments} departments
             </p>
-            <h1 className="mt-4 font-serif text-[clamp(2.2rem,4.5vw,3.75rem)] font-light leading-[0.95] tracking-[-0.02em] text-ivory">
+            <h1 className="mt-4 font-serif text-[clamp(2.8rem,6vw,5rem)] font-light leading-[0.92] tracking-[-0.022em] text-ivory">
               The <FloralWord variant="laurel">folio shelf</FloralWord>
             </h1>
           </div>
@@ -226,11 +249,11 @@ function Archive() {
               role="searchbox"
               value={query}
               onChange={(e) => setQuery(e.target.value)}
-              onKeyDown={onKeyDown}
+              onKeyDown={onSearchKeyDown}
               aria-describedby="art-search-status"
               className="mt-2 w-full border border-gold/40 bg-transparent px-3 py-2 font-mono text-[10px] uppercase tracking-[0.18em] text-ivory outline-none focus:border-gold"
             />
-            <p id="art-search-status" aria-live="polite" className="mt-1.5 min-h-4 font-mono text-[9px] uppercase tracking-[0.24em] text-white/45">
+            <p id="art-search-status" aria-live="polite" className="mt-1.5 min-h-4 font-mono text-[9px] uppercase tracking-[0.24em] text-white/60">
               {busy
                 ? 'Reading the index…'
                 : (query.trim() || cat !== 'All' || sort !== 'registry')
@@ -246,7 +269,7 @@ function Archive() {
           tabIndex={-1}
           className="relative z-10 mt-3 flex flex-wrap items-center gap-x-2 gap-y-3 border-t border-white/10 pt-4 outline-none md:mt-5 md:pt-5"
         >
-          <span className="mr-1 font-mono text-[9px] uppercase tracking-[0.28em] text-white/40">Room</span>
+          <span className="mr-1 font-mono text-[9px] uppercase tracking-[0.28em] text-white/60">Room</span>
           {cats.map((c) => {
             const active = cat === c
             return (
@@ -267,7 +290,7 @@ function Archive() {
           })}
         </div>
         <div className="relative z-10 mt-2 flex flex-wrap items-center gap-x-2 gap-y-3">
-          <span className="mr-1 font-mono text-[9px] uppercase tracking-[0.28em] text-white/40">Order</span>
+          <span className="mr-1 font-mono text-[9px] uppercase tracking-[0.28em] text-white/60">Order</span>
           {([{ key: 'registry' as const, label: 'Registry №', note: '' }] as { key: SortKey | 'registry'; label: string; note: string }[])
             .concat(SORTS.map((s) => ({ key: s.key, label: s.label, note: s.note })))
             .map((s) => {
@@ -286,187 +309,163 @@ function Archive() {
                 </button>
               )
             })}
-          <span aria-live="polite" className="w-full font-mono text-[9px] uppercase leading-[1.9] tracking-[0.2em] text-white/40 md:ml-auto md:w-auto">
+          <span aria-live="polite" className="w-full font-mono text-[9px] uppercase leading-[1.9] tracking-[0.2em] text-white/60 md:ml-auto md:w-auto">
             {activeSortNote}
           </span>
         </div>
 
-        {/* ——— Selected Folio Curatorial Preview Bar ——— */}
-        {(() => {
-          const activeFolio = ARTICLES.find((a) => a.id === selId) ?? ordered[0] ?? ARTICLES[0]
-          const activeAuthor = getAuthor(activeFolio.authorId)
-          const activeFolioNum = folioNoOf(activeFolio.id)
-          return (
-            <div
-              {...spotlight()}
-              className="st-spotlit relative z-10 mt-6 flex flex-wrap items-center justify-between gap-5 border-y border-white/10 py-3.5"
-            >
-              <div className="flex min-w-0 flex-1 items-center gap-4">
-                <img
-                  src={activeFolio.thumbnail ?? activeFolio.cover}
-                  alt=""
-                  width={64}
-                  height={56}
-                  loading="lazy"
-                  decoding="async"
-                  onError={(e) => handleImgError(e, activeFolio.title, activeFolioNum)}
-                  className="h-14 w-16 shrink-0 border border-white/15 object-cover"
-                />
-                <div className="min-w-0">
-                  <p className="font-mono text-[9px] uppercase tracking-[0.28em] text-gold">
-                    Selected Folio · № {activeFolioNum} · {activeFolio.category}
-                  </p>
-                  <p className="mt-0.5 truncate font-serif text-lg text-ivory md:text-xl">
-                    “{activeFolio.title}”
-                  </p>
-                  <p className="mt-0.5 truncate font-mono text-[9px] uppercase tracking-[0.24em] text-white/55">
-                    {activeAuthor?.name} · {activeFolio.readingTime} · {activeFolio.date}
-                  </p>
-                </div>
-              </div>
-              <Link
-                to={`/article/${activeFolio.id}`}
-                className="font-mono text-[9px] uppercase tracking-[0.28em] text-gold no-underline transition-colors hover:text-ivory"
-              >
-                Open Folio № {activeFolioNum} →
-              </Link>
-            </div>
-          )
-        })()}
-
-        {/* ——— FRONT · the folios — solid ivory plates on the shelf.
-            Desktop and tablet use a balanced 3-column (7 × 3 = 21) shelf
-            rhythm so every row is full and every folio plate has room for
-            its complete date, reading time, and selection badge. ——— */}
-        <div
-          role="group"
-          aria-label={`The archive — ${visibleIds.length} of ${LEDGER.features} folios shown`}
-          className={`relative ${filtered ? '' : 'hidden'}`}
-        >
+        {/* ——— FRONT · the folios — the gallery wall.
+            Every folio is a published 4:5 plate, and the shelf shows all of
+            it. The work carries the row; the brass label underneath carries
+            the record. Three columns on desktop and tablet keep 7 × 3 = 21
+            rows full, so the wall never ends on an orphaned gap. ——— */}
+        <div className={`relative ${filtered ? '' : 'hidden'}`}>
           {/* the shelf's central brass spine */}
           <div
             aria-hidden="true"
             className="pointer-events-none absolute bottom-0 left-1/2 top-0 z-0 hidden w-px -translate-x-1/2 bg-gradient-to-b from-transparent via-[#D9B978]/30 to-transparent xl:block"
           />
-          <div
-            className="relative z-10 mx-auto mt-[clamp(1.5rem,3.5vh,2.5rem)] grid grid-cols-1 items-stretch gap-x-[clamp(1rem,1.8vw,1.75rem)] gap-y-[clamp(1.4rem,3vh,2.2rem)] pb-16 sm:grid-cols-2 md:mt-[clamp(2rem,4.5vh,2.75rem)] md:grid-cols-3 md:pb-0 xl:[perspective:1500px]"
+          <ul
+            aria-label={`The archive — ${visibleIds.length} of ${LEDGER.features} folios shown`}
+            /* Two plates abreast from 360px up. Below that the column would
+               fall under ~134px, where the title drops to three or four words
+               a line and the record line can no longer hold № + status + date
+               — so the shelf honestly falls back to one column. The gutter
+               tightens to 12px on phones to buy that width back. */
+            className="relative z-10 mx-auto mt-[clamp(1.5rem,3.5vh,2.5rem)] grid list-none grid-cols-1 items-stretch gap-x-[clamp(0.75rem,1.8vw,1.75rem)] gap-y-[clamp(2rem,4vh,3rem)] p-0 pb-16 min-[360px]:grid-cols-2 md:mt-[clamp(2rem,4.5vh,2.75rem)] md:grid-cols-3 md:pb-0"
             onKeyDown={onKeyDown}
           >
             {ordered.map((a, pos) => {
-              /* a receded folio keeps its place on the shelf — the archive
-                 never collapses when it filters; the shelf dims instead */
               const author = getAuthor(a.authorId)
               const folio = String(ARTICLES.findIndex((x) => x.id === a.id) + 1).padStart(2, '0')
-              const selected = selId === a.id
               const filtering = cat !== 'All' || query !== '' || sort === 'editors-picks'
               const isMatch = visibleIds.includes(a.id)
+              /* a folio outside the current filter keeps its place on the
+                 wall — the archive never collapses, it recedes. It also stops
+                 being a destination: no pointer, no tab stop, and hidden from
+                 assistive technology, so what is announced matches what the
+                 status line claims is showing. */
               const receded = filtering && !isMatch
-              /* at rest the shelf tapers — the focused folio holds, neighbours recede by a step */
-              const inner = filtering ? (isMatch ? 1 : 0.1) : selected ? 1 : Math.max(1 - pos * 0.02, 0.78)
-              const dist = visibleIds.indexOf(a.id)
-              const neighbour = !filtering && dist > 0 && dist <= 2
               return (
-                <motion.div
+                <motion.li
                   key={a.id}
                   initial={{ opacity: 0, y: 18 }}
                   whileInView={{ opacity: 1, y: 0 }}
                   viewport={{ once: true, margin: '0px 0px -6% 0px' }}
                   transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
-                  className={`contents ${receded ? 'opacity-25 transition-all duration-700' : 'transition-all duration-700'}`}
+                  className={`relative ${
+                    ordered.length % 2 === 1 && pos === ordered.length - 1 ? 'min-[360px]:col-span-2 md:col-span-1' : ''
+                  }`}
                 >
-                  <span
-                    className={`group/plate relative block ${
-                      ordered.length % 2 === 1 && pos === ordered.length - 1 ? 'sm:col-span-2 md:col-span-1' : ''
+                  {/* Two owners, two properties: Motion owns the entrance
+                      opacity on the list item, CSS owns the recede opacity
+                      here. Sharing one element would let Motion's inline
+                      style win and the filter would stop dimming anything. */}
+                  <div
+                    aria-hidden={receded || undefined}
+                    className={`group/plate relative h-full transition-opacity duration-700 ${
+                      receded ? 'pointer-events-none opacity-[0.14]' : 'opacity-100'
                     }`}
-                    style={{ opacity: inner }}
                   >
-                    <Link
-                      id={`folio-${a.id}`}
-                      to={isMatch ? `/article/${a.id}` : '#'}
-                      onClick={(e) => { if (!isMatch) e.preventDefault() }}
-                      aria-label={`Folio ${folio} — ${a.title}, ${a.category}, ${author?.name}. ${a.readingTime}, ${a.publicationStatus === 'provisional' ? `provisional record ${a.date}` : `published ${a.date}`}.`}
-                      onFocus={() => setSelId(a.id)}
-                      onMouseEnter={() => setSelId(a.id)}
-                      tabIndex={selected ? 0 : -1}
-                      className={`group relative flex h-full flex-col overflow-hidden bg-[#F8F6F2] px-4 pb-3.5 pt-0 text-left no-underline transition-all duration-500 ${
-                        selected
-                          ? 'z-[2] border border-[#B89146] shadow-[0_12px_28px_rgba(0,0,0,0.4)] md:-translate-y-1.5 xl:-translate-y-2.5 xl:scale-[1.03] xl:shadow-[0_24px_50px_rgba(0,0,0,0.5)]'
-                          : `border border-[#B89146]/35 hover:border-[#D9B978]/90 hover:shadow-[0_8px_20px_rgba(0,0,0,0.25)]${neighbour ? ' xl:scale-[0.99]' : ''}`
-                      } focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-gold`}
-                    >
-                      {/* the cover strip — the feature's own plate, cropped wide
-                          so the shelf reads as filed photographs, not text rows */}
-                      <span
-                        className="plate-thumb st-spotlit block w-full"
-                        {...spotlitGlide('restrained')}
-                      >
-                        <img
-                          src={a.thumbnail ?? a.cover}
-                          alt=""
-                          width={320}
-                          height={118}
-                          loading="lazy"
-                          decoding="async"
-                          onError={(e) => handleImgError(e, a.title, folioNoOf(a.id))}
-                          className="h-[118px] w-full object-cover object-top"
-                        />
-                        <span aria-hidden="true" className="absolute inset-0 bg-[linear-gradient(180deg,rgba(42,15,24,0.12),rgba(42,15,24,0.34))]" />
-                        {isEditorsPick(a.id) && (
-                          <span className="absolute left-2 top-2 border border-gold/70 bg-[#1C0509]/70 px-2 py-0.5 font-mono text-[7px] uppercase tracking-[0.24em] text-gold">
-                            Desk pick
-                          </span>
-                        )}
-                      </span>
-                      {/* the plate's inner brass hairline */}
-                      <span
-                        aria-hidden="true"
-                        className={`pointer-events-none absolute inset-1 border transition-colors duration-500 ${
-                          selected ? 'border-[#D9B978]/50' : 'border-transparent group-hover/plate:border-[#D9B978]/25'
-                        }`}
+                  <Link
+                    id={`folio-${a.id}`}
+                    to={`/article/${a.id}`}
+                    aria-label={`Folio ${folio} — ${a.title}, ${a.category}, ${author?.name}. ${a.readingTime}, ${a.publicationStatus === 'provisional' ? `provisional record ${a.date}` : `published ${a.date}`}.`}
+                    tabIndex={receded ? -1 : 0}
+                    className="group flex h-full flex-col overflow-hidden border border-[#B89146]/35 bg-[#F8F6F2] text-left no-underline transition-[border-color,box-shadow,transform] duration-500 hover:border-[#D9B978]/90 hover:shadow-[0_14px_34px_rgba(0,0,0,0.42)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-gold motion-safe:hover:-translate-y-1.5 motion-safe:focus-visible:-translate-y-1.5"
+                  >
+                    {/* the plate — the contributor's published cover, whole.
+                        Every cover in the registry is 4:5, so the frame is the
+                        artwork's own proportion: nothing is cropped away and
+                        no scrim is laid over someone's work. */}
+                    <span className="plate-thumb" {...spotlitGlide('restrained')}>
+                      <img
+                        src={a.thumbnail ?? a.cover}
+                        alt=""
+                        width={420}
+                        height={525}
+                        loading={pos < 3 ? 'eager' : 'lazy'}
+                        decoding="async"
+                        onError={(e) => handleImgError(e, a.title, folioNoOf(a.id))}
                       />
-                      <span className="relative mt-3 flex items-baseline justify-between gap-2">
-                        <span className="shrink-0 whitespace-nowrap font-mono text-[9px] uppercase tracking-[0.28em] text-[#7C6338]">№ {folio}</span>
-                        <span className="truncate font-mono text-[8px] uppercase tracking-[0.18em] text-[#2A0F18]/55">{stampDate(a.date)} · {a.readingTime}</span>
-                      </span>
-                      <span className="relative mt-1.5 block font-serif text-[clamp(1.02rem,1.2vw,1.18rem)] font-normal leading-[1.15] text-[#1E0B12] transition-colors duration-500 group-hover/plate:text-[#5C1224]">
-                        {a.title}
-                      </span>
-                      <span className="relative mt-1.5 block font-mono text-[8px] uppercase tracking-[0.26em] text-[#2A0F18]/65">
-                        {a.category} · {author?.name}
-                      </span>
-                      {selected && (
-                        <span className="relative mt-auto inline-flex items-center gap-1.5 pt-2.5 font-mono text-[8px] uppercase tracking-[0.16em] text-[#7C6338]">
-                          <span aria-hidden="true" className="h-px w-2.5 shrink-0 bg-[#B89146]" />
-                          <span className="whitespace-nowrap">Selected — open folio →</span>
+                      {/* Sampled on rendered pixels, `text-gold` (#B89146)
+                          over this scrim measured 3.89:1 — under AA at 7px.
+                          #D9B978 on a /88 scrim measures ~9.7:1 typical and
+                          stays >5.7:1 even where the artwork beneath is
+                          near-white. Same brass family, legible ink. */}
+                      {isEditorsPick(a.id) && (
+                        <span className="absolute left-2.5 top-2.5 border border-[#D9B978]/70 bg-[#1C0509]/[0.88] px-2 py-0.5 font-mono text-[8px] uppercase tracking-[0.16em] text-[#D9B978] backdrop-blur-[2px]">
+                          Desk pick
                         </span>
                       )}
-                    </Link>
-                    {/* the keep-mark — above the plate, never inside the link */}
-                    <SaveButton
-                      id={a.id}
-                      title={a.title}
-                      category={a.category}
-                      author={author?.name}
-                      compact
-                      className="absolute right-2 top-2 z-10 opacity-100 transition-opacity duration-300 md:opacity-0 md:group-hover/plate:opacity-100 md:focus-within:opacity-100 [&_svg]:h-3 [&_svg]:w-3"
-                    />
-                  </span>
-                </motion.div>
+                    </span>
+
+                    {/* the label — the brass plaque under the plate */}
+                    <span className="flex flex-1 flex-col px-4 pb-4 pt-3">
+                      {/* The record line wraps as whole units rather than
+                          truncating, so a ten-minute read is never filed on
+                          the wall as “10 MIN RE…”. */}
+                      <span className="flex flex-wrap items-baseline justify-between gap-x-2 gap-y-0.5">
+                        <span className="shrink-0 whitespace-nowrap font-mono text-[9px] uppercase tracking-[0.16em] text-[#7C6338] md:tracking-[0.28em]">№ {folio}</span>
+                        {/* The registry already distinguishes a finished folio
+                            from a record still being set. That fact was only
+                            ever spoken to screen readers here; the wall now
+                            states it in ink too, so both audiences read the
+                            same shelf. No new data — `publicationStatus`
+                            straight off the record. */}
+                        {a.publicationStatus === 'provisional' && (
+                          <span className="shrink-0 whitespace-nowrap border border-[#7C6338]/45 px-1.5 py-px font-mono text-[9px] uppercase leading-[1.5] tracking-[0.1em] text-[#7C6338]">
+                            Provisional
+                          </span>
+                        )}
+                        {/* /55 measured 3.94:1 on this paper — below WCAG 2.1
+                            AA for 8px text. /65 is 5.45:1 and matches the
+                            byline ink already used below. */}
+                        <span className="whitespace-nowrap font-mono text-[8px] uppercase tracking-[0.1em] text-[#2A0F18]/65 md:tracking-[0.18em]">{stampDate(a.date)} · {a.readingTime}</span>
+                      </span>
+                      <span className="mt-2 block font-serif text-[clamp(1.08rem,1.3vw,1.3rem)] font-normal leading-[1.14] text-[#1E0B12] transition-colors duration-500 group-hover:text-[#5C1224]">
+                        {a.title}
+                      </span>
+                      <span className="mt-auto flex items-start gap-2 pt-3 font-mono text-[8px] uppercase leading-[1.6] tracking-[0.14em] text-[#2A0F18]/65 md:tracking-[0.26em]">
+                        {/* items-start now, so the rule needs a nudge to sit on
+                            the first line's optical centre instead of its top */}
+                        <span aria-hidden="true" className="mt-1.5 h-px w-3 shrink-0 bg-[#B89146] transition-[width] duration-500 group-hover:w-5" />
+                        <span className="min-w-0 break-words">{a.category} · {author?.name}</span>
+                      </span>
+                    </span>
+                  </Link>
+                  {/* the keep-mark — above the plate, never inside the link */}
+                  <SaveButton
+                    id={a.id}
+                    title={a.title}
+                    category={a.category}
+                    author={author?.name}
+                    compact
+                    /* On touch the keep-mark is always visible, so it needs a
+                       44px target — but a 44px *box* covers a quarter of a
+                       162px plate and sits on the contributor's artwork. The
+                       visible disc therefore stays 32px and the touch target
+                       is grown to 44px with an invisible inset ring, so the
+                       hand gets its target and the picture keeps its space. */
+                    className="absolute right-2 top-2 z-10 opacity-100 transition-opacity duration-300 max-md:after:absolute max-md:after:-inset-2 max-md:after:content-[''] md:opacity-0 md:group-hover/plate:opacity-100 md:focus-within:opacity-100 [&_svg]:h-3.5 [&_svg]:w-3.5 md:[&_svg]:h-3 md:[&_svg]:w-3"
+                  />
+                  </div>
+                </motion.li>
               )
             })}
-          </div>
+          </ul>
         </div>
         {!filtered && (
           <div className="mt-10 border border-dashed border-white/15 px-6 py-14 text-center md:mt-16">
             <p className="font-serif text-2xl font-light italic text-white/65">
               Nothing on this shelf matches — the archive keeps its promises honestly.
             </p>
-            <p className="mx-auto mt-3 max-w-[46ch] text-sm leading-relaxed text-white/50">
+            <p className="mx-auto mt-3 max-w-[46ch] text-sm leading-relaxed text-white/65">
               Try another word, open a different room, or return to the full shelf. If a feature truly is missing, the desk can add it — every folio began as a submission.
             </p>
             <button
               type="button"
-              onClick={() => { setCat('All'); setQuery(''); setSort('registry'); setSelId(ARTICLES[0].id) }}
+              onClick={resetShelf}
               className="mt-6 border-b border-gold/60 pb-1 font-mono text-[10px] uppercase tracking-[0.28em] text-gold no-underline transition-colors hover:text-ivory"
             >
               Return to all {LEDGER.features} folios
@@ -481,13 +480,13 @@ function Archive() {
             {(cat !== 'All' || query || sort !== 'registry') && (
               <button
                 type="button"
-                onClick={() => { setCat('All'); setQuery(''); setSort('registry'); setSelId(ARTICLES[0].id) }}
+                onClick={resetShelf}
                 className="border-b border-gold/60 pb-0.5 font-mono text-[9px] uppercase tracking-[0.3em] text-gold no-underline transition-colors hover:text-ivory"
               >
                 Esc · return to the full shelf
               </button>
             )}
-            {cat === 'All' && !query && sort === 'registry' && <span className="text-white/40">Issue № {LEDGER.issueNo} — all {LEDGER.features} folios in registry order</span>}
+            {cat === 'All' && !query && sort === 'registry' && <span className="text-white/60">Issue № {LEDGER.issueNo} — all {LEDGER.features} folios in registry order</span>}
           </span>
         </div>
       </div>

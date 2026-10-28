@@ -26,11 +26,11 @@ Node-side consumers load it through `scripts/lib/load-registry.mjs`, which bundl
 | core | `/`, `/articles`, `/categories`, `/creators`, `/community`, `/ambassadors`, `/about`, `/submit`, `/contact` | 9 | static |
 | spatial | `/room` | 1 | static |
 | category | `/categories/:slug` | 7 | `CATEGORIES` |
-| article | `/article/:id` | 20 | `ARTICLES` |
+| article | `/article/:id` | 21 | `ARTICLES` |
 | creator | `/creator/:authorId` | 16 | `AUTHORS` |
 | fallback | `*` | — | renders `NotFound` |
 
-All 53 ship a prerendered metadata shell and appear in `sitemap.xml`.
+All 54 ship a prerendered metadata shell and appear in `sitemap.xml`.
 
 ### Canonical URL form
 
@@ -118,7 +118,8 @@ curl -i -X POST https://verlysemedia.kesug.com/api/newsletter \
 | Variable | Class | Used by | Required? | Notes |
 |---|---|---|---|---|
 | `BUTTONDOWN_API_KEY` | **server-only** | `api/newsletter.ts` | optional | Absent → endpoint returns `503 not-configured`. Must never be client-exposed. |
-| `ALLOWED_ORIGINS` | **server-only** | `api/newsletter.ts` | optional | Comma-separated CORS allowlist override. When unset, production runtime defaults to `https://verlysemedia.kesug.com, https://verlyse-react.vercel.app` (local dev origins `http://localhost:5173`, `http://localhost:4173`, `http://127.0.0.1:5173`, `http://127.0.0.1:4173` are allowed only in non-production runtimes; code complete, live deployment verification pending). |
+| `VERLYSE_MAIL_PROVIDER` / `RESEND_API_KEY` / `VERLYSE_SUBMISSION_FROM_EMAIL` / `VERLYSE_SUBMISSION_TO_EMAIL` / `VERLYSE_MAIL_WEBHOOK_URL` / `VERLYSE_MAIL_WEBHOOK_SECRET` | **server-only** | `api/submit.ts` | optional | Unified `/api/submit` multipart endpoint for `/submit` (up to 4 MB cover attachment) and `/contact`. Absent → returns `503 provider-unconfigured`. |
+| `ALLOWED_ORIGINS` | **server-only** | `api/submit.ts`, `api/newsletter.ts` | optional | Comma-separated CORS allowlist override. When unset, `api/submit.ts` defaults to Kesug-only (`https://verlysemedia.kesug.com, https://www.verlysemedia.kesug.com`) in production and `api/newsletter.ts` allows Kesug + `https://verlyse-react.vercel.app` (local dev origins `http://localhost:5173`, `http://localhost:4173`, `http://127.0.0.1:5173`, `http://127.0.0.1:4173` are allowed only in non-production runtimes). |
 | `PUBLIC_SITE_ORIGIN` | build-time | prerender, sitemap, metadata audit | optional | Defaults to `https://verlysemedia.kesug.com`. Set for preview builds. |
 | `FTP_HOST` / `FTP_USER` / `FTP_PASS` / `FTP_DIR` | **server-only (deploy)** | `scripts/deploy-ftp.mjs` | required to deploy | Credentials. Never in the repo; `check:secrets` guards this. |
 | `PORT` | local | preview server | optional | — |
@@ -156,7 +157,7 @@ Verified by import-site count including dynamic imports — **nothing removed on
 | `three` 0.185 | 2 | keep (lazy `dist/assets/three-DF4bklDy.js`: `770.49 kB` / `203.48 kB` gzip) |
 | `@react-three/fiber` 8.18 | 2 | keep (lazy `dist/assets/three-DF4bklDy.js`) |
 | `animejs` 4.5 | 1 | **in use (isolated)** — dynamically imported by `src/components/ui/BrassRule.tsx` (`dist/assets/anime-CcJk6tc-.js`: `32.40 kB` / `13.15 kB` gzip) only when `!reduce && near`. |
-| `puppeteer`, `puppeteer-core`, `@playwright/test` | test harnesses | keep (dev) |
+| `puppeteer`, `@playwright/test` | test harnesses | keep (dev; `puppeteer-core` supplied transitively by `puppeteer`) |
 
 No unused runtime dependency was found. Nothing was deleted.
 
@@ -175,6 +176,6 @@ No unused runtime dependency was found. Nothing was deleted.
 
 ## 9 · Asset truth
 
-`public/` contains **104** static media and font assets (`100` image/SVG files across `public/img/**` and `public/favicon.svg`, plus `4` `.woff2` font files in `public/fonts/`, alongside `3` config/stylesheet files `public/fonts/fonts.css`, `public/robots.txt`, and `public/.htaccess`). `scripts/asset-audit.mjs` verifies both the `45/45` sampled role subset (`covers: 24, inner: 7, signature: 1, portrait: 5, fonts: 4, logo: 1, poster: 3`) and the `104/104` full static media/font inventory (`0` missing).
+`public/` contains **112** static media and font assets (`108` image/SVG files across `public/img/**` and `public/favicon.svg`, plus `4` `.woff2` font files in `public/fonts/`, alongside `3` config/stylesheet files `public/fonts/fonts.css`, `public/robots.txt`, and `public/.htaccess`). `scripts/asset-audit.mjs` verifies both the `53/53` sampled role subset (`covers: 32, inner: 7, signature: 1, portrait: 5, fonts: 4, logo: 1, poster: 3`) and the `112/112` full static media/font inventory (`0` missing).
 
 **Outstanding (not R01 scope):** five contributor portraits are still `.jpg` while the other 89 images are WebP — `alina-javed-about.jpg` is 259 KB and renders on four surfaces. No image uses `srcset`. See `audit/CODEBASE-AND-SITE-ASSESSMENT.md` §B5.

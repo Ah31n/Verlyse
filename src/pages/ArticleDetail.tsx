@@ -56,14 +56,16 @@ function EndingSpatialStage({ article }: { article: Article }) {
   const wrapRef = useRef<HTMLDivElement>(null)
   const ending = getEndingStatic(article)
 
-  const [near, setNear] = useState(false)
+  const [activated, setActivated] = useState(false)
+  const [inView, setInView] = useState(false)
   const [settled, setSettled] = useState(false)
   const [tabVisible, setTabVisible] = useState(() =>
     typeof document === 'undefined' ? true : document.visibilityState !== 'hidden'
   )
 
   useEffect(() => {
-    setNear(false)
+    setActivated(false)
+    setInView(false)
     setSettled(false)
   }, [article.id])
 
@@ -75,36 +77,27 @@ function EndingSpatialStage({ article }: { article: Article }) {
   }, [])
 
   useEffect(() => {
-    if (reduce || !glSupported || near) return undefined
+    if (reduce || !glSupported) return undefined
     const el = wrapRef.current
     if (!el || typeof window === 'undefined') return undefined
 
-    let done = false
-    const activate = () => {
-      if (done) return
-      done = true
-      setNear(true)
-    }
-
     const checkRect = () => {
-      if (done || !wrapRef.current) return
+      if (!wrapRef.current) return
       const r = wrapRef.current.getBoundingClientRect()
-      if (r.top < window.innerHeight * 1.15 && r.bottom > -60) {
-        activate()
-      }
+      const visible = r.top < window.innerHeight * 1.15 && r.bottom > -60
+      setInView(visible)
+      if (visible) setActivated(true)
     }
 
     checkRect()
-    if (done) return undefined
 
     let io: IntersectionObserver | null = null
     if ('IntersectionObserver' in window) {
       io = new IntersectionObserver(
         (entries) => {
-          if (entries.some((entry) => entry.isIntersecting)) {
-            activate()
-            io?.disconnect()
-          }
+          const hit = entries.some((entry) => entry.isIntersecting)
+          setInView(hit)
+          if (hit) setActivated(true)
         },
         { rootMargin: '240px 0px' }
       )
@@ -120,31 +113,33 @@ function EndingSpatialStage({ article }: { article: Article }) {
       window.removeEventListener('scroll', checkRect)
       window.removeEventListener('resize', checkRect)
     }
-  }, [article.id, glSupported, near, reduce])
+  }, [article.id, glSupported, reduce])
 
   useEffect(() => {
-    if (!near || reduce || !glSupported || settled) return undefined
+    if (!activated || reduce || !glSupported || settled) return undefined
     const id = window.setTimeout(() => setSettled(true), ending.motion.revealMs)
     return () => window.clearTimeout(id)
-  }, [ending.motion.revealMs, glSupported, near, reduce, settled])
+  }, [activated, ending.motion.revealMs, glSupported, reduce, settled])
 
   const phase = reduce
     ? 'REDUCED'
     : !glSupported
       ? 'FALLBACK'
-      : !near
+      : !activated
         ? 'RESTING'
         : !settled
           ? 'ENTERING'
           : 'ALIVE'
 
-  const eligible = glSupported && !reduce && near && tabVisible
+  const eligible = glSupported && !reduce && activated && tabVisible
+  const activelyRendering = eligible && inView
 
   return (
     <div
       ref={wrapRef}
       data-ending={ending.endingId}
       data-phase={phase}
+      data-ending-loop={activelyRendering ? 'active' : activated ? 'paused' : 'idle'}
       data-scene-kind={ending.sceneKind}
       className="pointer-events-none absolute inset-0 z-0"
       aria-hidden="true"
@@ -152,7 +147,7 @@ function EndingSpatialStage({ article }: { article: Article }) {
       {eligible ? (
         <EndingSpatialBoundary key={article.id}>
           <Suspense fallback={null}>
-            <StoryEnding3D article={article} activePhase={phase} />
+            <StoryEnding3D article={article} activePhase={phase} inView={activelyRendering} />
           </Suspense>
         </EndingSpatialBoundary>
       ) : null}
@@ -623,7 +618,7 @@ export default function ArticleDetail() {
                     />
                     <span aria-hidden="true" className="absolute inset-2 border border-gold/30" />
                   </div>
-                  <figcaption className="mt-3 flex items-center justify-between font-mono text-[9px] uppercase tracking-[0.30em] text-white/50">
+                  <figcaption className="mt-3 flex items-center justify-between font-mono text-[9px] uppercase tracking-[0.30em] text-white/65">
                     <span>Plate 01 — the cover</span>
                     <span className="text-gold">✦</span>
                   </figcaption>
@@ -664,7 +659,7 @@ export default function ArticleDetail() {
                     />
                     <span aria-hidden="true" className="absolute inset-2 border border-gold/40" />
                   </div>
-                  <figcaption className="mt-3 flex items-center justify-between font-mono text-[9px] uppercase tracking-[0.30em] text-white/50">
+                  <figcaption className="mt-3 flex items-center justify-between font-mono text-[9px] uppercase tracking-[0.30em] text-white/65">
                     <span>Plate 01 — the work</span>
                     <span className="text-gold">✦ view the gallery</span>
                   </figcaption>
@@ -746,7 +741,7 @@ export default function ArticleDetail() {
                 )}
                 <div>
                   <p className="font-serif text-2xl font-light tracking-[-0.01em] text-ivory">{author?.name}</p>
-                  <p className="mt-1.5 font-mono text-[10px] uppercase tracking-[0.28em] text-white/50">{author?.handle} · {author?.role}</p>
+                  <p className="mt-1.5 font-mono text-[10px] uppercase tracking-[0.28em] text-white/65">{author?.handle} · {author?.role}</p>
                 </div>
               </motion.div>
               {author && <Signature name={author.name} delay={0.3} />}

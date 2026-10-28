@@ -113,7 +113,7 @@ async function run() {
   await page.waitForTimeout(250)
   const lightboxPlate2 = await page.evaluate(() => document.body.textContent.includes('Plate 02 / 05 — A camera'))
   await page.keyboard.press('Escape')
-  await page.waitForTimeout(500)
+  await page.locator('[role="dialog"][aria-label*="The Quiet Grief"]').waitFor({ state: 'detached', timeout: 2500 }).catch(() => {})
   const lightboxClosed = (await page.locator('[role="dialog"][aria-label*="The Quiet Grief"]').count()) === 0
   const focusRestored = await page.evaluate(() =>
     document.activeElement?.getAttribute('aria-label')?.includes('Inspect Plate 01 of 05'),
@@ -227,6 +227,216 @@ async function run() {
   })
   pass('forms-and-profile-a11y', submitA11y && creatorQuotesOk, `submitA11y=${submitA11y}, creatorQuotesOk=${creatorQuotesOk}`)
 
+  // ---- SUBMIT, CONTACT & NEWSLETTER DELIVERY, FAILURE RECOVERY & SERVER ACCEPTANCE ----
+  // 1. Verify the live local /api/submit and /api/newsletter endpoints directly return 503 when unconfigured
+  const liveUnconfCheck = await fetch(BASE + '/api/submit', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', Origin: 'http://127.0.0.1:5173' },
+    body: JSON.stringify({
+      kind: 'contact',
+      name: 'Direct Probe',
+      email: 'probe@example.test',
+      subject: 'Probe',
+      message: 'Testing live server boundary.',
+    }),
+  })
+  const liveUnconfJson = await liveUnconfCheck.json().catch(() => ({}))
+  const liveNewsletterCheck = await fetch(BASE + '/api/newsletter', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', Origin: 'http://127.0.0.1:5173' },
+    body: JSON.stringify({ email: 'probe@example.test' }),
+  })
+  const liveNewsletterJson = await liveNewsletterCheck.json().catch(() => ({}))
+  const liveEndpoint503Ok =
+    liveUnconfCheck.status === 503 &&
+    liveUnconfJson.error === 'provider-unconfigured' &&
+    liveNewsletterCheck.status === 503 &&
+    liveNewsletterJson.error === 'not-configured'
+
+  // 2. Verify browser multipart/form-data binary image upload on /submit, multipart correspondence on /contact, and newsletter in Footer
+  const submitRequests = []
+  let mockAcceptSubmit = false
+  await page.route('**/api/submit', async (route) => {
+    const req = route.request()
+    const buf = req.postDataBuffer()
+    submitRequests.push({
+      url: req.url(),
+      method: req.method(),
+      contentType: req.headers()['content-type'] || '',
+      byteLength: buf ? buf.byteLength : 0,
+      hasPngMagicBytes: buf ? buf.includes(Buffer.from([0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a])) : false,
+      hasFilename: buf ? buf.includes(Buffer.from('filename="synthetic-cover.png"')) : false,
+      hasContactKind: buf ? buf.includes(Buffer.from('name="kind"\r\n\r\ncontact')) : false,
+    })
+    if (!mockAcceptSubmit) {
+      await route.fulfill({
+        status: 200,
+        contentType: 'application/json',
+        body: JSON.stringify({
+          ok: false,
+          error: 'provider-unconfigured',
+        }),
+      })
+      return
+    }
+    await route.fulfill({
+      status: 200,
+      contentType: 'application/json',
+      body: JSON.stringify({
+        ok: true,
+        accepted: true,
+        attachmentIncluded: true,
+        attachmentName: 'synthetic-cover.png',
+        attachmentBytes: 16,
+      }),
+    })
+  })
+
+  await page.goto(BASE + '/submit', { waitUntil: 'networkidle' })
+  await page.locator('#sf-name').fill('Synthetic Contributor')
+  await page.locator('#sf-email').fill('synthetic@example.test')
+  await page.locator('#sf-title').fill('Synthetic Verification Folio')
+  await page.locator('#sf-cat').selectOption('Stories')
+  await page.locator('#sf-work').fill('Synthetic manuscript text for Chromium verification.')
+  await page.locator('#sf-cover').setInputFiles({
+    name: 'synthetic-cover.png',
+    mimeType: 'image/png',
+    buffer: Buffer.from([
+      0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a,
+      0x00, 0x00, 0x00, 0x0d, 0x49, 0x48, 0x44, 0x52,
+    ]),
+  })
+  await page.locator('#sf-original').check({ force: true })
+  await page.getByRole('button', { name: 'Submit the piece' }).click()
+  await page.waitForSelector('[data-testid="submit-delivery-alert"]')
+  const failedState = await page.evaluate(() => {
+    const form = document.querySelector('form[data-submission-state]')
+    const alert = document.querySelector('[data-testid="submit-delivery-alert"]')
+    const titleVal = document.querySelector('#sf-title')?.value || ''
+    const bodyTxt = document.body.textContent || ''
+    return {
+      state: form?.getAttribute('data-submission-state'),
+      hasAlert: !!alert,
+      preservedTitle: titleVal === 'Synthetic Verification Folio',
+      preservedCover: bodyTxt.includes('Selected cover: synthetic-cover.png'),
+      noFalseSent: !bodyTxt.includes('Sent to the desk') && !bodyTxt.includes('Accepted by the submission system'),
+      hasManualDraftWarning: (alert?.textContent || '').includes('manually attach "synthetic-cover.png"'),
+    }
+  })
+  mockAcceptSubmit = true
+  await page.getByRole('button', { name: 'Retry submission' }).click()
+  await page.waitForSelector('form[data-submission-state="accepted"]')
+  const acceptedState = await page.evaluate(() => {
+    const bodyTxt = document.body.textContent || ''
+    return {
+      acceptedHeading: bodyTxt.includes('Accepted by the submission system'),
+      coverAttachedMsg: bodyTxt.includes('Cover image uploaded & attached: synthetic-cover.png'),
+    }
+  })
+
+  // Contact form: multipart failure -> retry -> accepted
+  mockAcceptSubmit = false
+  await page.goto(BASE + '/contact', { waitUntil: 'networkidle' })
+  await page.locator('#cf-name').fill('Synthetic Correspondent')
+  await page.locator('#cf-email').fill('synthetic@example.test')
+  await page.locator('#cf-subject').fill('Synthetic Inquiry')
+  await page.locator('#cf-msg').fill('Synthetic correspondence message.')
+  await page.getByRole('button', { name: 'Seal the letter' }).click()
+  await page.waitForSelector('[data-testid="contact-delivery-alert"]')
+  const contactFailedState = await page.evaluate(() => {
+    const form = document.querySelector('form[data-contact-state]')
+    const subjVal = document.querySelector('#cf-subject')?.value || ''
+    const bodyTxt = document.body.textContent || ''
+    return {
+      state: form?.getAttribute('data-contact-state'),
+      preservedSubject: subjVal === 'Synthetic Inquiry',
+      noFalseSent: !bodyTxt.includes('Letter received by the server'),
+    }
+  })
+  mockAcceptSubmit = true
+  await page.getByRole('button', { name: 'Retry sending letter' }).click()
+  await page.waitForSelector('form[data-contact-state="accepted"]')
+  const contactAccepted = await page.evaluate(() => {
+    return (document.body.textContent || '').includes('Letter received by the server')
+  })
+  await page.unroute('**/api/submit')
+
+  // Newsletter form: failure -> retry -> accepted
+  let mockAcceptNewsletter = false
+  await page.route('**/api/newsletter', async (route) => {
+    if (!mockAcceptNewsletter) {
+      await route.fulfill({
+        status: 200,
+        contentType: 'application/json',
+        body: JSON.stringify({ ok: false, error: 'not-configured' }),
+      })
+      return
+    }
+    await route.fulfill({
+      status: 200,
+      contentType: 'application/json',
+      body: JSON.stringify({ ok: true }),
+    })
+  })
+  await page.locator('#nl-email').fill('synthetic@example.test')
+  await page.getByRole('button', { name: 'Take the letter' }).click()
+  await page.waitForSelector('form[data-newsletter-state="failed"]')
+  const nlFailedPreserved = await page.evaluate(() => {
+    const input = document.querySelector('#nl-email')
+    return input?.value === 'synthetic@example.test' && !(document.body.textContent || '').includes("You're on the list.")
+  })
+  mockAcceptNewsletter = true
+  await page.getByRole('button', { name: 'Retry letter' }).click()
+  await page.waitForSelector('form[data-newsletter-state="accepted"]')
+  const nlAccepted = await page.evaluate(() => {
+    const input = document.querySelector('#nl-email')
+    return input?.value === '' && (document.body.textContent || '').includes("You're on the list.")
+  })
+  await page.unroute('**/api/newsletter')
+
+  const firstReq = submitRequests[0] || {}
+  const contactReq = submitRequests[2] || {}
+  const submitFlowOk =
+    liveEndpoint503Ok &&
+    submitRequests.length === 4 &&
+    /^multipart\/form-data;\s*boundary=/i.test(firstReq.contentType) &&
+    firstReq.hasPngMagicBytes === true &&
+    firstReq.hasFilename === true &&
+    /^multipart\/form-data;\s*boundary=/i.test(contactReq.contentType) &&
+    contactReq.hasContactKind === true &&
+    failedState.state === 'failed' &&
+    failedState.hasAlert &&
+    failedState.preservedTitle &&
+    failedState.preservedCover &&
+    failedState.noFalseSent &&
+    failedState.hasManualDraftWarning &&
+    acceptedState.acceptedHeading &&
+    acceptedState.coverAttachedMsg &&
+    contactFailedState.state === 'failed' &&
+    contactFailedState.preservedSubject &&
+    contactFailedState.noFalseSent &&
+    contactAccepted &&
+    nlFailedPreserved &&
+    nlAccepted
+  pass(
+    'submit-and-contact-binary-delivery',
+    submitFlowOk,
+    JSON.stringify({
+      liveEndpoint503Ok,
+      multipartBoundary: /^multipart\/form-data;\s*boundary=/i.test(firstReq.contentType),
+      hasPngMagicBytes: firstReq.hasPngMagicBytes,
+      hasFilename: firstReq.hasFilename,
+      contactMultipart: /^multipart\/form-data;\s*boundary=/i.test(contactReq.contentType) && contactReq.hasContactKind,
+      failedState: failedState.state,
+      preservedCover: failedState.preservedCover,
+      noFalseSent: failedState.noFalseSent,
+      accepted: acceptedState.acceptedHeading && acceptedState.coverAttachedMsg,
+      contactAccepted,
+      nlFailedPreserved,
+      nlAccepted,
+    }),
+  )
+
   // ---- HIRING EXPERIENCE ("THE NEXT BYLINE") & TEAM ROSTER REMOVAL ----
   await page.goto(BASE + '/ambassadors', { waitUntil: 'networkidle' })
   await page.waitForTimeout(500)
@@ -258,6 +468,167 @@ async function run() {
       rosterAndHiring.hasRoles &&
       rosterAndHiring.hasHeadline,
     JSON.stringify(rosterAndHiring),
+  )
+
+  // ---- THE ARCHIVE WALL: WHOLE COVERS, REAL TAB STOPS, HONEST FILTERING ----
+  // Regression guard for the /articles redesign. The shelf used to render
+  // every 4:5 cover into a fixed 92px letterbox (≈19% of the artwork at
+  // 1440px), expose exactly one tab stop that a mouse hover could move, and
+  // leave filtered-out folios in the accessibility tree.
+  await page.goto(BASE + '/articles', { waitUntil: 'networkidle' })
+  await page.waitForTimeout(1200)
+  await page.evaluate(async () => {
+    const h = document.body.scrollHeight
+    for (let y = 0; y < h; y += 700) { window.scrollTo(0, y); await new Promise((r) => setTimeout(r, 40)) }
+    window.scrollTo(0, 0)
+  })
+  await page.waitForTimeout(600)
+
+  const coverGeometry = await page.evaluate(() => {
+    const imgs = [...document.querySelectorAll('.plate-thumb img')].filter((i) => i.naturalWidth > 0)
+    const worst = imgs.reduce((acc, i) => {
+      const r = i.getBoundingClientRect()
+      const naturalAR = i.naturalWidth / i.naturalHeight
+      const renderedAR = r.width / r.height
+      // The frame is object-contain, so the question is no longer "does the
+      // image's ratio match the box" (one cover is 603x619, not 4:5) but
+      // "is any of the artwork cropped away". Under contain the answer is
+      // always no; this measures it rather than assuming it, and would catch
+      // a regression back to object-cover.
+      const fit = getComputedStyle(i).objectFit
+      const visible = fit === 'contain'
+        ? 1
+        : Math.min(1, renderedAR >= naturalAR ? naturalAR / renderedAR : renderedAR / naturalAR)
+      // paper visible around a cover whose ratio differs from the 4:5 frame
+      const scale = Math.min(r.width / i.naturalWidth, r.height / i.naturalHeight)
+      const margin = 1 - (i.naturalWidth * scale * i.naturalHeight * scale) / (r.width * r.height)
+      return visible < acc.visible || margin > acc.margin
+        ? { visible: Math.min(visible, acc.visible), margin: Math.max(margin, acc.margin), fit, renderedAR, naturalAR, src: i.currentSrc.split('/').pop() }
+        : acc
+    }, { visible: 1, margin: 0, fit: '', renderedAR: 0, naturalAR: 0, src: '' })
+    return { count: imgs.length, ...worst }
+  })
+
+  const tabStopsAtRest = await page.evaluate(() =>
+    [...document.querySelectorAll('a[id^="folio-"]')].filter((a) => a.tabIndex === 0).length)
+  const totalFolios = await page.evaluate(() => document.querySelectorAll('a[id^="folio-"]').length)
+  await page.locator('#folio-khageena').hover()
+  await page.waitForTimeout(250)
+  const tabStopsAfterHover = await page.evaluate(() =>
+    [...document.querySelectorAll('a[id^="folio-"]')].filter((a) => a.tabIndex === 0).length)
+
+  // the search field must keep its own caret: ← is a text key, not a shelf key
+  await page.locator('#art-search').click()
+  await page.locator('#art-search').fill('poetry')
+  await page.keyboard.press('ArrowLeft')
+  await page.waitForTimeout(150)
+  const caret = await page.evaluate(() => ({
+    id: document.activeElement?.id ?? '',
+    pos: document.activeElement?.selectionStart ?? -1,
+  }))
+
+  // a filtered-out folio is really out: no tab stop, hidden from AT
+  await page.goto(BASE + '/articles?room=Horror', { waitUntil: 'networkidle' })
+  await page.waitForTimeout(1000)
+  const filterHonesty = await page.evaluate(() => {
+    const links = [...document.querySelectorAll('a[id^="folio-"]')]
+    const reachable = links.filter((a) => a.tabIndex === 0)
+    const hiddenFromAT = links.filter((a) => a.closest('[aria-hidden="true"]'))
+    const status = document.querySelector('#art-search-status')?.textContent?.trim() ?? ''
+    return {
+      total: links.length,
+      reachable: reachable.length,
+      hiddenFromAT: hiddenFromAT.length,
+      reachableIsMatch: reachable.length === 1 && reachable[0].id === 'folio-3-13',
+      statusAgrees: /\b1 of \d+ folio\b/.test(status),
+    }
+  })
+
+  const archiveWall = {
+    covers: coverGeometry.count,
+    worstVisibleFraction: Number(coverGeometry.visible.toFixed(3)),
+    objectFit: coverGeometry.fit,
+    largestPaperMargin: Number(coverGeometry.margin.toFixed(3)),
+    wholeCovers: coverGeometry.visible > 0.995 && coverGeometry.fit === 'contain',
+    tabStopsAtRest,
+    totalFolios,
+    allFoliosTabbable: tabStopsAtRest === totalFolios && totalFolios > 1,
+    hoverKeepsTabStops: tabStopsAfterHover === tabStopsAtRest,
+    searchCaretKept: caret.id === 'art-search' && caret.pos === 5,
+    ...filterHonesty,
+  }
+  pass(
+    'archive-wall-whole-covers-and-keyboard',
+    archiveWall.wholeCovers &&
+      archiveWall.allFoliosTabbable &&
+      archiveWall.hoverKeepsTabStops &&
+      archiveWall.searchCaretKept &&
+      archiveWall.reachableIsMatch &&
+      archiveWall.hiddenFromAT === archiveWall.total - 1 &&
+      archiveWall.statusAgrees,
+    JSON.stringify(archiveWall),
+  )
+
+  // ---- ARCHIVE WALL: WCAG 2.1 AA CONTRAST + VISIBLE PROVENANCE ----
+  // The registry marks two folios `provisional`. That fact used to live only
+  // in the aria-label; the wall must now say it in ink too, and every caption
+  // must clear 4.5:1 (RandomA11y's published bar) at these small sizes.
+  await page.goto(BASE + '/articles', { waitUntil: 'networkidle' })
+  await page.waitForTimeout(800)
+  const wallInk = await page.evaluate(() => {
+    const chan = (v) => { v /= 255; return v <= 0.03928 ? v / 12.92 : Math.pow((v + 0.055) / 1.055, 2.4) }
+    const lum = (c) => 0.2126 * chan(c[0]) + 0.7152 * chan(c[1]) + 0.0722 * chan(c[2])
+    const nums = (s) => { const m = s.match(/[\d.]+/g); return m ? m.slice(0, 3).map(Number) : null }
+    const alpha = (s) => { const m = s.match(/[\d.]+/g); return m && m.length > 3 ? Number(m[3]) : 1 }
+    const over = (fg, a, bg) => fg.map((v, i) => v * a + bg[i] * (1 - a))
+    // composite translucent layers down to the first opaque ancestor; treat a
+    // backdrop image as mid-grey so a scrim over artwork is scored, not skipped
+    const bgOf = (el) => {
+      const stack = []
+      let n = el
+      while (n && n !== document.documentElement) {
+        const cs = getComputedStyle(n)
+        const c = nums(cs.backgroundColor)
+        const a = alpha(cs.backgroundColor)
+        if (c && a > 0) { stack.push([c, a]); if (a > 0.95) break }
+        if (n.tagName === 'IMG' || cs.backgroundImage !== 'none') { stack.push([[128, 128, 128], 1]); break }
+        n = n.parentElement
+      }
+      stack.push([[255, 255, 255], 1])
+      let out = stack[stack.length - 1][0]
+      for (let i = stack.length - 2; i >= 0; i--) out = over(stack[i][0], stack[i][1], out)
+      return out
+    }
+    let checked = 0
+    const failures = []
+    document.querySelectorAll('a[id^="folio-"], a[id^="folio-"] span').forEach((el) => {
+      const txt = [...el.childNodes].filter((n) => n.nodeType === 3).map((n) => n.textContent.trim()).join('')
+      if (!txt || el.closest('[aria-hidden="true"]')) return
+      const cs = getComputedStyle(el)
+      const fg = nums(cs.color)
+      if (!fg) return
+      const bg = bgOf(el)
+      const L1 = lum(over(fg, alpha(cs.color), bg))
+      const L2 = lum(bg)
+      const ratio = (Math.max(L1, L2) + 0.05) / (Math.min(L1, L2) + 0.05)
+      const px = parseFloat(cs.fontSize)
+      const need = px >= 24 || (px >= 18.66 && parseInt(cs.fontWeight) >= 700) ? 3 : 4.5
+      checked++
+      if (ratio < need) failures.push(`${txt.slice(0, 20)} ${ratio.toFixed(2)}:1 @${px}px`)
+    })
+    const links = [...document.querySelectorAll('a[id^="folio-"]')]
+    const inkMarks = links.filter((a) =>
+      [...a.querySelectorAll('span')].some((s) => s.children.length === 0 && s.textContent.trim() === 'Provisional'))
+    const ariaMarks = links.filter((a) => /provisional record/.test(a.getAttribute('aria-label') || ''))
+    return { checked, failures, inkMarks: inkMarks.length, ariaMarks: ariaMarks.length }
+  })
+  pass(
+    'archive-wall-contrast-and-visible-provenance',
+    wallInk.checked > 40 &&
+      wallInk.failures.length === 0 &&
+      wallInk.inkMarks === 2 &&
+      wallInk.inkMarks === wallInk.ariaMarks,
+    JSON.stringify(wallInk),
   )
 
   // ---- FIXED FOOTER SPECIMEN, SINGLE GLOBAL FOOTER & ZERO TG DEMO RESIDUE ----

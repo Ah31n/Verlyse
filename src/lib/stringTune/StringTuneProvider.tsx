@@ -7,6 +7,16 @@ import {
   stopStringTune,
 } from './runtime'
 
+export function shouldSuspendStringTune(pathname: string): boolean {
+  if (prefersReducedMotion()) return true
+  if (pathname === '/room' || pathname.startsWith('/room/')) return true
+  if (typeof document !== 'undefined') {
+    if (document.visibilityState === 'hidden') return true
+    if (!document.querySelector('[string]')) return true
+  }
+  return false
+}
+
 /**
  * Mounts the StringTune runtime once, for the whole publication.
  *
@@ -16,11 +26,44 @@ import {
  * Boot is deferred to an idle callback after first paint: the library is
  * expressive polish, and it must never compete with the cover plate or the
  * fonts for the first second of a reader's attention.
+ *
+ * Performance & lifecycle gating:
+ * - Never boots or stays running on `/room` (where no `[string]` bindings exist),
+ *   when the document tab is hidden (`visibilityState === 'hidden'`), when no
+ *   `[string]` elements exist in the current DOM, or under `prefers-reduced-motion: reduce`.
  */
 export default function StringTuneProvider() {
   const { pathname } = useLocation()
   const mountedRef = useRef(false)
   const transitionGenRef = useRef(0)
+  const pathnameRef = useRef(pathname)
+  pathnameRef.current = pathname
+
+  const bootOrRescan = () => {
+    const myGen = ++transitionGenRef.current
+    if (!mountedRef.current || shouldSuspendStringTune(pathnameRef.current)) {
+      stopStringTune()
+      return
+    }
+    void startStringTune()
+      .then((tune) => {
+        if (
+          !mountedRef.current ||
+          myGen !== transitionGenRef.current ||
+          !tune ||
+          shouldSuspendStringTune(pathnameRef.current)
+        ) {
+          if (!mountedRef.current || shouldSuspendStringTune(pathnameRef.current)) {
+            stopStringTune()
+          }
+          return
+        }
+        rescanStringTune()
+      })
+      .catch(() => {
+        /* Static CSS composition remains the fallback */
+      })
+  }
 
   useEffect(() => {
     mountedRef.current = true
@@ -35,29 +78,19 @@ export default function StringTuneProvider() {
 
     const handle = idle(
       () => {
-        if (!mountedRef.current || myGen !== transitionGenRef.current || prefersReducedMotion()) {
+        if (
+          !mountedRef.current ||
+          myGen !== transitionGenRef.current ||
+          shouldSuspendStringTune(pathnameRef.current)
+        ) {
+          if (shouldSuspendStringTune(pathnameRef.current)) {
+            stopStringTune()
+          }
           return
         }
-        void startStringTune()
-          .then((tune) => {
-            if (
-              !mountedRef.current ||
-              myGen !== transitionGenRef.current ||
-              !tune ||
-              prefersReducedMotion()
-            ) {
-              if (!mountedRef.current || prefersReducedMotion()) {
-                stopStringTune()
-              }
-              return
-            }
-            rescanStringTune()
-          })
-          .catch(() => {
-            /* Static CSS composition remains the fallback */
-          })
+        bootOrRescan()
       },
-      { timeout: 2000 }
+      { timeout: 2000 },
     )
 
     return () => {
@@ -68,15 +101,36 @@ export default function StringTuneProvider() {
     }
   }, [])
 
-  /* A new route is a new DOM tree; the runtime has to find its elements.
+  /* A new route is a new DOM tree; the runtime has to find its elements, or
+     tear down on `/room` and routes with zero `[string]` bindings.
      Deferred a frame so React has committed before the scan runs. */
   useEffect(() => {
+    if (pathname === '/room' || pathname.startsWith('/room/')) {
+      transitionGenRef.current += 1
+      stopStringTune()
+      return undefined
+    }
     const t = window.setTimeout(() => {
-      if (!mountedRef.current || prefersReducedMotion()) return
-      rescanStringTune()
+      if (!mountedRef.current) return
+      bootOrRescan()
     }, 60)
     return () => window.clearTimeout(t)
   }, [pathname])
+
+  /* Pause StringTune when the tab is hidden; resume when visible again. */
+  useEffect(() => {
+    if (typeof document === 'undefined') return undefined
+    const onVisibility = () => {
+      if (document.visibilityState === 'hidden') {
+        transitionGenRef.current += 1
+        stopStringTune()
+      } else {
+        bootOrRescan()
+      }
+    }
+    document.addEventListener('visibilitychange', onVisibility)
+    return () => document.removeEventListener('visibilitychange', onVisibility)
+  }, [])
 
   /* Dynamic reduced-motion preference changes: tear down immediately if the
      reader enables reduced motion mid-session, or boot/rescan if disabled. */
@@ -84,31 +138,13 @@ export default function StringTuneProvider() {
     if (typeof window === 'undefined' || !window.matchMedia) return undefined
     const mql = window.matchMedia('(prefers-reduced-motion: reduce)')
     const onChange = (e?: MediaQueryListEvent) => {
-      const myGen = ++transitionGenRef.current
       const isReduced = typeof e?.matches === 'boolean' ? e.matches : mql.matches
       if (isReduced || prefersReducedMotion()) {
+        transitionGenRef.current += 1
         stopStringTune()
         return
       }
-      void startStringTune()
-        .then((tune) => {
-          if (
-            !mountedRef.current ||
-            myGen !== transitionGenRef.current ||
-            !tune ||
-            mql.matches ||
-            prefersReducedMotion()
-          ) {
-            if (!mountedRef.current || mql.matches || prefersReducedMotion()) {
-              stopStringTune()
-            }
-            return
-          }
-          rescanStringTune()
-        })
-        .catch(() => {
-          /* Static CSS composition remains the fallback */
-        })
+      bootOrRescan()
     }
 
     if (typeof mql.addEventListener === 'function') {
@@ -128,7 +164,7 @@ export default function StringTuneProvider() {
       transitionGenRef.current += 1
       stopStringTune()
     },
-    []
+    [],
   )
 
   return null

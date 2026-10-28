@@ -15,6 +15,7 @@
     --ivory: #F8F6F2;
     --cream: #EFE8DD;
     --gold: #B89146;
+    --gold-lit: #D9B978;   /* R09 — the text-safe brass (Record 5) */
     --charcoal: #1C1C1C;
     --rule: rgba(248, 246, 242, 0.13);
     --faint: rgba(248, 246, 242, 0.52);
@@ -90,10 +91,25 @@
     content: "";
     @apply block h-px w-12 bg-gold;
   }
+  /* R09 — every section kicker now opens on the press rule, so the
+     chapter system reads the same on Home, the article, Submit and
+     Contact without each page hand-rolling its own header. */
   .kicker {
-    @apply font-mono text-[11px] uppercase text-gold;
+    @apply block font-mono text-[11px] uppercase text-gold-lit;
     letter-spacing: 0.28em;
   }
+  .kicker::before {
+    content: "";
+    display: block;
+    width: clamp(3.5rem, 14vw, 9rem);
+    height: 4px;
+    margin-bottom: 1.15rem;
+    background:
+      linear-gradient(to bottom, rgba(217, 185, 120, 0.52) 0 1px, transparent 1px) top / 100% 1px no-repeat,
+      linear-gradient(to bottom, rgba(217, 185, 120, 0.17) 0 1px, transparent 1px) bottom / 100% 1px no-repeat;
+  }
+  /* opt-out for the few kickers that sit inline inside a card */
+  .kicker-bare::before { display: none; }
 
   /* ——— the decorative drop cap: oversized, italic, seated on the measure ——— */
   .drop-cap::first-letter {
@@ -281,13 +297,23 @@
   }
 
   /* ---------- The archive plate — a cover strip set into a shelf plate ---------- */
+  /* The folio plate on the archive wall. Every cover in the registry is a
+     4:5 portrait, so the frame is the artwork's own proportion — the plate
+     shows the whole published work rather than a letterboxed strip of its
+     top edge. Nothing scales on hover: zooming a cover would crop the very
+     composition the page exists to show, so the plate itself lifts instead. */
   .plate-thumb {
-    @apply relative -mx-4 mb-3 overflow-hidden border-b border-[#B89146]/40;
+    @apply relative block w-full overflow-hidden border-b border-[#B89146]/40;
   }
+  /* The 4:5 frame keeps the wall's rhythm. `contain` rather than `cover` so
+     the frame never crops: 20 of the 21 covers are exactly 4:5 and fill it
+     edge to edge (contain is a no-op for them), while the one near-square
+     cover (603x619) is mounted whole on the paper instead of losing ~18% of
+     the artwork. Cropping a contributor's published work to suit a grid is
+     exactly what this redesign set out to stop. */
   .plate-thumb img {
-    @apply h-[92px] w-full object-cover transition-transform duration-[1400ms] ease-out;
+    @apply block aspect-[4/5] w-full bg-[#F1EDE6] object-contain object-center;
   }
-  .group:hover .plate-thumb img { transform: scale(1.05); }
 
   /* ---------- Skip link ---------- */
   .skip-link {
@@ -296,6 +322,149 @@
   .skip-link:focus { top: 1rem; }
 
   .no-scroll { overflow: hidden; }
+}
+
+/* ============================================================
+   R09 — "THE PRESSED EDITION"
+   The publication as a printed journal: a brass rule system, a
+   left gutter rail carrying section numerals, pressed paper
+   sheets with registration crops, and mounted plates.
+   One owner per idea; pages compose these, never re-declare them.
+   ============================================================ */
+@layer components {
+
+  /* ---------- the chapter opener ---------- */
+  .chapter {
+    @apply relative;
+    padding-left: 0;
+  }
+  @media (min-width: 1024px) {
+    .chapter { padding-left: clamp(4.5rem, 7vw, 7.5rem); }
+    /* the gutter rail — a hairline dropping from the section numeral */
+    .chapter::before {
+      content: "";
+      position: absolute;
+      left: clamp(1.5rem, 2.4vw, 2.6rem);
+      top: 0.65rem;
+      bottom: 0;
+      width: 1px;
+      background: linear-gradient(
+        to bottom,
+        rgba(217, 183, 120, 0.55) 0,
+        rgba(217, 183, 120, 0.18) 42%,
+        rgba(217, 183, 120, 0) 100%
+      );
+    }
+  }
+
+  /* the section numeral, set in the gutter on desktop */
+  .chapter-num {
+    @apply block font-mono uppercase;
+    font-size: 9px;
+    letter-spacing: 0.34em;
+    color: var(--gold-lit);
+  }
+  @media (min-width: 1024px) {
+    .chapter-num {
+      position: absolute;
+      left: 0;
+      top: 0;
+      width: clamp(3.5rem, 5.5vw, 6rem);
+      text-align: left;
+    }
+  }
+
+  /* the double rule that opens a chapter */
+  .chapter-rule {
+    @apply relative block w-full;
+    height: 3px;
+    border-top: 1px solid rgba(217, 183, 120, 0.42);
+    border-bottom: 1px solid rgba(217, 183, 120, 0.14);
+  }
+
+  /* oversized editorial title */
+  .chapter-title {
+    @apply font-serif font-light text-ivory;
+    font-size: clamp(2.1rem, 5.2vw, 4.1rem);
+    line-height: 0.95;
+    letter-spacing: -0.022em;
+    text-wrap: balance;
+    font-feature-settings: "liga" 1, "dlig" 1;
+  }
+  .chapter-title em {
+    @apply not-italic;
+    font-style: italic;
+    color: var(--gold-lit);
+  }
+
+  /* the deck — held to a reading measure, never full-bleed */
+  .chapter-deck {
+    @apply font-sans text-ivory/75;
+    font-size: clamp(0.82rem, 1.05vw, 0.95rem);
+    line-height: 1.65;
+    max-width: 46ch;
+    text-wrap: pretty;
+  }
+
+  /* ---------- pressed paper sheet ---------- */
+  .sheet {
+    @apply relative;
+    background:
+      linear-gradient(180deg, rgba(248, 246, 242, 0.035) 0%, rgba(248, 246, 242, 0.012) 100%);
+    border: 1px solid rgba(217, 183, 120, 0.2);
+  }
+  /* registration crops at the corners — printer's marks */
+  .sheet::before,
+  .sheet::after {
+    content: "";
+    position: absolute;
+    width: 11px;
+    height: 11px;
+    pointer-events: none;
+    border-color: rgba(217, 183, 120, 0.55);
+  }
+  .sheet::before {
+    top: -1px; left: -1px;
+    border-top: 1px solid; border-left: 1px solid;
+  }
+  .sheet::after {
+    bottom: -1px; right: -1px;
+    border-bottom: 1px solid; border-right: 1px solid;
+  }
+  .sheet-pad { padding: clamp(1.25rem, 3vw, 2.5rem); }
+
+  /* ---------- mounted plate ---------- */
+  .plate-mount {
+    @apply relative block overflow-hidden;
+    background: var(--cream);
+    padding: clamp(0.35rem, 0.9vw, 0.7rem);
+    border: 1px solid rgba(217, 183, 120, 0.38);
+  }
+  .plate-mount > img {
+    @apply block w-full;
+    background: #F1EDE6;
+  }
+
+  /* printed caption, seated under a hairline */
+  .plate-caption {
+    @apply mt-2.5 block font-mono uppercase;
+    font-size: 9px;
+    letter-spacing: 0.2em;
+    color: var(--gold-lit);
+    padding-top: 0.5rem;
+    border-top: 1px solid rgba(217, 183, 120, 0.22);
+  }
+
+  /* ---------- the colophon mark that closes a chapter ---------- */
+  .chapter-close {
+    @apply flex items-center justify-center gap-4 text-gold-lit;
+  }
+  .chapter-close::before,
+  .chapter-close::after {
+    content: "";
+    @apply block h-px flex-1;
+    background: linear-gradient(to right, transparent, rgba(217, 183, 120, 0.34), transparent);
+  }
 }
 
 @layer utilities {

@@ -182,7 +182,7 @@ function Cover({ selectedId, state }: { selectedId: string | null; state: Spatia
               initial={reduce ? false : { opacity: 0, y: 12 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: D(0.95), delay: T.mast, ease: E }}
-              className="mb-3 font-mono text-[9px] uppercase tracking-[0.34em] text-gold/85 md:text-[10px]"
+              className="mb-3 font-mono text-[9px] uppercase tracking-[0.34em] text-gold-lit/85 md:text-[10px]"
             >
               Issue № {LEDGER.issueNo} — {LEDGER.features} folios · {LEDGER.creators} creators · {LEDGER.departments} departments
             </motion.p>
@@ -304,7 +304,7 @@ function Cover({ selectedId, state }: { selectedId: string | null; state: Spatia
                     <p className="font-mono text-[9px] uppercase tracking-[0.26em] text-[#2A0F18]/80">
                       {author.name} · {author.handle}
                     </p>
-                    <p className="mt-0.5 font-mono text-[8px] uppercase tracking-[0.26em] text-[#2A0F18]/55">
+                    <p className="mt-0.5 font-mono text-[8px] uppercase tracking-[0.26em] text-[#2A0F18]/65">
                       {feature.category} · {feature.readingTime} · {feature.date}
                     </p>
                   </div>
@@ -331,7 +331,7 @@ function Cover({ selectedId, state }: { selectedId: string | null; state: Spatia
           <div className="mx-auto flex max-w-page items-center justify-between border-t border-white/15 px-[clamp(1.75rem,5.5vw,4.75rem)] py-4 font-mono text-[9px] uppercase tracking-[0.34em] text-white/65">
             <span>Verlyse Media presents — Issue № 01</span>
             <span className="hidden sm:inline">The first feature — “{feature.title}” · {feature.date}</span>
-            <span className="hidden text-gold/80 lg:inline">↓ the archive opens below</span>
+            <span className="hidden text-gold-lit/85 lg:inline">↓ the archive opens below</span>
             <span>{BRAND.handle}</span>
           </div>
         </motion.div>
@@ -382,7 +382,7 @@ function IssueBand() {
               <p className="mt-2 font-serif text-2xl font-light italic leading-none text-ivory md:text-3xl">
                 <span className="tnum not-italic text-gold">{it.value}</span> {it.unit}
               </p>
-              <span className="mt-2 font-mono text-[8px] uppercase tracking-[0.22em] text-white/50">
+              <span className="mt-2 font-mono text-[8px] uppercase tracking-[0.22em] text-white/65">
                 {it.note}
               </span>
             </div>
@@ -463,7 +463,7 @@ function StoryCard({
           {cover && (
             <span
               aria-hidden="true"
-              className="absolute left-5 top-1/2 hidden -translate-y-1/2 -rotate-90 origin-left whitespace-nowrap font-mono text-[9px] uppercase tracking-[0.42em] text-gold/90 md:block"
+              className="absolute left-5 top-1/2 hidden -translate-y-1/2 -rotate-90 origin-left whitespace-nowrap font-mono text-[9px] uppercase tracking-[0.42em] text-gold-lit/90 md:block"
             >
               The cover of the issue — Verlyse Media
             </span>
@@ -497,7 +497,7 @@ function StoryCard({
             )}
           </h3>
           {au && (
-            <p className="mt-2 font-mono text-[9px] uppercase tracking-[0.26em] text-white/45">
+            <p className="mt-2 font-mono text-[9px] uppercase tracking-[0.26em] text-white/60">
               {work.credit ? work.credit : `by ${au.name} ${au.handle}`}
             </p>
           )}
@@ -598,8 +598,8 @@ function WorksStrip() {
             <Reveal delay={0.08} className="flex flex-1 flex-col justify-between border border-gold/25 bg-white/[0.02] p-7 md:p-9">
               <div>
                 <div className="flex flex-wrap items-center justify-between gap-3 border-b border-white/10 pb-4">
-                  <p className="font-mono text-[9px] uppercase tracking-[0.3em] text-gold/85">Pull — the issue note</p>
-                  <span className="font-mono text-[9px] uppercase tracking-[0.26em] text-white/45">
+                  <p className="font-mono text-[9px] uppercase tracking-[0.3em] text-gold-lit/85">Pull — the issue note</p>
+                  <span className="font-mono text-[9px] uppercase tracking-[0.26em] text-white/60">
                     Issue № {LEDGER.issueNo} · Desk Record
                   </span>
                 </div>
@@ -629,7 +629,7 @@ function WorksStrip() {
                   </div>
                 </div>
                 <div className="mt-6 flex flex-wrap items-center justify-between gap-4 border-t border-white/10 pt-4">
-                  <span className="font-mono text-[9px] uppercase tracking-[0.26em] text-white/50">
+                  <span className="font-mono text-[9px] uppercase tracking-[0.26em] text-white/65">
                     {LEDGER.publishedFeatures} published · {LEDGER.provisionalFeatures} provisional {LEDGER.provisionalFeatures === 1 ? 'record' : 'records'}
                   </span>
                   <Link
@@ -676,7 +676,7 @@ function WorksStrip() {
         {/* ——— end of the issue ——— */}
         <Reveal className="mt-24">
           <div className="flex flex-col items-center gap-5">
-            <span aria-hidden="true" className="font-mono text-[10px] uppercase tracking-[0.28em] text-white/50">End of the issue</span>
+            <span aria-hidden="true" className="font-mono text-[10px] uppercase tracking-[0.28em] text-white/65">End of the issue</span>
             <span aria-hidden="true" className="flex items-center gap-4">
               <span className="h-px w-24 bg-gold/40" />
               <span className="text-gold">✦</span>
@@ -715,12 +715,12 @@ function FeatureSection({ feature, authorName }: { feature: (typeof ARTICLES)[nu
                   />
                   <figcaption className="flex items-center justify-between border-t border-white/10 px-3 py-2 font-mono text-[8px] uppercase tracking-[0.26em] text-white/55">
                     <span>Plate {String(i + 1).padStart(2, '0')}</span>
-                    <span className="text-gold/80">{String(i + 1).padStart(2, '0')} / {String(plates.length).padStart(2, '0')}</span>
+                    <span className="text-gold-lit/85">{String(i + 1).padStart(2, '0')} / {String(plates.length).padStart(2, '0')}</span>
                   </figcaption>
                 </figure>
               ))}
             </div>
-            <p className="mt-5 font-mono text-[10px] uppercase tracking-[0.28em] text-white/50">
+            <p className="mt-5 font-mono text-[10px] uppercase tracking-[0.28em] text-white/65">
               The feature as presented — {plates.length} plates, 4:5 · as published on the feed
             </p>
           </Reveal>
@@ -872,7 +872,7 @@ function Departments() {
                       </h3>
                       <p className="mt-1.5 max-w-[48ch] text-sm leading-relaxed text-white/60">{c.blurb}</p>
                     </div>
-                    <p className="text-left font-mono text-[10px] uppercase tracking-[0.28em] text-gold/90 md:text-right">
+                    <p className="text-left font-mono text-[10px] uppercase tracking-[0.28em] text-gold-lit/90 md:text-right">
                       {c.count} feature{c.count === 1 ? '' : 's'} · Browse <span aria-hidden="true">→</span>
                     </p>
                   </Link>
@@ -894,7 +894,7 @@ function Departments() {
                     Every room on this page was opened — or will be opened — by a writer who sent their work in. Yours could open the next one.
                   </p>
                 </div>
-                <p className="text-left font-mono text-[10px] uppercase tracking-[0.28em] text-gold/90 md:text-right">
+                <p className="text-left font-mono text-[10px] uppercase tracking-[0.28em] text-gold-lit/90 md:text-right">
                   Send your work <span aria-hidden="true">→</span>
                 </p>
               </Link>
@@ -954,7 +954,7 @@ function Departments() {
 
                 {/* Catalogued Folios in this Room */}
                 <div className="mt-5">
-                  <p className="font-mono text-[8px] uppercase tracking-[0.28em] text-white/50">
+                  <p className="font-mono text-[8px] uppercase tracking-[0.28em] text-white/65">
                     Folios in this room
                   </p>
                   <ul className="mt-2.5 divide-y divide-white/10 border-y border-white/10">
@@ -971,7 +971,7 @@ function Departments() {
                               <span className="mr-2 font-mono text-[9px] text-gold">№ {fNo}</span>
                               “{f.title}”
                             </span>
-                            <span className="shrink-0 font-mono text-[8px] uppercase tracking-[0.22em] text-white/45 group-hover:text-gold">
+                            <span className="shrink-0 font-mono text-[8px] uppercase tracking-[0.22em] text-white/60 group-hover:text-gold">
                               {fAu?.name} →
                             </span>
                           </Link>
@@ -1200,7 +1200,7 @@ function SpatialReading({ pickIdx, onSelect }: { pickIdx: number; onSelect: (i: 
                       activeSel ? 'border-gold/70 bg-gold/5' : 'border-white/15 hover:border-gold/40'
                     }`}
                   >
-                    <span aria-hidden="true" className={`mt-1 font-serif text-2xl leading-none ${activeSel ? 'text-gold' : 'text-white/40'}`}>✦</span>
+                    <span aria-hidden="true" className={`mt-1 font-serif text-2xl leading-none ${activeSel ? 'text-gold' : 'text-white/60'}`}>✦</span>
                     <span className="flex-1">
                       <span className={`block font-serif text-xl leading-tight ${activeSel ? 'text-ivory' : 'text-ivory/80'} transition-colors group-hover:text-ivory`}>
                         “{a.title}”
@@ -1221,7 +1221,7 @@ function SpatialReading({ pickIdx, onSelect }: { pickIdx: number; onSelect: (i: 
               {picks.map((a, i) => (
                 <span key={a.id} className={`h-1.5 w-1.5 rotate-45 border transition-colors duration-500 ${i === pickIdx ? 'border-gold bg-gold' : 'border-white/30 bg-transparent'}`} />
               ))}
-              <span className="ml-3 font-mono text-[9px] uppercase tracking-[0.24em] text-white/40">Four curated plates · Issue № 01</span>
+              <span className="ml-3 font-mono text-[9px] uppercase tracking-[0.24em] text-white/60">Four curated plates · Issue № 01</span>
             </div>
           </div>
 

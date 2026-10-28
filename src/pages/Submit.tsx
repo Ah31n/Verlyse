@@ -2,6 +2,11 @@ import { useRef, useState, type FormEvent, type ReactNode } from 'react'
 import { useSeo } from '../hooks/useSeo'
 import Reveal from '../components/ui/Reveal'
 import { BRAND, CATEGORIES } from '../data/content'
+import { CrashZoom } from '../components/cinematic'
+import {
+  FloralWord,
+  HaikeiContourPlane,
+} from '../components/ui/EditorialCraftSystem'
 
 /** A quiet field-level note — shown only when the line needs attention.
     Linked to its input via aria-describedby; a single form-level live region
@@ -15,31 +20,100 @@ function FieldHint({ id, show, children }: { id: string; show: boolean; children
   )
 }
 
-import { CrashZoom } from '../components/cinematic'
-import {
-  FloralWord,
-  HaikeiContourPlane,
-} from '../components/ui/EditorialCraftSystem'
+export const VERCEL_SUBMIT_ENDPOINT = 'https://verlyse-react.vercel.app/api/submit'
+export const MAX_COVER_BYTES = 4 * 1024 * 1024
+export const ACCEPTED_COVER_MIMES = [
+  'image/jpeg',
+  'image/png',
+  'image/webp',
+  'image/avif',
+  'image/gif',
+] as const
+
+/**
+ * Resolve the submission API target:
+ * - On the canonical static InfinityFree host (`verlysemedia.kesug.com`), where
+ *   `/api/*` is not backed by a serverless runtime, call the Vercel serverless
+ *   endpoint directly (`https://verlyse-react.vercel.app/api/submit`).
+ * - On Vercel or local dev/preview/test origins, call same-origin `/api/submit`.
+ */
+export function resolveSubmitEndpoint(hostname?: string): string {
+  const host =
+    hostname ?? (typeof window !== 'undefined' ? window.location.hostname : '')
+  if (host === 'verlysemedia.kesug.com' || host === 'www.verlysemedia.kesug.com') {
+    return VERCEL_SUBMIT_ENDPOINT
+  }
+  return '/api/submit'
+}
+
+function formatBytes(bytes: number): string {
+  if (bytes < 1024) return `${bytes} B`
+  if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(1)} KB`
+  return `${(bytes / (1024 * 1024)).toFixed(2)} MB`
+}
+
+interface DraftSnapshot {
+  name: string
+  email: string
+  handle: string
+  title: string
+  category: string
+  description: string
+  work: string
+  fileName: string
+}
+
+export function buildSubmissionMailtoHref(draft: DraftSnapshot): string {
+  const params = new URLSearchParams({
+    subject: `Submission — ${draft.title || 'Untitled piece'}`,
+    body: [
+      `Name: ${draft.name}`,
+      `Email: ${draft.email}`,
+      draft.handle ? `Handle: ${draft.handle}` : '',
+      `Title: ${draft.title}`,
+      `Category: ${draft.category}`,
+      draft.description ? `Description: ${draft.description}` : '',
+      '',
+      '--- the work ---',
+      draft.work,
+      draft.fileName
+        ? `\n[Cover image to attach manually in your mail app before pressing Send: ${draft.fileName}]`
+        : '',
+    ]
+      .filter(Boolean)
+      .join('\n'),
+  })
+  return `mailto:${BRAND.email}?${params.toString()}`
+}
+
+type SubmissionUiState = 'idle' | 'invalid' | 'sending' | 'accepted' | 'failed'
 
 export default function Submit() {
   useSeo({
-path: '/submit',
+    path: '/submit',
     title: 'Submit',
     description: 'Send your story to Verlyse Media. Every feature begins as a submission.',
   })
 
   const formRef = useRef<HTMLFormElement>(null)
   const fileInputRef = useRef<HTMLInputElement>(null)
-  const [sent, setSent] = useState(false)
-  const [sending, setSending] = useState(false)
-  const [viaBackend, setViaBackend] = useState(true)
+  const inFlightRef = useRef(false)
+  const [uiState, setUiState] = useState<SubmissionUiState>('idle')
   const [errors, setErrors] = useState<string[]>([])
+  const [coverFile, setCoverFile] = useState<File | null>(null)
   const [fileName, setFileName] = useState('')
   const [fileError, setFileError] = useState('')
-  /** the forwarding inbox never sees a cover larger than this; the mail
-      fallback can only name a file, so an honest size keeps both paths sane */
-  const MAX_COVER_BYTES = 8 * 1024 * 1024
-  const ACCEPTED_COVER = ['image/jpeg', 'image/png', 'image/webp', 'image/avif', 'image/gif']
+  const [deliveryError, setDeliveryError] = useState('')
+  const [draftOpened, setDraftOpened] = useState(false)
+  const [lastDraft, setLastDraft] = useState<DraftSnapshot | null>(null)
+  const [acceptedMeta, setAcceptedMeta] = useState<{
+    title: string
+    attachmentIncluded: boolean
+    attachmentName: string
+  } | null>(null)
+
+  const sending = uiState === 'sending'
+  const accepted = uiState === 'accepted'
 
   const clearFieldError = (field: string) => {
     setErrors((prev) => (prev.includes(field) ? prev.filter((k) => k !== field) : prev))
@@ -47,82 +121,87 @@ path: '/submit',
   }
 
   const clearCoverSelection = () => {
+    setCoverFile(null)
     setFileName('')
     setFileError('')
     if (fileInputRef.current) fileInputRef.current.value = ''
   }
 
-  /** validate a chosen cover before the form can name it — type and size
-      only; the writer is told exactly why a file was refused */
+  /** Validate a chosen cover file before upload — MIME type, non-empty, and size limit. */
   const onCoverChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0]
     if (!file) {
+      setCoverFile(null)
       setFileName('')
       setFileError('')
       return
     }
-    if (!ACCEPTED_COVER.includes(file.type)) {
-      setFileError('The desk reads JPG, PNG, WEBP, AVIF or GIF covers — please choose an image.')
+    if (!(ACCEPTED_COVER_MIMES as readonly string[]).includes(file.type)) {
+      setFileError('The desk accepts JPG, PNG, WEBP, AVIF or GIF covers — please choose a valid image file.')
       e.target.value = ''
+      setCoverFile(null)
+      setFileName('')
+      return
+    }
+    if (file.size === 0) {
+      setFileError('That image file appears to be empty — please choose a non-empty cover image.')
+      e.target.value = ''
+      setCoverFile(null)
       setFileName('')
       return
     }
     if (file.size > MAX_COVER_BYTES) {
-      setFileError('That image is over 8 MB — please send a smaller cover (the writing is the piece).')
+      setFileError('That image is over 4 MB — please send a smaller cover (up to 4 MB).')
       e.target.value = ''
+      setCoverFile(null)
       setFileName('')
       return
     }
     setFileError('')
+    setCoverFile(file)
     setFileName(file.name)
   }
 
-  /** Deliver the piece to the desk — posts to the forwarding service so it
-      arrives in the Verlyse Media inbox; if the network path fails, the
-      writer's mail app opens with everything prefilled instead. */
-  const sendToDesk = async (payload: Record<string, string>): Promise<boolean> => {
-    try {
-      const res = await fetch('https://formsubmit.co/ajax/Verlysemedia.09@gmail.com', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
-        body: JSON.stringify({ _subject: `Submission — ${payload.title}`, _captcha: 'false', ...payload }),
-      })
-      if (res.ok) return true
-    } catch {
-      /* fall through to the mail fallback */
+  const describeServerError = (status: number, code?: string): string => {
+    if (code === 'provider-unconfigured' || status === 503) {
+      return 'The submission service is currently unconfigured on this deployment — your manuscript and selected cover image are still intact on this page. Retry once configured, or open an email draft below.'
     }
-    const params = new URLSearchParams({
-      subject: `Submission — ${payload.title}`,
-      body: [
-        `Name: ${payload.name}`,
-        `Email: ${payload.email}`,
-        payload.handle ? `Handle: ${payload.handle}` : '',
-        `Title: ${payload.title}`,
-        `Category: ${payload.category}`,
-        payload.description ? `Description: ${payload.description}` : '',
-        '',
-        '--- the work ---',
-        payload.work,
-        payload.fileName ? `\n(cover image selected: ${payload.fileName} — please attach it to this email)` : '',
-      ].filter(Boolean).join('\n'),
-    })
-    window.location.href = `mailto:${BRAND.email}?${params.toString()}`
-    return false
+    if (code === 'file-too-large' || status === 413) {
+      return 'The selected cover image exceeds the upload size limit (4 MB max) — please choose a smaller image and retry.'
+    }
+    if (
+      code === 'invalid-image-signature' ||
+      code === 'invalid-image-type' ||
+      code === 'empty-file' ||
+      status === 415
+    ) {
+      return 'The selected file could not be verified as a valid JPG, PNG, WEBP, AVIF, or GIF image — please choose another image or clear the cover selection.'
+    }
+    if (code === 'too-many-requests' || status === 429) {
+      return 'Too many submission attempts in a short window — please wait a few minutes and retry, or open an email draft below.'
+    }
+    if (code === 'invalid-fields' || status === 422) {
+      return 'Some required submission fields were rejected by the server — please check your entries and retry.'
+    }
+    if (code === 'upstream-timeout' || status === 504) {
+      return 'The submission service timed out while contacting the mail relay — your words and selected cover image remain intact below. Please retry or open an email draft.'
+    }
+    return 'The submission could not be delivered to the server right now — your words and selected cover image remain intact on this page. Please retry or open an email draft below.'
   }
 
   const onSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault()
-    /* double-submit guard — a second press while the piece is crossing
-       must never open two requests or two drafts */
-    if (sending || sent) return
+    if (inFlightRef.current || sending || accepted) return
     const form = e.currentTarget
     const data = new FormData(form)
     const name = String(data.get('name') ?? '').trim()
     const email = String(data.get('email') ?? '').trim()
+    const handle = String(data.get('handle') ?? '').trim()
     const title = String(data.get('title') ?? '').trim()
+    const category = String(data.get('category') ?? '').trim()
+    const description = String(data.get('description') ?? '').trim()
     const work = String(data.get('work') ?? '').trim()
-    const category = String(data.get('category') ?? '')
-
+    const gotcha = String(data.get('_gotcha') ?? '').trim()
     const original = data.get('original') === 'on'
 
     const bad: string[] = []
@@ -138,34 +217,98 @@ path: '/submit',
     bad.forEach((k) => form.querySelector<HTMLElement>(`[name="${k}"]`)?.classList.add('is-invalid'))
     setErrors(bad)
 
-    if (bad.length) {
-      form.querySelector<HTMLElement>(`[name="${bad[0]}"]`)?.focus()
+    if (bad.length > 0 || fileError) {
+      setUiState('invalid')
+      setDeliveryError('')
+      if (bad.length > 0) {
+        form.querySelector<HTMLElement>(`[name="${bad[0]}"]`)?.focus()
+      } else {
+        fileInputRef.current?.focus()
+      }
       return
     }
 
-    setSending(true)
-    const ok = await sendToDesk({
+    const activeFile = coverFile ?? fileInputRef.current?.files?.[0] ?? null
+    const snapshot: DraftSnapshot = {
       name,
       email,
-      handle: String(data.get('handle') ?? '').trim(),
+      handle,
       title,
       category,
-      description: String(data.get('description') ?? '').trim(),
+      description,
       work,
-      fileName,
-    })
-    setSending(false)
-    setViaBackend(ok)
-    setSent(true)
+      fileName: activeFile?.name ?? fileName,
+    }
+    inFlightRef.current = true
+    setLastDraft(snapshot)
+    setDeliveryError('')
+    setDraftOpened(false)
+    setUiState('sending')
+
+    const outbound = new FormData()
+    outbound.append('kind', 'submission')
+    outbound.append('name', name)
+    outbound.append('email', email)
+    if (handle) outbound.append('handle', handle)
+    outbound.append('title', title)
+    outbound.append('category', category)
+    if (description) outbound.append('description', description)
+    outbound.append('work', work)
+    outbound.append('original', 'on')
+    if (gotcha) outbound.append('_gotcha', gotcha)
+    if (activeFile) {
+      outbound.append('cover', activeFile, activeFile.name)
+    }
+
+    try {
+      const res = await fetch(resolveSubmitEndpoint(), {
+        method: 'POST',
+        headers: { Accept: 'application/json' },
+        body: outbound,
+      })
+      const payload = (await res.json().catch(() => ({}))) as {
+        ok?: boolean
+        accepted?: boolean
+        error?: string
+        attachmentIncluded?: boolean
+        attachmentName?: string | null
+      }
+
+      if (res.ok && payload.ok === true) {
+        setAcceptedMeta({
+          title,
+          attachmentIncluded: Boolean(payload.attachmentIncluded ?? activeFile),
+          attachmentName: payload.attachmentName ?? activeFile?.name ?? '',
+        })
+        setUiState('accepted')
+        return
+      }
+
+      setDeliveryError(describeServerError(res.status, payload.error))
+      setUiState('failed')
+    } catch {
+      setDeliveryError(describeServerError(0))
+      setUiState('failed')
+    } finally {
+      inFlightRef.current = false
+    }
   }
 
   const resetForm = () => {
     formRef.current?.reset()
-    setSent(false)
+    setUiState('idle')
     setErrors([])
+    setCoverFile(null)
     setFileName('')
     setFileError('')
+    setDeliveryError('')
+    setDraftOpened(false)
+    setLastDraft(null)
+    setAcceptedMeta(null)
+    if (fileInputRef.current) fileInputRef.current.value = ''
   }
+
+  const hasValidationAlert = errors.length > 0 || Boolean(fileError)
 
   return (
     <>
@@ -200,7 +343,7 @@ path: '/submit',
           </Reveal>
           <Reveal delay={0.3}>
             <div className="mt-9 flex flex-wrap items-center gap-x-2 gap-y-3" role="group" aria-label="What Verlyse accepts — seven departments">
-              <span className="mr-2 font-mono text-[9px] uppercase tracking-[0.28em] text-white/45">The desk accepts —</span>
+              <span className="mr-2 font-mono text-[9px] uppercase tracking-[0.28em] text-white/60">The desk accepts —</span>
               {CATEGORIES.map((c) => (
                 <span
                   key={c.slug}
@@ -211,51 +354,53 @@ path: '/submit',
                   {c.name}
                 </span>
               ))}
-              <span className="font-mono text-[9px] uppercase tracking-[0.22em] text-white/45">…and ideas for a room not opened yet</span>
+              <span className="font-mono text-[9px] uppercase tracking-[0.22em] text-white/60">…and ideas for a room not opened yet</span>
             </div>
           </Reveal>
         </div>
       </section>
 
-      <section className="relative border-t border-white/10 py-[clamp(6rem,14vh,11rem)]">
+      <section className="relative border-t border-white/10 pb-[clamp(5rem,12vh,9rem)] pt-[clamp(3rem,7vh,5rem)]">
         <div aria-hidden="true" className="pointer-events-none absolute inset-x-0 top-0 h-80 bg-[radial-gradient(60%_90%_at_50%_0%,rgba(232,217,168,0.07),transparent_70%)]" />
         <div className="mx-auto grid max-w-page grid-cols-1 gap-[clamp(3rem,6vw,7rem)] px-[clamp(1.75rem,5.5vw,4.75rem)] lg:grid-cols-[1.15fr_0.85fr]">
           {/* Form */}
-          <form ref={formRef} onSubmit={onSubmit} className="flex max-w-[640px] flex-col gap-10" noValidate>
-            {sent ? (
-              /* ——— the acknowledgement — the piece has left the writer's hands ——— */
-              <div className="border-t border-gold/30 pt-10">
-                <p className="kicker">Sent to the desk</p>
+          <form
+            ref={formRef}
+            onSubmit={onSubmit}
+            data-submission-state={uiState}
+            className="flex max-w-[640px] flex-col gap-10"
+            noValidate
+          >
+            {accepted ? (
+              /* ——— Verified server acceptance screen ——— */
+              <div role="status" aria-live="polite" className="border-t border-gold/30 pt-10">
+                <p className="kicker">Accepted by the submission system</p>
                 <h2 className="mt-5 font-serif text-[clamp(2rem,3.6vw,3rem)] font-light leading-[1.05] tracking-[-0.015em] text-ivory">
-                  Your work is on the desk — <em className="italic text-gold">the desk writes back</em>
+                  Your submission has been received — <em className="italic text-gold">the desk writes back</em>
                 </h2>
-                <p className="mt-6 max-w-[44ch] font-serif text-lg font-light italic leading-[1.7] text-white/70">
-                  Every submission is read, and every writer is credited by name. The desk will write back — to the address on the envelope — within two weeks at the latest.
+                <p className="mt-6 max-w-[46ch] font-serif text-lg font-light italic leading-[1.7] text-white/75">
+                  {acceptedMeta?.title ? `“${acceptedMeta.title}”` : 'Your piece'} has been accepted by the Verlyse submission server and queued for the editorial desk. Every submission is read, and every featured writer is credited by name.
                 </p>
-                <p className="mt-6 max-w-[44ch] font-mono text-[10px] uppercase leading-[2] tracking-[0.28em] text-white/55">
-                  Received · read · answered — nothing is invented
-                </p>
-                {!viaBackend && (
-                  <p className="mt-4 max-w-[44ch] text-sm leading-[1.8] text-white/60">
-                    Your mail app should have opened with the piece written out — if it didn’t, send it directly to {BRAND.email}. The cover image’s filename travels with the submission; attach the file itself in the email if it opened.
+                {acceptedMeta?.attachmentIncluded && acceptedMeta.attachmentName ? (
+                  <p className="mt-4 max-w-[46ch] font-mono text-[10px] uppercase leading-[2] tracking-[0.24em] text-[#A8C9A2]">
+                    Cover image uploaded &amp; attached: {acceptedMeta.attachmentName}
                   </p>
-                )}
-                {fileName && (
-                  <div role="note" className="mt-6 max-w-[46ch] border border-gold/40 bg-wine-deep/60 px-5 py-4 text-left">
-                    <p className="font-mono text-[9px] uppercase tracking-[0.26em] text-gold">
-                      Cover image reminder — attach by email
-                    </p>
-                    <p className="mt-2 text-sm leading-[1.75] text-ivory/85">
-                      The cover image ({fileName}) is noted by filename only — the image file itself was not uploaded by this form. Reply to the desk’s email with the image file attached, or send it to {BRAND.email} now.
-                    </p>
-                  </div>
-                )}
+                ) : null}
+                <p className="mt-6 max-w-[44ch] font-mono text-[10px] uppercase leading-[2] tracking-[0.28em] text-white/55">
+                  Accepted by server · credited by name · answered from {BRAND.email}
+                </p>
                 <button type="button" onClick={resetForm} className="btn btn-ghost mt-10">
                   Send another piece
                 </button>
               </div>
             ) : (
               <>
+                {/* Honeypot field — hidden from humans and assistive tech */}
+                <div aria-hidden="true" className="sr-only">
+                  <label htmlFor="sf-gotcha">Leave this field blank</label>
+                  <input id="sf-gotcha" name="_gotcha" type="text" tabIndex={-1} autoComplete="off" />
+                </div>
+
                 {/* ——— I · the writer ——— */}
                 <div>
                   <p className="kicker">I — the writer</p>
@@ -289,7 +434,7 @@ path: '/submit',
                       <FieldHint id="sf-email-err" show={errors.includes('email')}>An email is needed — the desk writes back.</FieldHint>
                     </div>
                     <div className="field sm:col-span-2">
-                      <label className="field-label" htmlFor="sf-handle">Instagram / social handle <span className="text-white/40">— optional</span></label>
+                      <label className="field-label" htmlFor="sf-handle">Instagram / social handle <span className="text-white/60">— optional</span></label>
                       <input className="field-input" id="sf-handle" name="handle" type="text" autoComplete="username" />
                     </div>
                   </div>
@@ -337,7 +482,7 @@ path: '/submit',
                       <FieldHint id="sf-cat-err" show={errors.includes('category')}>Choose a department.</FieldHint>
                     </div>
                     <div className="field sm:col-span-2">
-                      <label className="field-label" htmlFor="sf-desc">Short description / excerpt <span className="text-white/40">— optional</span></label>
+                      <label className="field-label" htmlFor="sf-desc">Short description / excerpt <span className="text-white/60">— optional</span></label>
                       <textarea
                         className="field-input field-area !min-h-20"
                         id="sf-desc"
@@ -366,10 +511,12 @@ path: '/submit',
                       <FieldHint id="sf-work-err" show={errors.includes('work')}>The work itself is required.</FieldHint>
                     </div>
                     <div className="field">
-                      <label className="field-label" htmlFor="sf-cover">Cover / supporting image <span className="text-white/40">— optional (filename only; attach image by email)</span></label>
+                      <label className="field-label" htmlFor="sf-cover">Cover / supporting image <span className="text-white/60">— optional (JPG, PNG, WEBP, AVIF, GIF up to 4 MB)</span></label>
                       <div className="mt-1 flex flex-wrap items-center justify-between gap-4 border border-dashed border-gold/30 px-5 py-4 transition-colors duration-500 focus-within:border-gold hover:border-gold/60">
                         <span className="min-w-0 flex-1 truncate font-serif text-base italic text-white/70">
-                          {fileName ? `Filename noted: ${fileName} (not uploaded)` : 'Name your cover — a plate, a photograph, a scan'}
+                          {coverFile
+                            ? `Selected cover: ${fileName} (${formatBytes(coverFile.size)})`
+                            : 'Choose a cover plate, photograph, or scan'}
                         </span>
                         <div className="flex shrink-0 items-center gap-2">
                           {fileName && (
@@ -381,12 +528,13 @@ path: '/submit',
                               Clear
                             </button>
                           )}
-                          <label
-                            htmlFor="sf-cover"
-                            className="cursor-pointer border border-gold/50 px-4 py-2 font-mono text-[9px] uppercase tracking-[0.28em] text-gold transition-colors hover:border-gold hover:bg-gold/10"
+                          <button
+                            type="button"
+                            onClick={() => fileInputRef.current?.click()}
+                            className="cursor-pointer border border-gold/50 px-4 py-2 font-mono text-[9px] uppercase tracking-[0.28em] text-gold transition-colors hover:border-gold hover:bg-gold/10 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-gold"
                           >
                             {fileName ? 'Change' : 'Choose'}
-                          </label>
+                          </button>
                         </div>
                         <input
                           ref={fileInputRef}
@@ -394,7 +542,6 @@ path: '/submit',
                           type="file"
                           name="cover"
                           accept="image/jpeg,image/png,image/webp,image/avif,image/gif"
-                          aria-label="Cover image — optional (filename recorded only; attach actual image by email)"
                           aria-invalid={fileError ? 'true' : undefined}
                           aria-describedby={
                             fileError
@@ -407,16 +554,15 @@ path: '/submit',
                           onChange={onCoverChange}
                         />
                       </div>
-                      {fileError
-                        ? <FieldHint id="sf-cover-err" show>{fileError}</FieldHint>
-                        : fileName
-                          ? <p id="sf-cover-status" className="mt-2 font-mono text-[9px] uppercase tracking-[0.22em] text-gold/80">Cover filename noted ({fileName}) — file not uploaded by this form; attach image by email.</p>
-                          : null}
-                      {/* The desk must never imply it is holding a file it does
-                          not have: this form records the cover's name, and the
-                          image itself arrives by email. */}
-                      <p id="sf-cover-note" className="mt-2 max-w-[44ch] text-xs leading-[1.7] text-white/50">
-                        The image file isn’t sent with this form — only its name. The desk will reply to your email address and ask you to attach it there.
+                      {fileError ? (
+                        <FieldHint id="sf-cover-err" show>{fileError}</FieldHint>
+                      ) : coverFile ? (
+                        <p id="sf-cover-status" className="mt-2 font-mono text-[9px] uppercase tracking-[0.22em] text-gold-lit/85">
+                          Cover ready to upload ({fileName} · {formatBytes(coverFile.size)}) — transmitted as binary image data with your submission.
+                        </p>
+                      ) : null}
+                      <p id="sf-cover-note" className="mt-2 max-w-[48ch] text-xs leading-[1.7] text-white/65">
+                        Your selected cover image is uploaded directly to the submission endpoint (verified by file signature, up to 4 MB). If the server is unavailable and you open a manual email draft instead, attach the image file in your mail app before pressing Send.
                       </p>
                     </div>
                   </div>
@@ -449,31 +595,81 @@ path: '/submit',
                       </span>
                     </label>
                     <FieldHint id="sf-original-err" show={errors.includes('original')}>The desk needs this before the piece can be read.</FieldHint>
-                    <p className="mt-5 max-w-[58ch] font-mono text-[9px] uppercase leading-[2.1] tracking-[0.22em] text-white/45">
-                      Privacy — your name, email and handle are used for this submission only. The desk keeps no list beyond it, sells nothing, and deletes on request at {BRAND.email}. The work is not published unless it is featured — and never without your credit.
+                    <p className="mt-5 max-w-[58ch] font-mono text-[9px] uppercase leading-[2.1] tracking-[0.22em] text-white/60">
+                      Privacy — your name, email, handle, manuscript, and optional cover image are sent to the Verlyse submission endpoint to forward this submission to {BRAND.email}. Submission addresses are not added to the newsletter list, and work is published only if selected and credited to you. Questions about a submission may be sent to {BRAND.email}.
                     </p>
-                    <p className="mt-3 max-w-[58ch] font-mono text-[9px] uppercase leading-[2.1] tracking-[0.22em] text-white/45">
-                      Review window — the desk reads everything. Expect an answer within two weeks; selected pieces are set for the following issue.
+                    <p className="mt-3 max-w-[58ch] font-mono text-[9px] uppercase leading-[2.1] tracking-[0.22em] text-white/60">
+                      Review window — the desk reads every received submission and replies from {BRAND.email} as pieces are reviewed for upcoming issues.
                     </p>
                   </div>
                 </div>
 
                 {/* ——— the final action ——— */}
                 <div className="flex flex-col items-start gap-5">
-                  <button type="submit" disabled={sending} aria-busy={sending} className="btn btn-gold self-start disabled:pointer-events-none disabled:opacity-60">
-                    {sending ? 'Sending the piece…' : 'Submit the piece'}
+                  <button
+                    type="submit"
+                    disabled={sending}
+                    aria-busy={sending}
+                    className="btn btn-gold self-start disabled:pointer-events-none disabled:opacity-60"
+                  >
+                    {sending
+                      ? coverFile
+                        ? 'Uploading cover & sending…'
+                        : 'Sending the piece…'
+                      : uiState === 'failed'
+                        ? 'Retry submission'
+                        : 'Submit the piece'}
                   </button>
-                  {(errors.length > 0 || fileError) && (
+
+                  {hasValidationAlert && (
                     <p role="alert" className="font-mono text-[10px] uppercase tracking-[0.24em] text-[#E8A2A2]">
                       A few required lines remain — the desk has marked them ({errors.length + (fileError ? 1 : 0)} {errors.length + (fileError ? 1 : 0) === 1 ? 'item' : 'items'}).
                     </p>
                   )}
+
+                  {!hasValidationAlert && uiState === 'failed' && deliveryError && (
+                    <div
+                      role="alert"
+                      data-testid="submit-delivery-alert"
+                      className="w-full max-w-[56ch] border border-[#E8A2A2]/55 bg-wine-deep/80 px-5 py-5 text-left"
+                    >
+                      <p className="font-mono text-[10px] uppercase tracking-[0.24em] text-[#E8A2A2]">
+                        Submission not yet delivered — action needed
+                      </p>
+                      <p className="mt-2 text-sm leading-[1.75] text-ivory/90">
+                        {deliveryError}
+                      </p>
+                      {lastDraft && (
+                        <div className="mt-4 flex flex-col items-start gap-3 border-t border-white/10 pt-4">
+                          <a
+                            href={buildSubmissionMailtoHref(lastDraft)}
+                            onClick={() => setDraftOpened(true)}
+                            className="inline-flex items-center gap-2 border border-gold/60 px-4 py-2 font-mono text-[9px] uppercase tracking-[0.24em] text-gold no-underline transition-colors hover:border-gold hover:bg-gold/10"
+                          >
+                            Open email draft in your mail app ({BRAND.email})
+                          </a>
+                          <p className="text-xs leading-[1.7] text-white/65">
+                            Opening an email draft does not automatically send your submission: you must still press <strong>Send</strong> in your mail app
+                            {lastDraft.fileName
+                              ? `, and manually attach "${lastDraft.fileName}" because mailto: links cannot attach local image files automatically.`
+                              : '.'}
+                          </p>
+                          {draftOpened && (
+                            <p role="status" className="font-mono text-[9px] uppercase tracking-[0.22em] text-gold">
+                              Email draft requested — attach any cover image and press Send in your mail client to complete delivery.
+                            </p>
+                          )}
+                        </div>
+                      )}
+                    </div>
+                  )}
+
                   <p aria-live="polite" className="max-w-[52ch] text-sm leading-[1.8] text-white/60">
                     {sending
-                      ? 'The piece is crossing to the desk — one moment.'
+                      ? 'The piece is crossing to the submission server — one moment.'
                       : 'We carefully curate each submission — every post is more than content; the writer keeps the byline, the tools are disclosed, and the desk answers.'}
                   </p>
-                  <p className="font-mono text-[9px] uppercase leading-[2] tracking-[0.30em] text-white/45">
+                  <p className="font-mono text-[9px] uppercase leading-[2] tracking-[0.30em] text-white/60">
                     Delivered to the desk · credited by name · answered by {BRAND.email}
                   </p>
                 </div>

@@ -250,9 +250,11 @@ const SCENES: Record<EndingSceneKind, (p: Palette) => ReactNode> = {
 export default function StoryEnding3D({
   article,
   activePhase,
+  inView,
 }: {
   article: Article
   activePhase?: Phase
+  inView?: boolean
 }) {
   const reduce = useReducedMotion() === true
   const { supported } = useWebGLSupport()
@@ -263,7 +265,9 @@ export default function StoryEnding3D({
   const [internalPhase, setInternalPhase] = useState<Phase>(
     supported && !reduce ? 'RESTING' : reduce ? 'REDUCED' : 'FALLBACK'
   )
+  const [internalNear, setInternalNear] = useState(true)
   const phase = activePhase ?? internalPhase
+  const isNear = inView ?? internalNear
 
   const ending = getEndingStatic(article)
   const palette: Palette = { primary: ending.palette.primary, secondary: ending.palette.secondary }
@@ -276,34 +280,29 @@ export default function StoryEnding3D({
     return () => document.removeEventListener('visibilitychange', onVis)
   }, [])
 
-  // Activate on approach when rendered standalone without EndingSpatialStage.
+  // Activate & bidirectionally track viewport visibility when rendered standalone.
   useEffect(() => {
     if (activePhase !== undefined || reduce || !supported || !wrap.current) return undefined
     const el = wrap.current
-    let done = false
     const activate = () => {
-      if (done) return
-      done = true
       setInternalPhase((p) => (p === 'RESTING' ? 'ENTERING' : p))
     }
     const check = () => {
-      if (done || !wrap.current) return
+      if (!wrap.current) return
       const r = wrap.current.getBoundingClientRect()
-      if (r.top < window.innerHeight * 1.1 && r.bottom > -60) {
-        activate()
-      }
+      const visible = r.top < window.innerHeight * 1.1 && r.bottom > -60
+      setInternalNear(visible)
+      if (visible) activate()
     }
     check()
-    if (done) return undefined
 
     let io: IntersectionObserver | null = null
     if ('IntersectionObserver' in window) {
       io = new IntersectionObserver(
         (entries) => {
-          if (entries.some((entry) => entry.isIntersecting)) {
-            activate()
-            io?.disconnect()
-          }
+          const hit = entries.some((entry) => entry.isIntersecting)
+          setInternalNear(hit)
+          if (hit) activate()
         },
         { rootMargin: '240px 0px' }
       )
@@ -332,7 +331,7 @@ export default function StoryEnding3D({
   const render =
     (phase === 'ALIVE' || phase === 'ENTERING') && !reduce && supported && tabVisible ? (
       <Canvas
-        frameloop={phase === 'ALIVE' && tabVisible ? 'always' : 'demand'}
+        frameloop={phase === 'ALIVE' && tabVisible && isNear ? 'always' : 'demand'}
         dpr={[1, 1.5]}
         camera={{ position: [0, 0, 6], fov: 45 }}
         // Same ACES filmic grade as the spatial archive, so an article's ending

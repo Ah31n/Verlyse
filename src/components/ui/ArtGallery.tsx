@@ -114,7 +114,7 @@ export default function ArtGallery({ article }: { article: Article }) {
               {author ? ` — ${author.name}` : ''}
             </h2>
             {article.credit && (
-              <p className="mt-1.5 font-mono text-[9px] uppercase tracking-[0.26em] text-gold/85">
+              <p className="mt-1.5 font-mono text-[9px] uppercase tracking-[0.26em] text-gold-lit/85">
                 {article.credit}
               </p>
             )}

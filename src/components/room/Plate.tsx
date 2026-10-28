@@ -97,7 +97,7 @@ export default function Plate({
                 {folio.author}
               </p>
             )}
-            <p className="mt-2 font-mono text-[10px] uppercase tracking-[0.18em] text-[#8A8178] md:text-[11px]">
+            <p className="mt-2 font-mono text-[10px] uppercase tracking-[0.18em] text-[#6E665D] md:text-[11px]">
               {folio.category.toUpperCase()}
               {state === 'settle' ? ` · ${folio.date}` : ''} · {min(folio.readingTime)}
             </p>
@@ -124,7 +124,7 @@ export default function Plate({
                   <button
                     type="button"
                     onClick={onBack}
-                    className="font-mono text-[12px] uppercase tracking-[0.22em] text-[#8A8178] transition-colors hover:text-[#241D18] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#8A8178]"
+                    className="font-mono text-[12px] uppercase tracking-[0.22em] text-[#6E665D] transition-colors hover:text-[#241D18] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#6E665D]"
                   >
                     Return ←
                   </button>

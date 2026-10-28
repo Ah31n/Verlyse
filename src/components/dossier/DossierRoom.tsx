@@ -127,7 +127,7 @@ export default function DossierRoom({ author }: { author: Author }) {
               <p className="font-mono text-[11px] font-semibold uppercase tracking-[0.3em] text-[#7C6338]">
                 The Dossier
               </p>
-              <p className="font-mono text-[9px] uppercase tracking-[0.16em] text-[#8A8178]">
+              <p className="font-mono text-[9px] uppercase tracking-[0.16em] text-[#6E665D]">
                 Verlyse Media · Contributor Archive · Record {record} / {total}
               </p>
             </div>
@@ -187,31 +187,31 @@ export default function DossierRoom({ author }: { author: Author }) {
                 </p>
                 <dl className="mt-4 space-y-2.5 font-mono text-[10px] uppercase tracking-[0.1em] text-[#241D18]/80">
                   <div className="flex justify-between gap-4 border-b border-[#3A332C]/30 pb-2">
-                    <dt className="text-[#8A8178]">{coCredit ? 'First co-credit' : 'First folio'}</dt>
+                    <dt className="text-[#6E665D]">{coCredit ? 'First co-credit' : 'First folio'}</dt>
                     <dd>{first ? first.date.split('-').reverse().join('.') : '—'}</dd>
                   </div>
                   {works.length > 0 && (
                     <div className="flex justify-between gap-4 border-b border-[#3A332C]/30 pb-2">
-                      <dt className="text-[#8A8178]">Primary folios</dt>
+                      <dt className="text-[#6E665D]">Primary folios</dt>
                       <dd>{works.map((w) => `№ ${folioOf(w.id)}`).join(' · ')}</dd>
                     </div>
                   )}
                   {coWorks.length > 0 && (
                     <div className="flex justify-between gap-4 border-b border-[#3A332C]/30 pb-2">
-                      <dt className="text-[#8A8178]">Co-credits</dt>
+                      <dt className="text-[#6E665D]">Co-credits</dt>
                       <dd>{coWorks.map((w) => `№ ${folioOf(w.id)}`).join(' · ')}</dd>
                     </div>
                   )}
                   <div className="flex justify-between gap-4 border-b border-[#3A332C]/30 pb-2">
-                    <dt className="text-[#8A8178]">Portrait</dt>
+                    <dt className="text-[#6E665D]">Portrait</dt>
                     <dd>{portrait ? 'on file' : 'the monogram'}</dd>
                   </div>
                   <div className="flex justify-between gap-4 border-b border-[#3A332C]/30 pb-2">
-                    <dt className="text-[#8A8178]">Role</dt>
+                    <dt className="text-[#6E665D]">Role</dt>
                     <dd className="max-w-[55%] text-right">{author.role}</dd>
                   </div>
                   <div className="flex justify-between gap-4 pb-2">
-                    <dt className="text-[#8A8178]">Status</dt>
+                    <dt className="text-[#6E665D]">Status</dt>
                     <dd>{author.confirmed ? 'Confirmed contributor' : 'Pending'}</dd>
                   </div>
                 </dl>
